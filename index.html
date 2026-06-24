@@ -35,18 +35,29 @@
         .stat-value { font-size: 24px; font-weight: bold; color: #3b82f6; }
         .stat-label { color: #94a3b8; font-size: 12px; margin-top: 4px; }
         
-        /* ===== WEEKLY BONUS ===== */
-        .weekly-bonus { background: linear-gradient(135deg, #7c3aed, #2563eb); padding: 16px; border-radius: 16px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; animation: pulse 2s infinite; }
-        .weekly-bonus.hidden { display: none; }
+        /* ===== WEEKLY BONUS BUTTON ===== */
+        .weekly-bonus-btn {
+            background: linear-gradient(135deg, #7c3aed, #2563eb);
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.3s;
+            animation: pulse 2s infinite;
+        }
+        .weekly-bonus-btn:active { transform: scale(0.97); }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(124,58,237,0.4); } 70% { box-shadow: 0 0 0 10px rgba(124,58,237,0); } 100% { box-shadow: 0 0 0 0 rgba(124,58,237,0); } }
-        .weekly-bonus .bonus-text h4 { font-size: 16px; }
-        .weekly-bonus .bonus-text p { font-size: 12px; opacity: 0.9; }
-        .weekly-bonus .bonus-btn { background: white; color: #7c3aed; padding: 10px 20px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; }
-        .weekly-bonus .bonus-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .weekly-bonus .day-progress { display: flex; gap: 4px; margin-top: 8px; justify-content: center; }
-        .weekly-bonus .day-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.2); }
-        .weekly-bonus .day-dot.active { background: #fbbf24; box-shadow: 0 0 10px rgba(251,191,36,0.5); }
-        .weekly-bonus .day-dot.claimed { background: #22c55e; }
+        .weekly-bonus-btn .bonus-text h4 { font-size: 16px; }
+        .weekly-bonus-btn .bonus-text p { font-size: 12px; opacity: 0.9; }
+        .weekly-bonus-btn .arrow { font-size: 24px; color: rgba(255,255,255,0.7); }
+        .weekly-bonus-btn .day-progress { display: flex; gap: 4px; margin-top: 8px; justify-content: flex-start; }
+        .weekly-bonus-btn .day-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.2); }
+        .weekly-bonus-btn .day-dot.active { background: #fbbf24; box-shadow: 0 0 10px rgba(251,191,36,0.5); }
+        .weekly-bonus-btn .day-dot.claimed { background: #22c55e; }
+        .weekly-bonus-btn .day-dot.locked { background: rgba(255,255,255,0.1); }
         
         .tap-section { text-align: center; padding: 20px 0; margin-bottom: 24px; }
         .tap-coin { width: 180px; height: 180px; background: radial-gradient(circle at 30% 30%, #fbbf24, #f59e0b); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; cursor: pointer; box-shadow: 0 0 40px rgba(251,191,36,0.3); transition: transform 0.1s; user-select: none; -webkit-tap-highlight-color: transparent; position: relative; }
@@ -127,6 +138,25 @@
         .banned-overlay p { color: #94a3b8; text-align: center; max-width: 400px; line-height: 1.6; }
         .banned-overlay .ban-reason { background: #1a1f3a; padding: 16px; border-radius: 12px; margin-top: 16px; max-width: 400px; color: #fbbf24; border: 1px solid rgba(239,68,68,0.3); }
         .banned-overlay .ban-time { color: #6b7280; font-size: 12px; margin-top: 8px; }
+
+        /* ===== WEEKLY BONUS PAGE ===== */
+        .weekly-page { display: none; padding: 16px 0; }
+        .weekly-page.show { display: block; }
+        .weekly-page .back-btn { background: rgba(255,255,255,0.1); border: none; color: white; padding: 10px 16px; border-radius: 12px; cursor: pointer; margin-bottom: 16px; font-size: 14px; }
+        .weekly-page .back-btn i { margin-right: 8px; }
+        .weekly-page .day-box { background: #1a1f3a; border-radius: 16px; padding: 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between; }
+        .weekly-page .day-box .day-info { display: flex; flex-direction: column; align-items: flex-start; }
+        .weekly-page .day-box .day-info .day-name { font-size: 16px; font-weight: bold; }
+        .weekly-page .day-box .day-info .day-reward { font-size: 12px; color: #94a3b8; }
+        .weekly-page .day-box .day-status { padding: 6px 16px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+        .weekly-page .day-box .day-status.available { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; cursor: pointer; }
+        .weekly-page .day-box .day-status.claimed { background: #334155; color: #94a3b8; }
+        .weekly-page .day-box .day-status.locked { background: #1e293b; color: #6b7280; }
+        .weekly-page .day-box .day-status.ad-required { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; cursor: pointer; animation: pulse 1.5s infinite; }
+        .weekly-page .day-box .ad-box { width: 100%; margin-top: 12px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 12px; display: none; }
+        .weekly-page .day-box .ad-box.show { display: block; }
+        .weekly-page .day-box .ad-box .ad-label { font-size: 10px; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; text-align: center; margin-bottom: 8px; }
+        .weekly-page .day-box .ad-box .claim-btn { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; padding: 8px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; margin-top: 8px; width: 100%; }
     </style>
 </head>
 <body>
@@ -167,11 +197,11 @@
             <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-value" id="dailyStreak">0</div><div class="stat-label">Day Streak</div></div>
         </div>
 
-        <!-- ===== WEEKLY BONUS (7 Days) ===== -->
-        <div class="weekly-bonus" id="weeklyBonus">
+        <!-- ===== WEEKLY BONUS BUTTON ===== -->
+        <div class="weekly-bonus-btn" onclick="openWeeklyPage()">
             <div class="bonus-text">
                 <h4>📅 Weekly Bonus</h4>
-                <p id="weeklyBonusDesc">Claim your weekly reward!</p>
+                <p id="weeklyBonusDesc">Tap to claim your weekly rewards!</p>
                 <div class="day-progress" id="weeklyProgress">
                     <div class="day-dot" data-day="0"></div>
                     <div class="day-dot" data-day="1"></div>
@@ -182,7 +212,14 @@
                     <div class="day-dot" data-day="6"></div>
                 </div>
             </div>
-            <button class="bonus-btn" id="weeklyBonusBtn" onclick="claimWeeklyBonus()">Claim</button>
+            <div class="arrow">➜</div>
+        </div>
+
+        <!-- ===== WEEKLY BONUS PAGE ===== -->
+        <div class="weekly-page" id="weeklyPage">
+            <button class="back-btn" onclick="closeWeeklyPage()"><i class="fas fa-arrow-left"></i> Back</button>
+            <h3 class="section-title">📅 Weekly Rewards</h3>
+            <div id="weeklyDaysContainer"></div>
         </div>
 
         <div class="tab-content active" id="tabHome">
@@ -259,6 +296,7 @@
     <div class="modal" id="conversionModal"><div class="modal-content"><div class="success-animation">💰</div><h3>Coins Converted to USD!</h3><p id="conversionText">Your coins have been converted to USD</p><button onclick="closeConversionModal()">Awesome!</button></div></div>
     <div class="modal" id="weeklyBonusModal"><div class="modal-content"><div class="success-animation">📅</div><h3>Weekly Bonus Claimed!</h3><p id="weeklyBonusRewardText">You earned +50 Coins</p><button onclick="closeWeeklyBonusModal()">Awesome!</button></div></div>
     <div class="modal" id="withdrawModal"><div class="modal-content"><div class="success-animation">💳</div><h3 id="withdrawModalTitle">Withdrawal</h3><p id="withdrawModalText">Processing your withdrawal...</p><button onclick="closeWithdrawModal()">OK</button></div></div>
+    <div class="modal" id="adModal"><div class="modal-content"><div class="success-animation">📺</div><h3>Watch Ad to Claim</h3><p id="adModalText">Please watch the ad to claim your reward</p><div id="adModalContent"></div><button onclick="closeAdModal()">Skip</button></div></div>
 
     <div class="toast" id="toast"></div>
 
@@ -285,7 +323,7 @@
             userId = tg.initDataUnsafe.user.id.toString();
         }
 
-        // ==================== GET USER IP & COUNTRY ====================
+        // ==================== GET USER INFO ====================
         let userIP = 'Unknown';
         let userCountry = 'Unknown';
         let userISP = 'Unknown';
@@ -318,8 +356,8 @@
             dailyStreak: 0,
             userLevel: 1,
             tasksCompleted: [],
-            lastWeeklyClaim: null,
-            weeklyDay: 0,
+            weeklyClaimed: [],
+            weeklyAdWatched: [],
             tapCount: 0,
             tapEnergy: 100,
             purchasedOffers: {},
@@ -335,7 +373,8 @@
             ip: '',
             country: '',
             isVPN: false,
-            isp: ''
+            isp: '',
+            weekStart: null
         };
 
         let tasks = [];
@@ -355,38 +394,10 @@
         const rateRef = database.ref('conversionRate');
         const withdrawRef = database.ref('withdrawSettings');
 
-        // ==================== WEEKLY BONUS ====================
-        function updateWeeklyBonusUI() {
-            const today = new Date();
-            const weekStart = getWeekStart(today);
-            const weekKey = weekStart.toDateString();
-            
-            const isClaimed = appState.lastWeeklyClaim === weekKey;
-            const bonusDiv = document.getElementById('weeklyBonus');
-            const bonusBtn = document.getElementById('weeklyBonusBtn');
-            const progressContainer = document.getElementById('weeklyProgress');
-            
-            if (isClaimed) {
-                bonusDiv.classList.add('hidden');
-                return;
-            }
-            
-            bonusDiv.classList.remove('hidden');
-            bonusBtn.disabled = false;
-            
-            // Update progress dots
-            const dayOfWeek = today.getDay(); // 0=Sunday, 1=Monday, etc.
-            const dots = progressContainer.querySelectorAll('.day-dot');
-            dots.forEach((dot, index) => {
-                dot.classList.remove('active', 'claimed');
-                if (index < dayOfWeek) {
-                    dot.classList.add('claimed');
-                } else if (index === dayOfWeek) {
-                    dot.classList.add('active');
-                }
-            });
-        }
+        const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const REWARDS = [10, 15, 20, 25, 30, 40, 50];
 
+        // ==================== WEEKLY BONUS SYSTEM ====================
         function getWeekStart(date) {
             const d = new Date(date);
             const day = d.getDay();
@@ -396,42 +407,271 @@
             return d;
         }
 
-        function claimWeeklyBonus() {
+        function getWeekKey(date) {
+            return getWeekStart(date).toDateString();
+        }
+
+        function updateWeeklyUI() {
             const today = new Date();
+            const weekKey = getWeekKey(today);
             const weekStart = getWeekStart(today);
-            const weekKey = weekStart.toDateString();
             
-            if (appState.lastWeeklyClaim === weekKey) {
-                showToast('Already claimed this week!', 'error');
+            // Initialize week if not set
+            if (!appState.weekStart || appState.weekStart !== weekKey) {
+                appState.weekStart = weekKey;
+                appState.weeklyClaimed = [];
+                appState.weeklyAdWatched = [];
+                userRef.update({
+                    weekStart: weekKey,
+                    weeklyClaimed: [],
+                    weeklyAdWatched: []
+                });
+            }
+
+            // Update progress dots
+            const todayDay = today.getDay();
+            const dots = document.querySelectorAll('.day-dot');
+            dots.forEach((dot, index) => {
+                dot.classList.remove('active', 'claimed', 'locked');
+                if (index < todayDay) {
+                    if (appState.weeklyClaimed && appState.weeklyClaimed.includes(index)) {
+                        dot.classList.add('claimed');
+                    } else {
+                        dot.classList.add('locked');
+                    }
+                } else if (index === todayDay) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.add('locked');
+                }
+            });
+
+            // Update description
+            const claimedCount = appState.weeklyClaimed ? appState.weeklyClaimed.length : 0;
+            if (claimedCount >= 7) {
+                document.getElementById('weeklyBonusDesc').textContent = '🎉 All rewards claimed this week!';
+            } else {
+                document.getElementById('weeklyBonusDesc').textContent = `📅 ${claimedCount}/7 days claimed`;
+            }
+
+            renderWeeklyDays();
+        }
+
+        function renderWeeklyDays() {
+            const container = document.getElementById('weeklyDaysContainer');
+            const today = new Date();
+            const todayDay = today.getDay();
+            const weekKey = getWeekKey(today);
+
+            let html = '';
+            for (let i = 0; i < 7; i++) {
+                const isToday = i === todayDay;
+                const isPast = i < todayDay;
+                const isClaimed = appState.weeklyClaimed && appState.weeklyClaimed.includes(i);
+                const adWatched = appState.weeklyAdWatched && appState.weeklyAdWatched.includes(i);
+                
+                let status = 'locked';
+                let statusText = '🔒 Locked';
+                let statusClass = 'locked';
+                let canClaim = false;
+                let showAd = false;
+
+                if (isClaimed) {
+                    status = 'claimed';
+                    statusText = '✅ Claimed';
+                    statusClass = 'claimed';
+                } else if (isToday) {
+                    if (adWatched) {
+                        status = 'available';
+                        statusText = '🎁 Claim Now';
+                        statusClass = 'available';
+                        canClaim = true;
+                    } else {
+                        status = 'ad-required';
+                        statusText = '📺 Watch Ad';
+                        statusClass = 'ad-required';
+                        showAd = true;
+                    }
+                } else if (isPast && !isClaimed) {
+                    status = 'locked';
+                    statusText = '🔒 Missed';
+                    statusClass = 'locked';
+                } else {
+                    status = 'locked';
+                    statusText = '🔒 Coming Soon';
+                    statusClass = 'locked';
+                }
+
+                const reward = REWARDS[i] || 10;
+                const dayName = DAYS[i];
+
+                html += `
+                    <div class="day-box" data-day="${i}">
+                        <div class="day-info">
+                            <span class="day-name">${dayName}</span>
+                            <span class="day-reward">+${reward} 🪙 Coins</span>
+                        </div>
+                        <div class="day-status ${statusClass}" onclick="handleDayClick(${i})">
+                            ${statusText}
+                        </div>
+                    </div>
+                `;
+
+                // Add ad box if needed
+                if (showAd && !isClaimed) {
+                    html += `
+                        <div class="day-box" style="border-color: rgba(251,191,36,0.3);">
+                            <div class="ad-box show" style="display:block;">
+                                <div class="ad-label">📺 Watch Ad to Unlock</div>
+                                <div id="adContainer_${i}" style="padding:12px; background:#0a0e27; border-radius:8px; min-height:80px;">
+                                    <p style="color:#94a3b8; font-size:13px;">Loading ad...</p>
+                                </div>
+                                <button class="claim-btn" onclick="watchAdAndClaim(${i})">🎬 Watch & Claim</button>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            container.innerHTML = html;
+
+            // Load ads for today
+            if (!appState.weeklyClaimed || !appState.weeklyClaimed.includes(todayDay)) {
+                const adContainer = document.getElementById(`adContainer_${todayDay}`);
+                if (adContainer) {
+                    // You can put your ad code here (Monetag, etc.)
+                    adContainer.innerHTML = `
+                        <div style="padding:12px; background:#1a1f3a; border-radius:8px; text-align:center;">
+                            <p style="color:#fbbf24; font-size:14px;">📺 Ad Placeholder</p>
+                            <p style="color:#94a3b8; font-size:11px; margin-top:4px;">Add your Monetag ad code here</p>
+                            <div style="margin-top:8px; padding:8px; background:#0a0e27; border-radius:4px; font-size:12px; color:#6b7280;">
+                                ⏱️ Watch 5 seconds to claim
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        function handleDayClick(day) {
+            const today = new Date().getDay();
+            const isClaimed = appState.weeklyClaimed && appState.weeklyClaimed.includes(day);
+            
+            if (isClaimed) {
+                showToast('Already claimed!', 'error');
                 return;
             }
+
+            if (day !== today) {
+                showToast('You can only claim today\'s reward!', 'error');
+                return;
+            }
+
+            // Check if ad watched
+            const adWatched = appState.weeklyAdWatched && appState.weeklyAdWatched.includes(day);
+            if (!adWatched) {
+                showToast('Please watch the ad first!', 'error');
+                return;
+            }
+
+            claimWeeklyReward(day);
+        }
+
+        function watchAdAndClaim(day) {
+            const today = new Date().getDay();
+            if (day !== today) {
+                showToast('You can only claim today\'s reward!', 'error');
+                return;
+            }
+
+            // Simulate ad watching
+            showToast('⏳ Watching ad... Please wait');
             
-            const dayOfWeek = today.getDay() + 1; // 1-7
-            const bonusAmount = dayOfWeek * 10; // Day 1 = 10, Day 7 = 70
-            
-            appState.balance += bonusAmount;
+            // Show ad modal
+            document.getElementById('adModalText').textContent = 'Please watch the ad to claim your reward';
+            document.getElementById('adModalContent').innerHTML = `
+                <div style="padding:12px; background:#0a0e27; border-radius:8px; margin:12px 0;">
+                    <p style="color:#fbbf24; font-size:16px;">📺 Ad Playing...</p>
+                    <p style="color:#94a3b8; font-size:12px;">Please wait 5 seconds</p>
+                    <div style="width:100%; height:4px; background:#334155; border-radius:2px; margin-top:8px; overflow:hidden;">
+                        <div id="adProgress" style="width:0%; height:100%; background:linear-gradient(135deg,#22c55e,#16a34a); transition:width 0.1s;"></div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('adModal').classList.add('active');
+
+            let progress = 0;
+            const adInterval = setInterval(() => {
+                progress += 10;
+                const progressBar = document.getElementById('adProgress');
+                if (progressBar) {
+                    progressBar.style.width = progress + '%';
+                }
+                if (progress >= 100) {
+                    clearInterval(adInterval);
+                    document.getElementById('adModalText').textContent = '✅ Ad watched successfully!';
+                    document.getElementById('adModalContent').innerHTML = `
+                        <div style="padding:12px; background:#0a0e27; border-radius:8px; margin:12px 0;">
+                            <p style="color:#22c55e; font-size:16px;">🎉 Ad Completed!</p>
+                            <p style="color:#94a3b8; font-size:12px;">You can now claim your reward</p>
+                        </div>
+                    `;
+                    
+                    // Mark ad as watched
+                    if (!appState.weeklyAdWatched) appState.weeklyAdWatched = [];
+                    if (!appState.weeklyAdWatched.includes(day)) {
+                        appState.weeklyAdWatched.push(day);
+                        userRef.update({ weeklyAdWatched: appState.weeklyAdWatched });
+                    }
+                    
+                    setTimeout(() => {
+                        document.getElementById('adModal').classList.remove('active');
+                        claimWeeklyReward(day);
+                    }, 1500);
+                }
+            }, 500);
+        }
+
+        function claimWeeklyReward(day) {
+            const reward = REWARDS[day] || 10;
+            appState.balance += reward;
             appState.dailyStreak++;
-            appState.lastWeeklyClaim = weekKey;
-            appState.weeklyDay = dayOfWeek;
             
-            userRef.update({ 
-                balance: appState.balance, 
-                dailyStreak: appState.dailyStreak, 
-                lastWeeklyClaim: weekKey,
-                weeklyDay: dayOfWeek
+            if (!appState.weeklyClaimed) appState.weeklyClaimed = [];
+            if (!appState.weeklyClaimed.includes(day)) {
+                appState.weeklyClaimed.push(day);
+            }
+
+            userRef.update({
+                balance: appState.balance,
+                dailyStreak: appState.dailyStreak,
+                weeklyClaimed: appState.weeklyClaimed
             });
-            
-            document.getElementById('weeklyBonusRewardText').textContent = `You earned +${bonusAmount} Coins! 📅`;
+
+            document.getElementById('weeklyBonusRewardText').textContent = `You earned +${reward} Coins! 📅`;
             document.getElementById('weeklyBonusModal').classList.add('active');
-            
+
             updateUI();
             updateUSDDisplay();
-            updateWeeklyBonusUI();
-            showToast(`Weekly bonus claimed! +${bonusAmount} coins`);
+            updateWeeklyUI();
+            showToast(`Weekly bonus claimed! +${reward} coins`);
+        }
+
+        function openWeeklyPage() {
+            document.getElementById('weeklyPage').classList.add('show');
+            document.getElementById('weeklyPage').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function closeWeeklyPage() {
+            document.getElementById('weeklyPage').classList.remove('show');
         }
 
         function closeWeeklyBonusModal() {
             document.getElementById('weeklyBonusModal').classList.remove('active');
+        }
+
+        function closeAdModal() {
+            document.getElementById('adModal').classList.remove('active');
         }
 
         // ==================== WITHDRAW ====================
@@ -955,7 +1195,7 @@
                     updateUI();
                     updateTapUI();
                     updateUSDDisplay();
-                    updateWeeklyBonusUI();
+                    updateWeeklyUI();
                     updateWithdrawUI();
                     renderEnergyOffers();
                     
@@ -967,7 +1207,6 @@
                         country: userCountry,
                         isVPN: isVPN,
                         isp: userISP
-                        // loginCount বাদ, টাইম বাদ
                     });
                     
                     startConversionTimer();
@@ -982,6 +1221,7 @@
                     }
                 } else {
                     const today = new Date().toDateString();
+                    const weekKey = getWeekKey(new Date());
                     const newUser = {
                         balance: 100,
                         usdBalance: 0,
@@ -990,8 +1230,9 @@
                         dailyStreak: 0,
                         userLevel: 1,
                         tasksCompleted: [],
-                        lastWeeklyClaim: null,
-                        weeklyDay: 0,
+                        weeklyClaimed: [],
+                        weeklyAdWatched: [],
+                        weekStart: weekKey,
                         tapCount: 0,
                         tapEnergy: 100,
                         purchasedOffers: {},
@@ -1015,7 +1256,7 @@
                     updateUI();
                     updateTapUI();
                     updateUSDDisplay();
-                    updateWeeklyBonusUI();
+                    updateWeeklyUI();
                     updateWithdrawUI();
                     updateRechargeTimer();
                     renderEnergyOffers();
