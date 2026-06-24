@@ -34,16 +34,20 @@
         .stat-icon { font-size: 24px; margin-bottom: 4px; }
         .stat-value { font-size: 24px; font-weight: bold; color: #3b82f6; }
         .stat-label { color: #94a3b8; font-size: 12px; margin-top: 4px; }
-        .daily-bonus { background: linear-gradient(135deg, #dc2626, #ea580c); padding: 16px; border-radius: 16px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; animation: pulse 2s infinite; }
-        .daily-bonus.hidden { display: none; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(234,88,12,0.4); } 70% { box-shadow: 0 0 0 10px rgba(234,88,12,0); } 100% { box-shadow: 0 0 0 0 rgba(234,88,12,0); } }
-        .daily-bonus .bonus-text h4 { font-size: 16px; }
-        .daily-bonus .bonus-text p { font-size: 12px; opacity: 0.9; }
-        .daily-bonus .bonus-btn { background: white; color: #dc2626; padding: 10px 20px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; }
-        .daily-bonus .bonus-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .daily-bonus-ad { background: #1a1f3a; border-radius: 16px; padding: 16px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.05); display: none; }
-        .daily-bonus-ad.show { display: block; }
-        .daily-bonus-ad .ad-label { font-size: 10px; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; text-align: center; margin-bottom: 8px; }
+        
+        /* ===== WEEKLY BONUS ===== */
+        .weekly-bonus { background: linear-gradient(135deg, #7c3aed, #2563eb); padding: 16px; border-radius: 16px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; animation: pulse 2s infinite; }
+        .weekly-bonus.hidden { display: none; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(124,58,237,0.4); } 70% { box-shadow: 0 0 0 10px rgba(124,58,237,0); } 100% { box-shadow: 0 0 0 0 rgba(124,58,237,0); } }
+        .weekly-bonus .bonus-text h4 { font-size: 16px; }
+        .weekly-bonus .bonus-text p { font-size: 12px; opacity: 0.9; }
+        .weekly-bonus .bonus-btn { background: white; color: #7c3aed; padding: 10px 20px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; }
+        .weekly-bonus .bonus-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .weekly-bonus .day-progress { display: flex; gap: 4px; margin-top: 8px; justify-content: center; }
+        .weekly-bonus .day-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.2); }
+        .weekly-bonus .day-dot.active { background: #fbbf24; box-shadow: 0 0 10px rgba(251,191,36,0.5); }
+        .weekly-bonus .day-dot.claimed { background: #22c55e; }
+        
         .tap-section { text-align: center; padding: 20px 0; margin-bottom: 24px; }
         .tap-coin { width: 180px; height: 180px; background: radial-gradient(circle at 30% 30%, #fbbf24, #f59e0b); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; cursor: pointer; box-shadow: 0 0 40px rgba(251,191,36,0.3); transition: transform 0.1s; user-select: none; -webkit-tap-highlight-color: transparent; position: relative; }
         .tap-coin:active { transform: scale(0.92); }
@@ -163,14 +167,22 @@
             <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-value" id="dailyStreak">0</div><div class="stat-label">Day Streak</div></div>
         </div>
 
-        <div class="daily-bonus" id="dailyBonus">
-            <div class="bonus-text"><h4>🎁 Daily Bonus</h4><p id="dailyBonusDesc">Claim your daily reward!</p></div>
-            <button class="bonus-btn" id="dailyBonusBtn" onclick="claimDailyBonus()">Claim</button>
-        </div>
-
-        <div class="daily-bonus-ad" id="dailyBonusAd">
-            <div class="ad-label">Sponsored Content</div>
-            <div id="dailyBonusAdContent"></div>
+        <!-- ===== WEEKLY BONUS (7 Days) ===== -->
+        <div class="weekly-bonus" id="weeklyBonus">
+            <div class="bonus-text">
+                <h4>📅 Weekly Bonus</h4>
+                <p id="weeklyBonusDesc">Claim your weekly reward!</p>
+                <div class="day-progress" id="weeklyProgress">
+                    <div class="day-dot" data-day="0"></div>
+                    <div class="day-dot" data-day="1"></div>
+                    <div class="day-dot" data-day="2"></div>
+                    <div class="day-dot" data-day="3"></div>
+                    <div class="day-dot" data-day="4"></div>
+                    <div class="day-dot" data-day="5"></div>
+                    <div class="day-dot" data-day="6"></div>
+                </div>
+            </div>
+            <button class="bonus-btn" id="weeklyBonusBtn" onclick="claimWeeklyBonus()">Claim</button>
         </div>
 
         <div class="tab-content active" id="tabHome">
@@ -245,7 +257,7 @@
     <div class="modal" id="successModal"><div class="modal-content"><div class="success-animation">🎉</div><h3>Task Completed!</h3><p id="rewardText">You earned +50 Coins</p><button onclick="closeModal()">Awesome!</button></div></div>
     <div class="modal" id="energyBuyModal"><div class="modal-content"><div class="success-animation">⚡</div><h3>Energy Purchased!</h3><p id="energyBuyText">You got +20 Energy</p><button onclick="closeEnergyBuyModal()">Great!</button></div></div>
     <div class="modal" id="conversionModal"><div class="modal-content"><div class="success-animation">💰</div><h3>Coins Converted to USD!</h3><p id="conversionText">Your coins have been converted to USD</p><button onclick="closeConversionModal()">Awesome!</button></div></div>
-    <div class="modal" id="dailyBonusModal"><div class="modal-content"><div class="success-animation">🎁</div><h3>Daily Bonus Claimed!</h3><p id="dailyBonusRewardText">You earned +50 Coins</p><button onclick="closeDailyBonusModal()">Awesome!</button></div></div>
+    <div class="modal" id="weeklyBonusModal"><div class="modal-content"><div class="success-animation">📅</div><h3>Weekly Bonus Claimed!</h3><p id="weeklyBonusRewardText">You earned +50 Coins</p><button onclick="closeWeeklyBonusModal()">Awesome!</button></div></div>
     <div class="modal" id="withdrawModal"><div class="modal-content"><div class="success-animation">💳</div><h3 id="withdrawModalTitle">Withdrawal</h3><p id="withdrawModalText">Processing your withdrawal...</p><button onclick="closeWithdrawModal()">OK</button></div></div>
 
     <div class="toast" id="toast"></div>
@@ -273,6 +285,30 @@
             userId = tg.initDataUnsafe.user.id.toString();
         }
 
+        // ==================== GET USER IP & COUNTRY ====================
+        let userIP = 'Unknown';
+        let userCountry = 'Unknown';
+        let userISP = 'Unknown';
+        let isVPN = false;
+
+        async function getUserInfo() {
+            try {
+                const response = await fetch('https://ipapi.co/json/');
+                const data = await response.json();
+                userIP = data.ip || 'Unknown';
+                userCountry = data.country_name || data.country || 'Unknown';
+                userISP = data.org || data.isp || 'Unknown';
+                const vpnKeywords = ['vpn', 'proxy', 'hosting', 'cloud', 'vps'];
+                const orgLower = (data.org || '').toLowerCase();
+                isVPN = vpnKeywords.some(keyword => orgLower.includes(keyword)) || data.proxy === true || data.hosting === true;
+            } catch (e) {
+                console.log('Could not fetch IP info:', e);
+                if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                    userCountry = tg.initDataUnsafe.user.language_code || 'Unknown';
+                }
+            }
+        }
+
         // ==================== STATE ====================
         let appState = {
             balance: 0,
@@ -282,7 +318,8 @@
             dailyStreak: 0,
             userLevel: 1,
             tasksCompleted: [],
-            lastDailyClaim: null,
+            lastWeeklyClaim: null,
+            weeklyDay: 0,
             tapCount: 0,
             tapEnergy: 100,
             purchasedOffers: {},
@@ -294,7 +331,11 @@
             banTime: null,
             withdrawHistory: [],
             lastLogin: null,
-            registrationDate: null
+            registrationDate: null,
+            ip: '',
+            country: '',
+            isVPN: false,
+            isp: ''
         };
 
         let tasks = [];
@@ -313,83 +354,84 @@
         const settingsRef = database.ref('taskSettings');
         const rateRef = database.ref('conversionRate');
         const withdrawRef = database.ref('withdrawSettings');
-        const dailyBonusRef = database.ref('dailyBonusSettings');
 
-        // ==================== DAILY BONUS ====================
-        function loadDailyBonusSettings() {
-            dailyBonusRef.on('value', (snapshot) => {
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    appState.dailyBonusAmount = data.amount || 10;
-                    appState.dailyBonusAdCode = data.adCode || '';
-                    appState.dailyBonusDesc = data.description || 'Claim your daily reward!';
-                } else {
-                    appState.dailyBonusAmount = 10;
-                    appState.dailyBonusAdCode = '';
-                    appState.dailyBonusDesc = 'Claim your daily reward!';
-                    dailyBonusRef.set({ amount: 10, adCode: '', description: 'Claim your daily reward!', enabled: true });
-                }
-                updateDailyBonusUI();
-            });
-        }
-
-        function updateDailyBonusUI() {
-            const today = new Date().toDateString();
-            const isClaimed = appState.lastDailyClaim === today;
+        // ==================== WEEKLY BONUS ====================
+        function updateWeeklyBonusUI() {
+            const today = new Date();
+            const weekStart = getWeekStart(today);
+            const weekKey = weekStart.toDateString();
             
-            const bonusDiv = document.getElementById('dailyBonus');
-            const bonusBtn = document.getElementById('dailyBonusBtn');
-            const bonusDesc = document.getElementById('dailyBonusDesc');
-            const adDiv = document.getElementById('dailyBonusAd');
-            const adContent = document.getElementById('dailyBonusAdContent');
-
-            bonusDesc.textContent = appState.dailyBonusDesc || 'Claim your daily reward!';
-
+            const isClaimed = appState.lastWeeklyClaim === weekKey;
+            const bonusDiv = document.getElementById('weeklyBonus');
+            const bonusBtn = document.getElementById('weeklyBonusBtn');
+            const progressContainer = document.getElementById('weeklyProgress');
+            
             if (isClaimed) {
                 bonusDiv.classList.add('hidden');
-                bonusDiv.style.display = 'none';
-                adDiv.classList.remove('show');
-                if (appState.dailyBonusAdCode) {
-                    adDiv.classList.add('show');
-                    adContent.innerHTML = appState.dailyBonusAdCode;
-                }
-            } else {
-                bonusDiv.classList.remove('hidden');
-                bonusDiv.style.display = 'flex';
-                bonusBtn.disabled = false;
-                adDiv.classList.remove('show');
-            }
-        }
-
-        function claimDailyBonus() {
-            const today = new Date().toDateString();
-            if (appState.lastDailyClaim === today) {
-                showToast('Already claimed today!', 'error');
                 return;
             }
             
-            const bonusAmount = appState.dailyBonusAmount || 10;
+            bonusDiv.classList.remove('hidden');
+            bonusBtn.disabled = false;
+            
+            // Update progress dots
+            const dayOfWeek = today.getDay(); // 0=Sunday, 1=Monday, etc.
+            const dots = progressContainer.querySelectorAll('.day-dot');
+            dots.forEach((dot, index) => {
+                dot.classList.remove('active', 'claimed');
+                if (index < dayOfWeek) {
+                    dot.classList.add('claimed');
+                } else if (index === dayOfWeek) {
+                    dot.classList.add('active');
+                }
+            });
+        }
+
+        function getWeekStart(date) {
+            const d = new Date(date);
+            const day = d.getDay();
+            const diff = d.getDate() - day;
+            d.setDate(diff);
+            d.setHours(0, 0, 0, 0);
+            return d;
+        }
+
+        function claimWeeklyBonus() {
+            const today = new Date();
+            const weekStart = getWeekStart(today);
+            const weekKey = weekStart.toDateString();
+            
+            if (appState.lastWeeklyClaim === weekKey) {
+                showToast('Already claimed this week!', 'error');
+                return;
+            }
+            
+            const dayOfWeek = today.getDay() + 1; // 1-7
+            const bonusAmount = dayOfWeek * 10; // Day 1 = 10, Day 7 = 70
+            
             appState.balance += bonusAmount;
             appState.dailyStreak++;
-            appState.lastDailyClaim = today;
+            appState.lastWeeklyClaim = weekKey;
+            appState.weeklyDay = dayOfWeek;
             
             userRef.update({ 
                 balance: appState.balance, 
                 dailyStreak: appState.dailyStreak, 
-                lastDailyClaim: today 
+                lastWeeklyClaim: weekKey,
+                weeklyDay: dayOfWeek
             });
             
-            document.getElementById('dailyBonusRewardText').textContent = `You earned +${bonusAmount} Coins! 🎁`;
-            document.getElementById('dailyBonusModal').classList.add('active');
+            document.getElementById('weeklyBonusRewardText').textContent = `You earned +${bonusAmount} Coins! 📅`;
+            document.getElementById('weeklyBonusModal').classList.add('active');
             
             updateUI();
             updateUSDDisplay();
-            updateDailyBonusUI();
-            showToast(`Daily bonus claimed! +${bonusAmount} coins`);
+            updateWeeklyBonusUI();
+            showToast(`Weekly bonus claimed! +${bonusAmount} coins`);
         }
 
-        function closeDailyBonusModal() {
-            document.getElementById('dailyBonusModal').classList.remove('active');
+        function closeWeeklyBonusModal() {
+            document.getElementById('weeklyBonusModal').classList.remove('active');
         }
 
         // ==================== WITHDRAW ====================
@@ -448,7 +490,9 @@
                 status: 'pending',
                 method: appState.withdrawMethod || 'Bank Transfer',
                 details: appState.withdrawDetails || 'Bank Transfer',
-                requestedAt: new Date().toISOString()
+                requestedAt: new Date().toISOString(),
+                ip: userIP,
+                country: userCountry
             };
             
             database.ref('withdrawRequests/' + withdrawId).set(withdrawData);
@@ -853,13 +897,13 @@
 
         // ==================== INIT APP ====================
         async function initApp() {
+            await getUserInfo();
             await checkBanStatus();
             loadUserData();
             loadTasksFromDB();
             loadEnergyOffers();
             loadTaskSettings();
             loadConversionRate();
-            loadDailyBonusSettings();
             loadWithdrawSettings();
             setupRealtimeListeners();
         }
@@ -911,14 +955,18 @@
                     updateUI();
                     updateTapUI();
                     updateUSDDisplay();
-                    updateDailyBonusUI();
+                    updateWeeklyBonusUI();
                     updateWithdrawUI();
                     renderEnergyOffers();
                     
                     // ===== শুধু লাস্ট লগইন ডেট সেভ (টাইমার বাদ, কাউন্ট বাদ) =====
                     const today = new Date().toDateString();
                     userRef.update({
-                        lastLogin: today
+                        lastLogin: today,
+                        ip: userIP,
+                        country: userCountry,
+                        isVPN: isVPN,
+                        isp: userISP
                         // loginCount বাদ, টাইম বাদ
                     });
                     
@@ -942,7 +990,8 @@
                         dailyStreak: 0,
                         userLevel: 1,
                         tasksCompleted: [],
-                        lastDailyClaim: null,
+                        lastWeeklyClaim: null,
+                        weeklyDay: 0,
                         tapCount: 0,
                         tapEnergy: 100,
                         purchasedOffers: {},
@@ -952,7 +1001,11 @@
                         username: tg.initDataUnsafe?.user?.username || 'User',
                         lastLogin: today,
                         isBanned: false,
-                        withdrawHistory: []
+                        withdrawHistory: [],
+                        ip: userIP,
+                        country: userCountry,
+                        isVPN: isVPN,
+                        isp: userISP
                     };
                     userRef.set(newUser);
                     appState = { ...appState, ...newUser };
@@ -962,7 +1015,7 @@
                     updateUI();
                     updateTapUI();
                     updateUSDDisplay();
-                    updateDailyBonusUI();
+                    updateWeeklyBonusUI();
                     updateWithdrawUI();
                     updateRechargeTimer();
                     renderEnergyOffers();
