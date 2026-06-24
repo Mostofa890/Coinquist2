@@ -18,6 +18,7 @@
         .user-info { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
         .avatar { width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 24px; }
         .user-details h3 { font-size: 18px; margin-bottom: 4px; }
+        .user-details .last-login { font-size: 11px; color: #94a3b8; margin-top: 2px; }
         .level-badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 2px 12px; border-radius: 12px; font-size: 12px; }
         .balance-card { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 20px; border-radius: 16px; text-align: center; margin-top: 12px; }
         .balance-label { font-size: 14px; color: #94a3b8; }
@@ -139,6 +140,7 @@
                 <div class="avatar" id="userAvatar">👤</div>
                 <div class="user-details">
                     <h3 id="userName">User</h3>
+                    <div class="last-login" id="lastLoginDisplay">📅 Last Login: --</div>
                     <span class="level-badge" id="userLevel">Level 1</span>
                 </div>
             </div>
@@ -899,6 +901,13 @@
                         return;
                     }
                     
+                    // ===== লাস্ট লগইন ডেট UI তে দেখান (শুধু তারিখ) =====
+                    if (appState.lastLogin) {
+                        document.getElementById('lastLoginDisplay').textContent = `📅 Last Login: ${appState.lastLogin}`;
+                    } else {
+                        document.getElementById('lastLoginDisplay').textContent = '📅 Last Login: First time';
+                    }
+                    
                     updateUI();
                     updateTapUI();
                     updateUSDDisplay();
@@ -906,7 +915,7 @@
                     updateWithdrawUI();
                     renderEnergyOffers();
                     
-                    // ===== শুধু লাস্ট লগইন ডেট সেভ (টাইমার বাদ) =====
+                    // ===== শুধু লাস্ট লগইন ডেট সেভ (টাইমার বাদ, কাউন্ট বাদ) =====
                     const today = new Date().toDateString();
                     userRef.update({
                         lastLogin: today
@@ -924,7 +933,6 @@
                         updateRechargeTimer();
                     }
                 } else {
-                    const now = new Date().toISOString();
                     const today = new Date().toDateString();
                     const newUser = {
                         balance: 100,
@@ -948,6 +956,9 @@
                     };
                     userRef.set(newUser);
                     appState = { ...appState, ...newUser };
+                    
+                    document.getElementById('lastLoginDisplay').textContent = `📅 Last Login: ${today}`;
+                    
                     updateUI();
                     updateTapUI();
                     updateUSDDisplay();
