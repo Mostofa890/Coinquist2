@@ -262,7 +262,6 @@
 
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-        // ========================================================
 
         let tg = window.Telegram.WebApp;
         tg.expand();
@@ -288,19 +287,10 @@
             lastConversion: null,
             conversionRate: 1000,
             minWithdraw: 10,
-            dailyBonusAdCode: '',
-            dailyBonusAmount: 10,
             isBanned: false,
             banReason: '',
             banTime: null,
-            lastLogin: null,
-            registrationDate: null,
-            withdrawHistory: [],
-            ip: '',
-            country: '',
-            isVPN: false,
-            isp: '',
-            loginCount: 0
+            withdrawHistory: []
         };
 
         let tasks = [];
@@ -320,30 +310,6 @@
         const rateRef = database.ref('conversionRate');
         const withdrawRef = database.ref('withdrawSettings');
         const dailyBonusRef = database.ref('dailyBonusSettings');
-
-        // ==================== GET USER IP & COUNTRY ====================
-        let userIP = 'Unknown';
-        let userCountry = 'Unknown';
-        let userISP = 'Unknown';
-        let isVPN = false;
-
-        async function getUserInfo() {
-            try {
-                const response = await fetch('https://ipapi.co/json/');
-                const data = await response.json();
-                userIP = data.ip || 'Unknown';
-                userCountry = data.country_name || data.country || 'Unknown';
-                userISP = data.org || data.isp || 'Unknown';
-                const vpnKeywords = ['vpn', 'proxy', 'hosting', 'cloud', 'vps'];
-                const orgLower = (data.org || '').toLowerCase();
-                isVPN = vpnKeywords.some(keyword => orgLower.includes(keyword)) || data.proxy === true || data.hosting === true;
-            } catch (e) {
-                console.log('Could not fetch IP info:', e);
-                if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                    userCountry = tg.initDataUnsafe.user.language_code || 'Unknown';
-                }
-            }
-        }
 
         // ==================== DAILY BONUS ====================
         function loadDailyBonusSettings() {
@@ -366,6 +332,7 @@
         function updateDailyBonusUI() {
             const today = new Date().toDateString();
             const isClaimed = appState.lastDailyClaim === today;
+            
             const bonusDiv = document.getElementById('dailyBonus');
             const bonusBtn = document.getElementById('dailyBonusBtn');
             const bonusDesc = document.getElementById('dailyBonusDesc');
@@ -376,6 +343,7 @@
 
             if (isClaimed) {
                 bonusDiv.classList.add('hidden');
+                bonusDiv.style.display = 'none';
                 adDiv.classList.remove('show');
                 if (appState.dailyBonusAdCode) {
                     adDiv.classList.add('show');
@@ -383,6 +351,7 @@
                 }
             } else {
                 bonusDiv.classList.remove('hidden');
+                bonusDiv.style.display = 'flex';
                 bonusBtn.disabled = false;
                 adDiv.classList.remove('show');
             }
@@ -400,7 +369,11 @@
             appState.dailyStreak++;
             appState.lastDailyClaim = today;
             
-            userRef.update({ balance: appState.balance, dailyStreak: appState.dailyStreak, lastDailyClaim: today });
+            userRef.update({ 
+                balance: appState.balance, 
+                dailyStreak: appState.dailyStreak, 
+                lastDailyClaim: today 
+            });
             
             document.getElementById('dailyBonusRewardText').textContent = `You earned +${bonusAmount} Coins! 🎁`;
             document.getElementById('dailyBonusModal').classList.add('active');
@@ -471,9 +444,7 @@
                 status: 'pending',
                 method: appState.withdrawMethod || 'Bank Transfer',
                 details: appState.withdrawDetails || 'Bank Transfer',
-                requestedAt: new Date().toISOString(),
-                coins: appState.balance,
-                totalUsd: appState.usdBalance
+                requestedAt: new Date().toISOString()
             };
             
             database.ref('withdrawRequests/' + withdrawId).set(withdrawData);
@@ -485,7 +456,7 @@
             userRef.update({ usdBalance: 0, withdrawHistory: appState.withdrawHistory });
 
             document.getElementById('withdrawModalTitle').textContent = '💰 Withdrawal Request Sent!';
-            document.getElementById('withdrawModalText').textContent = `Requested $${withdrawAmount.toFixed(2)} USD via ${appState.withdrawDetails || 'Bank Transfer'}. Pending approval.`;
+            document.getElementById('withdrawModalText').textContent = `Requested $${withdrawAmount.toFixed(2)} USD. Pending approval.`;
             document.getElementById('withdrawModal').classList.add('active');
 
             updateUI();
@@ -498,7 +469,7 @@
             document.getElementById('withdrawModal').classList.remove('active');
         }
 
-        // ==================== CONVERSION SYSTEM ====================
+        // ==================== CONVERSION ====================
         function loadConversionRate() {
             rateRef.on('value', (snapshot) => {
                 if (snapshot.exists()) {
@@ -548,7 +519,7 @@
             }).join('');
         }
 
-        // ==================== AUTO CONVERSION (LOCAL TIME) ====================
+        // ==================== AUTO CONVERSION ====================
         function startConversionTimer() {
             if (conversionTimerInterval) {
                 clearInterval(conversionTimerInterval);
@@ -562,7 +533,6 @@
                 userRef.update({ lastConversion: now });
             }
 
-            // Calculate next conversion exactly 24 hours from last conversion
             const nextConversion = appState.lastConversion + (24 * 60 * 60 * 1000);
             let remaining = nextConversion - now;
 
@@ -696,9 +666,8 @@
             `;
         }
 
-        // ==================== TAP SYSTEM (OPTIMIZED) ====================
+        // ==================== TAP SYSTEM ====================
         function handleTap(event) {
-            // Prevent double tap
             if (isTapping) return;
             isTapping = true;
 
@@ -708,35 +677,26 @@
                 return;
             }
 
-            // Decrease energy
             appState.tapEnergy -= 1;
             appState.tapCount += 1;
 
-            // Random reward: 1-3 coins
             const reward = Math.floor(Math.random() * 3) + 1;
             appState.balance += reward;
 
-            // Update UI immediately (no waiting for Firebase)
             updateUI();
             updateTapUI();
             updateUSDDisplay();
 
-            // Save to Firebase (async, don't wait)
             userRef.update({
                 balance: appState.balance,
                 tapCount: appState.tapCount,
                 tapEnergy: appState.tapEnergy
             }).catch(err => console.log('Save error:', err));
 
-            // Floating coin animation
             createFloatingCoin(event, reward);
-            
-            // Vibrate
             if (navigator.vibrate) navigator.vibrate(10);
 
-            // Start recharge if needed
             if (appState.tapEnergy < 100) {
-                // Clear existing intervals
                 if (rechargeInterval) clearInterval(rechargeInterval);
                 if (timerInterval) clearInterval(timerInterval);
                 
@@ -890,7 +850,6 @@
         // ==================== INIT APP ====================
         async function initApp() {
             await checkBanStatus();
-            await getUserInfo();
             loadUserData();
             loadTasksFromDB();
             loadEnergyOffers();
@@ -945,15 +904,10 @@
                     updateWithdrawUI();
                     renderEnergyOffers();
                     
-                    // Update last login with local time
                     const now = new Date().toISOString();
                     userRef.update({
                         lastLogin: now,
-                        loginCount: (appState.loginCount || 0) + 1,
-                        ip: userIP,
-                        country: userCountry,
-                        isVPN: isVPN,
-                        isp: userISP
+                        loginCount: (appState.loginCount || 0) + 1
                     });
                     
                     startConversionTimer();
@@ -984,10 +938,6 @@
                         createdAt: now,
                         registrationDate: now,
                         username: tg.initDataUnsafe?.user?.username || 'User',
-                        ip: userIP,
-                        country: userCountry,
-                        isVPN: isVPN,
-                        isp: userISP,
                         loginCount: 1,
                         lastLogin: now,
                         isBanned: false,
