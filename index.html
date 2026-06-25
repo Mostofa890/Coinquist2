@@ -607,7 +607,7 @@
         const referRef = db.ref('referrals');
         const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
-        // ==================== REFERRAL SYSTEM ====================
+        // ==================== REFERRAL SYSTEM (FIXED) ====================
         const TIERS = [
             { level: 1, count: 10, bonus: 50, name: '🥉 Bronze Referrer' },
             { level: 2, count: 25, bonus: 150, name: '🥈 Silver Referrer' },
@@ -625,62 +625,94 @@
             return code;
         }
 
-        // ===== CHECK REFERRAL FROM URL =====
+        // ===== CHECK REFERRAL FROM URL / START PARAM =====
         function checkReferral() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const startParam = urlParams.get('start');
+            console.log('🔍 Checking referral...');
+            
+            // Telegram WebApp থেকে start_param নিন
+            let startParam = '';
+            if (tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
+                startParam = tg.initDataUnsafe.start_param;
+                console.log('📌 Start param from TG:', startParam);
+            }
+            
+            // URL থেকে চেক করুন (fallback)
+            if (!startParam) {
+                const urlParams = new URLSearchParams(window.location.search);
+                startParam = urlParams.get('start') || urlParams.get('ref') || '';
+                console.log('📌 Start param from URL:', startParam);
+            }
             
             if (startParam && startParam.startsWith('ref_')) {
                 const refCode = startParam.replace('ref_', '');
+                console.log('🔑 Refer Code:', refCode);
                 
-                // Check if this is a valid refer code
+                // রেফার কোড দিয়ে ইউজার খুঁজুন
                 db.ref('users').orderByChild('referCode').equalTo(refCode).once('value', (snapshot) => {
                     if (snapshot.exists()) {
                         snapshot.forEach((child) => {
                             const referrerId = child.key;
+                            console.log('👤 Referrer ID:', referrerId);
+                            console.log('👤 Current User ID:', userId);
                             
-                            // Don't allow self-referral
+                            // সেলফ রেফার চেক করুন
                             if (referrerId !== userId) {
-                                // Check if already referred
+                                // ইতিমধ্যে রেফার হয়েছে কিনা চেক করুন
                                 db.ref('referrals/' + userId).once('value', (s) => {
                                     if (!s.exists()) {
-                                        // Add referral record
+                                        console.log('✅ New referral detected!');
+                                        
+                                        // রেফার ডাটা সেভ করুন
                                         const refData = {
                                             referredBy: referrerId,
                                             referredAt: Date.now(),
                                             username: tg.initDataUnsafe?.user?.username || 'User',
-                                            bonus: 50
+                                            bonus: 50,
+                                            userId: userId
                                         };
                                         
-                                        db.ref('referrals/' + userId).set(refData);
-                                        
-                                        // Increase referrer count
-                                        db.ref('users/' + referrerId + '/referCount').transaction((current) => {
-                                            return (current || 0) + 1;
+                                        db.ref('referrals/' + userId).set(refData).then(() => {
+                                            console.log('✅ Referral saved to Firebase!');
+                                            
+                                            // রেফারারের কাউন্ট বাড়ান
+                                            db.ref('users/' + referrerId + '/referCount').transaction((current) => {
+                                                return (current || 0) + 1;
+                                            });
+                                            
+                                            // নতুন ইউজারকে বোনাস দিন
+                                            userRef.update({
+                                                balance: (appState.balance || 0) + 50
+                                            });
+                                            
+                                            appState.balance = (appState.balance || 0) + 50;
+                                            updateUI();
+                                            updateLevelUI();
+                                            updateReferUI();
+                                            
+                                            showToast('🎉 You got +50 Coins from referral!');
                                         });
-                                        
-                                        // Give bonus to new user
-                                        userRef.update({
-                                            balance: (appState.balance || 0) + 50
-                                        });
-                                        
-                                        appState.balance = (appState.balance || 0) + 50;
-                                        updateUI();
-                                        updateLevelUI();
-                                        
-                                        showToast('🎉 You got +50 Coins from referral!');
+                                    } else {
+                                        console.log('ℹ️ Already referred');
                                     }
                                 });
+                            } else {
+                                console.log('⚠️ Self referral detected!');
                             }
                         });
+                    } else {
+                        console.log('❌ Refer code not found in users');
                     }
                 });
+            } else {
+                console.log('ℹ️ No referral parameter found');
             }
         }
 
         // ===== LOAD REFERRAL DATA =====
         function loadReferralData() {
-            // Get refer code
+            console.log('📊 Loading referral data...');
+            
+            // রেফার কোড
             const refCodeRef = db.ref('users/' + userId + '/referCode');
             refCodeRef.once('value', (s) => {
                 if (!s.exists()) {
@@ -690,25 +722,29 @@
                 } else {
                     appState.referCode = s.val();
                 }
+                console.log('📌 Refer Code:', appState.referCode);
                 updateReferUI();
             });
 
-            // Count referrals
-            db.ref('referrals').orderByChild('referredBy').equalTo(userId).on('value', (s) => {
-                if (s.exists()) {
-                    const data = s.val();
+            // রেফার কাউন্ট (রিয়েলটাইম)
+            db.ref('referrals').orderByChild('referredBy').equalTo(userId).on('value', (snapshot) => {
+                console.log('🔄 Referral count updated');
+                
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
                     const keys = Object.keys(data);
                     appState.referCount = keys.length;
+                    console.log('📊 Total Referrals:', appState.referCount);
+                    
                     let earned = 0;
                     keys.forEach(key => {
                         earned += data[key].bonus || 0;
                     });
                     appState.referEarned = earned;
                     
-                    // Check tier bonuses
+                    // টায়ার বোনাস চেক করুন
                     TIERS.forEach(tier => {
                         if (appState.referCount >= tier.count && !appState.referTiers[tier.level]) {
-                            // Claim tier bonus
                             appState.balance += tier.bonus;
                             appState.referTiers[tier.level] = Date.now();
                             appState.referEarned += tier.bonus;
@@ -724,12 +760,13 @@
                     });
                 } else {
                     appState.referCount = 0;
+                    console.log('📊 No referrals yet');
                 }
                 updateReferUI();
                 updateUI();
             });
 
-            // Load referral list
+            // রেফার লিস্ট লোড করুন
             loadReferralList();
         }
 
@@ -742,18 +779,22 @@
                 if (snapshot.exists()) {
                     const data = snapshot.val();
                     const keys = Object.keys(data);
-                    keys.reverse();
-                    keys.forEach((key, index) => {
-                        const ref = data[key];
-                        const date = new Date(ref.referredAt).toLocaleDateString();
-                        html += `
-                            <div class="referral-item">
-                                <span class="name">${index+1}. ${ref.username || 'User'}</span>
-                                <span class="bonus">+${ref.bonus || 50} 🪙</span>
-                                <span class="date">${date}</span>
-                            </div>
-                        `;
-                    });
+                    if (keys.length > 0) {
+                        keys.reverse();
+                        keys.forEach((key, index) => {
+                            const ref = data[key];
+                            const date = new Date(ref.referredAt).toLocaleDateString();
+                            html += `
+                                <div class="referral-item">
+                                    <span class="name">${index+1}. ${ref.username || 'User'}</span>
+                                    <span class="bonus">+${ref.bonus || 50} 🪙</span>
+                                    <span class="date">${date}</span>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        html = '<p style="color:#6b7280;font-size:13px;text-align:center;padding:10px;">No referrals yet. Share your link!</p>';
+                    }
                 } else {
                     html = '<p style="color:#6b7280;font-size:13px;text-align:center;padding:10px;">No referrals yet. Share your link!</p>';
                 }
@@ -1533,7 +1574,10 @@
                     loadWithdrawSettings();
                     loadWeeklyRewards();
                     loadReferralData();
-                    checkReferral();
+                    // রেফার চেক করতে একটু দেরি করে কল করুন
+                    setTimeout(() => {
+                        checkReferral();
+                    }, 1000);
                     setupListeners();
                 });
             });
