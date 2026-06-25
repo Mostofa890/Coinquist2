@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>CoinQuest - Tap & Earn</title>
     
-    <!-- ===== ADSGRAM SDK (HEAD ট্যাগে বসান) ===== -->
+    <!-- ===== ADSGRAM SDK ===== -->
     <script src="https://cdn.adsgram.ai/adsgram.js"></script>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -394,7 +394,7 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // ==================== ADSGRAM AD FUNCTIONS (Block ID: 36185) ====================
+        // ==================== ADSGRAM AD FUNCTIONS ====================
         let adsgramInstance = null;
 
         function showAdsGramRewarded(callback) {
@@ -460,7 +460,8 @@
             lastConversion: null, conversionRate: 1000, minWithdraw: 10,
             isBanned: false, banReason: '', withdrawHistory: [],
             lastLogin: null, registrationDate: null,
-            ip: '', country: '', isVPN: false, isp: '', weekStart: null
+            ip: '', country: '', isVPN: false, isp: '', weekStart: null,
+            lastRechargeTime: Date.now()
         };
         let tasks = [], currentCategory = 'all', energyOffers = [], taskSettings = {};
         let conversionTimerInterval = null, rechargeInterval = null, timerInterval = null;
@@ -690,7 +691,6 @@
             if (day !== today) { showToast('Only today\'s reward!','error'); return; }
             showToast('⏳ Loading ad...');
             
-            // ===== ADSGRAM REWARDED AD =====
             showAdsGramRewarded(function() {
                 if (!appState.weeklyAdWatched) appState.weeklyAdWatched = [];
                 if (!appState.weeklyAdWatched.includes(day)) {
@@ -752,7 +752,6 @@
             let bal = appState.usdBalance || 0, min = appState.minWithdraw || 10;
             if (bal < min) { showToast(`Minimum $${min} USD`,'error'); return; }
             
-            // ===== ADSGRAM INTERSTITIAL AD =====
             showAdsGramInterstitial();
             
             let amount = bal, id = Date.now().toString();
@@ -845,26 +844,71 @@
             startConversionTimer();
         }
 
-        // ==================== ENERGY ====================
+        // ==================== ENERGY RECHARGE (FIXED) ====================
         function startRecharge() {
             if (rechargeInterval) clearInterval(rechargeInterval);
             if (timerInterval) clearInterval(timerInterval);
+
+            // Firebase থেকে শেষ রিচার্জ সময় নিন
+            const now = Date.now();
+            const elapsed = Math.floor((now - (appState.lastRechargeTime || now)) / 1000);
+            const energyGained = Math.floor(elapsed / 3);
+            
+            if (energyGained > 0 && appState.tapEnergy < 100) {
+                appState.tapEnergy = Math.min(100, appState.tapEnergy + energyGained);
+                appState.lastRechargeTime = now;
+                userRef.update({ 
+                    tapEnergy: appState.tapEnergy,
+                    lastRechargeTime: now 
+                });
+            }
+
             let needed = 100 - appState.tapEnergy;
             remainingSeconds = needed * 3;
+            if (remainingSeconds < 0) remainingSeconds = 0;
+
+            // প্রতি সেকেন্ডে টাইমার আপডেট
             timerInterval = setInterval(() => {
-                if (appState.tapEnergy < 100) { remainingSeconds--; if (remainingSeconds < 0) remainingSeconds = 0; updateRechargeTimer(); }
-                else updateRechargeTimer();
+                if (appState.tapEnergy < 100) {
+                    remainingSeconds--;
+                    if (remainingSeconds < 0) remainingSeconds = 0;
+                    updateRechargeTimer();
+                } else {
+                    updateRechargeTimer();
+                }
             }, 1000);
+
+            // প্রতি 3 সেকেন্ডে 1 এনার্জি যোগ
             rechargeInterval = setInterval(() => {
-                if (appState.tapEnergy < 100) { appState.tapEnergy++; updateTapUI(); updateRechargeTimer(); userRef.update({ tapEnergy: appState.tapEnergy }); }
-                else { clearInterval(rechargeInterval); clearInterval(timerInterval); rechargeInterval = null; timerInterval = null; updateRechargeTimer(); }
+                if (appState.tapEnergy < 100) {
+                    appState.tapEnergy++;
+                    appState.lastRechargeTime = Date.now();
+                    updateTapUI();
+                    updateRechargeTimer();
+                    userRef.update({ 
+                        tapEnergy: appState.tapEnergy,
+                        lastRechargeTime: appState.lastRechargeTime 
+                    });
+                } else {
+                    clearInterval(rechargeInterval);
+                    clearInterval(timerInterval);
+                    rechargeInterval = null;
+                    timerInterval = null;
+                    updateRechargeTimer();
+                }
             }, 3000);
+
+            updateRechargeTimer();
         }
 
         function updateRechargeTimer() {
             let div = document.getElementById('rechargeTimer');
-            if (appState.tapEnergy >= 100) { div.innerHTML = '<span class="full">✅ Energy Full!</span>'; return; }
-            let m = Math.floor(remainingSeconds / 60), s = remainingSeconds % 60;
+            if (appState.tapEnergy >= 100) {
+                div.innerHTML = '<span class="full">✅ Energy Full!</span>';
+                return;
+            }
+            let m = Math.floor(remainingSeconds / 60);
+            let s = remainingSeconds % 60;
             div.innerHTML = `⚡ Recharging... <span class="time">${m}m ${s}s</span> (${100 - appState.tapEnergy} left)`;
         }
 
@@ -1046,7 +1090,6 @@
             let task = tasks.find(t => t.id === taskId);
             if (!task || appState.tasksCompleted.includes(taskId)) return;
             if (task.type === 'ad') {
-                // ===== ADSGRAM REWARDED AD =====
                 showAdsGramRewarded(function() {
                     completeTaskAction(taskId);
                 });
@@ -1142,10 +1185,11 @@
         }
 
         function loadUserData() {
-            userRef.on('value', (s) => {
-                if (s.exists()) {
-                    let data = s.val();
+            userRef.on('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    let data = snapshot.val();
                     appState = { ...appState, ...data };
+                    
                     if (data.isBanned) {
                         appState.isBanned = true;
                         document.getElementById('banReason').textContent = `Reason: ${data.banReason || 'Violation'}`;
@@ -1154,19 +1198,48 @@
                         document.querySelector('.bottom-nav').style.display = 'none';
                         return;
                     }
-                    if (appState.lastLogin) document.getElementById('lastLoginDisplay').textContent = `📅 Last Login: ${appState.lastLogin}`;
+                    
+                    // ===== এনার্জি রিচার্জ ফিক্স =====
+                    // অ্যাপ ফিরে এলে সময় ক্যালকুলেট করুন
+                    const now = Date.now();
+                    const lastRecharge = appState.lastRechargeTime || now;
+                    const elapsedSeconds = Math.floor((now - lastRecharge) / 1000);
+                    const energyGained = Math.floor(elapsedSeconds / 3);
+                    
+                    if (energyGained > 0 && appState.tapEnergy < 100) {
+                        appState.tapEnergy = Math.min(100, appState.tapEnergy + energyGained);
+                        appState.lastRechargeTime = now;
+                        userRef.update({ 
+                            tapEnergy: appState.tapEnergy,
+                            lastRechargeTime: now 
+                        });
+                    }
+                    
+                    if (appState.lastLogin) {
+                        document.getElementById('lastLoginDisplay').textContent = `📅 Last Login: ${appState.lastLogin}`;
+                    }
+                    
                     updateUI();
                     updateTapUI();
                     updateLevelUI();
                     updateWeeklyUI();
                     updateWithdrawUI();
                     renderOffers();
+                    
                     let today = new Date().toDateString();
                     userRef.update({ lastLogin: today, ip: userIP, country: userCountry, isVPN: isVPN, isp: userISP });
+                    
                     startConversionTimer();
-                    if (appState.tapEnergy < 100) { let needed = 100 - appState.tapEnergy; remainingSeconds = needed * 3; if (remainingSeconds < 0) remainingSeconds = 0; startRecharge(); }
-                    else updateRechargeTimer();
+                    if (appState.tapEnergy < 100) {
+                        let needed = 100 - appState.tapEnergy;
+                        remainingSeconds = needed * 3;
+                        if (remainingSeconds < 0) remainingSeconds = 0;
+                        startRecharge();
+                    } else {
+                        updateRechargeTimer();
+                    }
                 } else {
+                    // নতুন ইউজার তৈরি
                     let today = new Date().toDateString();
                     let weekKey = getWeekKey();
                     let newUser = {
@@ -1177,10 +1250,12 @@
                         lastConversion: Date.now(), createdAt: today, registrationDate: today,
                         username: tg.initDataUnsafe?.user?.username || 'User',
                         lastLogin: today, isBanned: false, withdrawHistory: [],
-                        ip: userIP, country: userCountry, isVPN: isVPN, isp: userISP
+                        ip: userIP, country: userCountry, isVPN: isVPN, isp: userISP,
+                        lastRechargeTime: Date.now()
                     };
                     userRef.set(newUser);
                     appState = { ...appState, ...newUser };
+                    
                     document.getElementById('lastLoginDisplay').textContent = `📅 Last Login: ${today}`;
                     updateUI();
                     updateTapUI();
