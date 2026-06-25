@@ -339,7 +339,6 @@
                 <div id="referTierList"></div>
             </div>
 
-            <!-- Referral List -->
             <div class="referral-list-box">
                 <div class="list-title">📋 Referral History</div>
                 <div id="referralList"><p style="color:#6b7280;font-size:13px;text-align:center;padding:10px;">No referrals yet</p></div>
@@ -380,14 +379,12 @@
             </div>
         </div>
 
-        <!-- STATS -->
         <div class="stats-grid">
             <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-value" id="completedTasks">0</div><div class="stat-label">Tasks Done</div></div>
             <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-value" id="referralCount">0</div><div class="stat-label">Referrals</div></div>
             <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-value" id="dailyStreak">0</div><div class="stat-label">Day Streak</div></div>
         </div>
 
-        <!-- WEEKLY BONUS -->
         <div class="weekly-bonus-btn" onclick="openWeeklyPage()">
             <div class="bonus-text">
                 <h4>📅 Weekly Bonus</h4>
@@ -405,7 +402,6 @@
             <div class="arrow">➜</div>
         </div>
 
-        <!-- TAB: HOME (TAP TO EARN) -->
         <div class="tab-content active" id="tabHome">
             <div class="tap-section">
                 <div class="tap-coin" id="tapCoin" onclick="handleTap(event)">
@@ -424,7 +420,6 @@
             </div>
         </div>
 
-        <!-- TAB: TASKS -->
         <div class="tab-content" id="tabTasks">
             <div class="categories">
                 <button class="category-btn active" onclick="filterTasks('all',event)">All</button>
@@ -436,7 +431,6 @@
             <div id="tasksContainer"><div class="loading"><div class="loading-spinner"></div><p>Loading tasks...</p></div></div>
         </div>
 
-        <!-- TAB: REFER -->
         <div class="tab-content" id="tabRefer">
             <div class="refer-link-box">
                 <p style="font-size:13px;color:#94a3b8;">Your Referral Link</p>
@@ -461,7 +455,6 @@
                 <div id="referTierListHome"></div>
             </div>
 
-            <!-- Referral List Home -->
             <div class="referral-list-box" style="margin-top:12px;">
                 <div class="list-title">📋 Referral History</div>
                 <div id="referralListHome"><p style="color:#6b7280;font-size:13px;text-align:center;padding:10px;">No referrals yet</p></div>
@@ -470,7 +463,6 @@
             <button style="margin-top:12px;width:100%;padding:10px;background:linear-gradient(135deg,#7c3aed,#2563eb);border:none;border-radius:10px;color:#fff;font-weight:bold;cursor:pointer;font-size:14px;" onclick="openReferPage()">📊 View Full Details</button>
         </div>
 
-        <!-- TAB: WALLET -->
         <div class="tab-content" id="tabWallet">
             <h3 class="section-title">💰 Wallet</h3>
             <div style="background:#1a1f3a;padding:16px;border-radius:14px;text-align:center;">
@@ -518,13 +510,28 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // ==================== ADSGRAM AD FUNCTIONS ====================
+        // ==================== ADSGRAM AD FUNCTIONS (Monetag REMOVED) ====================
         let adsgramInstance = null;
 
+        // ===== In-app Interstitial - অ্যাপ লোড হওয়ার সময় (int-36224) =====
+        function showInAppInterstitial() {
+            try {
+                if (!adsgramInstance) {
+                    adsgramInstance = new Adsgram({
+                        blockId: 'int-36224'  // আপনার ইন্টারস্টিশিয়াল অ্যাড আইডি
+                    });
+                }
+                adsgramInstance.show();
+            } catch (e) {
+                console.log('AdsGram error:', e);
+            }
+        }
+
+        // ===== Rewarded Ad - উইকলি বোনাস ও টাস্কের জন্য =====
         function showAdsGramRewarded(callback) {
             try {
                 adsgramInstance = new Adsgram({
-                    blockId: '36185',
+                    blockId: 'int-36224',  // আপনার রিওয়ার্ডেড অ্যাড আইডি
                     onReward: function() {
                         console.log('✅ Ad rewarded!');
                         if (callback) callback();
@@ -538,19 +545,6 @@
             } catch (e) {
                 console.log('AdsGram error:', e);
                 if (callback) callback();
-            }
-        }
-
-        function showAdsGramInterstitial() {
-            try {
-                if (!adsgramInstance) {
-                    adsgramInstance = new Adsgram({
-                        blockId: '36185'
-                    });
-                }
-                adsgramInstance.show();
-            } catch (e) {
-                console.log('AdsGram error:', e);
             }
         }
 
@@ -607,7 +601,7 @@
         const referRef = db.ref('referrals');
         const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
-        // ==================== REFERRAL SYSTEM (FIXED) ====================
+        // ==================== REFERRAL SYSTEM ====================
         const TIERS = [
             { level: 1, count: 10, bonus: 50, name: '🥉 Bronze Referrer' },
             { level: 2, count: 25, bonus: 150, name: '🥈 Silver Referrer' },
@@ -625,18 +619,15 @@
             return code;
         }
 
-        // ===== CHECK REFERRAL FROM URL / START PARAM =====
         function checkReferral() {
             console.log('🔍 Checking referral...');
             
-            // Telegram WebApp থেকে start_param নিন
             let startParam = '';
             if (tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
                 startParam = tg.initDataUnsafe.start_param;
                 console.log('📌 Start param from TG:', startParam);
             }
             
-            // URL থেকে চেক করুন (fallback)
             if (!startParam) {
                 const urlParams = new URLSearchParams(window.location.search);
                 startParam = urlParams.get('start') || urlParams.get('ref') || '';
@@ -647,7 +638,6 @@
                 const refCode = startParam.replace('ref_', '');
                 console.log('🔑 Refer Code:', refCode);
                 
-                // রেফার কোড দিয়ে ইউজার খুঁজুন
                 db.ref('users').orderByChild('referCode').equalTo(refCode).once('value', (snapshot) => {
                     if (snapshot.exists()) {
                         snapshot.forEach((child) => {
@@ -655,14 +645,11 @@
                             console.log('👤 Referrer ID:', referrerId);
                             console.log('👤 Current User ID:', userId);
                             
-                            // সেলফ রেফার চেক করুন
                             if (referrerId !== userId) {
-                                // ইতিমধ্যে রেফার হয়েছে কিনা চেক করুন
                                 db.ref('referrals/' + userId).once('value', (s) => {
                                     if (!s.exists()) {
                                         console.log('✅ New referral detected!');
                                         
-                                        // রেফার ডাটা সেভ করুন
                                         const refData = {
                                             referredBy: referrerId,
                                             referredAt: Date.now(),
@@ -674,12 +661,10 @@
                                         db.ref('referrals/' + userId).set(refData).then(() => {
                                             console.log('✅ Referral saved to Firebase!');
                                             
-                                            // রেফারারের কাউন্ট বাড়ান
                                             db.ref('users/' + referrerId + '/referCount').transaction((current) => {
                                                 return (current || 0) + 1;
                                             });
                                             
-                                            // নতুন ইউজারকে বোনাস দিন
                                             userRef.update({
                                                 balance: (appState.balance || 0) + 50
                                             });
@@ -708,11 +693,9 @@
             }
         }
 
-        // ===== LOAD REFERRAL DATA =====
         function loadReferralData() {
             console.log('📊 Loading referral data...');
             
-            // রেফার কোড
             const refCodeRef = db.ref('users/' + userId + '/referCode');
             refCodeRef.once('value', (s) => {
                 if (!s.exists()) {
@@ -726,7 +709,6 @@
                 updateReferUI();
             });
 
-            // রেফার কাউন্ট (রিয়েলটাইম)
             db.ref('referrals').orderByChild('referredBy').equalTo(userId).on('value', (snapshot) => {
                 console.log('🔄 Referral count updated');
                 
@@ -742,7 +724,6 @@
                     });
                     appState.referEarned = earned;
                     
-                    // টায়ার বোনাস চেক করুন
                     TIERS.forEach(tier => {
                         if (appState.referCount >= tier.count && !appState.referTiers[tier.level]) {
                             appState.balance += tier.bonus;
@@ -766,7 +747,6 @@
                 updateUI();
             });
 
-            // রেফার লিস্ট লোড করুন
             loadReferralList();
         }
 
@@ -804,7 +784,6 @@
         }
 
         function updateReferUI() {
-            // Homepage
             document.getElementById('referTotalHome').textContent = appState.referCount || 0;
             document.getElementById('referEarnedHome').textContent = appState.referEarned || 0;
             
@@ -816,7 +795,6 @@
             });
             document.getElementById('referBonusHome').textContent = bonusReady;
             
-            // Progress
             let nextTier = TIERS.find(t => (appState.referCount || 0) < t.count);
             if (nextTier) {
                 const progress = ((appState.referCount || 0) / nextTier.count) * 100;
@@ -827,7 +805,6 @@
                 document.getElementById('referProgressTextHome').textContent = '🎉 All tiers completed!';
             }
             
-            // Tiers
             let html = '';
             TIERS.forEach(tier => {
                 const claimed = appState.referTiers[tier.level];
@@ -846,12 +823,10 @@
             });
             document.getElementById('referTierListHome').innerHTML = html;
             
-            // Refer link
             const link = `https://t.me/CoinQuist_bot?start=ref_${appState.referCode}`;
             document.getElementById('referLinkHome').textContent = link;
             document.getElementById('referLink').textContent = link;
 
-            // Overlay
             document.getElementById('referTotal').textContent = appState.referCount || 0;
             document.getElementById('referEarned').textContent = appState.referEarned || 0;
             document.getElementById('referBonus').textContent = bonusReady;
@@ -1125,6 +1100,7 @@
             if (day !== today) { showToast('Only today\'s reward!','error'); return; }
             showToast('⏳ Loading ad...');
             
+            // ===== ADSGRAM REWARDED AD =====
             showAdsGramRewarded(function() {
                 if (!appState.weeklyAdWatched) appState.weeklyAdWatched = [];
                 if (!appState.weeklyAdWatched.includes(day)) {
@@ -1186,7 +1162,8 @@
             let bal = appState.usdBalance || 0, min = appState.minWithdraw || 10;
             if (bal < min) { showToast(`Minimum $${min} USD`,'error'); return; }
             
-            showAdsGramInterstitial();
+            // ===== In-app Interstitial Ad =====
+            showInAppInterstitial();
             
             let amount = bal, id = Date.now().toString();
             db.ref('withdrawRequests/' + id).set({ userId, username: tg.initDataUnsafe?.user?.username || 'User', amount, status: 'pending', method: appState.withdrawMethod || 'Bank Transfer', details: appState.withdrawDetails || 'Bank Transfer', requestedAt: new Date().toISOString(), ip: userIP, country: userCountry });
@@ -1521,6 +1498,7 @@
             let task = tasks.find(t => t.id === taskId);
             if (!task || appState.tasksCompleted.includes(taskId)) return;
             if (task.type === 'ad') {
+                // ===== ADSGRAM REWARDED AD =====
                 showAdsGramRewarded(function() {
                     completeTaskAction(taskId);
                 });
@@ -1564,6 +1542,11 @@
 
         // ==================== INIT ====================
         function initApp() {
+            // ===== অ্যাপ লোড হওয়ার সাথে সাথে In-app Interstitial Ad দেখান =====
+            setTimeout(() => {
+                showInAppInterstitial();
+            }, 1500);
+            
             getUserInfo().then(() => {
                 checkBan().then(() => {
                     loadUserData();
@@ -1574,7 +1557,6 @@
                     loadWithdrawSettings();
                     loadWeeklyRewards();
                     loadReferralData();
-                    // রেফার চেক করতে একটু দেরি করে কল করুন
                     setTimeout(() => {
                         checkReferral();
                     }, 1000);
@@ -1614,7 +1596,6 @@
                         return;
                     }
                     
-                    // Energy recharge fix
                     const now = Date.now();
                     const lastRecharge = appState.lastRechargeTime || now;
                     const elapsedSeconds = Math.floor((now - lastRecharge) / 1000);
@@ -1710,7 +1691,6 @@
             updateUSDDisplay();
         }
 
-        // ==================== NAV ====================
         function switchTab(tab, event) {
             if (document.getElementById('weeklyOverlay').classList.contains('show')) return;
             if (document.getElementById('levelOverlay').classList.contains('show')) return;
@@ -1727,7 +1707,6 @@
 
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-        // ==================== TOAST ====================
         function showToast(msg, type = 'success') {
             let t = document.getElementById('toast');
             t.textContent = msg;
@@ -1736,7 +1715,6 @@
             setTimeout(() => t.classList.remove('show'), 3000);
         }
 
-        // ==================== START ====================
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
