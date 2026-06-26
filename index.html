@@ -600,7 +600,8 @@
             videoReward: 10,
             videoDailyLimit: 5,
             energyVideoReward: 20,
-            energyRechargeTime: 3600
+            energyRechargeTime: 3600,
+            referrals: []
         };
 
         let tasks = [], energyOffers = [];
@@ -620,16 +621,11 @@
 
         // ==================== PAGE NAVIGATION ====================
         function switchPage(page, event) {
-            // Update nav items
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             if (event && event.currentTarget) {
                 event.currentTarget.classList.add('active');
             }
-
-            // Hide all pages
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-
-            // Show selected page
             const pageMap = {
                 'home': 'pageHome',
                 'earn': 'pageEarn',
@@ -637,13 +633,10 @@
                 'refer': 'pageRefer',
                 'wallet': 'pageWallet'
             };
-
             const targetPage = document.getElementById(pageMap[page]);
             if (targetPage) {
                 targetPage.classList.add('active');
             }
-
-            // Refresh content based on page
             if (page === 'tasks') {
                 renderTasks();
             }
@@ -656,9 +649,6 @@
             }
             if (page === 'wallet') {
                 updateWithdrawHistory();
-            }
-            if (page === 'home') {
-                // Home page already loaded
             }
         }
 
@@ -819,13 +809,6 @@
                 return;
             }
             
-            const statusColors = { 
-                pending: '#f59e0b', 
-                approved: '#22c55e', 
-                cancelled: '#ef4444', 
-                processing: '#3b82f6' 
-            };
-            
             const statusLabels = {
                 pending: '⏳ Pending',
                 approved: '✅ Approved',
@@ -836,7 +819,7 @@
             container.innerHTML = appState.withdrawHistory.slice(-10).reverse().map(w => {
                 let cancelReasonHTML = '';
                 if (w.status === 'cancelled' && w.cancelReason) {
-                    cancelReasonHTML = `<div class="cancel-reason">⚠️ ${w.cancelReason}</div>";
+                    cancelReasonHTML = `<div class="cancel-reason">⚠️ ${w.cancelReason}</div>`;
                 }
                 
                 return `
@@ -1303,14 +1286,6 @@
                 }
             }
             container.innerHTML = html;
-            let adContainer = document.getElementById('adContainer_' + today);
-            if (adContainer) {
-                adContainer.innerHTML = `<div style="padding:10px;background:#1a1f3a;border-radius:6px;text-align:center;">
-                    <p style="color:#fbbf24;font-size:13px;">📺 Ad Placeholder</p>
-                    <p style="color:#94a3b8;font-size:10px;margin-top:2px;">Add your AdsGram ad code here</p>
-                    <div style="margin-top:6px;padding:6px;background:#0a0e27;border-radius:4px;font-size:11px;color:#6b7280;">⏱️ Watch 5 seconds to claim</div>
-                </div>`;
-            }
         }
 
         function handleDayClick(day) {
@@ -1594,25 +1569,23 @@
                 updateReferUI();
             });
 
-            db.ref('referrals').orderByChild('referredBy').equalTo(userId).on('value', (snapshot                    db.ref('referrals').orderByChild('referredBy').equalTo(userId).on('value', (snapshot) => {
-                    let count = 0;
-                    let earn = 0;
-                    let refs = [];
-                    if (snapshot.exists()) {
-                        snapshot.forEach((child) => {
-                            const val = child.val();
-                            count++;
-                            earn += (val.bonus || 50);
-                            refs.push({ id: child.key, ...val });
-                        });
-                    }
-                    appState.referralCount = count;
-                    appState.referEarned = earn;
-                    appState.referrals = refs;
-                    appState.userReferrals = refs;
-                    updateReferUI();
-                    loadReferralList();
-                });
+            db.ref('referrals').orderByChild('referredBy').equalTo(userId).on('value', (snapshot) => {
+                let count = 0;
+                let earn = 0;
+                let refs = [];
+                if (snapshot.exists()) {
+                    snapshot.forEach((child) => {
+                        const val = child.val();
+                        count++;
+                        earn += (val.bonus || 50);
+                        refs.push({ id: child.key, ...val });
+                    });
+                }
+                appState.referralCount = count;
+                appState.referEarned = earn;
+                appState.referrals = refs;
+                updateReferUI();
+                loadReferralList();
             });
 
             // Check if this user was referred
@@ -1620,7 +1593,6 @@
                 if (s.exists()) {
                     const data = s.val();
                     if (data.referredBy) {
-                        // User was referred, add bonus if not already
                         if (!data.bonusClaimed) {
                             appState.balance = (appState.balance || 0) + 50;
                             db.ref('referrals/' + userId).update({ bonusClaimed: true });
@@ -1998,43 +1970,6 @@
         console.log('👤 User ID:', userId);
         console.log('📱 Telegram User:', tg.initDataUnsafe?.user?.username || 'Unknown');
 
-        // ==================== INDEXEDDB CACHE FOR OFFLINE ====================
-        // Simple cache for critical data
-        const CACHE_KEY = 'coinquest_cache';
-        function cacheData(data) {
-            try {
-                const cache = {
-                    timestamp: Date.now(),
-                    data: data
-                };
-                localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
-            } catch (e) {}
-        }
-
-        function getCachedData() {
-            try {
-                const cache = JSON.parse(localStorage.getItem(CACHE_KEY));
-                if (cache && (Date.now() - cache.timestamp < 3600000)) { // 1 hour
-                    return cache.data;
-                }
-            } catch (e) {}
-            return null;
-        }
-
-        // ==================== PWA INSTALLATION ====================
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-        });
-
-        // ==================== SERVICE WORKER REGISTRATION ====================
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js')
-                .then(() => console.log('📦 Service Worker registered'))
-                .catch(() => console.log('⚠️ Service Worker registration failed'));
-        }
-
         // ==================== ERROR HANDLING ====================
         window.addEventListener('error', (e) => {
             console.error('❌ Global error:', e.message);
@@ -2055,7 +1990,7 @@
             showToast('⚠️ You are offline. Some features may not work.', 'error');
         });
 
-        // ==================== CLOSE WEEKLY ON BACK ====================
+        // ==================== CLOSE OVERLAYS ON BACK ====================
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 if (document.getElementById('levelOverlay').classList.contains('show')) {
@@ -2065,14 +2000,6 @@
                 } else if (document.getElementById('referOverlay').classList.contains('show')) {
                     closeReferPage();
                 }
-            }
-        });
-
-        // ==================== EXIT CONFIRMATION ====================
-        window.addEventListener('beforeunload', (e) => {
-            if (appState.balance > 0) {
-                e.preventDefault();
-                e.returnValue = 'You have unsaved coins!';
             }
         });
 
