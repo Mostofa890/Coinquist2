@@ -609,7 +609,7 @@
             energyVideoReward: 20,
             referrals: [],
             weekStart: null,
-            energyRechargeStart: null // timestamp when energy became 0
+            energyRechargeStart: null
         };
 
         let tasks = [], energyOffers = [];
@@ -1519,7 +1519,7 @@
             showToast(`+${energy} Energy!`);
         }
 
-        // ==================== REFERRAL SYSTEM (FIXED) ====================
+        // ==================== NEW REFERRAL SYSTEM (FIXED) ====================
         const TIERS = [
             { level: 1, count: 10, bonus: 50, name: '🥉 Bronze Referrer' },
             { level: 2, count: 25, bonus: 150, name: '🥈 Silver Referrer' },
@@ -1555,32 +1555,33 @@
                             if (referrerId !== userId) {
                                 db.ref('referrals/' + userId).once('value', (s) => {
                                     if (!s.exists()) {
-                                        const refData = {
+                                        const newUserData = {
                                             referredBy: referrerId,
                                             referredAt: Date.now(),
                                             username: tg.initDataUnsafe?.user?.username || 'User',
                                             bonus: 50,
-                                            userId: userId,
-                                            referrerName: tg.initDataUnsafe?.user?.username || 'Referrer'
+                                            userId: userId
                                         };
-                                        db.ref('referrals/' + userId).set(refData).then(() => {
-                                            // Increment referrer's count
-                                            db.ref('users/' + referrerId + '/referCount').transaction((current) => {
-                                                return (current || 0) + 1;
+                                        // Save in 'referrals' node (for tracking)
+                                        db.ref('referrals/' + userId).set(newUserData).then(() => {
+                                            // Update referrer's count and list
+                                            const referrerRef = db.ref('users/' + referrerId);
+                                            referrerRef.transaction((current) => {
+                                                if (current === null) return { referCount: 1, referrals: [newUserData] };
+                                                return {
+                                                    ...current,
+                                                    referCount: (current.referCount || 0) + 1,
+                                                    referrals: (current.referrals || []).concat([newUserData])
+                                                };
+                                            }).then(() => {
+                                                // Give bonus to new user
+                                                userRef.update({ balance: (appState.balance || 0) + 50 });
+                                                appState.balance = (appState.balance || 0) + 50;
+                                                updateUI();
+                                                updateLevelUI();
+                                                updateReferUI();
+                                                showToast('🎉 You got +50 Coins from referral!');
                                             });
-                                            // Also update referrer's referral list
-                                            db.ref('users/' + referrerId + '/referrals').push({
-                                                username: tg.initDataUnsafe?.user?.username || 'User',
-                                                bonus: 50,
-                                                date: Date.now()
-                                            });
-                                            // Give bonus to new user
-                                            userRef.update({ balance: (appState.balance || 0) + 50 });
-                                            appState.balance = (appState.balance || 0) + 50;
-                                            updateUI();
-                                            updateLevelUI();
-                                            updateReferUI();
-                                            showToast('🎉 You got +50 Coins from referral!');
                                         });
                                     }
                                 });
@@ -1709,7 +1710,7 @@
                 <div class="referral-item">
                     <span class="name">${ref.username || 'User'}</span>
                     <span class="bonus">+${ref.bonus || 50} 🪙</span>
-                    <span class="date">${new Date(ref.date || ref.referredAt || Date.now()).toLocaleDateString()}</span>
+                    <span class="date">${new Date(ref.referredAt || ref.date || Date.now()).toLocaleDateString()}</span>
                 </div>
             `).join('');
             
