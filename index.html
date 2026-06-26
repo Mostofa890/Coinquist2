@@ -14,256 +14,286 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-        body { background: #0a0e27; color: #fff; padding-bottom: 80px; min-height: 100vh; }
+        /* ===== GLOBAL ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; }
+        body { background: linear-gradient(145deg, #0a0e27, #141b3d); color: #fff; padding-bottom: 80px; min-height: 100vh; }
         .container { max-width: 500px; margin: 0 auto; padding: 16px; }
         
-        .header { background: linear-gradient(135deg, #1e3a8a, #5b21b6); padding: 16px 18px; border-radius: 20px; margin-bottom: 16px; }
-        .user-info { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; }
-        .user-details h3 { font-size: 15px; }
-        .user-details .last-login { font-size: 10px; color: #94a3b8; }
-        .level-badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 2px 10px; border-radius: 10px; font-size: 11px; cursor: pointer; }
-        
-        .balance-card { background: rgba(255,255,255,0.08); padding: 14px; border-radius: 14px; text-align: center; }
-        .balance-label { font-size: 12px; color: #94a3b8; }
-        .balance-amount { font-size: 32px; font-weight: 800; background: linear-gradient(to right, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .usd-value { color: #22c55e; font-size: 15px; font-weight: bold; }
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 4px; }
+
+        /* ===== HEADER ===== */
+        .header { background: linear-gradient(135deg, #1e3a8a, #6d28d9, #4c1d95); padding: 18px 20px; border-radius: 24px; margin-bottom: 18px; box-shadow: 0 8px 32px rgba(109,40,217,0.3); border: 1px solid rgba(255,255,255,0.08); }
+        .user-info { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+        .avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #fbbf24, #f59e0b); display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; box-shadow: 0 4px 12px rgba(251,191,36,0.3); transition: transform 0.2s; }
+        .avatar:hover { transform: scale(1.05); }
+        .user-details h3 { font-size: 16px; font-weight: 600; }
+        .user-details .last-login { font-size: 10px; color: #a5b4fc; }
+        .level-badge { display: inline-block; background: rgba(255,255,255,0.15); backdrop-filter: blur(4px); padding: 3px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); transition: all 0.2s; }
+        .level-badge:hover { background: rgba(255,255,255,0.25); }
+
+        .balance-card { background: rgba(255,255,255,0.06); backdrop-filter: blur(8px); padding: 16px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.08); }
+        .balance-label { font-size: 12px; color: #c4b5fd; letter-spacing: 1px; }
+        .balance-amount { font-size: 36px; font-weight: 900; background: linear-gradient(to right, #fcd34d, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 30px rgba(251,191,36,0.2); }
+        .usd-value { color: #34d399; font-size: 16px; font-weight: bold; }
         .total-usd-earned { font-size: 11px; color: #94a3b8; margin-top: 2px; }
-        
-        .level-section { background: rgba(255,255,255,0.04); border-radius: 10px; padding: 8px 12px; margin-top: 6px; cursor: pointer; }
+
+        .level-section { background: rgba(255,255,255,0.04); border-radius: 12px; padding: 8px 14px; margin-top: 8px; cursor: pointer; transition: background 0.2s; }
+        .level-section:hover { background: rgba(255,255,255,0.08); }
         .level-section .level-row { display: flex; justify-content: space-between; align-items: center; }
-        .level-section .level-title { font-size: 12px; font-weight: bold; }
+        .level-section .level-title { font-size: 12px; font-weight: bold; color: #e2e8f0; }
         .level-section .level-number { font-size: 16px; font-weight: bold; color: #fbbf24; }
-        .level-section .level-arrow { color: #94a3b8; font-size: 14px; }
-        .level-section .level-progress { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 4px; overflow: hidden; }
-        .level-section .level-progress .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 2px; }
+        .level-section .level-arrow { color: #94a3b8; font-size: 14px; transition: transform 0.2s; }
+        .level-section:hover .level-arrow { transform: translateX(4px); }
+        .level-section .level-progress { width: 100%; height: 5px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-top: 4px; overflow: hidden; }
+        .level-section .level-progress .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 4px; box-shadow: 0 0 10px rgba(251,191,36,0.3); }
         .level-section .level-points { font-size: 10px; color: #94a3b8; margin-top: 2px; display: flex; justify-content: space-between; }
-        
-        .conversion-timer { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.15); border-radius: 10px; padding: 8px; margin-top: 8px; }
+
+        .conversion-timer { background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.15); border-radius: 12px; padding: 10px; margin-top: 10px; }
         .conversion-timer .label { font-size: 10px; color: #94a3b8; }
-        .conversion-timer .time { font-size: 15px; font-weight: bold; color: #22c55e; }
+        .conversion-timer .time { font-size: 16px; font-weight: bold; color: #34d399; }
         .conversion-timer .rate-info { font-size: 10px; color: #94a3b8; margin-top: 2px; }
-        
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
-        .stat-card { background: #1a1f3a; padding: 10px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.04); }
-        .stat-icon { font-size: 18px; margin-bottom: 2px; }
-        .stat-value { font-size: 18px; font-weight: bold; color: #3b82f6; }
-        .stat-label { color: #94a3b8; font-size: 10px; }
-        
-        .weekly-bonus-btn { background: linear-gradient(135deg, #7c3aed, #2563eb); padding: 12px 14px; border-radius: 14px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
-        .weekly-bonus-btn .bonus-text h4 { font-size: 14px; }
+
+        /* ===== STATS ===== */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+        .stat-card { background: rgba(255,255,255,0.04); backdrop-filter: blur(4px); padding: 14px 10px; border-radius: 16px; text-align: center; border: 1px solid rgba(255,255,255,0.06); transition: transform 0.2s; }
+        .stat-card:hover { transform: translateY(-2px); }
+        .stat-icon { font-size: 22px; margin-bottom: 4px; }
+        .stat-value { font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stat-label { color: #94a3b8; font-size: 10px; margin-top: 2px; }
+
+        /* ===== WEEKLY BONUS ===== */
+        .weekly-bonus-btn { background: linear-gradient(135deg, #7c3aed, #2563eb, #06b6d4); padding: 14px 18px; border-radius: 18px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 20px rgba(124,58,237,0.3); border: 1px solid rgba(255,255,255,0.08); }
+        .weekly-bonus-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 30px rgba(124,58,237,0.4); }
+        .weekly-bonus-btn .bonus-text h4 { font-size: 15px; font-weight: 700; }
         .weekly-bonus-btn .bonus-text p { font-size: 11px; opacity: 0.9; }
-        .weekly-bonus-btn .arrow { font-size: 20px; color: rgba(255,255,255,0.7); }
-        .weekly-bonus-btn .day-progress { display: flex; gap: 3px; margin-top: 4px; }
-        .weekly-bonus-btn .day-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.2); }
-        .weekly-bonus-btn .day-dot.active { background: #fbbf24; }
-        .weekly-bonus-btn .day-dot.claimed { background: #22c55e; }
-        .weekly-bonus-btn .day-dot.locked { background: rgba(255,255,255,0.1); }
-        
-        .tap-section { text-align: center; padding: 20px 0; margin-bottom: 16px; }
-        .tap-coin { width: 160px; height: 160px; background: radial-gradient(circle at 30% 30%, #fbbf24, #f59e0b); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; cursor: pointer; box-shadow: 0 0 40px rgba(251,191,36,0.25); transition: transform 0.1s; user-select: none; -webkit-tap-highlight-color: transparent; position: relative; }
-        .tap-coin:active { transform: scale(0.92); }
-        .tap-coin .coin-icon { font-size: 64px; color: #0a0e27; }
-        .tap-coin .tap-text { position: absolute; bottom: 24px; font-size: 12px; color: rgba(0,0,0,0.4); font-weight: bold; }
-        .tap-stats { display: flex; justify-content: center; gap: 24px; margin-top: 12px; }
+        .weekly-bonus-btn .arrow { font-size: 22px; color: rgba(255,255,255,0.7); transition: transform 0.2s; }
+        .weekly-bonus-btn:hover .arrow { transform: translateX(4px); }
+        .weekly-bonus-btn .day-progress { display: flex; gap: 4px; margin-top: 4px; }
+        .weekly-bonus-btn .day-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all 0.3s; }
+        .weekly-bonus-btn .day-dot.active { background: #fbbf24; box-shadow: 0 0 12px rgba(251,191,36,0.5); }
+        .weekly-bonus-btn .day-dot.claimed { background: #34d399; }
+        .weekly-bonus-btn .day-dot.locked { background: rgba(255,255,255,0.08); }
+
+        /* ===== TAP SECTION (ENHANCED) ===== */
+        .tap-section-enhanced { background: linear-gradient(145deg, rgba(26,31,58,0.9), rgba(15,21,53,0.95)); backdrop-filter: blur(12px); border-radius: 28px; padding: 28px 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.06); margin-bottom: 18px; }
+
+        /* ----- TAP COIN (3D + GLOW) ----- */
+        .tap-coin-wrapper { position: relative; display: flex; justify-content: center; margin-bottom: 20px; }
+        .tap-coin { width: 180px; height: 180px; background: radial-gradient(circle at 35% 35%, #fde047, #fbbf24, #f59e0b 70%, #d97706); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 80px rgba(251,191,36,0.4), inset 0 -8px 20px rgba(0,0,0,0.3), inset 0 8px 20px rgba(255,255,255,0.4); transition: transform 0.12s, box-shadow 0.12s; user-select: none; -webkit-tap-highlight-color: transparent; position: relative; border: 3px solid rgba(255,255,255,0.15); }
+        .tap-coin:active { transform: scale(0.88); box-shadow: 0 0 40px rgba(251,191,36,0.2); }
+        .tap-coin .coin-icon { font-size: 80px; color: #0a0e27; text-shadow: 0 4px 12px rgba(0,0,0,0.3); filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2)); }
+        .tap-coin .tap-text { position: absolute; bottom: 20px; font-size: 14px; color: rgba(0,0,0,0.5); font-weight: 800; letter-spacing: 1px; background: rgba(255,255,255,0.2); padding: 2px 16px; border-radius: 20px; backdrop-filter: blur(4px); }
+        .tap-coin::after { content: ''; position: absolute; inset: 6px; border-radius: 50%; background: transparent; border: 2px solid rgba(255,255,255,0.1); pointer-events: none; }
+        .tap-coin::before { content: ''; position: absolute; inset: -8px; border-radius: 50%; background: transparent; border: 1px solid rgba(255,255,255,0.05); pointer-events: none; }
+
+        .tap-stats { display: flex; justify-content: center; gap: 32px; margin-top: 4px; }
         .tap-stats .stat { text-align: center; }
-        .tap-stats .stat .number { font-size: 18px; font-weight: bold; color: #fbbf24; }
-        .tap-stats .stat .label { font-size: 11px; color: #94a3b8; }
-        
-        .recharge-timer { text-align: center; margin-top: 8px; padding: 12px; background: rgba(255,255,255,0.04); border-radius: 10px; }
-        .recharge-timer .watch-video-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; padding: 8px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 13px; margin-top: 6px; }
+        .tap-stats .stat .number { font-size: 24px; font-weight: 900; color: #fbbf24; text-shadow: 0 0 20px rgba(251,191,36,0.2); }
+        .tap-stats .stat .label { font-size: 12px; color: #94a3b8; letter-spacing: 0.5px; }
+
+        /* ===== RECHARGE TIMER ===== */
+        .recharge-timer { text-align: center; margin-top: 16px; padding: 16px; background: rgba(255,255,255,0.03); border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); }
+        .recharge-timer .watch-video-btn { background: linear-gradient(135deg, #f97316, #ea580c, #c2410c); color: #fff; padding: 10px 28px; border-radius: 14px; border: none; font-weight: 700; cursor: pointer; font-size: 14px; box-shadow: 0 4px 16px rgba(249,115,22,0.3); transition: all 0.2s; position: relative; overflow: hidden; }
         .recharge-timer .watch-video-btn:active { transform: scale(0.95); }
-        .recharge-timer .status-text { font-size: 13px; font-weight: bold; margin-top: 4px; }
-        .recharge-timer .status-text.full { color: #22c55e; }
-        .recharge-timer .status-text.empty { color: #ef4444; }
-        .recharge-timer .energy-display { font-size: 16px; font-weight: bold; color: #fbbf24; margin-top: 4px; }
-        
-        /* Enhanced Tap Section */
-        .tap-section-enhanced { background: linear-gradient(145deg, #1a1f3a, #0f1535); border-radius: 24px; padding: 24px 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; }
-        .tap-section-enhanced .tap-coin { width: 180px; height: 180px; background: radial-gradient(circle at 30% 30%, #fcd34d, #f59e0b); box-shadow: 0 0 60px rgba(251,191,36,0.4), inset 0 -4px 10px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.2); }
-        .tap-section-enhanced .tap-coin .coin-icon { font-size: 80px; color: #0a0e27; text-shadow: 0 2px 8px rgba(0,0,0,0.3); }
-        .tap-section-enhanced .tap-coin .tap-text { bottom: 20px; font-size: 14px; color: rgba(0,0,0,0.5); }
-        .tap-section-enhanced .tap-stats .stat .number { font-size: 22px; }
-        .tap-section-enhanced .tap-stats .stat .label { font-size: 12px; }
-        .tap-section-enhanced .recharge-timer { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); }
-        .tap-section-enhanced .recharge-timer .watch-video-btn { background: linear-gradient(135deg, #f97316, #ea580c); }
-        
-        .energy-offer-section { background: #1a1f3a; border-radius: 12px; padding: 12px; margin-top: 12px; border: 1px solid rgba(255,255,255,0.04); }
-        .energy-offer-section .offer-title { font-size: 12px; color: #94a3b8; margin-bottom: 8px; text-align: center; }
-        .energy-offer-card { background: rgba(255,255,255,0.04); border-radius: 10px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .recharge-timer .watch-video-btn:hover { box-shadow: 0 6px 24px rgba(249,115,22,0.4); transform: translateY(-2px); }
+        .recharge-timer .watch-video-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+        .recharge-timer .status-text { font-size: 14px; font-weight: 600; margin-top: 4px; }
+        .recharge-timer .status-text.full { color: #34d399; }
+        .recharge-timer .status-text.empty { color: #f87171; }
+        .recharge-timer .energy-display { font-size: 18px; font-weight: 700; color: #fbbf24; margin-top: 4px; }
+        .recharge-timer .countdown-timer { font-size: 20px; font-weight: 800; color: #60a5fa; background: rgba(96,165,250,0.1); padding: 6px 18px; border-radius: 30px; display: inline-block; margin-top: 4px; border: 1px solid rgba(96,165,250,0.2); }
+
+        /* ===== ENERGY OFFERS ===== */
+        .energy-offer-section { background: rgba(255,255,255,0.03); border-radius: 16px; padding: 14px; margin-top: 14px; border: 1px solid rgba(255,255,255,0.05); }
+        .energy-offer-section .offer-title { font-size: 12px; color: #94a3b8; margin-bottom: 10px; text-align: center; letter-spacing: 1px; }
+        .energy-offer-card { background: rgba(255,255,255,0.04); border-radius: 12px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; transition: background 0.2s; }
         .energy-offer-card:last-child { margin-bottom: 0; }
-        .energy-offer-card .offer-info .energy-amount { font-size: 15px; font-weight: bold; color: #fbbf24; }
+        .energy-offer-card:hover { background: rgba(255,255,255,0.06); }
+        .energy-offer-card .offer-info .energy-amount { font-size: 16px; font-weight: bold; color: #fbbf24; }
         .energy-offer-card .offer-info .offer-price { font-size: 11px; color: #94a3b8; }
-        .energy-offer-card .buy-btn { background: linear-gradient(135deg, #06b6d4, #3b82f6); color: #fff; padding: 4px 14px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; font-size: 12px; }
-        .energy-offer-card .buy-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .energy-offer-card .buy-btn.bought { background: #22c55e; }
+        .energy-offer-card .buy-btn { background: linear-gradient(135deg, #06b6d4, #3b82f6); color: #fff; padding: 6px 18px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; font-size: 12px; transition: all 0.2s; box-shadow: 0 2px 12px rgba(59,130,246,0.2); }
+        .energy-offer-card .buy-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .energy-offer-card .buy-btn.bought { background: #34d399; }
         .energy-offer-card.locked { opacity: 0.5; filter: grayscale(0.5); }
         .offer-limit { font-size: 10px; color: #94a3b8; }
-        
-        .floating-coin { position: fixed; font-size: 28px; pointer-events: none; z-index: 1000; animation: floatUp 1s ease-out forwards; }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-130px) scale(0.5); } }
-        
+
+        /* ===== FLOATING COIN ===== */
+        .floating-coin { position: fixed; font-size: 32px; pointer-events: none; z-index: 1000; animation: floatUp 1s ease-out forwards; text-shadow: 0 0 20px rgba(251,191,36,0.5); }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); } 100% { opacity: 0; transform: translateY(-140px) scale(0.6) rotate(20deg); } }
+
+        /* ===== PAGES ===== */
         .page { display: none; min-height: 60vh; padding-top: 10px; }
         .page.active { display: block; }
-        .page-header { font-size: 20px; font-weight: bold; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid rgba(255,255,255,0.06); }
-        
-        .video-card { background: #1a1f3a; border-radius: 12px; padding: 20px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.04); text-align: center; }
-        .video-card .video-icon { font-size: 48px; margin-bottom: 8px; }
-        .video-card .video-title { font-size: 16px; font-weight: bold; }
-        .video-card .video-desc { font-size: 12px; color: #94a3b8; margin: 4px 0; }
-        .video-card .video-reward { font-size: 14px; color: #22c55e; font-weight: bold; }
-        .video-card .video-btn { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; padding: 10px 30px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 14px; margin-top: 10px; }
-        .video-card .video-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .video-card .video-limit { font-size: 11px; color: #94a3b8; margin-top: 6px; }
-        .video-card .video-watched { font-size: 12px; color: #22c55e; margin-top: 4px; }
-        
-        .task-card { background: #1a1f3a; border-radius: 12px; padding: 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.04); }
+        .page-header { font-size: 22px; font-weight: 800; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 2px solid rgba(255,255,255,0.06); background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* ===== VIDEO CARD ===== */
+        .video-card { background: linear-gradient(145deg, rgba(26,31,58,0.8), rgba(15,21,53,0.9)); border-radius: 18px; padding: 24px 20px; margin-bottom: 14px; border: 1px solid rgba(255,255,255,0.06); text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+        .video-card .video-title { font-size: 18px; font-weight: 700; }
+        .video-card .video-desc { font-size: 12px; color: #94a3b8; margin: 6px 0; }
+        .video-card .video-reward { font-size: 15px; color: #34d399; font-weight: bold; }
+        .video-card .video-btn { background: linear-gradient(135deg, #34d399, #10b981); color: #fff; padding: 12px 36px; border-radius: 14px; border: none; font-weight: 700; cursor: pointer; font-size: 15px; margin-top: 12px; box-shadow: 0 4px 20px rgba(52,211,153,0.3); transition: all 0.2s; position: relative; overflow: hidden; }
+        .video-card .video-btn:active { transform: scale(0.95); }
+        .video-card .video-btn:hover { box-shadow: 0 6px 28px rgba(52,211,153,0.4); transform: translateY(-2px); }
+        .video-card .video-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+        .video-card .video-limit { font-size: 11px; color: #94a3b8; margin-top: 8px; }
+        .video-card .video-watched { font-size: 12px; color: #34d399; margin-top: 4px; }
+        .video-card .countdown-timer { font-size: 20px; font-weight: 800; color: #60a5fa; background: rgba(96,165,250,0.1); padding: 6px 20px; border-radius: 30px; display: inline-block; margin-top: 6px; border: 1px solid rgba(96,165,250,0.2); }
+
+        /* ===== TASK CARD ===== */
+        .task-card { background: rgba(255,255,255,0.03); border-radius: 16px; padding: 18px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); transition: transform 0.2s; }
+        .task-card:hover { transform: translateY(-2px); }
         .task-card .task-header { display: flex; justify-content: space-between; align-items: center; }
-        .task-card .task-title { font-size: 15px; font-weight: bold; }
-        .task-card .task-reward { color: #22c55e; font-weight: bold; font-size: 14px; }
+        .task-card .task-title { font-size: 16px; font-weight: 600; }
+        .task-card .task-reward { color: #34d399; font-weight: bold; font-size: 15px; }
         .task-card .task-desc { font-size: 12px; color: #94a3b8; margin: 4px 0; }
-        .task-card .task-btn { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; padding: 6px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 13px; }
+        .task-card .task-btn { background: linear-gradient(135deg, #60a5fa, #3b82f6); color: #fff; padding: 8px 24px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 13px; transition: all 0.2s; box-shadow: 0 2px 12px rgba(59,130,246,0.2); }
         .task-card .task-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .task-card .task-btn.completed { background: #22c55e; }
-        .task-card .task-progress { background: rgba(255,255,255,0.08); height: 4px; border-radius: 2px; margin-top: 8px; overflow: hidden; }
-        .task-card .task-progress .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 2px; }
-        .task-card .task-link { color: #3b82f6; text-decoration: none; font-size: 12px; display: inline-block; margin-top: 4px; }
-        .no-tasks { text-align: center; padding: 30px; color: #6b7280; font-size: 14px; }
-        
-        .refer-link-box { background: #1a1f3a; border-radius: 12px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.04); text-align: center; }
-        .refer-link-box .link { background: #0a0e27; padding: 10px; border-radius: 8px; font-size: 13px; color: #3b82f6; word-break: break-all; margin: 8px 0; border: 1px solid rgba(59,130,246,0.2); }
-        .refer-link-box .copy-btn { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; padding: 6px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 13px; }
-        .refer-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
-        .refer-stats .stat { background: #1a1f3a; padding: 10px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.04); }
-        .refer-stats .stat .number { font-size: 20px; font-weight: bold; color: #fbbf24; }
+        .task-card .task-btn.completed { background: #34d399; }
+        .task-card .task-progress { background: rgba(255,255,255,0.06); height: 5px; border-radius: 4px; margin-top: 10px; overflow: hidden; }
+        .task-card .task-progress .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 4px; }
+        .task-card .task-link { color: #60a5fa; text-decoration: none; font-size: 12px; display: inline-block; margin-top: 4px; }
+
+        /* ===== REFER ===== */
+        .refer-link-box { background: rgba(255,255,255,0.03); border-radius: 16px; padding: 18px; margin-bottom: 18px; border: 1px solid rgba(255,255,255,0.05); text-align: center; }
+        .refer-link-box .link { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px; font-size: 13px; color: #60a5fa; word-break: break-all; margin: 10px 0; border: 1px solid rgba(59,130,246,0.15); }
+        .refer-link-box .copy-btn { background: linear-gradient(135deg, #60a5fa, #3b82f6); color: #fff; padding: 8px 24px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 13px; transition: all 0.2s; box-shadow: 0 2px 12px rgba(59,130,246,0.2); }
+        .refer-link-box .copy-btn:hover { transform: translateY(-2px); }
+
+        .refer-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+        .refer-stats .stat { background: rgba(255,255,255,0.03); padding: 14px 10px; border-radius: 14px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .refer-stats .stat .number { font-size: 22px; font-weight: 800; color: #fbbf24; }
         .refer-stats .stat .label { font-size: 10px; color: #94a3b8; }
-        .refer-tier { background: #1a1f3a; border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.04); display: flex; justify-content: space-between; align-items: center; }
-        .refer-tier .tier-info .tier-name { font-size: 14px; font-weight: bold; }
+
+        .refer-tier { background: rgba(255,255,255,0.03); border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .refer-tier .tier-info .tier-name { font-size: 15px; font-weight: 600; }
         .refer-tier .tier-info .tier-desc { font-size: 11px; color: #94a3b8; }
-        .refer-tier .tier-status { font-size: 13px; font-weight: bold; }
-        .refer-tier .tier-status.claimed { color: #22c55e; }
+        .refer-tier .tier-status { font-size: 13px; font-weight: 700; }
+        .refer-tier .tier-status.claimed { color: #34d399; }
         .refer-tier .tier-status.locked { color: #6b7280; }
         .refer-tier .tier-status.available { color: #fbbf24; cursor: pointer; }
-        .refer-progress { background: #1a1f3a; border-radius: 12px; padding: 14px; border: 1px solid rgba(255,255,255,0.04); }
-        .refer-progress .progress-bar { width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; margin-top: 8px; overflow: hidden; }
-        .refer-progress .progress-bar .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 3px; }
+
+        .refer-progress { background: rgba(255,255,255,0.03); border-radius: 14px; padding: 16px; border: 1px solid rgba(255,255,255,0.05); }
+        .refer-progress .progress-bar { width: 100%; height: 6px; background: rgba(255,255,255,0.06); border-radius: 4px; margin-top: 10px; overflow: hidden; }
+        .refer-progress .progress-bar .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 4px; }
         .refer-progress .progress-text { display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; margin-top: 4px; }
-        .referral-list-box { background: #1a1f3a; border-radius: 12px; padding: 14px; margin-top: 12px; border: 1px solid rgba(255,255,255,0.04); max-height: 200px; overflow-y: auto; }
-        .referral-list-box .list-title { font-size: 13px; color: #94a3b8; margin-bottom: 8px; }
-        .referral-list-box::-webkit-scrollbar { width: 3px; }
-        .referral-list-box::-webkit-scrollbar-track { background: rgba(255,255,255,0.04); border-radius: 2px; }
-        .referral-list-box::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 2px; }
-        .referral-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+        .referral-list-box { background: rgba(255,255,255,0.03); border-radius: 14px; padding: 16px; margin-top: 14px; border: 1px solid rgba(255,255,255,0.05); max-height: 220px; overflow-y: auto; }
+        .referral-list-box .list-title { font-size: 13px; color: #94a3b8; margin-bottom: 10px; }
+        .referral-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
         .referral-item:last-child { border-bottom: none; }
-        .referral-item .name { font-size: 13px; }
-        .referral-item .bonus { color: #22c55e; font-size: 12px; font-weight: bold; }
+        .referral-item .name { font-size: 13px; font-weight: 500; }
+        .referral-item .bonus { color: #34d399; font-size: 12px; font-weight: bold; }
         .referral-item .date { font-size: 10px; color: #6b7280; }
-        
-        .wallet-card { background: #1a1f3a; padding: 20px; border-radius: 14px; text-align: center; }
-        .wallet-card .wallet-balance { font-size: 42px; font-weight: 800; color: #fbbf24; }
-        .wallet-card .wallet-usd { color: #22c55e; font-size: 18px; font-weight: bold; margin-top: 4px; }
-        .wallet-card .wallet-total { background: rgba(34,197,94,0.08); border-radius: 6px; padding: 8px; margin-top: 10px; }
+
+        /* ===== WALLET ===== */
+        .wallet-card { background: rgba(255,255,255,0.03); padding: 24px 20px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .wallet-card .wallet-balance { font-size: 46px; font-weight: 900; color: #fbbf24; text-shadow: 0 0 30px rgba(251,191,36,0.2); }
+        .wallet-card .wallet-usd { color: #34d399; font-size: 20px; font-weight: bold; margin-top: 4px; }
+        .wallet-card .wallet-total { background: rgba(52,211,153,0.06); border-radius: 10px; padding: 10px; margin-top: 12px; }
         .wallet-card .wallet-total .label { font-size: 12px; color: #94a3b8; }
-        .wallet-card .wallet-total .value { font-size: 16px; font-weight: bold; color: #22c55e; }
-        .wallet-card .wallet-conversion { background: rgba(59,130,246,0.08); border-radius: 6px; padding: 8px; margin-top: 8px; }
+        .wallet-card .wallet-total .value { font-size: 17px; font-weight: bold; color: #34d399; }
+        .wallet-card .wallet-conversion { background: rgba(59,130,246,0.06); border-radius: 10px; padding: 10px; margin-top: 10px; }
         .wallet-card .wallet-conversion .label { font-size: 11px; color: #94a3b8; }
-        .wallet-card .wallet-conversion .value { font-size: 13px; color: #3b82f6; font-weight: bold; }
-        .wallet-card .withdraw-section { margin-top: 12px; padding: 12px; background: rgba(239,68,68,0.08); border-radius: 8px; border: 1px solid rgba(239,68,68,0.15); }
-        .wallet-card .withdraw-section .withdraw-btn { margin-top: 8px; padding: 8px 20px; background: linear-gradient(135deg, #22c55e, #16a34a); border: none; border-radius: 6px; color: #fff; font-weight: bold; cursor: pointer; width: 100%; font-size: 13px; }
-        .wallet-card .withdraw-section .withdraw-btn:disabled { background: #6b7280; cursor: not-allowed; }
-        .wallet-card .withdraw-history { margin-top: 12px; padding: 8px; background: rgba(255,255,255,0.04); border-radius: 6px; max-height: 180px; overflow-y: auto; text-align: left; }
-        .wallet-card .withdraw-history .title { font-size: 10px; color: #94a3b8; margin-bottom: 4px; }
-        .withdraw-history-item { padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .wallet-card .wallet-conversion .value { font-size: 14px; color: #60a5fa; font-weight: bold; }
+        .wallet-card .withdraw-section { margin-top: 16px; padding: 14px; background: rgba(239,68,68,0.06); border-radius: 12px; border: 1px solid rgba(239,68,68,0.1); }
+        .wallet-card .withdraw-section .withdraw-btn { margin-top: 10px; padding: 10px 24px; background: linear-gradient(135deg, #34d399, #10b981); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; width: 100%; font-size: 14px; box-shadow: 0 4px 20px rgba(52,211,153,0.2); transition: all 0.2s; }
+        .wallet-card .withdraw-section .withdraw-btn:disabled { background: #4b5563; cursor: not-allowed; box-shadow: none; }
+        .wallet-card .withdraw-history { margin-top: 14px; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 10px; max-height: 180px; overflow-y: auto; text-align: left; }
+        .wallet-card .withdraw-history .title { font-size: 10px; color: #94a3b8; margin-bottom: 6px; }
+        .withdraw-history-item { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04); display: flex; justify-content: space-between; align-items: center; }
         .withdraw-history-item:last-child { border-bottom: none; }
         .withdraw-history-item .amount { font-weight: bold; color: #fbbf24; }
         .withdraw-history-item .status-pending { color: #f59e0b; }
-        .withdraw-history-item .status-approved { color: #22c55e; }
+        .withdraw-history-item .status-approved { color: #34d399; }
         .withdraw-history-item .status-cancelled { color: #ef4444; }
         .withdraw-history-item .date { font-size: 9px; color: #6b7280; }
-        
-        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; background: rgba(17,24,39,0.95); backdrop-filter: blur(20px); display: flex; justify-content: space-around; padding: 10px 8px; border-top: 1px solid rgba(255,255,255,0.06); z-index: 1000; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; color: #6b7280; font-size: 9px; cursor: pointer; flex: 1; }
-        .nav-item.active { color: #3b82f6; }
-        .nav-item i { font-size: 18px; }
-        
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center; }
+
+        /* ===== BOTTOM NAV ===== */
+        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; background: rgba(17,24,39,0.92); backdrop-filter: blur(24px); display: flex; justify-content: space-around; padding: 10px 6px; border-top: 1px solid rgba(255,255,255,0.06); z-index: 1000; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; color: #6b7280; font-size: 10px; cursor: pointer; flex: 1; transition: color 0.2s; }
+        .nav-item.active { color: #60a5fa; }
+        .nav-item i { font-size: 20px; transition: transform 0.2s; }
+        .nav-item:hover i { transform: translateY(-2px); }
+        .nav-item.active i { text-shadow: 0 0 20px rgba(96,165,250,0.3); }
+
+        /* ===== MODALS ===== */
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center; }
         .modal.active { display: flex; }
-        .modal-content { background: #1e293b; padding: 20px; border-radius: 16px; width: 90%; max-width: 340px; text-align: center; }
-        .modal-content button { background: linear-gradient(135deg, #06b6d4, #3b82f6); color: #fff; padding: 10px 32px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; margin-top: 8px; }
-        .success-animation { font-size: 48px; margin-bottom: 12px; }
-        .modal-content h3 { font-size: 20px; margin-bottom: 6px; }
+        .modal-content { background: linear-gradient(145deg, #1e293b, #0f172a); padding: 24px; border-radius: 24px; width: 90%; max-width: 360px; text-align: center; border: 1px solid rgba(255,255,255,0.06); box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+        .modal-content button { background: linear-gradient(135deg, #06b6d4, #3b82f6); color: #fff; padding: 12px 36px; border-radius: 14px; border: none; font-weight: 700; cursor: pointer; margin-top: 12px; transition: transform 0.2s; }
+        .modal-content button:hover { transform: scale(1.03); }
+        .success-animation { font-size: 54px; margin-bottom: 14px; }
+        .modal-content h3 { font-size: 22px; margin-bottom: 8px; }
         .modal-content p { color: #94a3b8; margin-bottom: 12px; }
-        
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #22c55e; color: #fff; padding: 10px 20px; border-radius: 10px; font-weight: bold; z-index: 9999; display: none; font-size: 14px; }
-        .toast.show { display: block; animation: slideDown 0.3s ease-out; }
-        .toast.error { background: #ef4444; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-100%); } to { opacity: 1; transform: translateY(0); } }
-        
-        .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #0a0e27; z-index: 9998; display: none; overflow-y: auto; padding-bottom: 80px; }
+
+        /* ===== TOAST ===== */
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #34d399; color: #fff; padding: 12px 24px; border-radius: 16px; font-weight: 700; z-index: 9999; display: none; font-size: 15px; box-shadow: 0 8px 32px rgba(52,211,153,0.3); }
+        .toast.show { display: block; animation: slideDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .toast.error { background: #ef4444; box-shadow: 0 8px 32px rgba(239,68,68,0.3); }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-80px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+        /* ===== OVERLAYS ===== */
+        .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10,14,39,0.98); z-index: 9998; display: none; overflow-y: auto; padding-bottom: 80px; }
         .overlay.show { display: block; }
-        .overlay-header { background: linear-gradient(135deg, #1e3a8a, #5b21b6); padding: 16px 18px; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 10px; }
-        .overlay-header .back-btn { background: rgba(255,255,255,0.15); border: none; color: #fff; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 6px; }
-        .overlay-header h2 { font-size: 18px; flex: 1; text-align: center; margin-right: 50px; }
-        .overlay-content { padding: 14px; }
-        
-        .current-level-card { background: #1a1f3a; border-radius: 14px; padding: 16px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.04); text-align: center; }
-        .current-level-card .level-emoji { font-size: 40px; }
-        .current-level-card .level-number { font-size: 26px; font-weight: bold; color: #fbbf24; }
-        .current-level-card .level-title { font-size: 16px; color: #94a3b8; }
+        .overlay-header { background: linear-gradient(135deg, #1e3a8a, #6d28d9); padding: 16px 20px; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 12px; }
+        .overlay-header .back-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 8px 18px; border-radius: 12px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 6px; transition: background 0.2s; }
+        .overlay-header .back-btn:hover { background: rgba(255,255,255,0.2); }
+        .overlay-header h2 { font-size: 20px; flex: 1; text-align: center; margin-right: 50px; }
+        .overlay-content { padding: 18px; }
+
+        /* ===== LEVEL ===== */
+        .current-level-card { background: rgba(255,255,255,0.03); border-radius: 18px; padding: 20px; margin-bottom: 18px; border: 1px solid rgba(255,255,255,0.05); text-align: center; }
+        .current-level-card .level-emoji { font-size: 48px; }
+        .current-level-card .level-number { font-size: 30px; font-weight: 900; color: #fbbf24; }
+        .current-level-card .level-title { font-size: 17px; color: #94a3b8; }
         .current-level-card .level-points { font-size: 13px; color: #94a3b8; margin-top: 4px; }
-        .current-level-card .level-progress { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin-top: 10px; overflow: hidden; }
-        .current-level-card .level-progress .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 3px; }
+        .current-level-card .level-progress { width: 100%; height: 8px; background: rgba(255,255,255,0.06); border-radius: 6px; margin-top: 12px; overflow: hidden; }
+        .current-level-card .level-progress .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 6px; }
         .current-level-card .level-progress-text { display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; margin-top: 4px; }
-        .reward-section { background: #1a1f3a; border-radius: 12px; padding: 12px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.04); }
-        .reward-section .reward-title { font-size: 13px; color: #94a3b8; margin-bottom: 6px; }
-        .reward-section .reward-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
-        .reward-section .reward-item:last-child { border-bottom: none; }
-        .reward-section .reward-item .value { color: #fbbf24; font-weight: bold; font-size: 13px; }
-        .filter-tabs { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; }
-        .filter-tabs .tab { padding: 4px 14px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); background: transparent; color: #94a3b8; cursor: pointer; font-size: 12px; white-space: nowrap; }
-        .filter-tabs .tab.active { background: linear-gradient(135deg, #7c3aed, #2563eb); border-color: transparent; color: #fff; }
-        .level-list-title { font-size: 16px; font-weight: bold; margin: 12px 0; display: flex; align-items: center; gap: 8px; }
-        .level-list-title span { font-size: 12px; color: #94a3b8; font-weight: normal; }
-        .level-item { background: #1a1f3a; border-radius: 10px; padding: 10px 14px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(255,255,255,0.04); }
-        .level-item.active { border-color: #fbbf24; background: rgba(251,191,36,0.05); }
-        .level-item.locked { opacity: 0.5; }
-        .level-item .level-info { display: flex; align-items: center; gap: 10px; }
-        .level-item .level-info .num { font-size: 14px; font-weight: bold; color: #94a3b8; min-width: 26px; }
-        .level-item .level-info .name { font-size: 13px; }
-        .level-item .level-info .emoji { font-size: 18px; }
-        .level-item .level-info .badge { font-size: 9px; padding: 2px 6px; border-radius: 8px; background: rgba(251,191,36,0.2); color: #fbbf24; }
-        .level-item .level-reward { font-size: 12px; color: #22c55e; }
-        .level-item .level-check { color: #22c55e; font-size: 16px; }
-        .level-list { max-height: 350px; overflow-y: auto; }
-        .level-list::-webkit-scrollbar { width: 3px; }
-        .level-list::-webkit-scrollbar-track { background: rgba(255,255,255,0.04); border-radius: 2px; }
-        .level-list::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 2px; }
-        
-        .weekly-overlay .day-box { background: #1a1f3a; border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.04); display: flex; align-items: center; justify-content: space-between; }
-        .weekly-overlay .day-box .day-info .day-name { font-size: 14px; font-weight: bold; }
+
+        .filter-tabs { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 4px; }
+        .filter-tabs .tab { padding: 6px 18px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.08); background: transparent; color: #94a3b8; cursor: pointer; font-size: 12px; white-space: nowrap; transition: all 0.2s; }
+        .filter-tabs .tab.active { background: linear-gradient(135deg, #7c3aed, #2563eb); border-color: transparent; color: #fff; box-shadow: 0 4px 16px rgba(124,58,237,0.3); }
+        .filter-tabs .tab:hover:not(.active) { background: rgba(255,255,255,0.05); }
+
+        .level-list-title { font-size: 18px; font-weight: 700; margin: 14px 0; display: flex; align-items: center; gap: 10px; }
+        .level-item { background: rgba(255,255,255,0.03); border-radius: 14px; padding: 12px 16px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(255,255,255,0.04); transition: all 0.2s; }
+        .level-item.active { border-color: #fbbf24; background: rgba(251,191,36,0.06); box-shadow: 0 0 20px rgba(251,191,36,0.05); }
+        .level-item.locked { opacity: 0.4; }
+        .level-item .level-info { display: flex; align-items: center; gap: 12px; }
+        .level-item .level-info .num { font-size: 15px; font-weight: bold; color: #94a3b8; min-width: 30px; }
+        .level-item .level-info .name { font-size: 14px; }
+        .level-item .level-info .emoji { font-size: 20px; }
+        .level-item .level-info .badge { font-size: 10px; padding: 3px 10px; border-radius: 20px; background: rgba(251,191,36,0.15); color: #fbbf24; }
+        .level-item .level-reward { font-size: 13px; color: #34d399; }
+        .level-item .level-check { color: #34d399; font-size: 18px; }
+
+        /* ===== WEEKLY OVERLAY ===== */
+        .weekly-overlay .day-box { background: rgba(255,255,255,0.03); border-radius: 14px; padding: 14px 18px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between; }
+        .weekly-overlay .day-box .day-info .day-name { font-size: 15px; font-weight: 600; }
         .weekly-overlay .day-box .day-info .day-reward { font-size: 11px; color: #94a3b8; }
-        .weekly-overlay .day-box .day-status { padding: 4px 14px; border-radius: 10px; font-size: 11px; font-weight: bold; border: none; cursor: pointer; }
-        .weekly-overlay .day-box .day-status.available { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; }
-        .weekly-overlay .day-box .day-status.claimed { background: #334155; color: #94a3b8; cursor: default; }
-        .weekly-overlay .day-box .day-status.locked { background: #1e293b; color: #6b7280; cursor: default; }
+        .weekly-overlay .day-box .day-status { padding: 6px 18px; border-radius: 30px; font-size: 12px; font-weight: 700; border: none; cursor: pointer; transition: all 0.2s; }
+        .weekly-overlay .day-box .day-status.available { background: linear-gradient(135deg, #34d399, #10b981); color: #fff; }
+        .weekly-overlay .day-box .day-status.claimed { background: #1e293b; color: #6b7280; cursor: default; }
+        .weekly-overlay .day-box .day-status.locked { background: #0f172a; color: #4b5563; cursor: default; }
         .weekly-overlay .day-box .day-status.ad-required { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
-        .weekly-overlay .day-box .ad-box { width: 100%; margin-top: 8px; padding: 10px; background: rgba(255,255,255,0.04); border-radius: 10px; display: none; }
+        .weekly-overlay .day-box .ad-box { width: 100%; margin-top: 10px; padding: 14px; background: rgba(255,255,255,0.03); border-radius: 12px; display: none; }
         .weekly-overlay .day-box .ad-box.show { display: block; }
-        .weekly-overlay .day-box .ad-box .claim-btn { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; padding: 6px 16px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; margin-top: 6px; width: 100%; }
-        
-        .banned-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 99999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 20px; text-align: center; }
+        .weekly-overlay .day-box .ad-box .claim-btn { background: linear-gradient(135deg, #34d399, #10b981); color: #fff; padding: 8px 20px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; margin-top: 6px; width: 100%; }
+
+        /* ===== BANNED ===== */
+        .banned-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.97); z-index: 99999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; }
         .banned-overlay.show { display: flex; }
-        .banned-overlay h1 { color: #ef4444; font-size: 28px; margin-bottom: 10px; }
-        .banned-overlay p { color: #94a3b8; max-width: 380px; line-height: 1.5; }
-        .banned-overlay .ban-reason { background: #1a1f3a; padding: 14px; border-radius: 10px; margin-top: 12px; max-width: 380px; color: #fbbf24; border: 1px solid rgba(239,68,68,0.2); }
-        
-        .main-content.hide { display: none; }
-        .page { display: none; }
-        .page.active { display: block; }
+        .banned-overlay h1 { color: #ef4444; font-size: 30px; margin-bottom: 12px; }
+        .banned-overlay p { color: #94a3b8; max-width: 380px; line-height: 1.6; }
+        .banned-overlay .ban-reason { background: rgba(255,255,255,0.05); padding: 16px; border-radius: 14px; margin-top: 14px; max-width: 380px; color: #fbbf24; border: 1px solid rgba(239,68,68,0.15); }
+
         .hidden { display: none !important; }
         .loading { text-align: center; padding: 30px; color: #6b7280; }
-        .loading-spinner { border: 3px solid rgba(255,255,255,0.08); border-top: 3px solid #3b82f6; border-radius: 50%; width: 32px; height: 32px; animation: spin 1s linear infinite; margin: 0 auto 12px; }
+        .loading-spinner { border: 3px solid rgba(255,255,255,0.06); border-top: 3px solid #60a5fa; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 12px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
@@ -383,16 +413,18 @@
         <!-- ===== PAGE: HOME (Enhanced Tap) ===== -->
         <div class="page active" id="pageHome">
             <div class="tap-section-enhanced">
-                <div class="tap-coin" onclick="handleTap(event)">
-                    <span class="coin-icon">🪙</span>
-                    <span class="tap-text">TAP ME</span>
+                <div class="tap-coin-wrapper">
+                    <div class="tap-coin" onclick="handleTap(event)">
+                        <span class="coin-icon">🪙</span>
+                        <span class="tap-text">TAP ME</span>
+                    </div>
                 </div>
                 <div class="tap-stats">
                     <div class="stat"><div class="number" id="tapCount">0</div><div class="label">Total Taps</div></div>
                     <div class="stat"><div class="number" id="tapEnergy">100</div><div class="label">Energy ⚡</div></div>
                 </div>
                 <div class="recharge-timer" id="rechargeTimer">
-                    <!-- Dynamic content: energy display + ad button / countdown -->
+                    <!-- Dynamic content -->
                 </div>
                 <div class="energy-offer-section">
                     <div class="offer-title">⚡ Buy Energy with Coins</div>
@@ -405,7 +437,6 @@
         <div class="page" id="pageEarn">
             <h2 class="page-header">📺 Earn Coins</h2>
             <div class="video-card">
-                <div class="video-icon">📺</div>
                 <div class="video-title">Watch Video & Earn</div>
                 <div class="video-desc">Watch short videos to earn coins!</div>
                 <div class="video-reward" id="videoReward">+10 Coins per video</div>
@@ -511,13 +542,12 @@
     <script>
         // ==================== MONETAG REWARDED AD ====================
         function showRewardedAd(callback) {
-            // Monetag Rewarded Interstitial
             show_11197472().then(() => {
                 console.log('✅ Ad watched successfully!');
                 if (callback) callback();
             }).catch((err) => {
                 console.log('Ad error:', err);
-                if (callback) callback(); // still call callback to avoid stuck
+                if (callback) callback();
             });
         }
 
@@ -561,7 +591,7 @@
             energyVideoReward: 20,
             referrals: [],
             weekStart: null,
-            energyRechargeStart: null // timestamp when energy became 0
+            energyRechargeStart: null
         };
 
         let tasks = [], energyOffers = [];
@@ -695,7 +725,6 @@
             let bal = appState.usdBalance || 0, min = appState.minWithdraw || 10;
             if (bal < min) { showToast(`Minimum $${min} USD required!`, 'error'); return; }
             
-            // No ads for withdraw, just process
             let amount = bal, id = Date.now().toString();
             
             const withdrawData = {
@@ -830,6 +859,7 @@
             }
         }
 
+        // ==================== VIDEO WATCH (with 15s timer) ====================
         function watchVideo() {
             const today = new Date().toDateString();
             const isToday = appState.videoLastWatchDate === today;
@@ -841,52 +871,60 @@
                 return;
             }
 
-            // Use Monetag rewarded ad
-            showRewardedAd(function() {
-                appState.videoWatchedToday = watched + 1;
-                appState.videoLastWatchDate = today;
-                const reward = appState.videoReward || 10;
-                appState.balance += reward;
-                
-                userRef.update({
-                    balance: appState.balance,
-                    videoWatchedToday: appState.videoWatchedToday,
-                    videoLastWatchDate: appState.videoLastWatchDate
-                });
+            const btn = document.getElementById('videoBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Please wait...';
 
-                document.getElementById('videoRewardText').textContent = `You earned +${reward} Coins! 📺`;
-                document.getElementById('videoModal').classList.add('active');
-                
-                updateUI();
-                updateLevelUI();
-                updateVideoUI();
-                showToast(`+${reward} Coins for watching video! 🎉`);
-            });
+            let seconds = 15;
+            const timerInterval = setInterval(() => {
+                seconds--;
+                btn.textContent = `⏳ ${seconds}s`;
+                if (seconds <= 0) {
+                    clearInterval(timerInterval);
+                    btn.textContent = '▶ Watch Video';
+                    btn.disabled = false;
+                    // Now show the ad
+                    showRewardedAd(function() {
+                        appState.videoWatchedToday = watched + 1;
+                        appState.videoLastWatchDate = today;
+                        const reward = appState.videoReward || 10;
+                        appState.balance += reward;
+                        
+                        userRef.update({
+                            balance: appState.balance,
+                            videoWatchedToday: appState.videoWatchedToday,
+                            videoLastWatchDate: appState.videoLastWatchDate
+                        });
+
+                        document.getElementById('videoRewardText').textContent = `You earned +${reward} Coins! 📺`;
+                        document.getElementById('videoModal').classList.add('active');
+                        
+                        updateUI();
+                        updateLevelUI();
+                        updateVideoUI();
+                        showToast(`+${reward} Coins for watching video! 🎉`);
+                    });
+                }
+            }, 1000);
         }
 
         // ==================== ENERGY RECHARGE (TIMER + AD) ====================
-        // 1 hour = 3600 seconds for full 100 energy
-        const RECHARGE_TIME = 3600; // seconds
+        const RECHARGE_TIME = 3600; // 1 hour
 
         function startRechargeTimer() {
             if (rechargeTimerInterval) clearInterval(rechargeTimerInterval);
             
-            // If energy is already full, don't start timer
             if (appState.tapEnergy >= 100) {
                 updateRechargeTimer();
                 return;
             }
 
-            // If energy is 0, set recharge start time if not set
             if (appState.tapEnergy === 0 && !appState.energyRechargeStart) {
                 appState.energyRechargeStart = Date.now();
                 userRef.update({ energyRechargeStart: appState.energyRechargeStart });
             }
 
-            // If energy > 0 but less than 100, we might have partial recharge from timer
-            // We'll compute based on stored start time or just show current energy
-
-            updateRechargeTimer(); // initial update
+            updateRechargeTimer();
 
             rechargeTimerInterval = setInterval(() => {
                 updateRechargeTimer();
@@ -896,42 +934,37 @@
         function updateRechargeTimer() {
             let div = document.getElementById('rechargeTimer');
             
-            // If energy is full
             if (appState.tapEnergy >= 100) {
                 if (rechargeTimerInterval) {
                     clearInterval(rechargeTimerInterval);
                     rechargeTimerInterval = null;
                 }
-                appState.energyRechargeStart = null; // reset
+                appState.energyRechargeStart = null;
                 userRef.update({ energyRechargeStart: null });
                 
                 div.innerHTML = `
                     <div class="status-text full">✅ Energy Full! Keep Tapping!</div>
                     <div class="energy-display">${appState.tapEnergy}/100 Energy</div>
-                    <button class="watch-video-btn" onclick="watchVideoForEnergy()">
+                    <button class="watch-video-btn" id="energyVideoBtn" onclick="watchVideoForEnergy()">
                         📺 Watch Video for +20 Energy
                     </button>
                 `;
                 return;
             }
 
-            // Energy is less than 100
-            // If energy is 0, we show timer countdown if recharge started
             if (appState.tapEnergy === 0 && appState.energyRechargeStart) {
                 const elapsed = Math.floor((Date.now() - appState.energyRechargeStart) / 1000);
                 const remaining = Math.max(0, RECHARGE_TIME - elapsed);
                 
                 if (remaining <= 0) {
-                    // Recharge complete!
                     appState.tapEnergy = 100;
                     appState.energyRechargeStart = null;
                     userRef.update({ tapEnergy: 100, energyRechargeStart: null });
-                    updateRechargeTimer(); // will show full
+                    updateRechargeTimer();
                     showToast('⚡ Energy fully recharged!');
                     return;
                 }
 
-                // Show countdown
                 const hours = Math.floor(remaining / 3600);
                 const minutes = Math.floor((remaining % 3600) / 60);
                 const seconds = remaining % 60;
@@ -940,17 +973,15 @@
                 div.innerHTML = `
                     <div class="energy-display">0/100 Energy</div>
                     <div class="status-text empty">⏳ Recharging in ${timeStr}</div>
-                    <button class="watch-video-btn" onclick="watchVideoForEnergy()">
+                    <div class="countdown-timer">${timeStr}</div>
+                    <button class="watch-video-btn" id="energyVideoBtn" onclick="watchVideoForEnergy()">
                         📺 Watch Video for +20 Energy
                     </button>
                 `;
                 return;
             }
 
-            // Energy > 0 but < 100: show current energy and ad button
-            // But also check if we have a recharge start time (could be partial)
             if (appState.energyRechargeStart) {
-                // We might have partially recharged from timer. Let's compute.
                 const elapsed = Math.floor((Date.now() - appState.energyRechargeStart) / 1000);
                 const totalRecharge = Math.min(100, Math.floor((elapsed / RECHARGE_TIME) * 100));
                 if (totalRecharge > appState.tapEnergy) {
@@ -965,53 +996,75 @@
                 }
             }
 
-            // Show current energy + ad button
             div.innerHTML = `
                 <div class="energy-display">${appState.tapEnergy}/100 Energy</div>
                 <div class="status-text ${appState.tapEnergy === 0 ? 'empty' : ''}">
                     ${appState.tapEnergy === 0 ? '⛔ No Energy! Watch video to recharge!' : '⚡ Energy remaining'}
                 </div>
-                <button class="watch-video-btn" onclick="watchVideoForEnergy()">
+                <button class="watch-video-btn" id="energyVideoBtn" onclick="watchVideoForEnergy()">
                     📺 Watch Video for +20 Energy
                 </button>
             `;
         }
 
-        // ==================== WATCH VIDEO FOR ENERGY (Monetag Ad) ====================
+        // ==================== WATCH VIDEO FOR ENERGY (with 15s timer) ====================
         function watchVideoForEnergy() {
             if (appState.tapEnergy >= 100) {
                 showToast('Energy is already full!', 'error');
                 return;
             }
-            
-            // Show Monetag rewarded ad
-            showRewardedAd(function() {
-                const energyGain = appState.energyVideoReward || 20;
-                appState.tapEnergy = Math.min(100, appState.tapEnergy + energyGain);
-                // If energy becomes 100, clear recharge start
-                if (appState.tapEnergy >= 100) {
-                    appState.energyRechargeStart = null;
-                } else if (appState.tapEnergy > 0 && appState.energyRechargeStart) {
-                    // If energy > 0 and we have a recharge timer, we might want to adjust?
-                    // We'll keep it simple: if energy > 0, we don't need timer, but we keep the start if it was set.
-                    // Actually, if energy > 0, we can clear the start because timer not needed (energy will be used)
-                    // But we might want to continue recharging if energy is not full? 
-                    // For simplicity, if energy > 0, we clear the start so timer won't override.
-                    appState.energyRechargeStart = null;
+
+            const btn = document.getElementById('energyVideoBtn');
+            if (!btn) {
+                // If button not found, try to find it again
+                const newBtn = document.querySelector('.watch-video-btn');
+                if (newBtn) {
+                    newBtn.disabled = true;
+                    newBtn.textContent = '⏳ Please wait...';
+                    startEnergyTimer(newBtn);
                 }
-                userRef.update({
-                    tapEnergy: appState.tapEnergy,
-                    energyRechargeStart: appState.energyRechargeStart
-                });
-                updateTapUI();
-                updateRechargeTimer();
-                showToast(`⚡ +${energyGain} Energy from video!`);
-            });
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = '⏳ Please wait...';
+            startEnergyTimer(btn);
+        }
+
+        function startEnergyTimer(btn) {
+            let seconds = 15;
+            const timerInterval = setInterval(() => {
+                seconds--;
+                if (btn) btn.textContent = `⏳ ${seconds}s`;
+                if (seconds <= 0) {
+                    clearInterval(timerInterval);
+                    if (btn) {
+                        btn.textContent = '📺 Watch Video for +20 Energy';
+                        btn.disabled = false;
+                    }
+                    // Show the ad
+                    showRewardedAd(function() {
+                        const energyGain = appState.energyVideoReward || 20;
+                        appState.tapEnergy = Math.min(100, appState.tapEnergy + energyGain);
+                        if (appState.tapEnergy >= 100) {
+                            appState.energyRechargeStart = null;
+                        } else if (appState.tapEnergy > 0 && appState.energyRechargeStart) {
+                            appState.energyRechargeStart = null;
+                        }
+                        userRef.update({
+                            tapEnergy: appState.tapEnergy,
+                            energyRechargeStart: appState.energyRechargeStart
+                        });
+                        updateTapUI();
+                        updateRechargeTimer();
+                        showToast(`⚡ +${energyGain} Energy from video!`);
+                    });
+                }
+            }, 1000);
         }
 
         // ==================== TAP ====================
         function handleTap(event) {
-            // Energy 0 হলে ট্যাপ বন্ধ - Error দেখাবে
             if (appState.tapEnergy <= 0) {
                 showToast('⛔ No Energy! Watch video or wait for recharge!', 'error');
                 return;
@@ -1029,13 +1082,11 @@
             updateTapUI();
             updateLevelUI();
             
-            // If energy becomes 0, start recharge timer
             if (appState.tapEnergy === 0) {
                 appState.energyRechargeStart = Date.now();
                 userRef.update({ energyRechargeStart: appState.energyRechargeStart });
                 startRechargeTimer();
             } else {
-                // If energy > 0, update recharge timer display
                 updateRechargeTimer();
             }
             
@@ -1046,7 +1097,6 @@
                 energyRechargeStart: appState.energyRechargeStart
             }).catch(() => {});
             
-            // Floating coin animation
             let coin = document.createElement('div');
             coin.className = 'floating-coin';
             coin.textContent = `+${reward} 🪙`;
@@ -1134,7 +1184,7 @@
             document.getElementById('levelDailyBonus').textContent = `${10 + t.bonus} Coins`;
             let isExclusive = data.level >= 10;
             document.getElementById('levelExclusiveTasks').textContent = isExclusive ? '✅ Unlocked' : '🔒 Locked';
-            document.getElementById('levelExclusiveTasks').style.color = isExclusive ? '#22c55e' : '#94a3b8';
+            document.getElementById('levelExclusiveTasks').style.color = isExclusive ? '#34d399' : '#94a3b8';
         }
 
         function renderLevelList() {
@@ -1160,7 +1210,7 @@
                             <span class="emoji">${t.emoji}</span>
                             <span class="name">${t.name}</span>
                             ${isCurrent ? '<span class="badge">👈 Current</span>' : ''}
-                            ${!isUnlocked ? '<span class="badge" style="background:rgba(239,68,68,0.2);color:#ef4444;">🔒</span>' : ''}
+                            ${!isUnlocked ? '<span class="badge" style="background:rgba(239,68,68,0.15);color:#ef4444;">🔒</span>' : ''}
                         </div>
                         <div class="level-reward">+${t.bonus}%</div>
                         ${isCurrent ? '<div class="level-check">✅</div>' : ''}
@@ -1270,7 +1320,6 @@
             if (day !== today) { showToast('Only today\'s reward!','error'); return; }
             showToast('⏳ Loading ad...');
             
-            // Monetag rewarded ad
             showRewardedAd(function() {
                 if (!appState.weeklyAdWatched) appState.weeklyAdWatched = [];
                 if (!appState.weeklyAdWatched.includes(day)) {
@@ -1278,7 +1327,7 @@
                     userRef.update({ weeklyAdWatched: appState.weeklyAdWatched });
                 }
                 document.getElementById('adModalText').textContent = '✅ Ad watched!';
-                document.getElementById('adModalContent').innerHTML = `<div style="padding:10px;background:#0a0e27;border-radius:6px;margin:10px 0;"><p style="color:#22c55e;font-size:15px;">🎉 Ad Completed!</p></div>`;
+                document.getElementById('adModalContent').innerHTML = `<div style="padding:10px;background:rgba(255,255,255,0.05);border-radius:8px;margin:10px 0;"><p style="color:#34d399;font-size:15px;">🎉 Ad Completed!</p></div>`;
                 document.getElementById('adModal').classList.add('active');
                 setTimeout(() => { document.getElementById('adModal').classList.remove('active'); claimWeeklyReward(day); }, 1500);
             });
@@ -1364,7 +1413,7 @@
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
                             <span style="font-size:11px;color:#94a3b8;">${task.participants || 0} participants</span>
                             ${task.type !== 'link' ? actionHTML : ''}
-                            ${isCompleted ? '<span style="color:#22c55e;font-size:12px;">✓ Done</span>' : ''}
+                            ${isCompleted ? '<span style="color:#34d399;font-size:12px;">✓ Done</span>' : ''}
                         </div>
                     </div>
                 `;
@@ -1438,11 +1487,9 @@
             appState.balance -= price;
             appState.tapEnergy = Math.min(100, appState.tapEnergy + energy);
             appState.purchasedOffers[id] = bought + 1;
-            // If energy becomes full, clear recharge timer
             if (appState.tapEnergy >= 100) {
                 appState.energyRechargeStart = null;
             } else if (appState.energyRechargeStart) {
-                // If energy > 0 and we had a timer, clear it because energy bought
                 appState.energyRechargeStart = null;
             }
             userRef.update({ balance: appState.balance, tapEnergy: appState.tapEnergy, purchasedOffers: appState.purchasedOffers, energyRechargeStart: appState.energyRechargeStart });
@@ -1496,7 +1543,8 @@
                                             referredAt: Date.now(),
                                             username: tg.initDataUnsafe?.user?.username || 'User',
                                             bonus: 50,
-                                            userId: userId
+                                            userId: userId,
+                                            referrerName: tg.initDataUnsafe?.user?.username || 'Referrer'
                                         };
                                         db.ref('referrals/' + userId).set(refData).then(() => {
                                             db.ref('users/' + referrerId + '/referCount').transaction((current) => {
@@ -1757,7 +1805,7 @@
                     updateVideoUI();
                     updateReferUI();
                     updateWithdrawHistory();
-                    updateRechargeTimer(); // this will start timer if needed
+                    updateRechargeTimer();
                     
                     if (appState.lastConversion) {
                         startConversionTimer();
@@ -1767,7 +1815,6 @@
                         startConversionTimer();
                     }
 
-                    // If energy is 0 and recharge start exists, start timer
                     if (appState.tapEnergy === 0 && appState.energyRechargeStart) {
                         startRechargeTimer();
                     }
@@ -1799,7 +1846,9 @@
                     startConversionTimer();
                 }
                 
-                const link = `https://t.me/${tg.initDataUnsafe?.user?.username || 'CoinQuestBot'}?start=ref_${appState.referCode}`;
+                // Updated referral link with your bot
+                const botUsername = 'CoinQuist_bot';
+                const link = `https://t.me/${botUsername}?start=ref_${appState.referCode}`;
                 document.getElementById('referLinkHome').textContent = link;
             });
 
