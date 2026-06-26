@@ -33,6 +33,7 @@
         .level-section .level-row { display: flex; justify-content: space-between; align-items: center; }
         .level-section .level-title { font-size: 12px; font-weight: bold; }
         .level-section .level-number { font-size: 16px; font-weight: bold; color: #fbbf24; }
+        .level-section .level-arrow { color: #94a3b8; font-size: 14px; }
         .level-section .level-progress { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 4px; overflow: hidden; }
         .level-section .level-progress .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 2px; }
         .level-section .level-points { font-size: 10px; color: #94a3b8; margin-top: 2px; display: flex; justify-content: space-between; }
@@ -69,11 +70,12 @@
         .tap-stats .stat .label { font-size: 11px; color: #94a3b8; }
         
         .recharge-timer { text-align: center; margin-top: 8px; padding: 12px; background: rgba(255,255,255,0.04); border-radius: 10px; }
-        .recharge-timer .watch-video-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; padding: 6px 18px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 12px; margin-top: 6px; }
+        .recharge-timer .watch-video-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; padding: 8px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 13px; margin-top: 6px; }
         .recharge-timer .watch-video-btn:active { transform: scale(0.95); }
         .recharge-timer .status-text { font-size: 13px; font-weight: bold; margin-top: 4px; }
         .recharge-timer .status-text.full { color: #22c55e; }
         .recharge-timer .status-text.empty { color: #ef4444; }
+        .recharge-timer .energy-display { font-size: 16px; font-weight: bold; color: #fbbf24; margin-top: 4px; }
         
         .energy-offer-section { background: #1a1f3a; border-radius: 12px; padding: 12px; margin-top: 12px; border: 1px solid rgba(255,255,255,0.04); }
         .energy-offer-section .offer-title { font-size: 12px; color: #94a3b8; margin-bottom: 8px; text-align: center; }
@@ -875,6 +877,7 @@
             });
         }
 
+        // ==================== ENERGY VIDEO RECHARGE ====================
         function watchVideoForEnergy() {
             if (appState.tapEnergy >= 100) {
                 showToast('Energy is already full!', 'error');
@@ -893,7 +896,7 @@
             });
         }
 
-        // ==================== UPDATE RECHARGE TIMER (শুধু স্ট্যাটাস দেখাবে, টাইমার নাই) ====================
+        // ==================== UPDATE RECHARGE TIMER (শুধু স্ট্যাটাস দেখাবে) ====================
         function updateRechargeTimer() {
             let div = document.getElementById('rechargeTimer');
             
@@ -901,7 +904,7 @@
             if (appState.tapEnergy >= 100) {
                 div.innerHTML = `
                     <div class="status-text full">✅ Energy Full! Keep Tapping!</div>
-                    <div style="margin-top:6px;font-size:11px;color:#94a3b8;">${appState.tapEnergy}/100 Energy</div>
+                    <div class="energy-display">${appState.tapEnergy}/100 Energy</div>
                     <button class="watch-video-btn" onclick="watchVideoForEnergy()">
                         📺 Watch Video for +20 Energy
                     </button>
@@ -910,10 +913,19 @@
             }
             
             // Energy কম থাকলে
+            let statusMsg = '';
+            let statusClass = '';
+            if (appState.tapEnergy === 0) {
+                statusMsg = '⛔ No Energy! Watch video to recharge!';
+                statusClass = 'empty';
+            } else {
+                statusMsg = '⚡ Energy remaining';
+                statusClass = '';
+            }
+            
             div.innerHTML = `
-                <div style="font-size:12px;color:#94a3b8;">⚡ Energy Status</div>
-                <div style="font-size:11px;color:#94a3b8;">${appState.tapEnergy}/100 Energy</div>
-                ${appState.tapEnergy === 0 ? '<div class="status-text empty">⛔ No Energy! Watch video to recharge!</div>' : ''}
+                <div class="energy-display">${appState.tapEnergy}/100 Energy</div>
+                <div class="status-text ${statusClass}">${statusMsg}</div>
                 <button class="watch-video-btn" onclick="watchVideoForEnergy()">
                     📺 Watch Video for +20 Energy
                 </button>
@@ -922,7 +934,7 @@
 
         // ==================== TAP ====================
         function handleTap(event) {
-            // Energy 0 হলে ট্যাপ বন্ধ
+            // Energy 0 হলে ট্যাপ বন্ধ - Error দেখাবে
             if (appState.tapEnergy <= 0) {
                 showToast('⛔ No Energy! Watch video to recharge!', 'error');
                 return;
