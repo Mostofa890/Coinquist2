@@ -249,7 +249,13 @@
         .page.active { display: block; }
         .page-header { font-size: 18px; font-weight: 800; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        /* ===== VIDEO CARD ===== */
+        /* ===== TASK PAGE FILTERS ===== */
+        .task-filters { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 4px; }
+        .task-filters .filter-btn { padding: 4px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #94a3b8; cursor: pointer; font-size: 11px; white-space: nowrap; transition: all 0.2s; }
+        .task-filters .filter-btn.active { background: linear-gradient(135deg, #8b5cf6, #3b82f6); border-color: transparent; color: #fff; box-shadow: 0 4px 16px rgba(139,92,246,0.2); }
+        .task-filters .filter-btn:hover:not(.active) { background: rgba(255,255,255,0.05); }
+
+        /* ===== VIDEO CARD (for earning page) ===== */
         .video-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(8px); border-radius: 16px; padding: 18px 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.08); text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
         .video-card .video-title { font-size: 16px; font-weight: 700; color: #fff; }
         .video-card .video-desc { font-size: 11px; color: #94a3b8; margin: 4px 0; }
@@ -261,7 +267,7 @@
         .video-card .video-limit { font-size: 10px; color: #94a3b8; margin-top: 6px; }
         .video-card .video-watched { font-size: 11px; color: #10b981; margin-top: 4px; }
 
-        /* ===== TASK CARD ===== */
+        /* ===== TASK CARD (Dynamic) ===== */
         .task-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 14px; padding: 14px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.08); transition: transform 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
         .task-card:hover { transform: translateY(-2px); }
         .task-card .task-header { display: flex; justify-content: space-between; align-items: center; }
@@ -271,9 +277,13 @@
         .task-card .task-btn { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; padding: 6px 20px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 12px; transition: all 0.2s; box-shadow: 0 2px 12px rgba(59,130,246,0.2); }
         .task-card .task-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .task-card .task-btn.completed { background: #10b981; }
+        .task-card .task-link { color: #3b82f6; text-decoration: none; font-size: 11px; display: inline-block; margin-top: 4px; }
+        .task-card .task-video-btn { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; padding: 6px 20px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 12px; transition: all 0.2s; box-shadow: 0 2px 12px rgba(239,68,68,0.2); }
+        .task-card .task-video-btn:hover { transform: scale(1.05); }
+        .task-card .task-video-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .task-card .task-progress { background: rgba(255,255,255,0.1); height: 4px; border-radius: 4px; margin-top: 8px; overflow: hidden; }
         .task-card .task-progress .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 4px; }
-        .task-card .task-link { color: #3b82f6; text-decoration: none; font-size: 11px; display: inline-block; margin-top: 4px; }
+        .task-card .task-status { font-size: 10px; margin-top: 4px; }
 
         /* ===== REFER ===== */
         .refer-link-box { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 14px; padding: 14px; margin-bottom: 14px; border: 1px solid rgba(255,255,255,0.08); text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
@@ -587,9 +597,15 @@
             </div>
         </div>
 
-        <!-- ===== PAGE: TASKS ===== -->
+        <!-- ===== PAGE: TASKS (Dynamic) ===== -->
         <div class="page" id="pageTasks">
             <h2 class="page-header">📋 Tasks</h2>
+            <div class="task-filters">
+                <button class="filter-btn active" data-filter="all" onclick="filterTasks('all', this)">📋 All</button>
+                <button class="filter-btn" data-filter="link" onclick="filterTasks('link', this)">🔗 Link</button>
+                <button class="filter-btn" data-filter="button" onclick="filterTasks('button', this)">🟦 Button</button>
+                <button class="filter-btn" data-filter="video" onclick="filterTasks('video', this)">📺 Video</button>
+            </div>
             <div class="tasks-section" id="tasksContainer">
                 <div class="no-tasks">No tasks available. Check back later!</div>
             </div>
@@ -742,7 +758,7 @@
         // ==================== STATE ====================
         let appState = {
             balance: 0, usdBalance: 0, completedTasks: 0, referralCount: 0,
-            dailyStreak: 0, userLevel: 1, tasksCompleted: [],
+            dailyStreak: 0, userLevel: 1, tasksCompleted: [], // Array of task IDs
             weeklyClaimed: [], weeklyAdWatched: [],
             lastConversion: null, conversionRate: 1000, minWithdraw: 10,
             isBanned: false, banReason: '', withdrawHistory: [],
@@ -759,7 +775,8 @@
             progressCoins: 1000,
             videoWatchedCount: 0,
             isSpeedBoostActive: false,
-            speedBoostCooldown: 0
+            speedBoostCooldown: 0,
+            taskLastCompleted: {} // { taskId: dateString }
         };
 
         let tasks = [];
@@ -805,7 +822,7 @@
             if (page === 'wallet') updateWithdrawHistory();
         }
 
-        // ==================== CONVERSION ====================
+        // ==================== CONVERSION RATE (Dynamic from Firebase) ====================
         function loadConversionRate() {
             rateRef.on('value', (s) => {
                 appState.conversionRate = s.exists() ? s.val() : 1000;
@@ -992,7 +1009,7 @@
             });
         }
 
-        // ==================== VIDEO SETTINGS ====================
+        // ==================== VIDEO SETTINGS (Earn Page) ====================
         function loadVideoSettings() {
             videoSettingsRef.on('value', (snapshot) => {
                 if (snapshot.exists()) {
@@ -1026,7 +1043,6 @@
             }
         }
 
-        // ==================== VIDEO WATCH ====================
         function watchVideo() {
             const today = new Date().toDateString();
             const isToday = appState.videoLastWatchDate === today;
@@ -1191,10 +1207,9 @@
 
         // ==================== SPEED BOOST (3 Seconds, 1 Hour Cooldown) ====================
         function activateSpeedBoost() {
-            // চেক করুন কুলডাউন শেষ হয়েছে কিনা
             const now = Date.now();
             if (appState.speedBoostCooldown > 0) {
-                const timeLeft = Math.ceil((appState.speedBoostCooldown - now) / 60000); // মিনিটে
+                const timeLeft = Math.ceil((appState.speedBoostCooldown - now) / 60000);
                 if (timeLeft > 0) {
                     showToast(`⏳ Wait ${timeLeft} minute(s) before next Speed Boost!`, 'error');
                     return;
@@ -1206,23 +1221,19 @@
                 return;
             }
 
-            // Show popup ad (rewarded)
             showRewardedPopup(function() {
-                // Ad watched successfully
                 appState.isSpeedBoostActive = true;
                 document.getElementById('speedBoostBtn').disabled = true;
                 document.getElementById('speedBoostBtn').innerHTML = '<i class="fas fa-rocket"></i> Boost Active!';
 
-                // Show spinner overlay
                 const overlay = document.getElementById('speedSpinnerOverlay');
                 overlay.classList.add('active');
 
-                let timeLeft = 3; // 3 seconds
+                let timeLeft = 3;
                 let progress = 0;
                 const speedTimerDisplay = document.getElementById('speedTimerDisplay');
                 const speedProgressFill = document.getElementById('speedProgressFill');
 
-                // Update timer every 100ms for smooth progress
                 const speedUpdateInterval = setInterval(() => {
                     timeLeft -= 0.1;
                     progress = ((3 - timeLeft) / 3) * 100;
@@ -1231,13 +1242,11 @@
 
                     if (timeLeft <= 0) {
                         clearInterval(speedUpdateInterval);
-                        // End boost
                         appState.isSpeedBoostActive = false;
                         overlay.classList.remove('active');
                         document.getElementById('speedBoostBtn').disabled = false;
                         document.getElementById('speedBoostBtn').innerHTML = '<i class="fas fa-rocket"></i> Speed Boost <span class="boost-timer"></span>';
                         
-                        // Set cooldown: 1 hour (3600000 ms)
                         appState.speedBoostCooldown = Date.now() + 3600000;
                         userRef.update({ speedBoostCooldown: appState.speedBoostCooldown });
                         
@@ -1245,7 +1254,6 @@
                     }
                 }, 100);
 
-                // During boost, add coins every 50ms (faster) - 3 seconds = 60 coins max
                 speedBoostInterval = setInterval(() => {
                     if (appState.progressCoins > 0) {
                         appState.progressCoins -= 1;
@@ -1258,7 +1266,6 @@
                         updateUI();
                         updateLevelUI();
                     } else {
-                        // If coins run out, stop boost
                         clearInterval(speedBoostInterval);
                         appState.isSpeedBoostActive = false;
                         overlay.classList.remove('active');
@@ -1266,7 +1273,166 @@
                         document.getElementById('speedBoostBtn').innerHTML = '<i class="fas fa-rocket"></i> Speed Boost <span class="boost-timer"></span>';
                         showToast('⛔ No coins left! Boost stopped.');
                     }
-                }, 50); // 20 coins per second = 60 coins in 3 seconds
+                }, 50);
+            });
+        }
+
+        // ==================== DYNAMIC TASKS (Link, Button, Video) ====================
+        function loadTasksFromDB() {
+            tasksRef.on('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    tasks = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                    renderTasks();
+                } else {
+                    tasks = [];
+                    renderTasks();
+                }
+            });
+        }
+
+        function renderTasks() {
+            const container = document.getElementById('tasksContainer');
+            const filteredTasks = getFilteredTasks();
+            
+            if (!filteredTasks || filteredTasks.length === 0) {
+                container.innerHTML = '<div class="no-tasks">📭 No tasks available. Check back later!</div>';
+                return;
+            }
+
+            container.innerHTML = filteredTasks.map(task => {
+                const today = new Date().toDateString();
+                const isCompleted = appState.tasksCompleted.includes(task.id) || 
+                                  (appState.taskLastCompleted[task.id] && appState.taskLastCompleted[task.id] === today);
+                
+                // If task is completed today, show as completed
+                const isCompletedToday = appState.taskLastCompleted[task.id] === today;
+                
+                let actionHTML = '';
+                let statusText = '';
+                
+                if (isCompletedToday) {
+                    statusText = '✅ Done Today';
+                } else {
+                    statusText = isCompleted ? '✅ Completed' : '⏳ Incomplete';
+                }
+                
+                if (!isCompletedToday) {
+                    if (task.type === 'link') {
+                        let link = task.link || '#';
+                        actionHTML = `
+                            <a href="${link}" target="_blank" class="task-link" onclick="event.preventDefault(); window.open('${link}', '_blank'); setTimeout(() => completeTask('${task.id}'), 3000);">
+                                ${task.actionText || 'Go →'}
+                            </a>
+                        `;
+                    } else if (task.type === 'button') {
+                        actionHTML = `
+                            <button class="task-btn" onclick="completeTask('${task.id}')">
+                                ${task.actionText || 'Complete'}
+                            </button>
+                        `;
+                    } else if (task.type === 'video') {
+                        actionHTML = `
+                            <button class="task-video-btn" onclick="watchTaskVideo('${task.id}')">
+                                📺 ${task.actionText || 'Watch Video'}
+                            </button>
+                        `;
+                    }
+                }
+
+                return `
+                    <div class="task-card">
+                        <div class="task-header">
+                            <span class="task-title">${task.title}</span>
+                            <span class="task-reward">+${task.reward} 🪙</span>
+                        </div>
+                        <div class="task-desc">${task.description || ''}</div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+                            ${actionHTML}
+                            <span class="task-status">${statusText}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getFilteredTasks() {
+            if (currentFilter === 'all') return tasks;
+            return tasks.filter(task => task.type === currentFilter);
+        }
+
+        function filterTasks(filter, btn) {
+            currentFilter = filter;
+            document.querySelectorAll('.task-filters .filter-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderTasks();
+        }
+
+        function completeTask(taskId) {
+            const today = new Date().toDateString();
+            if (appState.taskLastCompleted[taskId] === today) {
+                showToast('You already completed this task today!', 'error');
+                return;
+            }
+            
+            let task = tasks.find(t => t.id === taskId);
+            if (!task) return;
+            
+            // Add task to completed list
+            if (!appState.tasksCompleted.includes(taskId)) {
+                appState.tasksCompleted.push(taskId);
+            }
+            appState.taskLastCompleted[taskId] = today;
+            appState.balance += task.reward;
+            appState.completedTasks++;
+            
+            userRef.update({ 
+                balance: appState.balance, 
+                completedTasks: appState.completedTasks, 
+                tasksCompleted: appState.tasksCompleted,
+                taskLastCompleted: appState.taskLastCompleted
+            });
+            
+            document.getElementById('rewardText').textContent = `+${task.reward} Coins`;
+            document.getElementById('successModal').classList.add('active');
+            updateUI();
+            updateLevelUI();
+            renderTasks();
+            showToast(`🎉 +${task.reward} Coins for completing task!`);
+        }
+
+        function watchTaskVideo(taskId) {
+            const today = new Date().toDateString();
+            if (appState.taskLastCompleted[taskId] === today) {
+                showToast('You already completed this task today!', 'error');
+                return;
+            }
+
+            let task = tasks.find(t => t.id === taskId);
+            if (!task) return;
+
+            showRewardedAd(function() {
+                // After ad, reward user
+                if (!appState.tasksCompleted.includes(taskId)) {
+                    appState.tasksCompleted.push(taskId);
+                }
+                appState.taskLastCompleted[taskId] = today;
+                appState.balance += task.reward;
+                appState.completedTasks++;
+                
+                userRef.update({ 
+                    balance: appState.balance, 
+                    completedTasks: appState.completedTasks, 
+                    tasksCompleted: appState.tasksCompleted,
+                    taskLastCompleted: appState.taskLastCompleted
+                });
+                
+                document.getElementById('rewardText').textContent = `+${task.reward} Coins`;
+                document.getElementById('successModal').classList.add('active');
+                updateUI();
+                updateLevelUI();
+                renderTasks();
+                showToast(`🎉 +${task.reward} Coins for watching video!`);
             });
         }
 
@@ -1507,94 +1673,6 @@
             document.getElementById('mainContent').classList.remove('hide');
             document.querySelector('.bottom-nav').style.display = 'flex';
             updateWeeklyUI();
-        }
-
-        // ==================== TASKS ====================
-        function loadTasksFromDB() {
-            tasksRef.on('value', (snapshot) => {
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    tasks = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-                    renderTasks();
-                } else {
-                    tasks = [];
-                    renderTasks();
-                }
-            });
-        }
-
-        function renderTasks() {
-            const container = document.getElementById('tasksContainer');
-            if (!tasks || tasks.length === 0) {
-                container.innerHTML = '<div class="no-tasks">📭 No tasks available. Check back later!</div>';
-                return;
-            }
-
-            container.innerHTML = tasks.map(task => {
-                const isCompleted = appState.tasksCompleted.includes(task.id);
-                const progressPercent = Math.min((task.progress / task.maxProgress) * 100, 100);
-                
-                let actionHTML = '';
-                if (task.type === 'link') {
-                    let link = task.link || '#';
-                    actionHTML = `
-                        <a href="${link}" target="_blank" class="task-link" onclick="if(!${isCompleted}){event.preventDefault();window.open('${link}','_blank');setTimeout(()=>completeTask('${task.id}'),5000);}">
-                            ${isCompleted ? '✓ Completed' : (task.actionText || 'Go →')}
-                        </a>
-                    `;
-                } else {
-                    actionHTML = `
-                        <button class="task-btn ${isCompleted ? 'completed' : ''}" ${isCompleted ? 'disabled' : ''} onclick="completeTask('${task.id}')">
-                            ${isCompleted ? '✓ Completed' : (task.actionText || 'Complete')}
-                        </button>
-                    `;
-                }
-
-                return `
-                    <div class="task-card">
-                        <div class="task-header">
-                            <span class="task-title">${task.title}</span>
-                            <span class="task-reward">+${task.reward} 🪙</span>
-                        </div>
-                        <div class="task-desc">${task.description || ''}</div>
-                        ${task.type === 'link' && !isCompleted ? actionHTML : ''}
-                        <div class="task-progress"><div class="fill" style="width:${progressPercent}%"></div></div>
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
-                            <span style="font-size:11px;color:#94a3b8;">${task.participants || 0} participants</span>
-                            ${task.type !== 'link' ? actionHTML : ''}
-                            ${isCompleted ? '<span style="color:#10b981;font-size:12px;">✓ Done</span>' : ''}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function completeTask(taskId) {
-            let task = tasks.find(t => t.id === taskId);
-            if (!task || appState.tasksCompleted.includes(taskId)) return;
-            completeTaskAction(taskId);
-        }
-
-        function completeTaskAction(taskId) {
-            let task = tasks.find(t => t.id === taskId);
-            if (!task || appState.tasksCompleted.includes(taskId)) return;
-            
-            tasksRef.child(taskId).update({ progress: task.progress + 1 }).then(() => {
-                tasksRef.child(taskId).once('value', (s) => {
-                    let updated = s.val();
-                    if (updated.progress >= updated.maxProgress && !appState.tasksCompleted.includes(taskId)) {
-                        appState.tasksCompleted.push(taskId);
-                        appState.balance += updated.reward;
-                        appState.completedTasks++;
-                        userRef.update({ balance: appState.balance, completedTasks: appState.completedTasks, tasksCompleted: appState.tasksCompleted });
-                        document.getElementById('rewardText').textContent = `+${updated.reward} Coins`;
-                        document.getElementById('successModal').classList.add('active');
-                        updateUI();
-                        updateLevelUI();
-                        renderTasks();
-                    }
-                });
-            }).catch((e) => showToast('Error: '+e.message,'error'));
         }
 
         // ==================== REFERRAL SYSTEM ====================
@@ -1958,6 +2036,7 @@
                     appState.progressCoins = data.progressCoins !== undefined ? data.progressCoins : 1000;
                     appState.videoWatchedCount = data.videoWatchedCount !== undefined ? data.videoWatchedCount : 0;
                     appState.speedBoostCooldown = data.speedBoostCooldown || 0;
+                    appState.taskLastCompleted = data.taskLastCompleted || {};
                     
                     const username = tg.initDataUnsafe?.user?.username || 'User';
                     document.getElementById('userName').textContent = username;
@@ -1998,7 +2077,8 @@
                         lastLogin: new Date().toISOString(),
                         progressCoins: 1000,
                         videoWatchedCount: 0,
-                        speedBoostCooldown: 0
+                        speedBoostCooldown: 0,
+                        taskLastCompleted: {}
                     });
                     appState.referCode = generateReferCode();
                     updateUI();
