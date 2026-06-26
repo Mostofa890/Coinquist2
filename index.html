@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>CoinQuest - Tap & Earn</title>
     
+    <!-- ===== ADSGRAM SDK ===== -->
     <script src="https://cdn.adsgram.ai/adsgram.js"></script>
+    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
@@ -68,12 +70,13 @@
         .tap-stats .stat .number { font-size: 18px; font-weight: bold; color: #fbbf24; }
         .tap-stats .stat .label { font-size: 11px; color: #94a3b8; }
         
-        .recharge-timer { text-align: center; margin-top: 8px; font-size: 13px; min-height: 35px; padding: 10px; background: rgba(255,255,255,0.04); border-radius: 8px; }
-        .recharge-timer .time { font-weight: bold; color: #22c55e; font-size: 18px; }
+        .recharge-timer { text-align: center; margin-top: 8px; font-size: 13px; min-height: 35px; padding: 12px; background: rgba(255,255,255,0.04); border-radius: 10px; }
+        .recharge-timer .time { font-weight: bold; color: #22c55e; font-size: 20px; }
         .recharge-timer .full { color: #22c55e; font-size: 16px; }
-        .recharge-timer .progress-bar { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin-top: 8px; overflow: hidden; }
-        .recharge-timer .progress-bar .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 3px; transition: width 1s; }
-        .recharge-timer .watch-video-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; padding: 5px 16px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 12px; margin-top: 4px; }
+        .recharge-timer .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-top: 8px; overflow: hidden; }
+        .recharge-timer .progress-bar .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 4px; transition: width 1s; }
+        .recharge-timer .watch-video-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; padding: 6px 18px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 12px; margin-top: 6px; }
+        .recharge-timer .watch-video-btn:active { transform: scale(0.95); }
         
         .energy-offer-section { background: #1a1f3a; border-radius: 12px; padding: 12px; margin-top: 12px; border: 1px solid rgba(255,255,255,0.04); }
         .energy-offer-section .offer-title { font-size: 12px; color: #94a3b8; margin-bottom: 8px; text-align: center; }
@@ -90,13 +93,10 @@
         .floating-coin { position: fixed; font-size: 28px; pointer-events: none; z-index: 1000; animation: floatUp 1s ease-out forwards; }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-130px) scale(0.5); } }
         
-        /* ===== PAGE STYLES ===== */
         .page { display: none; min-height: 60vh; }
         .page.active { display: block; }
-        
         .page-header { font-size: 20px; font-weight: bold; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid rgba(255,255,255,0.06); }
         
-        /* Earn Page */
         .video-card { background: #1a1f3a; border-radius: 12px; padding: 20px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.04); text-align: center; }
         .video-card .video-icon { font-size: 48px; margin-bottom: 8px; }
         .video-card .video-title { font-size: 16px; font-weight: bold; }
@@ -107,7 +107,6 @@
         .video-card .video-limit { font-size: 11px; color: #94a3b8; margin-top: 6px; }
         .video-card .video-watched { font-size: 12px; color: #22c55e; margin-top: 4px; }
         
-        /* Tasks Page */
         .task-card { background: #1a1f3a; border-radius: 12px; padding: 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.04); }
         .task-card .task-header { display: flex; justify-content: space-between; align-items: center; }
         .task-card .task-title { font-size: 15px; font-weight: bold; }
@@ -121,7 +120,6 @@
         .task-card .task-link { color: #3b82f6; text-decoration: none; font-size: 12px; display: inline-block; margin-top: 4px; }
         .no-tasks { text-align: center; padding: 30px; color: #6b7280; font-size: 14px; }
         
-        /* Refer Page */
         .refer-link-box { background: #1a1f3a; border-radius: 12px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.04); text-align: center; }
         .refer-link-box .link { background: #0a0e27; padding: 10px; border-radius: 8px; font-size: 13px; color: #3b82f6; word-break: break-all; margin: 8px 0; border: 1px solid rgba(59,130,246,0.2); }
         .refer-link-box .copy-btn { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; padding: 6px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 13px; }
@@ -151,7 +149,6 @@
         .referral-item .bonus { color: #22c55e; font-size: 12px; font-weight: bold; }
         .referral-item .date { font-size: 10px; color: #6b7280; }
         
-        /* Wallet Page */
         .wallet-card { background: #1a1f3a; padding: 20px; border-radius: 14px; text-align: center; }
         .wallet-card .wallet-balance { font-size: 42px; font-weight: 800; color: #fbbf24; }
         .wallet-card .wallet-usd { color: #22c55e; font-size: 18px; font-weight: bold; margin-top: 4px; }
@@ -174,7 +171,6 @@
         .withdraw-history-item .status-cancelled { color: #ef4444; }
         .withdraw-history-item .date { font-size: 9px; color: #6b7280; }
         
-        /* BOTTOM NAV */
         .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; background: rgba(17,24,39,0.95); backdrop-filter: blur(20px); display: flex; justify-content: space-around; padding: 10px 8px; border-top: 1px solid rgba(255,255,255,0.06); z-index: 1000; }
         .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; color: #6b7280; font-size: 9px; cursor: pointer; flex: 1; }
         .nav-item.active { color: #3b82f6; }
@@ -392,8 +388,8 @@
             <h2 class="page-header">📺 Earn Coins</h2>
             <div class="video-card">
                 <div class="video-icon">📺</div>
-                <div class="video-title" id="videoTitle">Watch Video & Earn</div>
-                <div class="video-desc" id="videoDesc">Watch short videos to earn coins!</div>
+                <div class="video-title">Watch Video & Earn</div>
+                <div class="video-desc">Watch short videos to earn coins!</div>
                 <div class="video-reward" id="videoReward">+10 Coins per video</div>
                 <div class="video-limit" id="videoLimit">Today: 0 / 5 videos</div>
                 <button class="video-btn" id="videoBtn" onclick="watchVideo()">▶ Watch Video</button>
@@ -495,28 +491,53 @@
     <div class="toast" id="toast"></div>
 
     <script>
+        // ==================== ADSGRAM CONFIGURATION ====================
+        // আপনার দেওয়া টোকেন এবং এড কোড
+        const ADSGRAM_TOKEN = '45fb0dd985994022984aa3e6db4753df';
+        const ADSGRAM_INTERSTITIAL = 'int-36224';
+        
         let adsgramInstance = null;
 
+        // ==================== ADSGRAM AD FUNCTIONS ====================
         function showInAppInterstitial() {
             try {
                 if (!adsgramInstance) {
-                    adsgramInstance = new Adsgram({ blockId: '36224' });
+                    adsgramInstance = new Adsgram({ 
+                        blockId: ADSGRAM_INTERSTITIAL,
+                        token: ADSGRAM_TOKEN 
+                    });
                 }
                 adsgramInstance.show();
-            } catch (e) { console.log('AdsGram error:', e); }
+            } catch (e) { 
+                console.log('AdsGram error:', e); 
+                // এড না দেখালেও কাজ চলবে
+            }
         }
 
         function showAdsGramRewarded(callback) {
             try {
                 adsgramInstance = new Adsgram({
-                    blockId: '36224',
-                    onReward: function() { if (callback) callback(); },
-                    onError: function(error) { if (callback) callback(); }
+                    blockId: ADSGRAM_INTERSTITIAL,
+                    token: ADSGRAM_TOKEN,
+                    onReward: function() { 
+                        console.log('✅ Ad reward received!');
+                        if (callback) callback(); 
+                    },
+                    onError: function(error) { 
+                        console.log('Ad error:', error);
+                        // এড না দেখালেও ইউজার রিওয়ার্ড পাবে
+                        if (callback) callback(); 
+                    }
                 });
                 adsgramInstance.show();
-            } catch (e) { if (callback) callback(); }
+            } catch (e) { 
+                console.log('AdsGram error:', e);
+                // এরর থাকলেও কাজ চলবে
+                if (callback) callback(); 
+            }
         }
 
+        // ==================== FIREBASE ====================
         const firebaseConfig = {
             apiKey: "AIzaSyAqCNHhu9oaBDea85tAH-iHucHczZnR7nY",
             authDomain: "tolaka-exc-reverb-b1afd.firebaseapp.com",
@@ -529,6 +550,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // ==================== TG ====================
         let tg = window.Telegram.WebApp;
         tg.expand();
         let userId = 'default_user';
@@ -536,6 +558,7 @@
             userId = tg.initDataUnsafe.user.id.toString();
         }
 
+        // ==================== STATE ====================
         let appState = {
             balance: 0, usdBalance: 0, completedTasks: 0, referralCount: 0,
             dailyStreak: 0, userLevel: 1, tasksCompleted: [],
@@ -571,6 +594,7 @@
         const videoSettingsRef = db.ref('videoSettings');
         const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
+        // ==================== PAGE NAVIGATION ====================
         function switchPage(page, event) {
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             if (event && event.currentTarget) {
@@ -597,6 +621,7 @@
             if (page === 'wallet') updateWithdrawHistory();
         }
 
+        // ==================== CONVERSION ====================
         function loadConversionRate() {
             rateRef.on('value', (s) => {
                 appState.conversionRate = s.exists() ? s.val() : 1000;
@@ -661,6 +686,7 @@
             document.getElementById('walletNextConversion').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
         }
 
+        // ==================== WITHDRAW ====================
         function loadWithdrawSettings() {
             withdrawRef.on('value', (s) => {
                 if (s.exists()) { 
@@ -684,6 +710,7 @@
             let bal = appState.usdBalance || 0, min = appState.minWithdraw || 10;
             if (bal < min) { showToast(`Minimum $${min} USD required!`, 'error'); return; }
             
+            // উইথড্র করার আগে ইন্টারস্টিশিয়াল এড দেখান
             showInAppInterstitial();
             
             let amount = bal, id = Date.now().toString();
@@ -786,6 +813,7 @@
             });
         }
 
+        // ==================== VIDEO SETTINGS ====================
         function loadVideoSettings() {
             videoSettingsRef.on('value', (snapshot) => {
                 if (snapshot.exists()) {
@@ -830,6 +858,7 @@
                 return;
             }
 
+            // AdsGram রিওয়ার্ডেড এড দেখান
             showAdsGramRewarded(function() {
                 appState.videoWatchedToday = watched + 1;
                 appState.videoLastWatchDate = today;
@@ -858,6 +887,7 @@
                 return;
             }
             
+            // AdsGram রিওয়ার্ডেড এড দেখান
             showAdsGramRewarded(function() {
                 const energyGain = appState.energyVideoReward || 20;
                 appState.tapEnergy = Math.min(100, appState.tapEnergy + energyGain);
@@ -872,39 +902,43 @@
             });
         }
 
-        // ===== ENERGY RECHARGE SYSTEM - 1 HOUR =====
+        // ==================== ENERGY RECHARGE SYSTEM ====================
+        // 1 ঘন্টায় 100 Energy রিচার্জ হবে (প্রতি 36 সেকেন্ডে 1 Energy)
         function startRecharge() {
             if (rechargeInterval) clearInterval(rechargeInterval);
             if (timerInterval) clearInterval(timerInterval);
 
             const now = Date.now();
             const elapsed = Math.floor((now - (appState.lastRechargeTime || now)) / 1000);
-            const rechargeTime = 3600; // 1 hour per energy
             
-            // Calculate how many energy should have been recharged
-            const energyGained = Math.floor(elapsed / rechargeTime);
+            // প্রতি 36 সেকেন্ডে 1 Energy রিচার্জ হবে (1 ঘন্টায় 100 টা)
+            const PER_ENERGY_TIME = 36; // 3600 / 100 = 36
+            
+            // এতক্ষণে কত Energy রিচার্জ হয়েছে
+            const energyGained = Math.floor(elapsed / PER_ENERGY_TIME);
             
             if (energyGained > 0 && appState.tapEnergy < 100) {
-                appState.tapEnergy = Math.min(100, appState.tapEnergy + energyGained);
+                let newEnergy = appState.tapEnergy + energyGained;
+                if (newEnergy > 100) newEnergy = 100;
+                
+                appState.tapEnergy = newEnergy;
                 appState.lastRechargeTime = now;
+                
                 userRef.update({ 
                     tapEnergy: appState.tapEnergy,
                     lastRechargeTime: now 
                 });
             }
 
-            // Calculate remaining time for next energy
-            let remainingEnergy = 100 - appState.tapEnergy;
-            if (remainingEnergy > 0) {
-                const timeSinceLastRecharge = (now - appState.lastRechargeTime) / 1000;
-                const remainingForCurrent = rechargeTime - (timeSinceLastRecharge % rechargeTime);
-                remainingSeconds = remainingForCurrent + ((remainingEnergy - 1) * rechargeTime);
-                if (remainingSeconds < 0) remainingSeconds = 0;
-            } else {
-                remainingSeconds = 0;
-            }
+            // বাকি Energy রিচার্জ হতে কত সময় লাগবে
+            const remainingEnergy = 100 - appState.tapEnergy;
+            let remainingSecs = remainingEnergy * PER_ENERGY_TIME;
+            if (remainingSecs < 0) remainingSecs = 0;
+            
+            // গ্লোবাল ভেরিয়েবল আপডেট
+            remainingSeconds = remainingSecs;
 
-            // Update timer every second
+            // প্রতি সেকেন্ডে টাইমার আপডেট
             timerInterval = setInterval(() => {
                 if (appState.tapEnergy < 100) {
                     remainingSeconds--;
@@ -915,27 +949,34 @@
                 }
             }, 1000);
 
-            // Check for new energy every second
+            // প্রতি সেকেন্ডে চেক করা Energy রিচার্জ হয়েছে কিনা
             rechargeInterval = setInterval(() => {
                 if (appState.tapEnergy < 100) {
                     const now2 = Date.now();
-                    const elapsed2 = Math.floor((now2 - (appState.lastRechargeTime || now2)) / 1000);
-                    if (elapsed2 >= rechargeTime) {
+                    const elapsed2 = Math.floor((now2 - appState.lastRechargeTime) / 1000);
+                    
+                    // 36 সেকেন্ড পার হলে 1 Energy যোগ কর
+                    if (elapsed2 >= PER_ENERGY_TIME) {
                         appState.tapEnergy++;
                         appState.lastRechargeTime = now2;
+                        
                         updateTapUI();
                         updateRechargeTimer();
+                        
                         userRef.update({ 
                             tapEnergy: appState.tapEnergy,
                             lastRechargeTime: appState.lastRechargeTime 
                         });
+                        
+                        // Energy 100 হলে টাইমার বন্ধ
+                        if (appState.tapEnergy >= 100) {
+                            clearInterval(rechargeInterval);
+                            clearInterval(timerInterval);
+                            rechargeInterval = null;
+                            timerInterval = null;
+                            updateRechargeTimer();
+                        }
                     }
-                } else {
-                    clearInterval(rechargeInterval);
-                    clearInterval(timerInterval);
-                    rechargeInterval = null;
-                    timerInterval = null;
-                    updateRechargeTimer();
                 }
             }, 1000);
 
@@ -944,6 +985,8 @@
 
         function updateRechargeTimer() {
             let div = document.getElementById('rechargeTimer');
+            
+            // Energy ফুল থাকলে
             if (appState.tapEnergy >= 100) {
                 div.innerHTML = `
                     <div class="full">✅ Energy Full! Keep Tapping!</div>
@@ -953,9 +996,16 @@
                 return;
             }
             
-            let hours = Math.floor(remainingSeconds / 3600);
-            let minutes = Math.floor((remainingSeconds % 3600) / 60);
-            let seconds = remainingSeconds % 60;
+            // বাকি Energy ক্যালকুলেশন
+            const PER_ENERGY_TIME = 36;
+            const remainingEnergy = 100 - appState.tapEnergy;
+            let remainingSecs = remainingEnergy * PER_ENERGY_TIME;
+            if (remainingSecs < 0) remainingSecs = 0;
+            
+            // টাইমার দেখানোর জন্য
+            let hours = Math.floor(remainingSecs / 3600);
+            let minutes = Math.floor((remainingSecs % 3600) / 60);
+            let seconds = Math.floor(remainingSecs % 60);
             
             let timeText = '';
             if (hours > 0) {
@@ -966,38 +1016,54 @@
                 timeText = `${seconds}s`;
             }
             
-            // Calculate progress for next energy
-            const rechargeTime = 3600;
-            const elapsed = (Date.now() - appState.lastRechargeTime) / 1000;
-            const progress = Math.min((elapsed / rechargeTime) * 100, 100);
+            // প্রগ্রেস বার (কতটুকু রিচার্জ হয়েছে)
+            const progress = ((100 - remainingEnergy) / 100) * 100;
+            
+            // বর্তমান Energy রিচার্জ হতে বাকি সময়
+            const elapsed = Math.floor((Date.now() - appState.lastRechargeTime) / 1000);
+            const nextEnergyIn = Math.max(0, PER_ENERGY_TIME - (elapsed % PER_ENERGY_TIME));
             
             div.innerHTML = `
                 <div style="font-size:12px;color:#94a3b8;">⚡ Recharging Energy</div>
                 <div class="time">${timeText}</div>
                 <div style="font-size:11px;color:#94a3b8;">${appState.tapEnergy}/100 Energy</div>
                 <div class="progress-bar"><div class="fill" style="width:${progress}%;"></div></div>
-                <div style="font-size:10px;color:#6b7280;margin-top:4px;">Next energy in ${timeText}</div>
-                <button class="watch-video-btn" onclick="watchVideoForEnergy()">📺 Watch Video for Energy</button>
+                <div style="font-size:10px;color:#6b7280;margin-top:4px;">
+                    Next energy in ${nextEnergyIn}s
+                </div>
+                <button class="watch-video-btn" onclick="watchVideoForEnergy()">
+                    📺 Watch Video for +20 Energy
+                </button>
             `;
         }
 
+        // ==================== TAP ====================
         function handleTap(event) {
             if (isTapping) return;
             isTapping = true;
+            
             if (appState.tapEnergy < 1) {
-                showToast('No energy! Watch video or wait for recharge ⚡', 'error');
+                showToast('⛔ No energy! Watch video or wait for recharge ⚡', 'error');
                 isTapping = false;
                 return;
             }
+            
             appState.tapEnergy -= 1;
             appState.tapCount += 1;
             let reward = Math.floor(Math.random() * 3) + 1;
             appState.balance += reward;
+            
             updateUI();
             updateTapUI();
             updateLevelUI();
-            userRef.update({ balance: appState.balance, tapCount: appState.tapCount, tapEnergy: appState.tapEnergy }).catch(() => {});
             
+            userRef.update({ 
+                balance: appState.balance, 
+                tapCount: appState.tapCount, 
+                tapEnergy: appState.tapEnergy 
+            }).catch(() => {});
+            
+            // Floating coin animation
             let coin = document.createElement('div');
             coin.className = 'floating-coin';
             coin.textContent = `+${reward} 🪙`;
@@ -1007,13 +1073,16 @@
             coin.style.top = (y - 20) + 'px';
             document.body.appendChild(coin);
             setTimeout(() => coin.remove(), 1000);
+            
             if (navigator.vibrate) navigator.vibrate(10);
             
+            // Energy কমে গেলে রিচার্জ স্টার্ট
             if (appState.tapEnergy < 100) {
                 if (rechargeInterval) clearInterval(rechargeInterval);
                 if (timerInterval) clearInterval(timerInterval);
                 startRecharge();
             }
+            
             isTapping = false;
         }
 
@@ -1022,6 +1091,7 @@
             document.getElementById('tapEnergy').textContent = appState.tapEnergy;
         }
 
+        // ==================== LEVEL SYSTEM ====================
         function getLevelTier(level) {
             if (level >= 76) return { name:'Diamond', emoji:'👑', bonus:30 };
             if (level >= 51) return { name:'Platinum', emoji:'💎', bonus:20 };
@@ -1143,6 +1213,7 @@
             document.querySelector('.bottom-nav').style.display = 'flex';
         }
 
+        // ==================== WEEKLY BONUS ====================
         function getWeekKey() { let d=new Date(); let day=d.getDay(); let diff=d.getDate()-day; d.setDate(diff); d.setHours(0,0,0,0); return d.toDateString(); }
         
         function loadWeeklyRewards() {
@@ -1223,6 +1294,7 @@
             if (day !== today) { showToast('Only today\'s reward!','error'); return; }
             showToast('⏳ Loading ad...');
             
+            // AdsGram রিওয়ার্ডেড এড দেখান
             showAdsGramRewarded(function() {
                 if (!appState.weeklyAdWatched) appState.weeklyAdWatched = [];
                 if (!appState.weeklyAdWatched.includes(day)) {
@@ -1263,6 +1335,7 @@
             updateWeeklyUI();
         }
 
+        // ==================== TASKS ====================
         function loadTasksFromDB() {
             tasksRef.on('value', (snapshot) => {
                 if (snapshot.exists()) {
@@ -1350,6 +1423,7 @@
             }).catch((e) => showToast('Error: '+e.message,'error'));
         }
 
+        // ==================== OFFERS ====================
         function loadOffers() {
             offersRef.on('value', (s) => {
                 energyOffers = s.exists() ? Object.keys(s.val()).map(k => ({ id: k, ...s.val()[k] })) : [];
@@ -1398,6 +1472,7 @@
             showToast(`+${energy} Energy!`);
         }
 
+        // ==================== REFERRAL SYSTEM ====================
         const TIERS = [
             { level: 1, count: 10, bonus: 50, name: '🥉 Bronze Referrer' },
             { level: 2, count: 25, bonus: 150, name: '🥈 Silver Referrer' },
@@ -1588,6 +1663,7 @@
             navigator.clipboard.writeText(link).then(() => showToast('📋 Copied!')).catch(() => showToast('📋 Copy manually','error'));
         }
 
+        // ==================== BAN CHECK ====================
         function checkBanStatus() {
             userRef.child('banned').on('value', (snapshot) => {
                 const isBanned = snapshot.val() === true;
@@ -1608,6 +1684,7 @@
             });
         }
 
+        // ==================== GEOLOCATION ====================
         let userIP = 'Unknown', userCountry = 'Unknown';
 
         function getUserLocation() {
@@ -1629,6 +1706,7 @@
                 });
         }
 
+        // ==================== UI UPDATE ====================
         function updateUI() {
             document.getElementById('balance').textContent = appState.balance.toLocaleString();
             document.getElementById('completedTasks').textContent = appState.completedTasks || 0;
@@ -1642,6 +1720,7 @@
             updateVideoUI();
         }
 
+        // ==================== TOAST ====================
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             toast.textContent = message;
@@ -1655,6 +1734,7 @@
             document.getElementById(id).classList.remove('active');
         }
 
+        // ==================== INIT ====================
         function initApp() {
             userRef.on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -1759,6 +1839,7 @@
             }, 1500);
         }
 
+        // ==================== START ====================
         document.addEventListener('DOMContentLoaded', initApp);
 
         document.addEventListener('visibilitychange', () => {
@@ -1766,8 +1847,8 @@
                 if (appState.tapEnergy < 100) {
                     const now = Date.now();
                     const elapsed = Math.floor((now - appState.lastRechargeTime) / 1000);
-                    const rechargeTime = 3600;
-                    const energyGained = Math.floor(elapsed / rechargeTime);
+                    const PER_ENERGY_TIME = 36;
+                    const energyGained = Math.floor(elapsed / PER_ENERGY_TIME);
                     if (energyGained > 0) {
                         appState.tapEnergy = Math.min(100, appState.tapEnergy + energyGained);
                         appState.lastRechargeTime = now;
@@ -1820,6 +1901,8 @@
         });
 
         console.log('✅ CoinQuest App Loaded Successfully');
+        console.log('📊 User ID:', userId);
+        console.log('🎯 AdsGram Configured with Token:', ADSGRAM_TOKEN);
     </script>
 </body>
 </html>
