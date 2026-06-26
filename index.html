@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>CoinQuest - Tap & Earn</title>
     
-    <!-- ===== ADSGRAM SDK ===== -->
     <script src="https://cdn.adsgram.ai/adsgram.js"></script>
-    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
@@ -492,13 +490,11 @@
 
     <script>
         // ==================== ADSGRAM CONFIGURATION ====================
-        // আপনার দেওয়া টোকেন এবং এড কোড
         const ADSGRAM_TOKEN = '45fb0dd985994022984aa3e6db4753df';
         const ADSGRAM_INTERSTITIAL = 'int-36224';
         
         let adsgramInstance = null;
 
-        // ==================== ADSGRAM AD FUNCTIONS ====================
         function showInAppInterstitial() {
             try {
                 if (!adsgramInstance) {
@@ -510,7 +506,6 @@
                 adsgramInstance.show();
             } catch (e) { 
                 console.log('AdsGram error:', e); 
-                // এড না দেখালেও কাজ চলবে
             }
         }
 
@@ -525,14 +520,12 @@
                     },
                     onError: function(error) { 
                         console.log('Ad error:', error);
-                        // এড না দেখালেও ইউজার রিওয়ার্ড পাবে
                         if (callback) callback(); 
                     }
                 });
                 adsgramInstance.show();
             } catch (e) { 
                 console.log('AdsGram error:', e);
-                // এরর থাকলেও কাজ চলবে
                 if (callback) callback(); 
             }
         }
@@ -710,7 +703,6 @@
             let bal = appState.usdBalance || 0, min = appState.minWithdraw || 10;
             if (bal < min) { showToast(`Minimum $${min} USD required!`, 'error'); return; }
             
-            // উইথড্র করার আগে ইন্টারস্টিশিয়াল এড দেখান
             showInAppInterstitial();
             
             let amount = bal, id = Date.now().toString();
@@ -858,7 +850,6 @@
                 return;
             }
 
-            // AdsGram রিওয়ার্ডেড এড দেখান
             showAdsGramRewarded(function() {
                 appState.videoWatchedToday = watched + 1;
                 appState.videoLastWatchDate = today;
@@ -887,7 +878,6 @@
                 return;
             }
             
-            // AdsGram রিওয়ার্ডেড এড দেখান
             showAdsGramRewarded(function() {
                 const energyGain = appState.energyVideoReward || 20;
                 appState.tapEnergy = Math.min(100, appState.tapEnergy + energyGain);
@@ -902,25 +892,23 @@
             });
         }
 
-        // ==================== ENERGY RECHARGE SYSTEM ====================
+        // ==================== ENERGY RECHARGE SYSTEM - FIXED ====================
         // 1 ঘন্টায় 100 Energy রিচার্জ হবে (প্রতি 36 সেকেন্ডে 1 Energy)
+
         function startRecharge() {
             if (rechargeInterval) clearInterval(rechargeInterval);
             if (timerInterval) clearInterval(timerInterval);
 
             const now = Date.now();
+            const PER_ENERGY_TIME = 36; // 3600 / 100 = 36 সেকেন্ড
+            
+            // ===== 1. চেক করা আগে থেকে কত Energy রিচার্জ হয়েছে =====
             const elapsed = Math.floor((now - (appState.lastRechargeTime || now)) / 1000);
-            
-            // প্রতি 36 সেকেন্ডে 1 Energy রিচার্জ হবে (1 ঘন্টায় 100 টা)
-            const PER_ENERGY_TIME = 36; // 3600 / 100 = 36
-            
-            // এতক্ষণে কত Energy রিচার্জ হয়েছে
             const energyGained = Math.floor(elapsed / PER_ENERGY_TIME);
             
             if (energyGained > 0 && appState.tapEnergy < 100) {
                 let newEnergy = appState.tapEnergy + energyGained;
                 if (newEnergy > 100) newEnergy = 100;
-                
                 appState.tapEnergy = newEnergy;
                 appState.lastRechargeTime = now;
                 
@@ -929,27 +917,31 @@
                     lastRechargeTime: now 
                 });
             }
-
-            // বাকি Energy রিচার্জ হতে কত সময় লাগবে
+            
+            // ===== 2. বাকি Energy রিচার্জ হতে কত সময় লাগবে =====
             const remainingEnergy = 100 - appState.tapEnergy;
             let remainingSecs = remainingEnergy * PER_ENERGY_TIME;
             if (remainingSecs < 0) remainingSecs = 0;
             
-            // গ্লোবাল ভেরিয়েবল আপডেট
+            // ===== 3. গ্লোবাল ভেরিয়েবল আপডেট =====
             remainingSeconds = remainingSecs;
-
-            // প্রতি সেকেন্ডে টাইমার আপডেট
+            
+            // ===== 4. UI আপডেট =====
+            updateRechargeTimer();
+            
+            // ===== 5. টাইমার (প্রতি সেকেন্ডে কাউন্টডাউন) =====
             timerInterval = setInterval(() => {
                 if (appState.tapEnergy < 100) {
-                    remainingSeconds--;
-                    if (remainingSeconds < 0) remainingSeconds = 0;
+                    if (remainingSeconds > 0) {
+                        remainingSeconds--;
+                    }
                     updateRechargeTimer();
                 } else {
                     updateRechargeTimer();
                 }
             }, 1000);
-
-            // প্রতি সেকেন্ডে চেক করা Energy রিচার্জ হয়েছে কিনা
+            
+            // ===== 6. রিচার্জ চেক (প্রতি সেকেন্ডে) =====
             rechargeInterval = setInterval(() => {
                 if (appState.tapEnergy < 100) {
                     const now2 = Date.now();
@@ -959,6 +951,11 @@
                     if (elapsed2 >= PER_ENERGY_TIME) {
                         appState.tapEnergy++;
                         appState.lastRechargeTime = now2;
+                        
+                        // রিমেইনিং সেকেন্ড রিক্যালকুলেট
+                        const remEnergy = 100 - appState.tapEnergy;
+                        remainingSeconds = remEnergy * PER_ENERGY_TIME;
+                        if (remainingSeconds < 0) remainingSeconds = 0;
                         
                         updateTapUI();
                         updateRechargeTimer();
@@ -974,19 +971,18 @@
                             clearInterval(timerInterval);
                             rechargeInterval = null;
                             timerInterval = null;
+                            remainingSeconds = 0;
                             updateRechargeTimer();
                         }
                     }
                 }
             }, 1000);
-
-            updateRechargeTimer();
         }
 
         function updateRechargeTimer() {
             let div = document.getElementById('rechargeTimer');
             
-            // Energy ফুল থাকলে
+            // ===== Energy ফুল থাকলে =====
             if (appState.tapEnergy >= 100) {
                 div.innerHTML = `
                     <div class="full">✅ Energy Full! Keep Tapping!</div>
@@ -996,13 +992,13 @@
                 return;
             }
             
-            // বাকি Energy ক্যালকুলেশন
+            // ===== বাকি Energy ক্যালকুলেশন =====
             const PER_ENERGY_TIME = 36;
             const remainingEnergy = 100 - appState.tapEnergy;
             let remainingSecs = remainingEnergy * PER_ENERGY_TIME;
             if (remainingSecs < 0) remainingSecs = 0;
             
-            // টাইমার দেখানোর জন্য
+            // ===== টাইমার দেখানোর জন্য =====
             let hours = Math.floor(remainingSecs / 3600);
             let minutes = Math.floor((remainingSecs % 3600) / 60);
             let seconds = Math.floor(remainingSecs % 60);
@@ -1016,10 +1012,10 @@
                 timeText = `${seconds}s`;
             }
             
-            // প্রগ্রেস বার (কতটুকু রিচার্জ হয়েছে)
+            // ===== প্রগ্রেস বার =====
             const progress = ((100 - remainingEnergy) / 100) * 100;
             
-            // বর্তমান Energy রিচার্জ হতে বাকি সময়
+            // ===== পরবর্তী Energy কখন পাবে =====
             const elapsed = Math.floor((Date.now() - appState.lastRechargeTime) / 1000);
             const nextEnergyIn = Math.max(0, PER_ENERGY_TIME - (elapsed % PER_ENERGY_TIME));
             
@@ -1029,7 +1025,7 @@
                 <div style="font-size:11px;color:#94a3b8;">${appState.tapEnergy}/100 Energy</div>
                 <div class="progress-bar"><div class="fill" style="width:${progress}%;"></div></div>
                 <div style="font-size:10px;color:#6b7280;margin-top:4px;">
-                    Next energy in ${nextEnergyIn}s
+                    ⏳ Next energy in ${nextEnergyIn}s
                 </div>
                 <button class="watch-video-btn" onclick="watchVideoForEnergy()">
                     📺 Watch Video for +20 Energy
@@ -1294,7 +1290,6 @@
             if (day !== today) { showToast('Only today\'s reward!','error'); return; }
             showToast('⏳ Loading ad...');
             
-            // AdsGram রিওয়ার্ডেড এড দেখান
             showAdsGramRewarded(function() {
                 if (!appState.weeklyAdWatched) appState.weeklyAdWatched = [];
                 if (!appState.weeklyAdWatched.includes(day)) {
