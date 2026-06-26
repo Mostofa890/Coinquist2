@@ -783,6 +783,7 @@
         let conversionTimerInterval = null;
         let progressInterval = null;
         let speedBoostInterval = null;
+        let speedBoostTimerInterval = null; // For countdown timer
         let weeklyRewards = [10,15,20,25,30,40,50];
         let currentFilter = 'all';
         const TOTAL_COINS = 1000;
@@ -793,8 +794,8 @@
         const withdrawRef = db.ref('withdrawSettings');
         const weeklyRewardsRef = db.ref('weeklyRewards');
         const videoSettingsRef = db.ref('videoSettings');
-        const levelConfigRef = db.ref('levelConfig'); // Admin level config
-        const referralConfigRef = db.ref('referralConfig'); // Admin referral config
+        const levelConfigRef = db.ref('levelConfig');
+        const referralConfigRef = db.ref('referralConfig');
         const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
         // ==================== PAGE NAVIGATION ====================
@@ -1204,16 +1205,21 @@
             });
         }
 
-        // ==================== SPEED BOOST (Fixed) ====================
+        // ==================== SPEED BOOST (Fixed + Countdown Timer) ====================
         function updateSpeedBoostUI() {
             const btn = document.getElementById('speedBoostBtn');
             const timerSpan = document.getElementById('boostTimer');
             
             if (appState.speedBoostCooldown > 0) {
                 const now = Date.now();
-                const timeLeft = Math.ceil((appState.speedBoostCooldown - now) / 60000); // minutes
+                const timeLeft = Math.ceil((appState.speedBoostCooldown - now) / 1000); // seconds
+                
                 if (timeLeft > 0) {
                     btn.style.display = 'none';
+                    // Show countdown on timerSpan
+                    const minutes = Math.floor(timeLeft / 60);
+                    const seconds = timeLeft % 60;
+                    timerSpan.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
                 } else {
                     btn.style.display = 'flex';
                     timerSpan.textContent = '';
@@ -1242,6 +1248,7 @@
             }
 
             showRewardedPopup(function() {
+                // --- Start Speed Boost ---
                 appState.isSpeedBoostActive = true;
                 document.getElementById('speedBoostBtn').disabled = true;
                 document.getElementById('speedBoostBtn').innerHTML = '<i class="fas fa-rocket"></i> Boost Active!';
@@ -1254,6 +1261,7 @@
                 const speedTimerDisplay = document.getElementById('speedTimerDisplay');
                 const speedProgressFill = document.getElementById('speedProgressFill');
 
+                // Timer update every 100ms
                 const speedUpdateInterval = setInterval(() => {
                     timeLeft -= 0.1;
                     progress = ((3 - timeLeft) / 3) * 100;
@@ -1267,6 +1275,7 @@
                         document.getElementById('speedBoostBtn').disabled = false;
                         document.getElementById('speedBoostBtn').innerHTML = '<i class="fas fa-rocket"></i> Speed Boost <span class="boost-timer"></span>';
                         
+                        // Set cooldown 1 hour
                         appState.speedBoostCooldown = Date.now() + 3600000;
                         userRef.update({ speedBoostCooldown: appState.speedBoostCooldown });
                         updateSpeedBoostUI();
@@ -1274,24 +1283,43 @@
                     }
                 }, 100);
 
+                // --- Coin addition every 50ms (20 coins per second, total 60 in 3s) ---
+                let coinsAdded = 0;
                 speedBoostInterval = setInterval(() => {
-                    if (appState.progressCoins > 0) {
+                    if (appState.progressCoins > 0 && coinsAdded < 60) {
                         appState.progressCoins -= 1;
                         appState.balance += 1;
+                        coinsAdded++;
+                        
+                        // Update database with every single coin
                         userRef.update({ 
                             balance: appState.balance,
                             progressCoins: appState.progressCoins
                         });
+                        
                         updateProgressUI();
                         updateUI();
                         updateLevelUI();
+
+                        // Floating animation
+                        let coin = document.createElement('div');
+                        coin.className = 'floating-coin';
+                        coin.textContent = '+1 🪙';
+                        coin.style.left = (Math.random() * 80 + 10) + '%';
+                        coin.style.top = '30%';
+                        document.body.appendChild(coin);
+                        setTimeout(() => coin.remove(), 1000);
                     } else {
+                        // Stop if coins run out or 60 coins reached
                         clearInterval(speedBoostInterval);
+                        if (appState.progressCoins <= 0) {
+                            showToast('⛔ No coins left! Boost stopped.');
+                        }
+                        // Ensure boost ends properly
                         appState.isSpeedBoostActive = false;
                         overlay.classList.remove('active');
                         document.getElementById('speedBoostBtn').disabled = false;
                         document.getElementById('speedBoostBtn').innerHTML = '<i class="fas fa-rocket"></i> Speed Boost <span class="boost-timer"></span>';
-                        showToast('⛔ No coins left! Boost stopped.');
                     }
                 }, 50);
             });
@@ -1656,7 +1684,15 @@
         }
 
         // ==================== WEEKLY BONUS ====================
-        function getWeekKey() { let d=new Date(); let day=d.getDay(); let diff=d.getDate()-day; d.setDate(diff); d.setHours(0,0,0,0); return d.toDateString(); }
+        // FIX 1: Generate Week Key based on Monday's date to persist state across refreshes
+        function getWeekKey() { 
+            let now = new Date();
+            let dayOfWeek = now.getDay();
+            let diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); // Adjust to Monday
+            let monday = new Date(now.setDate(diff));
+            monday.setHours(0,0,0,0);
+            return monday.toDateString(); 
+        }
         
         function loadWeeklyRewards() {
             weeklyRewardsRef.on('value', (s) => {
@@ -2095,6 +2131,7 @@
             updateWithdrawUI();
             updateVideoUI();
             updateProgressUI();
+            updateSpeedBoostUI();
         }
 
         // ==================== TOAST ====================
