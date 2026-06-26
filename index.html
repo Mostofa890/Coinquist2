@@ -94,6 +94,11 @@
         .floating-coin { position: fixed; font-size: 28px; pointer-events: none; z-index: 1000; animation: floatUp 1s ease-out forwards; }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-130px) scale(0.5); } }
         
+        /* ===== PAGE STYLES ===== */
+        .page { display: none; }
+        .page.active { display: block; }
+        
+        /* Earn Page */
         .earn-section { padding: 10px 0; }
         .video-card { background: #1a1f3a; border-radius: 12px; padding: 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.04); text-align: center; }
         .video-card .video-icon { font-size: 48px; margin-bottom: 8px; }
@@ -106,6 +111,7 @@
         .video-card .video-limit { font-size: 11px; color: #94a3b8; margin-top: 6px; }
         .video-card .video-watched { font-size: 12px; color: #22c55e; margin-top: 4px; }
         
+        /* Tasks Page */
         .task-card { background: #1a1f3a; border-radius: 12px; padding: 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.04); }
         .task-card .task-header { display: flex; justify-content: space-between; align-items: center; }
         .task-card .task-title { font-size: 15px; font-weight: bold; }
@@ -121,11 +127,55 @@
         .task-card .ad-label { font-size: 9px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
         .no-tasks { text-align: center; padding: 30px; color: #6b7280; font-size: 14px; }
         
+        /* Refer Page */
+        .refer-link-box { background: #1a1f3a; border-radius: 12px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.04); text-align: center; }
+        .refer-link-box .link { background: #0a0e27; padding: 10px; border-radius: 8px; font-size: 13px; color: #3b82f6; word-break: break-all; margin: 8px 0; border: 1px solid rgba(59,130,246,0.2); }
+        .refer-link-box .copy-btn { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; padding: 6px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 13px; }
+        .refer-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+        .refer-stats .stat { background: #1a1f3a; padding: 10px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.04); }
+        .refer-stats .stat .number { font-size: 20px; font-weight: bold; color: #fbbf24; }
+        .refer-stats .stat .label { font-size: 10px; color: #94a3b8; }
+        .refer-tier { background: #1a1f3a; border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.04); display: flex; justify-content: space-between; align-items: center; }
+        .refer-tier .tier-info .tier-name { font-size: 14px; font-weight: bold; }
+        .refer-tier .tier-info .tier-desc { font-size: 11px; color: #94a3b8; }
+        .refer-tier .tier-status { font-size: 13px; font-weight: bold; }
+        .refer-tier .tier-status.claimed { color: #22c55e; }
+        .refer-tier .tier-status.locked { color: #6b7280; }
+        .refer-tier .tier-status.available { color: #fbbf24; cursor: pointer; }
+        .refer-progress { background: #1a1f3a; border-radius: 12px; padding: 14px; border: 1px solid rgba(255,255,255,0.04); }
+        .refer-progress .progress-bar { width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; margin-top: 8px; overflow: hidden; }
+        .refer-progress .progress-bar .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 3px; transition: width 0.5s; }
+        .refer-progress .progress-text { display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; margin-top: 4px; }
+        .referral-list-box { background: #1a1f3a; border-radius: 12px; padding: 14px; margin-top: 12px; border: 1px solid rgba(255,255,255,0.04); max-height: 200px; overflow-y: auto; }
+        .referral-list-box .list-title { font-size: 13px; color: #94a3b8; margin-bottom: 8px; }
+        .referral-list-box::-webkit-scrollbar { width: 3px; }
+        .referral-list-box::-webkit-scrollbar-track { background: rgba(255,255,255,0.04); border-radius: 2px; }
+        .referral-list-box::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 2px; }
+        .referral-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .referral-item:last-child { border-bottom: none; }
+        .referral-item .name { font-size: 13px; }
+        .referral-item .bonus { color: #22c55e; font-size: 12px; font-weight: bold; }
+        .referral-item .date { font-size: 10px; color: #6b7280; }
+        
+        /* Wallet Page */
+        .withdraw-history-item { padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .withdraw-history-item:last-child { border-bottom: none; }
+        .withdraw-history-item .amount { font-weight: bold; color: #fbbf24; }
+        .withdraw-history-item .status-pending { color: #f59e0b; }
+        .withdraw-history-item .status-approved { color: #22c55e; }
+        .withdraw-history-item .status-cancelled { color: #ef4444; }
+        .withdraw-history-item .status-processing { color: #3b82f6; }
+        .withdraw-history-item .cancel-reason { font-size: 10px; color: #ef4444; margin-top: 2px; }
+        .withdraw-history-item .date { font-size: 9px; color: #6b7280; }
+        .withdraw-history-item .status-text { font-size: 10px; font-weight: bold; }
+        
+        /* BOTTOM NAV */
         .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; background: rgba(17,24,39,0.95); backdrop-filter: blur(20px); display: flex; justify-content: space-around; padding: 10px 8px; border-top: 1px solid rgba(255,255,255,0.06); z-index: 1000; }
         .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; color: #6b7280; font-size: 9px; cursor: pointer; flex: 1; }
         .nav-item.active { color: #3b82f6; }
         .nav-item i { font-size: 18px; }
         
+        /* MODALS */
         .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center; }
         .modal.active { display: flex; }
         .modal-content { background: #1e293b; padding: 20px; border-radius: 16px; width: 90%; max-width: 340px; text-align: center; }
@@ -191,35 +241,6 @@
         .weekly-overlay .day-box .ad-box.show { display: block; }
         .weekly-overlay .day-box .ad-box .claim-btn { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; padding: 6px 16px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; margin-top: 6px; width: 100%; }
         
-        .refer-link-box { background: #1a1f3a; border-radius: 12px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.04); text-align: center; }
-        .refer-link-box .link { background: #0a0e27; padding: 10px; border-radius: 8px; font-size: 13px; color: #3b82f6; word-break: break-all; margin: 8px 0; border: 1px solid rgba(59,130,246,0.2); }
-        .refer-link-box .copy-btn { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; padding: 6px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 13px; }
-        .refer-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
-        .refer-stats .stat { background: #1a1f3a; padding: 10px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.04); }
-        .refer-stats .stat .number { font-size: 20px; font-weight: bold; color: #fbbf24; }
-        .refer-stats .stat .label { font-size: 10px; color: #94a3b8; }
-        .refer-tier { background: #1a1f3a; border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.04); display: flex; justify-content: space-between; align-items: center; }
-        .refer-tier .tier-info .tier-name { font-size: 14px; font-weight: bold; }
-        .refer-tier .tier-info .tier-desc { font-size: 11px; color: #94a3b8; }
-        .refer-tier .tier-status { font-size: 13px; font-weight: bold; }
-        .refer-tier .tier-status.claimed { color: #22c55e; }
-        .refer-tier .tier-status.locked { color: #6b7280; }
-        .refer-tier .tier-status.available { color: #fbbf24; cursor: pointer; }
-        .refer-progress { background: #1a1f3a; border-radius: 12px; padding: 14px; border: 1px solid rgba(255,255,255,0.04); }
-        .refer-progress .progress-bar { width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; margin-top: 8px; overflow: hidden; }
-        .refer-progress .progress-bar .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 3px; transition: width 0.5s; }
-        .refer-progress .progress-text { display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; margin-top: 4px; }
-        .referral-list-box { background: #1a1f3a; border-radius: 12px; padding: 14px; margin-top: 12px; border: 1px solid rgba(255,255,255,0.04); max-height: 200px; overflow-y: auto; }
-        .referral-list-box .list-title { font-size: 13px; color: #94a3b8; margin-bottom: 8px; }
-        .referral-list-box::-webkit-scrollbar { width: 3px; }
-        .referral-list-box::-webkit-scrollbar-track { background: rgba(255,255,255,0.04); border-radius: 2px; }
-        .referral-list-box::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 2px; }
-        .referral-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .referral-item:last-child { border-bottom: none; }
-        .referral-item .name { font-size: 13px; }
-        .referral-item .bonus { color: #22c55e; font-size: 12px; font-weight: bold; }
-        .referral-item .date { font-size: 10px; color: #6b7280; }
-        
         .banned-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 99999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 20px; text-align: center; }
         .banned-overlay.show { display: flex; }
         .banned-overlay h1 { color: #ef4444; font-size: 28px; margin-bottom: 10px; }
@@ -227,24 +248,12 @@
         .banned-overlay .ban-reason { background: #1a1f3a; padding: 14px; border-radius: 10px; margin-top: 12px; max-width: 380px; color: #fbbf24; border: 1px solid rgba(239,68,68,0.2); }
         
         .main-content.hide { display: none; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        .page { display: none; }
+        .page.active { display: block; }
         .hidden { display: none !important; }
         .loading { text-align: center; padding: 30px; color: #6b7280; }
         .loading-spinner { border: 3px solid rgba(255,255,255,0.08); border-top: 3px solid #3b82f6; border-radius: 50%; width: 32px; height: 32px; animation: spin 1s linear infinite; margin: 0 auto 12px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        /* ===== WITHDRAW HISTORY ===== */
-        .withdraw-history-item { padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .withdraw-history-item:last-child { border-bottom: none; }
-        .withdraw-history-item .amount { font-weight: bold; color: #fbbf24; }
-        .withdraw-history-item .status-pending { color: #f59e0b; }
-        .withdraw-history-item .status-approved { color: #22c55e; }
-        .withdraw-history-item .status-cancelled { color: #ef4444; }
-        .withdraw-history-item .status-processing { color: #3b82f6; }
-        .withdraw-history-item .cancel-reason { font-size: 10px; color: #ef4444; margin-top: 2px; }
-        .withdraw-history-item .date { font-size: 9px; color: #6b7280; }
-        .withdraw-history-item .status-text { font-size: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -395,8 +404,8 @@
             <div class="arrow">➜</div>
         </div>
 
-        <!-- TAB: HOME -->
-        <div class="tab-content active" id="tabHome">
+        <!-- ===== PAGE: HOME (TAP TO EARN) ===== -->
+        <div class="page active" id="pageHome">
             <div class="tap-section">
                 <div class="tap-coin" id="tapCoin" onclick="handleTap(event)">
                     <span class="coin-icon">🪙</span>
@@ -414,8 +423,8 @@
             </div>
         </div>
 
-        <!-- TAB: EARN -->
-        <div class="tab-content" id="tabEarn">
+        <!-- ===== PAGE: EARN (WAZ VIDEO) ===== -->
+        <div class="page" id="pageEarn">
             <h3 class="section-title">📺 Waz Video</h3>
             <div class="earn-section" id="earnSection">
                 <div class="video-card" id="videoCard">
@@ -430,16 +439,16 @@
             </div>
         </div>
 
-        <!-- TAB: TASKS -->
-        <div class="tab-content" id="tabTasks">
+        <!-- ===== PAGE: TASKS ===== -->
+        <div class="page" id="pageTasks">
             <h3 class="section-title">📋 Tasks</h3>
             <div class="tasks-section" id="tasksContainer">
                 <div class="no-tasks">No tasks available. Check back later!</div>
             </div>
         </div>
 
-        <!-- TAB: REFER -->
-        <div class="tab-content" id="tabRefer">
+        <!-- ===== PAGE: REFER ===== -->
+        <div class="page" id="pageRefer">
             <div class="refer-link-box">
                 <p style="font-size:13px;color:#94a3b8;">Your Referral Link</p>
                 <div class="link" id="referLinkHome">Loading...</div>
@@ -471,8 +480,8 @@
             <button style="margin-top:12px;width:100%;padding:10px;background:linear-gradient(135deg,#7c3aed,#2563eb);border:none;border-radius:10px;color:#fff;font-weight:bold;cursor:pointer;font-size:14px;" onclick="openReferPage()">📊 View Full Details</button>
         </div>
 
-        <!-- ===== TAB: WALLET (আপডেটেড উইথড্র হিস্ট্রি সহ) ===== -->
-        <div class="tab-content" id="tabWallet">
+        <!-- ===== PAGE: WALLET ===== -->
+        <div class="page" id="pageWallet">
             <h3 class="section-title">💰 Wallet</h3>
             <div style="background:#1a1f3a;padding:16px;border-radius:14px;text-align:center;">
                 <p style="color:#94a3b8;margin-bottom:4px;font-size:13px;">Coins Balance</p>
@@ -497,7 +506,7 @@
                     <button id="withdrawBtn" onclick="withdraw()" style="margin-top:6px;padding:6px 20px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;border-radius:6px;color:#fff;font-weight:bold;cursor:pointer;width:100%;font-size:13px;">Withdraw Now</button>
                 </div>
                 
-                <!-- ===== WITHDRAW HISTORY (আপডেটেড) ===== -->
+                <!-- Withdraw History -->
                 <div style="margin-top:8px;padding:6px;background:rgba(255,255,255,0.04);border-radius:6px;max-height:180px;overflow-y:auto;">
                     <p style="font-size:10px;color:#94a3b8;text-align:left;margin-bottom:4px;">📜 Withdraw History</p>
                     <div id="withdrawHistory" style="font-size:11px;color:#94a3b8;text-align:left;"></div>
@@ -506,13 +515,13 @@
         </div>
     </div>
 
-    <!-- BOTTOM NAV (5 TABS) -->
+    <!-- BOTTOM NAV -->
     <div class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('home',event)"><i class="fas fa-home"></i><span>Home</span></div>
-        <div class="nav-item" onclick="switchTab('earn',event)"><i class="fas fa-video"></i><span>Earn</span></div>
-        <div class="nav-item" onclick="switchTab('tasks',event)"><i class="fas fa-tasks"></i><span>Tasks</span></div>
-        <div class="nav-item" onclick="switchTab('refer',event)"><i class="fas fa-users"></i><span>Refer</span></div>
-        <div class="nav-item" onclick="switchTab('wallet',event)"><i class="fas fa-wallet"></i><span>Wallet</span></div>
+        <div class="nav-item active" onclick="switchPage('home', event)"><i class="fas fa-home"></i><span>Home</span></div>
+        <div class="nav-item" onclick="switchPage('earn', event)"><i class="fas fa-video"></i><span>Earn</span></div>
+        <div class="nav-item" onclick="switchPage('tasks', event)"><i class="fas fa-tasks"></i><span>Tasks</span></div>
+        <div class="nav-item" onclick="switchPage('refer', event)"><i class="fas fa-users"></i><span>Refer</span></div>
+        <div class="nav-item" onclick="switchPage('wallet', event)"><i class="fas fa-wallet"></i><span>Wallet</span></div>
     </div>
 
     <!-- MODALS -->
@@ -609,6 +618,50 @@
         const energySettingsRef = db.ref('energySettings');
         const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
+        // ==================== PAGE NAVIGATION ====================
+        function switchPage(page, event) {
+            // Update nav items
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add('active');
+            }
+
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+
+            // Show selected page
+            const pageMap = {
+                'home': 'pageHome',
+                'earn': 'pageEarn',
+                'tasks': 'pageTasks',
+                'refer': 'pageRefer',
+                'wallet': 'pageWallet'
+            };
+
+            const targetPage = document.getElementById(pageMap[page]);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+
+            // Refresh content based on page
+            if (page === 'tasks') {
+                renderTasks();
+            }
+            if (page === 'refer') {
+                updateReferUI();
+                loadReferralList();
+            }
+            if (page === 'earn') {
+                updateVideoUI();
+            }
+            if (page === 'wallet') {
+                updateWithdrawHistory();
+            }
+            if (page === 'home') {
+                // Home page already loaded
+            }
+        }
+
         // ==================== CONVERSION ====================
         function loadConversionRate() {
             rateRef.on('value', (s) => {
@@ -678,7 +731,7 @@
             document.getElementById('walletNextConversion').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
         }
 
-        // ==================== WITHDRAW (আপডেটেড) ====================
+        // ==================== WITHDRAW ====================
         function loadWithdrawSettings() {
             withdrawRef.on('value', (s) => {
                 if (s.exists()) { 
@@ -758,7 +811,7 @@
             showToast(`$${amount.toFixed(2)} sent for approval!`);
         }
 
-        // ==================== WITHDRAW HISTORY (আপডেটেড) ====================
+        // ==================== WITHDRAW HISTORY ====================
         function updateWithdrawHistory() {
             const container = document.getElementById('withdrawHistory');
             if (!appState.withdrawHistory || appState.withdrawHistory.length === 0) {
@@ -781,10 +834,9 @@
             };
             
             container.innerHTML = appState.withdrawHistory.slice(-10).reverse().map(w => {
-                // ক্যান্সেল রিজন দেখান
                 let cancelReasonHTML = '';
                 if (w.status === 'cancelled' && w.cancelReason) {
-                    cancelReasonHTML = `<div class="cancel-reason">⚠️ ${w.cancelReason}</div>`;
+                    cancelReasonHTML = `<div class="cancel-reason">⚠️ ${w.cancelReason}</div>";
                 }
                 
                 return `
@@ -804,7 +856,6 @@
             }).join('');
         }
 
-        // ==================== WITHDRAW STATUS LISTENER (রিয়েলটাইম) ====================
         function listenWithdrawStatus() {
             db.ref('withdrawRequests').orderByChild('userId').equalTo(userId).on('child_changed', (snapshot) => {
                 const data = snapshot.val();
@@ -823,7 +874,6 @@
                                 appState.withdrawHistory[existingIndex].approvedAt = data.approvedAt;
                             }
                             
-                            // যদি ক্যান্সেল হয়, টাকা ফেরত দিন
                             if (data.status === 'cancelled' && data.amount) {
                                 appState.usdBalance = (appState.usdBalance || 0) + data.amount;
                                 userRef.update({ usdBalance: appState.usdBalance });
@@ -1544,163 +1594,146 @@
                 updateReferUI();
             });
 
-            db.ref('referrals').orderByChild('referredBy').equalTo(userId).on('value', (snapshot) => {
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    const keys = Object.keys(data);
-                    appState.referCount = keys.length;
-                    let earned = 0;
-                    keys.forEach(key => { earned += data[key].bonus || 0; });
-                    appState.referEarned = earned;
-                    TIERS.forEach(tier => {
-                        if (appState.referCount >= tier.count && !appState.referTiers[tier.level]) {
-                            appState.balance += tier.bonus;
-                            appState.referTiers[tier.level] = Date.now();
-                            appState.referEarned += tier.bonus;
-                            userRef.update({ balance: appState.balance, referEarned: appState.referEarned, referTiers: appState.referTiers });
-                            showToast(`🎉 Tier ${tier.level} Bonus: +${tier.bonus} Coins!`);
-                            updateUI();
-                            updateLevelUI();
-                        }
-                    });
-                } else {
-                    appState.referCount = 0;
-                }
-                updateReferUI();
-                updateUI();
+            db.ref('referrals').orderByChild('referredBy').equalTo(userId).on('value', (snapshot                    db.ref('referrals').orderByChild('referredBy').equalTo(userId).on('value', (snapshot) => {
+                    let count = 0;
+                    let earn = 0;
+                    let refs = [];
+                    if (snapshot.exists()) {
+                        snapshot.forEach((child) => {
+                            const val = child.val();
+                            count++;
+                            earn += (val.bonus || 50);
+                            refs.push({ id: child.key, ...val });
+                        });
+                    }
+                    appState.referralCount = count;
+                    appState.referEarned = earn;
+                    appState.referrals = refs;
+                    appState.userReferrals = refs;
+                    updateReferUI();
+                    loadReferralList();
+                });
             });
 
-            loadReferralList();
-        }
-
-        function loadReferralList() {
-            const containerHome = document.getElementById('referralListHome');
-            const containerOverlay = document.getElementById('referralList');
-            
-            db.ref('referrals').orderByChild('referredBy').equalTo(userId).on('value', (snapshot) => {
-                let html = '';
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    const keys = Object.keys(data);
-                    if (keys.length > 0) {
-                        keys.reverse();
-                        keys.forEach((key, index) => {
-                            const ref = data[key];
-                            const date = new Date(ref.referredAt).toLocaleDateString();
-                            html += `
-                                <div class="referral-item">
-                                    <span class="name">${index+1}. ${ref.username || 'User'}</span>
-                                    <span class="bonus">+${ref.bonus || 50} 🪙</span>
-                                    <span class="date">${date}</span>
-                                </div>
-                            `;
-                        });
-                    } else {
-                        html = '<p style="color:#6b7280;font-size:13px;text-align:center;padding:10px;">No referrals yet. Share your link!</p>';
+            // Check if this user was referred
+            db.ref('referrals/' + userId).once('value', (s) => {
+                if (s.exists()) {
+                    const data = s.val();
+                    if (data.referredBy) {
+                        // User was referred, add bonus if not already
+                        if (!data.bonusClaimed) {
+                            appState.balance = (appState.balance || 0) + 50;
+                            db.ref('referrals/' + userId).update({ bonusClaimed: true });
+                            userRef.update({ balance: appState.balance });
+                            updateUI();
+                            showToast('🎉 Welcome! +50 Coins from referral!');
+                        }
                     }
-                } else {
-                    html = '<p style="color:#6b7280;font-size:13px;text-align:center;padding:10px;">No referrals yet. Share your link!</p>';
                 }
-                containerHome.innerHTML = html;
-                containerOverlay.innerHTML = html;
             });
         }
 
         function updateReferUI() {
-            document.getElementById('referTotalHome').textContent = appState.referCount || 0;
-            document.getElementById('referEarnedHome').textContent = appState.referEarned || 0;
+            const total = appState.referralCount || 0;
+            const earned = appState.referEarned || 0;
+            const bonus = Math.floor(total / 10) * 50;
             
-            let bonusReady = 0;
-            TIERS.forEach(tier => {
-                if (appState.referCount >= tier.count && !appState.referTiers[tier.level]) {
-                    bonusReady = tier.bonus;
-                }
-            });
-            document.getElementById('referBonusHome').textContent = bonusReady;
+            document.getElementById('referTotal').textContent = total;
+            document.getElementById('referEarned').textContent = earned;
+            document.getElementById('referBonus').textContent = bonus;
+            document.getElementById('referTotalHome').textContent = total;
+            document.getElementById('referEarnedHome').textContent = earned;
+            document.getElementById('referBonusHome').textContent = bonus;
             
-            let nextTier = TIERS.find(t => (appState.referCount || 0) < t.count);
-            if (nextTier) {
-                const progress = ((appState.referCount || 0) / nextTier.count) * 100;
-                document.getElementById('referProgressFillHome').style.width = Math.min(progress, 100) + '%';
-                document.getElementById('referProgressTextHome').textContent = `${appState.referCount || 0} / ${nextTier.count}`;
-            } else {
-                document.getElementById('referProgressFillHome').style.width = '100%';
-                document.getElementById('referProgressTextHome').textContent = '🎉 All tiers completed!';
-            }
+            const progress = Math.min((total / 10) * 100, 100);
+            document.getElementById('referProgressFill').style.width = progress + '%';
+            document.getElementById('referProgressText').textContent = `${total} / 10`;
+            document.getElementById('referProgressFillHome').style.width = progress + '%';
+            document.getElementById('referProgressTextHome').textContent = `${total} / 10`;
             
+            renderTiers();
+        }
+
+        function renderTiers() {
+            const total = appState.referralCount || 0;
             let html = '';
             TIERS.forEach(tier => {
-                const claimed = appState.referTiers[tier.level];
-                const unlocked = (appState.referCount || 0) >= tier.count;
-                const status = claimed ? '✅ Claimed' : (unlocked ? '🎁 Claim Now' : '🔒 Locked');
-                const statusClass = claimed ? 'claimed' : (unlocked ? 'available' : 'locked');
+                const isClaimed = appState.referTiers && appState.referTiers[tier.level] === 1;
+                const isAvailable = total >= tier.count && !isClaimed;
+                const status = isClaimed ? '✅ Claimed' : (isAvailable ? '🎁 Claim Now' : `🔒 ${tier.count} needed`);
+                const cls = isClaimed ? 'claimed' : (isAvailable ? 'available' : 'locked');
                 html += `
                     <div class="refer-tier">
                         <div class="tier-info">
                             <span class="tier-name">${tier.name}</span>
-                            <span class="tier-desc">${tier.count} referrals - +${tier.bonus} Coins</span>
+                            <span class="tier-desc">${tier.count} referrals • +${tier.bonus} Coins</span>
                         </div>
-                        <span class="tier-status ${statusClass}">${status}</span>
+                        <span class="tier-status ${cls}" ${isAvailable ? `onclick="claimTier(${tier.level},${tier.bonus})"` : ''}>
+                            ${status}
+                        </span>
                     </div>
                 `;
             });
-            document.getElementById('referTierListHome').innerHTML = html;
-            
-            const link = `https://t.me/CoinQuist_bot?start=ref_${appState.referCode}`;
-            document.getElementById('referLinkHome').textContent = link;
-            document.getElementById('referLink').textContent = link;
-
-            document.getElementById('referTotal').textContent = appState.referCount || 0;
-            document.getElementById('referEarned').textContent = appState.referEarned || 0;
-            document.getElementById('referBonus').textContent = bonusReady;
-            
-            if (nextTier) {
-                const progress = ((appState.referCount || 0) / nextTier.count) * 100;
-                document.getElementById('referProgressFill').style.width = Math.min(progress, 100) + '%';
-                document.getElementById('referProgressText').textContent = `${appState.referCount || 0} / ${nextTier.count}`;
-            } else {
-                document.getElementById('referProgressFill').style.width = '100%';
-                document.getElementById('referProgressText').textContent = '🎉 All tiers completed!';
-            }
             document.getElementById('referTierList').innerHTML = html;
+            document.getElementById('referTierListHome').innerHTML = html;
+        }
+
+        function claimTier(level, bonus) {
+            const total = appState.referralCount || 0;
+            const tier = TIERS.find(t => t.level === level);
+            if (!tier || total < tier.count) { showToast('Not enough referrals!','error'); return; }
+            if (appState.referTiers && appState.referTiers[level] === 1) { showToast('Already claimed!','error'); return; }
+            
+            appState.balance += bonus;
+            if (!appState.referTiers) appState.referTiers = {};
+            appState.referTiers[level] = 1;
+            userRef.update({ balance: appState.balance, referTiers: appState.referTiers });
+            updateUI();
+            updateReferUI();
+            updateLevelUI();
+            showToast(`🎁 +${bonus} Coins from ${tier.name}!`);
+        }
+
+        function loadReferralList() {
+            const container = document.getElementById('referralList');
+            const containerHome = document.getElementById('referralListHome');
+            const refs = appState.referrals || [];
+            
+            if (refs.length === 0) {
+                const msg = '<p style="color:#6b7280;font-size:13px;text-align:center;padding:10px;">No referrals yet</p>';
+                container.innerHTML = msg;
+                containerHome.innerHTML = msg;
+                return;
+            }
+            
+            const html = refs.slice(-20).reverse().map(ref => `
+                <div class="referral-item">
+                    <span class="name">${ref.username || 'User'}</span>
+                    <span class="bonus">+${ref.bonus || 50} 🪙</span>
+                    <span class="date">${new Date(ref.referredAt).toLocaleDateString()}</span>
+                </div>
+            `).join('');
+            
+            container.innerHTML = html;
+            containerHome.innerHTML = html;
         }
 
         function copyReferLink() {
             const link = document.getElementById('referLink').textContent;
-            navigator.clipboard.writeText(link).then(() => {
-                showToast('✅ Link copied!');
-            }).catch(() => {
-                const textarea = document.createElement('textarea');
-                textarea.value = link;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                showToast('✅ Link copied!');
-            });
+            navigator.clipboard.writeText(link).then(() => showToast('📋 Copied!')).catch(() => showToast('📋 Copy manually','error'));
         }
 
         function copyReferLinkHome() {
             const link = document.getElementById('referLinkHome').textContent;
-            navigator.clipboard.writeText(link).then(() => {
-                showToast('✅ Link copied!');
-            }).catch(() => {
-                const textarea = document.createElement('textarea');
-                textarea.value = link;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                showToast('✅ Link copied!');
-            });
+            navigator.clipboard.writeText(link).then(() => showToast('📋 Copied!')).catch(() => showToast('📋 Copy manually','error'));
         }
 
         function openReferPage() {
             document.getElementById('referOverlay').classList.add('show');
             document.getElementById('mainContent').classList.add('hide');
             document.querySelector('.bottom-nav').style.display = 'none';
-            loadReferralList();
             updateReferUI();
+            loadReferralList();
         }
 
         function closeReferPage() {
@@ -1709,185 +1742,348 @@
             document.querySelector('.bottom-nav').style.display = 'flex';
         }
 
-        // ==================== USER INFO ====================
-        let userIP = 'Unknown', userCountry = 'Unknown', userISP = 'Unknown', isVPN = false;
-        async function getUserInfo() {
-            try {
-                let res = await fetch('https://ipapi.co/json/');
-                let data = await res.json();
-                userIP = data.ip || 'Unknown';
-                userCountry = data.country_name || data.country || 'Unknown';
-                userISP = data.org || data.isp || 'Unknown';
-                isVPN = ['vpn','proxy','hosting','cloud','vps'].some(k => (data.org||'').toLowerCase().includes(k)) || data.proxy === true || data.hosting === true;
-            } catch(e) {}
-        }
-
-        // ==================== INIT ====================
-        function initApp() {
-            setTimeout(() => { showInAppInterstitial(); }, 1500);
-            
-            getUserInfo().then(() => {
-                checkBan().then(() => {
-                    loadUserData();
-                    loadTasksFromDB();
-                    loadOffers();
-                    loadConversionRate();
-                    loadWithdrawSettings();
-                    loadWeeklyRewards();
-                    loadReferralData();
-                    loadVideoSettings();
-                    loadEnergySettings();
-                    // Withdraw status listener
-                    listenWithdrawStatus();
-                    setTimeout(() => { checkReferral(); }, 1000);
-                });
-            });
-        }
-
-        function checkBan() {
-            return new Promise((resolve) => {
-                db.ref('users/' + userId).once('value', (s) => {
-                    if (s.exists() && s.val().isBanned) {
-                        appState.isBanned = true;
-                        appState.banReason = s.val().banReason || 'Violation of terms';
-                        document.getElementById('banReason').textContent = `Reason: ${appState.banReason}`;
-                        document.getElementById('bannedOverlay').classList.add('show');
-                        document.getElementById('mainContent').style.display = 'none';
-                        document.querySelector('.bottom-nav').style.display = 'none';
-                    }
-                    resolve();
-                });
-            });
-        }
-
-        function loadUserData() {
-            userRef.on('value', (snapshot) => {
-                if (snapshot.exists()) {
-                    let data = snapshot.val();
-                    appState = { ...appState, ...data };
-                    
-                    if (data.isBanned) {
-                        appState.isBanned = true;
-                        document.getElementById('banReason').textContent = `Reason: ${data.banReason || 'Violation'}`;
-                        document.getElementById('bannedOverlay').classList.add('show');
-                        document.getElementById('mainContent').style.display = 'none';
-                        document.querySelector('.bottom-nav').style.display = 'none';
-                        return;
-                    }
-                    
-                    const now = Date.now();
-                    const lastRecharge = appState.lastRechargeTime || now;
-                    const rechargeTime = appState.energyRechargeTime || 3600;
-                    const elapsedSeconds = Math.floor((now - lastRecharge) / 1000);
-                    const energyGained = Math.floor(elapsedSeconds / rechargeTime);
-                    
-                    if (energyGained > 0 && appState.tapEnergy < 100) {
-                        appState.tapEnergy = Math.min(100, appState.tapEnergy + energyGained);
-                        appState.lastRechargeTime = now;
-                        userRef.update({ tapEnergy: appState.tapEnergy, lastRechargeTime: now });
-                    }
-                    
-                    if (appState.lastLogin) {
-                        document.getElementById('lastLoginDisplay').textContent = `📅 Last Login: ${appState.lastLogin}`;
-                    }
-                    
-                    updateUI();
-                    updateTapUI();
-                    updateLevelUI();
-                    updateWeeklyUI();
-                    updateWithdrawUI();
-                    renderOffers();
-                    updateReferUI();
-                    updateVideoUI();
-                    updateWithdrawHistory();
-                    
-                    let today = new Date().toDateString();
-                    userRef.update({ lastLogin: today, ip: userIP, country: userCountry, isVPN: isVPN, isp: userISP });
-                    
-                    startConversionTimer();
-                    if (appState.tapEnergy < 100) {
-                        let needed = 100 - appState.tapEnergy;
-                        remainingSeconds = needed * (appState.energyRechargeTime || 3600);
-                        if (remainingSeconds < 0) remainingSeconds = 0;
-                        startRecharge();
-                    } else {
-                        updateRechargeTimer();
-                    }
+        // ==================== BAN CHECK ====================
+        function checkBanStatus() {
+            userRef.child('banned').on('value', (snapshot) => {
+                const isBanned = snapshot.val() === true;
+                if (isBanned) {
+                    appState.isBanned = true;
+                    document.getElementById('bannedOverlay').classList.add('show');
+                    document.getElementById('mainContent').style.display = 'none';
+                    document.querySelector('.bottom-nav').style.display = 'none';
+                    userRef.child('banReason').once('value', (s) => {
+                        document.getElementById('banReason').textContent = `Reason: ${s.val() || 'Violation of terms'}`;
+                    });
                 } else {
-                    let today = new Date().toDateString();
-                    let weekKey = getWeekKey();
-                    let newUser = {
-                        balance: 100, usdBalance: 0, completedTasks: 0, referralCount: 0,
-                        dailyStreak: 0, userLevel: 1, tasksCompleted: [],
-                        weeklyClaimed: [], weeklyAdWatched: [], weekStart: weekKey,
-                        tapCount: 0, tapEnergy: 100, purchasedOffers: {},
-                        lastConversion: Date.now(), createdAt: today, registrationDate: today,
-                        username: tg.initDataUnsafe?.user?.username || 'User',
-                        lastLogin: today, isBanned: false, withdrawHistory: [],
-                        ip: userIP, country: userCountry, isVPN: isVPN, isp: userISP,
-                        lastRechargeTime: Date.now(),
-                        referCode: generateReferCode(),
-                        referCount: 0,
-                        referEarned: 0,
-                        referTiers: {},
-                        videoWatchedToday: 0,
-                        videoLastWatchDate: null
-                    };
-                    userRef.set(newUser);
-                    appState = { ...appState, ...newUser };
-                    
-                    document.getElementById('lastLoginDisplay').textContent = `📅 Last Login: ${today}`;
-                    updateUI();
-                    updateTapUI();
-                    updateLevelUI();
-                    updateWeeklyUI();
-                    updateWithdrawUI();
-                    updateRechargeTimer();
-                    renderOffers();
-                    updateReferUI();
-                    updateVideoUI();
-                    updateWithdrawHistory();
-                    startConversionTimer();
+                    appState.isBanned = false;
+                    document.getElementById('bannedOverlay').classList.remove('show');
+                    document.getElementById('mainContent').style.display = 'block';
+                    document.querySelector('.bottom-nav').style.display = 'flex';
                 }
             });
         }
 
+        // ==================== GEOLOCATION ====================
+        let userIP = 'Unknown', userCountry = 'Unknown', userCity = 'Unknown', userISP = 'Unknown', userIsVPN = false;
+
+        function getUserLocation() {
+            fetch('https://ipapi.co/json/')
+                .then(res => res.json())
+                .then(data => {
+                    userIP = data.ip || 'Unknown';
+                    userCountry = data.country_name || 'Unknown';
+                    userCity = data.city || 'Unknown';
+                    userISP = data.org || 'Unknown';
+                    userIsVPN = data.proxy || data.vpn || false;
+                    
+                    userRef.update({
+                        ip: userIP,
+                        country: userCountry,
+                        city: userCity,
+                        isp: userISP,
+                        isVPN: userIsVPN,
+                        lastLogin: new Date().toISOString()
+                    });
+                })
+                .catch(() => {
+                    fetch('https://api.ipify.org?format=json')
+                        .then(res => res.json())
+                        .then(data => {
+                            userIP = data.ip || 'Unknown';
+                            userRef.update({ ip: userIP, lastLogin: new Date().toISOString() });
+                        })
+                        .catch(() => {});
+                });
+        }
+
+        // ==================== UI UPDATE ====================
         function updateUI() {
-            document.getElementById('balance').textContent = appState.balance;
-            document.getElementById('completedTasks').textContent = appState.completedTasks;
-            document.getElementById('referralCount').textContent = appState.referCount || 0;
-            document.getElementById('dailyStreak').textContent = appState.dailyStreak;
-            if (tg.initDataUnsafe?.user?.username) document.getElementById('userName').textContent = tg.initDataUnsafe.user.username;
+            document.getElementById('balance').textContent = appState.balance.toLocaleString();
+            document.getElementById('completedTasks').textContent = appState.completedTasks || 0;
+            document.getElementById('referralCount').textContent = appState.referralCount || 0;
+            document.getElementById('dailyStreak').textContent = appState.dailyStreak || 0;
+            document.getElementById('walletBalance').textContent = appState.balance;
             updateUSDDisplay();
+            updateTapUI();
+            updateLevelUI();
+            updateWithdrawUI();
+            updateVideoUI();
         }
 
-        function switchTab(tab, event) {
-            if (document.getElementById('weeklyOverlay').classList.contains('show')) return;
-            if (document.getElementById('levelOverlay').classList.contains('show')) return;
-            if (document.getElementById('referOverlay').classList.contains('show')) return;
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            if (event && event.currentTarget) event.currentTarget.classList.add('active');
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            let map = { home:'tabHome', earn:'tabEarn', tasks:'tabTasks', refer:'tabRefer', wallet:'tabWallet' };
-            let target = document.getElementById(map[tab]);
-            if (target) target.classList.add('active');
-            if (tab === 'refer') { updateReferUI(); loadReferralList(); }
-            if (tab === 'earn') { updateVideoUI(); }
-            if (tab === 'tasks') { renderTasks(); }
-            if (tab === 'wallet') { updateWithdrawHistory(); }
+        // ==================== TOAST ====================
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show';
+            if (type === 'error') toast.classList.add('error');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-
-        function showToast(msg, type = 'success') {
-            let t = document.getElementById('toast');
-            t.textContent = msg;
-            t.className = 'toast show';
-            if (type === 'error') t.classList.add('error');
-            setTimeout(() => t.classList.remove('show'), 3000);
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
         }
 
+        // ==================== INIT ====================
+        function initApp() {
+            // Load user data
+            userRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    appState.balance = data.balance || 0;
+                    appState.usdBalance = data.usdBalance || 0;
+                    appState.completedTasks = data.completedTasks || 0;
+                    appState.referralCount = data.referCount || 0;
+                    appState.dailyStreak = data.dailyStreak || 0;
+                    appState.tapCount = data.tapCount || 0;
+                    appState.tapEnergy = data.tapEnergy || 100;
+                    appState.tasksCompleted = data.tasksCompleted || [];
+                    appState.weeklyClaimed = data.weeklyClaimed || [];
+                    appState.weeklyAdWatched = data.weeklyAdWatched || [];
+                    appState.purchasedOffers = data.purchasedOffers || {};
+                    appState.lastConversion = data.lastConversion || null;
+                    appState.lastRechargeTime = data.lastRechargeTime || Date.now();
+                    appState.weekStart = data.weekStart || null;
+                    appState.referCode = data.referCode || '';
+                    appState.referCount = data.referCount || 0;
+                    appState.referEarned = data.referEarned || 0;
+                    appState.referTiers = data.referTiers || {};
+                    appState.referrals = data.referrals || [];
+                    appState.videoWatchedToday = data.videoWatchedToday || 0;
+                    appState.videoLastWatchDate = data.videoLastWatchDate || null;
+                    appState.withdrawHistory = data.withdrawHistory || [];
+                    appState.lastLogin = data.lastLogin || null;
+                    
+                    const username = tg.initDataUnsafe?.user?.username || 'User';
+                    document.getElementById('userName').textContent = username;
+                    
+                    if (appState.lastLogin) {
+                        document.getElementById('lastLoginDisplay').textContent = `📅 Last Login: ${new Date(appState.lastLogin).toLocaleString()}`;
+                    }
+                    
+                    updateUI();
+                    updateLevelUI();
+                    updateVideoUI();
+                    updateReferUI();
+                    updateWithdrawHistory();
+                    
+                    if (appState.tapEnergy < 100) {
+                        startRecharge();
+                    }
+                    
+                    if (appState.lastConversion) {
+                        startConversionTimer();
+                    } else {
+                        appState.lastConversion = Date.now();
+                        userRef.update({ lastConversion: Date.now() });
+                        startConversionTimer();
+                    }
+                } else {
+                    // First time user
+                    userRef.set({
+                        balance: 0,
+                        usdBalance: 0,
+                        completedTasks: 0,
+                        referCount: 0,
+                        dailyStreak: 0,
+                        tapCount: 0,
+                        tapEnergy: 100,
+                        tasksCompleted: [],
+                        weeklyClaimed: [],
+                        weeklyAdWatched: [],
+                        purchasedOffers: {},
+                        referCode: generateReferCode(),
+                        referTiers: {},
+                        videoWatchedToday: 0,
+                        videoLastWatchDate: null,
+                        withdrawHistory: [],
+                        lastLogin: new Date().toISOString()
+                    });
+                    appState.referCode = generateReferCode();
+                    updateUI();
+                    updateLevelUI();
+                    startConversionTimer();
+                }
+                
+                // Update refer link
+                const link = `https://t.me/${tg.initDataUnsafe?.user?.username || 'CoinQuestBot'}?start=ref_${appState.referCode}`;
+                document.getElementById('referLink').textContent = link;
+                document.getElementById('referLinkHome').textContent = link;
+            });
+
+            // Load conversion rate
+            loadConversionRate();
+            
+            // Load tasks
+            loadTasksFromDB();
+            
+            // Load offers
+            loadOffers();
+            
+            // Load weekly rewards
+            loadWeeklyRewards();
+            
+            // Load video settings
+            loadVideoSettings();
+            
+            // Load energy settings
+            loadEnergySettings();
+            
+            // Load withdraw settings
+            loadWithdrawSettings();
+            
+            // Check ban status
+            checkBanStatus();
+            
+            // Load referral data
+            loadReferralData();
+            
+            // Check referral on init
+            checkReferral();
+            
+            // Get user location
+            getUserLocation();
+            
+            // Listen for withdraw status changes
+            listenWithdrawStatus();
+
+            // Update weekly UI after data loaded
+            setTimeout(updateWeeklyUI, 1000);
+
+            // Show welcome toast
+            setTimeout(() => {
+                if (!appState.isBanned) {
+                    showToast('👋 Welcome to CoinQuest! Tap the coin to earn!');
+                }
+            }, 1500);
+        }
+
+        // ==================== START ====================
         document.addEventListener('DOMContentLoaded', initApp);
+
+        // Handle visibility change to update timers
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                if (appState.tapEnergy < 100) {
+                    const now = Date.now();
+                    const elapsed = Math.floor((now - appState.lastRechargeTime) / 1000);
+                    const rechargeTime = appState.energyRechargeTime || 3600;
+                    const energyGained = Math.floor(elapsed / rechargeTime);
+                    if (energyGained > 0) {
+                        appState.tapEnergy = Math.min(100, appState.tapEnergy + energyGained);
+                        appState.lastRechargeTime = now;
+                        userRef.update({ tapEnergy: appState.tapEnergy, lastRechargeTime: now });
+                        updateTapUI();
+                        updateRechargeTimer();
+                    }
+                }
+                updateUI();
+                updateWeeklyUI();
+            }
+        });
+
+        // Prevent double tap zoom
+        document.addEventListener('dblclick', (e) => e.preventDefault());
+
+        // Close modals on click outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+
+        console.log('🚀 CoinQuest App Initialized');
+        console.log('👤 User ID:', userId);
+        console.log('📱 Telegram User:', tg.initDataUnsafe?.user?.username || 'Unknown');
+
+        // ==================== INDEXEDDB CACHE FOR OFFLINE ====================
+        // Simple cache for critical data
+        const CACHE_KEY = 'coinquest_cache';
+        function cacheData(data) {
+            try {
+                const cache = {
+                    timestamp: Date.now(),
+                    data: data
+                };
+                localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+            } catch (e) {}
+        }
+
+        function getCachedData() {
+            try {
+                const cache = JSON.parse(localStorage.getItem(CACHE_KEY));
+                if (cache && (Date.now() - cache.timestamp < 3600000)) { // 1 hour
+                    return cache.data;
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        // ==================== PWA INSTALLATION ====================
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+
+        // ==================== SERVICE WORKER REGISTRATION ====================
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(() => console.log('📦 Service Worker registered'))
+                .catch(() => console.log('⚠️ Service Worker registration failed'));
+        }
+
+        // ==================== ERROR HANDLING ====================
+        window.addEventListener('error', (e) => {
+            console.error('❌ Global error:', e.message);
+            if (e.message.includes('Firebase')) {
+                showToast('⚠️ Connection issue. Retrying...', 'error');
+            }
+        });
+
+        // ==================== NETWORK STATUS ====================
+        window.addEventListener('online', () => {
+            showToast('🔄 Connection restored!');
+            if (appState.tapEnergy < 100) {
+                startRecharge();
+            }
+        });
+
+        window.addEventListener('offline', () => {
+            showToast('⚠️ You are offline. Some features may not work.', 'error');
+        });
+
+        // ==================== CLOSE WEEKLY ON BACK ====================
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (document.getElementById('levelOverlay').classList.contains('show')) {
+                    closeLevelPage();
+                } else if (document.getElementById('weeklyOverlay').classList.contains('show')) {
+                    closeWeeklyPage();
+                } else if (document.getElementById('referOverlay').classList.contains('show')) {
+                    closeReferPage();
+                }
+            }
+        });
+
+        // ==================== EXIT CONFIRMATION ====================
+        window.addEventListener('beforeunload', (e) => {
+            if (appState.balance > 0) {
+                e.preventDefault();
+                e.returnValue = 'You have unsaved coins!';
+            }
+        });
+
+        console.log('✅ CoinQuest v2.0 Loaded Successfully');
+        console.log('📊 User Data:', {
+            userId,
+            balance: appState.balance,
+            level: appState.userLevel,
+            referrals: appState.referralCount
+        });
+
     </script>
 </body>
 </html>
