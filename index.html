@@ -752,8 +752,11 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
         let userId = 'default_user';
+        let tgUsername = 'User';
+        
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
             userId = tg.initDataUnsafe.user.id.toString();
+            tgUsername = tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name || 'User';
         }
 
         // ==================== STATE ====================
@@ -921,7 +924,7 @@
             
             const withdrawData = {
                 userId: userId,
-                username: tg.initDataUnsafe?.user?.username || 'User',
+                username: tgUsername,
                 amount: amount,
                 status: 'pending',
                 requestedAt: new Date().toISOString()
@@ -1946,6 +1949,12 @@
 
         // ==================== INIT ====================
         function initApp() {
+            // Update TG Username and UserID to Database automatically
+            userRef.update({
+                username: tgUsername,
+                lastLogin: new Date().toISOString()
+            });
+
             userRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -1972,8 +1981,7 @@
                     appState.speedBoostCooldown = data.speedBoostCooldown || 0;
                     appState.taskLastCompleted = data.taskLastCompleted || {};
                     
-                    const username = tg.initDataUnsafe?.user?.username || 'User';
-                    document.getElementById('userName').textContent = username;
+                    document.getElementById('userName').textContent = tgUsername;
                     
                     if (appState.lastLogin) {
                         document.getElementById('lastLoginDisplay').textContent = `📅 Last Login: ${new Date(appState.lastLogin).toLocaleString()}`;
@@ -1991,6 +1999,7 @@
                     else { appState.lastConversion = Date.now(); userRef.update({ lastConversion: Date.now() }); startConversionTimer(); }
                 } else {
                     userRef.set({
+                        username: tgUsername,
                         balance: 0, usdBalance: 0, completedTasks: 0, referCount: 0, dailyStreak: 0, tasksCompleted: [],
                         weeklyClaimed: [], weeklyAdWatched: [], referCode: generateReferCode(), referTiers: {},
                         videoWatchedToday: 0, videoLastWatchDate: null, withdrawHistory: [], lastLogin: new Date().toISOString(),
@@ -2045,6 +2054,7 @@
 
         console.log('✅ CoinQuest App Loaded Successfully');
         console.log('📊 User ID:', userId);
+        console.log('👤 TG Username:', tgUsername);
         console.log('🎯 Monetag Ad SDK Integrated');
     </script>
 </body>
