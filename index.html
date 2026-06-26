@@ -578,7 +578,7 @@
                 <!-- SPEED BOOST BUTTON -->
                 <div class="speed-btn-container">
                     <button class="speed-boost-btn" id="speedBoostBtn" onclick="activateSpeedBoost()">
-                        <i class="fas fa-rocket"></i> Speed Boost <span class="boost-timer"></span>
+                        <i class="fas fa-rocket"></i> Speed Boost <span class="boost-timer" id="boostTimer"></span>
                     </button>
                 </div>
             </div>
@@ -758,7 +758,7 @@
         // ==================== STATE ====================
         let appState = {
             balance: 0, usdBalance: 0, completedTasks: 0, referralCount: 0,
-            dailyStreak: 0, userLevel: 1, tasksCompleted: [], // Array of task IDs
+            dailyStreak: 0, userLevel: 1, tasksCompleted: [],
             weeklyClaimed: [], weeklyAdWatched: [],
             lastConversion: null, conversionRate: 1000, minWithdraw: 10,
             isBanned: false, banReason: '', withdrawHistory: [],
@@ -776,7 +776,7 @@
             videoWatchedCount: 0,
             isSpeedBoostActive: false,
             speedBoostCooldown: 0,
-            taskLastCompleted: {} // { taskId: dateString }
+            taskLastCompleted: {}
         };
 
         let tasks = [];
@@ -793,6 +793,8 @@
         const withdrawRef = db.ref('withdrawSettings');
         const weeklyRewardsRef = db.ref('weeklyRewards');
         const videoSettingsRef = db.ref('videoSettings');
+        const levelConfigRef = db.ref('levelConfig'); // Admin level config
+        const referralConfigRef = db.ref('referralConfig'); // Admin referral config
         const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
         // ==================== PAGE NAVIGATION ====================
@@ -822,7 +824,7 @@
             if (page === 'wallet') updateWithdrawHistory();
         }
 
-        // ==================== CONVERSION RATE (Dynamic from Firebase) ====================
+        // ==================== CONVERSION RATE (Admin Configurable) ====================
         function loadConversionRate() {
             rateRef.on('value', (s) => {
                 appState.conversionRate = s.exists() ? s.val() : 1000;
@@ -1090,7 +1092,7 @@
             });
         }
 
-        // ==================== PROGRESS BAR (5 Seconds Interval) ====================
+        // ==================== PROGRESS BAR (Fixed) ====================
         function updateProgressUI() {
             const fill = document.getElementById('progressBarFill');
             const count = document.getElementById('progressCoinCount');
@@ -1103,10 +1105,18 @@
             
             if (appState.progressCoins === 0) {
                 status.textContent = '🎯 All coins earned! Watch videos to refill.';
+                document.getElementById('progressWatchBtn').classList.remove('hidden');
+                document.getElementById('progressStartBtn').classList.add('hidden');
             } else if (appState.progressCoins === TOTAL_COINS) {
                 status.textContent = '✅ Full! Press START to begin.';
+                document.getElementById('progressWatchBtn').classList.add('hidden');
+                document.getElementById('progressStartBtn').classList.remove('hidden');
+                document.getElementById('progressStartBtn').disabled = false;
+                document.getElementById('progressStartBtn').textContent = '▶ START';
             } else {
                 status.textContent = `⏳ Earning... ${appState.progressCoins} coins left`;
+                document.getElementById('progressWatchBtn').classList.add('hidden');
+                document.getElementById('progressStartBtn').classList.remove('hidden');
             }
         }
 
@@ -1114,6 +1124,7 @@
             if (progressInterval) return;
             if (appState.progressCoins <= 0) {
                 showToast('❌ No coins left! Watch videos first.', 'error');
+                updateProgressUI();
                 return;
             }
             
@@ -1129,8 +1140,6 @@
                     btn.textContent = '▶ START';
                     updateProgressUI();
                     showToast('🎉 All coins earned! Watch videos to refill.');
-                    document.getElementById('progressWatchBtn').classList.remove('hidden');
-                    document.getElementById('progressStartBtn').classList.add('hidden');
                     return;
                 }
                 
@@ -1152,7 +1161,7 @@
                 updateProgressUI();
                 updateUI();
                 updateLevelUI();
-            }, 5000); // 5 seconds interval
+            }, 5000);
         }
 
         function startVideoProgress() {
@@ -1163,10 +1172,6 @@
                 appState.videoWatchedCount = 0;
                 userRef.update({ progressCoins: appState.progressCoins, videoWatchedCount: 0 });
                 updateProgressUI();
-                document.getElementById('progressWatchBtn').classList.add('hidden');
-                document.getElementById('progressStartBtn').classList.remove('hidden');
-                document.getElementById('progressStartBtn').disabled = false;
-                document.getElementById('progressStartBtn').textContent = '▶ START';
                 showToast('🪙 1000 coins refilled! Press START to earn again.');
                 return;
             }
@@ -1192,20 +1197,35 @@
                             appState.videoWatchedCount = 0;
                             userRef.update({ progressCoins: appState.progressCoins, videoWatchedCount: 0 });
                             updateProgressUI();
-                            document.getElementById('progressWatchBtn').classList.add('hidden');
-                            document.getElementById('progressStartBtn').classList.remove('hidden');
-                            document.getElementById('progressStartBtn').disabled = false;
-                            document.getElementById('progressStartBtn').textContent = '▶ START';
                             showToast('🪙 1000 coins refilled! Press START to earn again.');
-                        } else {
-                            btn.textContent = `📺 Watch Videos (${appState.videoWatchedCount}/5)`;
                         }
                     }
                 }, 1000);
             });
         }
 
-        // ==================== SPEED BOOST (3 Seconds, 1 Hour Cooldown) ====================
+        // ==================== SPEED BOOST (Fixed) ====================
+        function updateSpeedBoostUI() {
+            const btn = document.getElementById('speedBoostBtn');
+            const timerSpan = document.getElementById('boostTimer');
+            
+            if (appState.speedBoostCooldown > 0) {
+                const now = Date.now();
+                const timeLeft = Math.ceil((appState.speedBoostCooldown - now) / 60000); // minutes
+                if (timeLeft > 0) {
+                    btn.style.display = 'none';
+                } else {
+                    btn.style.display = 'flex';
+                    timerSpan.textContent = '';
+                    appState.speedBoostCooldown = 0;
+                    userRef.update({ speedBoostCooldown: 0 });
+                }
+            } else {
+                btn.style.display = 'flex';
+                timerSpan.textContent = '';
+            }
+        }
+
         function activateSpeedBoost() {
             const now = Date.now();
             if (appState.speedBoostCooldown > 0) {
@@ -1249,7 +1269,7 @@
                         
                         appState.speedBoostCooldown = Date.now() + 3600000;
                         userRef.update({ speedBoostCooldown: appState.speedBoostCooldown });
-                        
+                        updateSpeedBoostUI();
                         showToast('🚀 Speed Boost ended! You earned extra coins!');
                     }
                 }, 100);
@@ -1277,6 +1297,219 @@
             });
         }
 
+        // ==================== LEVEL SYSTEM (Firebase Config) ====================
+        let levelConfig = {};
+        let referralConfig = {};
+
+        function loadLevelConfig() {
+            levelConfigRef.on('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    levelConfig = snapshot.val();
+                } else {
+                    // Default if no config
+                    levelConfig = {
+                        levels: {
+                            1: { name: 'Bronze', emoji: '🥉', bonus: 2, requiredPoints: 0 },
+                            2: { name: 'Silver', emoji: '🥈', bonus: 5, requiredPoints: 100 },
+                            3: { name: 'Gold', emoji: '🥇', bonus: 10, requiredPoints: 300 },
+                            4: { name: 'Platinum', emoji: '💎', bonus: 20, requiredPoints: 600 },
+                            5: { name: 'Diamond', emoji: '👑', bonus: 30, requiredPoints: 1000 }
+                        }
+                    };
+                    levelConfigRef.set(levelConfig);
+                }
+                updateLevelUI();
+                renderLevelList();
+            });
+        }
+
+        function loadReferralConfig() {
+            referralConfigRef.on('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    referralConfig = snapshot.val();
+                } else {
+                    // Default values
+                    referralConfig = {
+                        perReferralCoins: 50,
+                        tier1: { count: 10, bonus: 50 },
+                        tier2: { count: 25, bonus: 150 },
+                        tier3: { count: 50, bonus: 300 },
+                        tier4: { count: 100, bonus: 500 },
+                        tier5: { count: 200, bonus: 1000 }
+                    };
+                    referralConfigRef.set(referralConfig);
+                }
+                updateReferUI();
+            });
+        }
+
+        function getLevelTier(level) {
+            if (levelConfig && levelConfig.levels && levelConfig.levels[level]) {
+                const lvl = levelConfig.levels[level];
+                return { name: lvl.name || 'Unknown', emoji: lvl.emoji || '🪙', bonus: lvl.bonus || 0 };
+            }
+            // Fallback if level not found
+            return { name: 'Level ' + level, emoji: '🪙', bonus: 0 };
+        }
+
+        function calcLevel(coins, tasks, taps, streak, withdrawals) {
+            let points = Math.floor((coins * 1) + (tasks * 50) + (taps * 0.1) + (streak * 10) + (withdrawals * 100));
+            let level = 1;
+            
+            // Check from admin config
+            if (levelConfig && levelConfig.levels) {
+                const levels = Object.keys(levelConfig.levels).map(Number).sort((a,b) => a-b);
+                for (let i = levels.length - 1; i >= 0; i--) {
+                    const lvlNum = levels[i];
+                    const lvlData = levelConfig.levels[lvlNum];
+                    if (points >= lvlData.requiredPoints) {
+                        level = lvlNum;
+                        break;
+                    }
+                }
+            } else {
+                // Fallback calculation
+                let totalReq = 0;
+                for (let i = 1; i <= 100; i++) {
+                    totalReq += i * 100;
+                    if (points >= totalReq) level = i;
+                    else break;
+                }
+            }
+            
+            let nextLevel = level + 1;
+            let currentRequired = 0;
+            let nextRequired = 0;
+            
+            if (levelConfig && levelConfig.levels) {
+                if (levelConfig.levels[level]) {
+                    currentRequired = levelConfig.levels[level].requiredPoints || 0;
+                }
+                if (levelConfig.levels[nextLevel]) {
+                    nextRequired = levelConfig.levels[nextLevel].requiredPoints || 0;
+                }
+            }
+            
+            let progress = 0;
+            if (nextRequired > currentRequired) {
+                progress = ((points - currentRequired) / (nextRequired - currentRequired)) * 100;
+                if (progress > 100) progress = 100;
+                if (progress < 0) progress = 0;
+            }
+            
+            let tier = getLevelTier(level);
+            let nextTier = getLevelTier(nextLevel);
+            
+            return {
+                level, points, currentRequired, nextRequired, progress: Math.floor(progress),
+                isMax: !levelConfig.levels || !levelConfig.levels[nextLevel],
+                tier, nextTier
+            };
+        }
+
+        function updateLevelUI() {
+            const data = calcLevel(
+                appState.balance, appState.completedTasks, 0,
+                appState.dailyStreak, appState.withdrawHistory ? appState.withdrawHistory.length : 0
+            );
+            const t = data.tier;
+            document.getElementById('levelTitle').textContent = `${t.emoji} ${t.name}`;
+            document.getElementById('levelNumber').textContent = `Level ${data.level}`;
+            document.getElementById('levelProgressFill').style.width = `${data.progress}%`;
+            
+            if (data.isMax) {
+                document.getElementById('levelCurrentPoints').textContent = `${data.points}`;
+                document.getElementById('levelNextPoints').textContent = '⭐ MAX';
+            } else {
+                document.getElementById('levelCurrentPoints').textContent = data.points - data.currentRequired;
+                document.getElementById('levelNextPoints').textContent = `/ ${data.nextRequired - data.currentRequired}`;
+            }
+            document.getElementById('userLevelBadge').textContent = `Level ${data.level} 👆`;
+            appState.userLevel = data.level;
+            
+            document.getElementById('levelCurrentEmoji').textContent = t.emoji;
+            document.getElementById('levelCurrentNumber').textContent = `Level ${data.level}`;
+            document.getElementById('levelCurrentTitle').textContent = t.name;
+            
+            if (data.isMax) {
+                document.getElementById('levelCurrentPointsText').textContent = '🏆 MAX LEVEL!';
+                document.getElementById('levelProgressFill2').style.width = '100%';
+                document.getElementById('levelProgressText2').textContent = '100%';
+                document.getElementById('levelNextInfo').textContent = '⭐ MAX';
+            } else {
+                document.getElementById('levelCurrentPointsText').textContent = `${data.points - data.currentRequired} / ${data.nextRequired - data.currentRequired} XP`;
+                document.getElementById('levelProgressFill2').style.width = `${data.progress}%`;
+                document.getElementById('levelProgressText2').textContent = `${data.progress}%`;
+                document.getElementById('levelNextInfo').textContent = `Next: ${data.level + 1}`;
+            }
+            document.getElementById('levelBonusPercent').textContent = `+${t.bonus}%`;
+            document.getElementById('levelDailyBonus').textContent = `${10 + t.bonus} Coins`;
+            let isExclusive = data.level >= 10;
+            document.getElementById('levelExclusiveTasks').textContent = isExclusive ? '✅ Unlocked' : '🔒 Locked';
+            document.getElementById('levelExclusiveTasks').style.color = isExclusive ? '#10b981' : '#94a3b8';
+        }
+
+        function renderLevelList() {
+            const container = document.getElementById('levelList');
+            const data = calcLevel(
+                appState.balance, appState.completedTasks, 0,
+                appState.dailyStreak, appState.withdrawHistory ? appState.withdrawHistory.length : 0
+            );
+            let html = '';
+            
+            let levelNumbers = [];
+            if (levelConfig && levelConfig.levels) {
+                levelNumbers = Object.keys(levelConfig.levels).map(Number).sort((a,b) => a-b);
+            } else {
+                for (let i = 1; i <= 100; i++) levelNumbers.push(i);
+            }
+            
+            for (let i of levelNumbers) {
+                if (currentFilter !== 'all') {
+                    // Simple filter by tier
+                    const filterMap = { 'bronze':[1,10], 'silver':[11,25], 'gold':[26,50], 'platinum':[51,75], 'diamond':[76,100] };
+                    const range = filterMap[currentFilter];
+                    if (!range || i < range[0] || i > range[1]) continue;
+                }
+                const t = getLevelTier(i);
+                const isUnlocked = data.level >= i;
+                const isCurrent = data.level === i;
+                html += `
+                    <div class="level-item ${isCurrent ? 'active' : ''} ${!isUnlocked ? 'locked' : ''}">
+                        <div class="level-info">
+                            <span class="num">${i}</span>
+                            <span class="emoji">${t.emoji}</span>
+                            <span class="name">${t.name}</span>
+                            ${isCurrent ? '<span class="badge">👈 Current</span>' : ''}
+                            ${!isUnlocked ? '<span class="badge" style="background:rgba(239,68,68,0.1);color:#ef4444;">🔒</span>' : ''}
+                        </div>
+                        <div class="level-reward">+${t.bonus}%</div>
+                        ${isCurrent ? '<div class="level-check">✅</div>' : ''}
+                    </div>
+                `;
+            }
+            container.innerHTML = html || '<div class="loading"><p>No levels found</p></div>';
+        }
+
+        function filterLevels(filter, btn) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-tabs .tab').forEach(t => t.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderLevelList();
+        }
+
+        function openLevelPage() {
+            document.getElementById('levelOverlay').classList.add('show');
+            document.getElementById('mainContent').classList.add('hide');
+            document.querySelector('.bottom-nav').style.display = 'none';
+            renderLevelList();
+        }
+        function closeLevelPage() {
+            document.getElementById('levelOverlay').classList.remove('show');
+            document.getElementById('mainContent').classList.remove('hide');
+            document.querySelector('.bottom-nav').style.display = 'flex';
+        }
+
         // ==================== DYNAMIC TASKS (Link, Button, Video) ====================
         function loadTasksFromDB() {
             tasksRef.on('value', (snapshot) => {
@@ -1302,10 +1535,6 @@
 
             container.innerHTML = filteredTasks.map(task => {
                 const today = new Date().toDateString();
-                const isCompleted = appState.tasksCompleted.includes(task.id) || 
-                                  (appState.taskLastCompleted[task.id] && appState.taskLastCompleted[task.id] === today);
-                
-                // If task is completed today, show as completed
                 const isCompletedToday = appState.taskLastCompleted[task.id] === today;
                 
                 let actionHTML = '';
@@ -1314,7 +1543,7 @@
                 if (isCompletedToday) {
                     statusText = '✅ Done Today';
                 } else {
-                    statusText = isCompleted ? '✅ Completed' : '⏳ Incomplete';
+                    statusText = '⏳ Incomplete';
                 }
                 
                 if (!isCompletedToday) {
@@ -1378,10 +1607,6 @@
             let task = tasks.find(t => t.id === taskId);
             if (!task) return;
             
-            // Add task to completed list
-            if (!appState.tasksCompleted.includes(taskId)) {
-                appState.tasksCompleted.push(taskId);
-            }
             appState.taskLastCompleted[taskId] = today;
             appState.balance += task.reward;
             appState.completedTasks++;
@@ -1389,7 +1614,6 @@
             userRef.update({ 
                 balance: appState.balance, 
                 completedTasks: appState.completedTasks, 
-                tasksCompleted: appState.tasksCompleted,
                 taskLastCompleted: appState.taskLastCompleted
             });
             
@@ -1412,10 +1636,6 @@
             if (!task) return;
 
             showRewardedAd(function() {
-                // After ad, reward user
-                if (!appState.tasksCompleted.includes(taskId)) {
-                    appState.tasksCompleted.push(taskId);
-                }
                 appState.taskLastCompleted[taskId] = today;
                 appState.balance += task.reward;
                 appState.completedTasks++;
@@ -1423,7 +1643,6 @@
                 userRef.update({ 
                     balance: appState.balance, 
                     completedTasks: appState.completedTasks, 
-                    tasksCompleted: appState.tasksCompleted,
                     taskLastCompleted: appState.taskLastCompleted
                 });
                 
@@ -1434,128 +1653,6 @@
                 renderTasks();
                 showToast(`🎉 +${task.reward} Coins for watching video!`);
             });
-        }
-
-        // ==================== LEVEL SYSTEM ====================
-        function getLevelTier(level) {
-            if (level >= 76) return { name:'Diamond', emoji:'👑', bonus:30 };
-            if (level >= 51) return { name:'Platinum', emoji:'💎', bonus:20 };
-            if (level >= 26) return { name:'Gold', emoji:'🥇', bonus:10 };
-            if (level >= 11) return { name:'Silver', emoji:'🥈', bonus:5 };
-            return { name:'Bronze', emoji:'🥉', bonus:2 };
-        }
-
-        function calcLevel(coins, tasks, taps, streak, withdrawals) {
-            let points = Math.floor((coins * 1) + (tasks * 50) + (taps * 0.1) + (streak * 10) + (withdrawals * 100));
-            let level = 1, totalReq = 0;
-            for (let i = 1; i <= 100; i++) {
-                totalReq += i * 100;
-                if (points >= totalReq) level = i;
-                else break;
-            }
-            let currentTotal = 0;
-            for (let i = 1; i <= level; i++) currentTotal += i * 100;
-            let progress = ((points - currentTotal) / ((level + 1) * 100)) * 100;
-            if (progress > 100) progress = 100;
-            if (progress < 0) progress = 0;
-            let tier = getLevelTier(level);
-            return {
-                level, points, currentTotal, progress: Math.floor(progress),
-                required: (level + 1) * 100, isMax: level >= 100,
-                tier, nextTier: level < 100 ? getLevelTier(level + 1) : null
-            };
-        }
-
-        function updateLevelUI() {
-            const data = calcLevel(
-                appState.balance, appState.completedTasks, 0,
-                appState.dailyStreak, appState.withdrawHistory ? appState.withdrawHistory.length : 0
-            );
-            const t = data.tier;
-            document.getElementById('levelTitle').textContent = `${t.emoji} ${t.name}`;
-            document.getElementById('levelNumber').textContent = `Level ${data.level}`;
-            document.getElementById('levelProgressFill').style.width = `${data.progress}%`;
-            if (data.isMax) {
-                document.getElementById('levelCurrentPoints').textContent = `${data.points}`;
-                document.getElementById('levelNextPoints').textContent = '⭐ MAX';
-            } else {
-                document.getElementById('levelCurrentPoints').textContent = data.points - data.currentTotal;
-                document.getElementById('levelNextPoints').textContent = `/ ${data.required}`;
-            }
-            document.getElementById('userLevelBadge').textContent = `Level ${data.level} 👆`;
-            appState.userLevel = data.level;
-            
-            document.getElementById('levelCurrentEmoji').textContent = t.emoji;
-            document.getElementById('levelCurrentNumber').textContent = `Level ${data.level}`;
-            document.getElementById('levelCurrentTitle').textContent = t.name;
-            if (data.isMax) {
-                document.getElementById('levelCurrentPointsText').textContent = '🏆 MAX LEVEL!';
-                document.getElementById('levelProgressFill2').style.width = '100%';
-                document.getElementById('levelProgressText2').textContent = '100%';
-                document.getElementById('levelNextInfo').textContent = '⭐ MAX';
-            } else {
-                document.getElementById('levelCurrentPointsText').textContent = `${data.points - data.currentTotal} / ${data.required} XP`;
-                document.getElementById('levelProgressFill2').style.width = `${data.progress}%`;
-                document.getElementById('levelProgressText2').textContent = `${data.progress}%`;
-                document.getElementById('levelNextInfo').textContent = `Next: ${data.level + 1}`;
-            }
-            document.getElementById('levelBonusPercent').textContent = `+${t.bonus}%`;
-            document.getElementById('levelDailyBonus').textContent = `${10 + t.bonus} Coins`;
-            let isExclusive = data.level >= 10;
-            document.getElementById('levelExclusiveTasks').textContent = isExclusive ? '✅ Unlocked' : '🔒 Locked';
-            document.getElementById('levelExclusiveTasks').style.color = isExclusive ? '#10b981' : '#94a3b8';
-        }
-
-        function renderLevelList() {
-            const container = document.getElementById('levelList');
-            const data = calcLevel(
-                appState.balance, appState.completedTasks, 0,
-                appState.dailyStreak, appState.withdrawHistory ? appState.withdrawHistory.length : 0
-            );
-            let html = '';
-            const filterMap = { 'bronze':[1,10], 'silver':[11,25], 'gold':[26,50], 'platinum':[51,75], 'diamond':[76,100] };
-            for (let i = 1; i <= 100; i++) {
-                if (currentFilter !== 'all') {
-                    const range = filterMap[currentFilter];
-                    if (!range || i < range[0] || i > range[1]) continue;
-                }
-                const t = getLevelTier(i);
-                const isUnlocked = data.level >= i;
-                const isCurrent = data.level === i;
-                html += `
-                    <div class="level-item ${isCurrent ? 'active' : ''} ${!isUnlocked ? 'locked' : ''}">
-                        <div class="level-info">
-                            <span class="num">${i}</span>
-                            <span class="emoji">${t.emoji}</span>
-                            <span class="name">${t.name}</span>
-                            ${isCurrent ? '<span class="badge">👈 Current</span>' : ''}
-                            ${!isUnlocked ? '<span class="badge" style="background:rgba(239,68,68,0.1);color:#ef4444;">🔒</span>' : ''}
-                        </div>
-                        <div class="level-reward">+${t.bonus}%</div>
-                        ${isCurrent ? '<div class="level-check">✅</div>' : ''}
-                    </div>
-                `;
-            }
-            container.innerHTML = html || '<div class="loading"><p>No levels found</p></div>';
-        }
-
-        function filterLevels(filter, btn) {
-            currentFilter = filter;
-            document.querySelectorAll('.filter-tabs .tab').forEach(t => t.classList.remove('active'));
-            if (btn) btn.classList.add('active');
-            renderLevelList();
-        }
-
-        function openLevelPage() {
-            document.getElementById('levelOverlay').classList.add('show');
-            document.getElementById('mainContent').classList.add('hide');
-            document.querySelector('.bottom-nav').style.display = 'none';
-            renderLevelList();
-        }
-        function closeLevelPage() {
-            document.getElementById('levelOverlay').classList.remove('show');
-            document.getElementById('mainContent').classList.remove('hide');
-            document.querySelector('.bottom-nav').style.display = 'flex';
         }
 
         // ==================== WEEKLY BONUS ====================
@@ -1675,15 +1772,71 @@
             updateWeeklyUI();
         }
 
-        // ==================== REFERRAL SYSTEM ====================
-        const TIERS = [
-            { level: 1, count: 10, bonus: 50, name: '🥉 Bronze Referrer' },
-            { level: 2, count: 25, bonus: 150, name: '🥈 Silver Referrer' },
-            { level: 3, count: 50, bonus: 300, name: '🥇 Gold Referrer' },
-            { level: 4, count: 100, bonus: 500, name: '💎 Platinum Referrer' },
-            { level: 5, count: 200, bonus: 1000, name: '👑 Diamond Referrer' }
-        ];
+        // ==================== REFERRAL SYSTEM (Admin Configurable) ====================
+        function updateReferUI() {
+            const total = appState.referralCount || 0;
+            const perReferralCoins = referralConfig.perReferralCoins || 50;
+            const earned = total * perReferralCoins;
+            const bonus = Math.floor(total / 10) * 50;
+            
+            document.getElementById('referTotalHome').textContent = total;
+            document.getElementById('referEarnedHome').textContent = earned;
+            document.getElementById('referBonusHome').textContent = bonus;
+            
+            const progress = Math.min((total / 10) * 100, 100);
+            document.getElementById('referProgressFillHome').style.width = progress + '%';
+            document.getElementById('referProgressTextHome').textContent = `${total} / 10`;
+            
+            renderTiers();
+        }
 
+        function renderTiers() {
+            const total = appState.referralCount || 0;
+            const tiers = [
+                { level: 1, count: referralConfig.tier1?.count || 10, bonus: referralConfig.tier1?.bonus || 50, name: '🥉 Bronze Referrer' },
+                { level: 2, count: referralConfig.tier2?.count || 25, bonus: referralConfig.tier2?.bonus || 150, name: '🥈 Silver Referrer' },
+                { level: 3, count: referralConfig.tier3?.count || 50, bonus: referralConfig.tier3?.bonus || 300, name: '🥇 Gold Referrer' },
+                { level: 4, count: referralConfig.tier4?.count || 100, bonus: referralConfig.tier4?.bonus || 500, name: '💎 Platinum Referrer' },
+                { level: 5, count: referralConfig.tier5?.count || 200, bonus: referralConfig.tier5?.bonus || 1000, name: '👑 Diamond Referrer' }
+            ];
+            
+            let html = '';
+            tiers.forEach(tier => {
+                const isClaimed = appState.referTiers && appState.referTiers[tier.level] === 1;
+                const isAvailable = total >= tier.count && !isClaimed;
+                const status = isClaimed ? '✅ Claimed' : (isAvailable ? '🎁 Claim Now' : `🔒 ${tier.count} needed`);
+                const cls = isClaimed ? 'claimed' : (isAvailable ? 'available' : 'locked');
+                html += `
+                    <div class="refer-tier">
+                        <div class="tier-info">
+                            <span class="tier-name">${tier.name}</span>
+                            <span class="tier-desc">${tier.count} referrals • +${tier.bonus} Coins</span>
+                        </div>
+                        <span class="tier-status ${cls}" ${isAvailable ? `onclick="claimTier(${tier.level},${tier.bonus})"` : ''}>
+                            ${status}
+                        </span>
+                    </div>
+                `;
+            });
+            document.getElementById('referTierListHome').innerHTML = html;
+        }
+
+        function claimTier(level, bonus) {
+            const total = appState.referralCount || 0;
+            if (total < 10) { showToast('Not enough referrals!','error'); return; }
+            if (appState.referTiers && appState.referTiers[level] === 1) { showToast('Already claimed!','error'); return; }
+            
+            appState.balance += bonus;
+            if (!appState.referTiers) appState.referTiers = {};
+            appState.referTiers[level] = 1;
+            userRef.update({ balance: appState.balance, referTiers: appState.referTiers });
+            updateUI();
+            updateReferUI();
+            updateLevelUI();
+            showToast(`🎁 +${bonus} Coins from referral tier!`);
+        }
+
+        // ==================== REFERRAL CODE HANDLING ====================
         function generateReferCode() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let code = '';
@@ -1711,11 +1864,12 @@
                             if (referrerId !== userId) {
                                 db.ref('referrals/' + userId).once('value', (s) => {
                                     if (!s.exists()) {
+                                        const perReferralCoins = referralConfig.perReferralCoins || 50;
                                         const newUserData = {
                                             referredBy: referrerId,
                                             referredAt: Date.now(),
                                             username: tg.initDataUnsafe?.user?.username || 'User',
-                                            bonus: 50,
+                                            bonus: perReferralCoins,
                                             userId: userId
                                         };
                                         db.ref('referrals/' + userId).set(newUserData).then(() => {
@@ -1728,12 +1882,12 @@
                                                     referrals: (current.referrals || []).concat([newUserData])
                                                 };
                                             }).then(() => {
-                                                userRef.update({ balance: (appState.balance || 0) + 50 });
-                                                appState.balance = (appState.balance || 0) + 50;
+                                                userRef.update({ balance: (appState.balance || 0) + perReferralCoins });
+                                                appState.balance = (appState.balance || 0) + perReferralCoins;
                                                 updateUI();
                                                 updateLevelUI();
                                                 updateReferUI();
-                                                showToast('🎉 You got +50 Coins from referral!');
+                                                showToast(`🎉 You got +${perReferralCoins} Coins from referral!`);
                                             });
                                         });
                                     }
@@ -1771,11 +1925,12 @@
                                 return;
                             }
                             
+                            const perReferralCoins = referralConfig.perReferralCoins || 50;
                             const newUserData = {
                                 referredBy: referrerId,
                                 referredAt: Date.now(),
                                 username: tg.initDataUnsafe?.user?.username || 'User',
-                                bonus: 50,
+                                bonus: perReferralCoins,
                                 userId: userId
                             };
                             
@@ -1790,17 +1945,17 @@
                                     };
                                 }).then(() => {
                                     userRef.update({ 
-                                        balance: (appState.balance || 0) + 50,
+                                        balance: (appState.balance || 0) + perReferralCoins,
                                         referCodeSubmitted: true 
                                     });
-                                    appState.balance = (appState.balance || 0) + 50;
+                                    appState.balance = (appState.balance || 0) + perReferralCoins;
                                     submitBtn.disabled = true;
                                     submitBtn.textContent = '✅ Submitted';
                                     codeInput.disabled = true;
                                     updateUI();
                                     updateLevelUI();
                                     updateReferUI();
-                                    showToast('🎉 Code accepted! +50 Coins from referral!');
+                                    showToast(`🎉 Code accepted! +${perReferralCoins} Coins from referral!`);
                                 });
                             });
                         });
@@ -1832,7 +1987,7 @@
                     snapshot.forEach((child) => {
                         const val = child.val();
                         count++;
-                        earn += (val.bonus || 50);
+                        earn += (val.bonus || 0);
                         refs.push({ id: child.key, ...val });
                     });
                 }
@@ -1848,70 +2003,16 @@
                     const data = s.val();
                     if (data.referredBy) {
                         if (!data.bonusClaimed) {
-                            appState.balance = (appState.balance || 0) + 50;
+                            const perReferralCoins = referralConfig.perReferralCoins || 50;
+                            appState.balance = (appState.balance || 0) + perReferralCoins;
                             db.ref('referrals/' + userId).update({ bonusClaimed: true });
                             userRef.update({ balance: appState.balance });
                             updateUI();
-                            showToast('🎉 Welcome! +50 Coins from referral!');
+                            showToast(`🎉 Welcome! +${perReferralCoins} Coins from referral!`);
                         }
                     }
                 }
             });
-        }
-
-        function updateReferUI() {
-            const total = appState.referralCount || 0;
-            const earned = appState.referEarned || 0;
-            const bonus = Math.floor(total / 10) * 50;
-            
-            document.getElementById('referTotalHome').textContent = total;
-            document.getElementById('referEarnedHome').textContent = earned;
-            document.getElementById('referBonusHome').textContent = bonus;
-            
-            const progress = Math.min((total / 10) * 100, 100);
-            document.getElementById('referProgressFillHome').style.width = progress + '%';
-            document.getElementById('referProgressTextHome').textContent = `${total} / 10`;
-            
-            renderTiers();
-        }
-
-        function renderTiers() {
-            const total = appState.referralCount || 0;
-            let html = '';
-            TIERS.forEach(tier => {
-                const isClaimed = appState.referTiers && appState.referTiers[tier.level] === 1;
-                const isAvailable = total >= tier.count && !isClaimed;
-                const status = isClaimed ? '✅ Claimed' : (isAvailable ? '🎁 Claim Now' : `🔒 ${tier.count} needed`);
-                const cls = isClaimed ? 'claimed' : (isAvailable ? 'available' : 'locked');
-                html += `
-                    <div class="refer-tier">
-                        <div class="tier-info">
-                            <span class="tier-name">${tier.name}</span>
-                            <span class="tier-desc">${tier.count} referrals • +${tier.bonus} Coins</span>
-                        </div>
-                        <span class="tier-status ${cls}" ${isAvailable ? `onclick="claimTier(${tier.level},${tier.bonus})"` : ''}>
-                            ${status}
-                        </span>
-                    </div>
-                `;
-            });
-            document.getElementById('referTierListHome').innerHTML = html;
-        }
-
-        function claimTier(level, bonus) {
-            const total = appState.referralCount || 0;
-            const tier = TIERS.find(t => t.level === level);
-            if (!tier || total < tier.count) { showToast('Not enough referrals!','error'); return; }
-            if (appState.referTiers && appState.referTiers[level] === 1) { showToast('Already claimed!','error'); return; }
-            
-            appState.balance += bonus;
-            if (!appState.referTiers) appState.referTiers = {};
-            appState.referTiers[level] = 1;
-            userRef.update({ balance: appState.balance, referTiers: appState.referTiers });
-            updateUI();
-            updateReferUI();
-            updateLevelUI();
-            showToast(`🎁 +${bonus} Coins from ${tier.name}!`);
         }
 
         function loadReferralList() {
@@ -1926,7 +2027,7 @@
             const html = refs.slice(-20).reverse().map(ref => `
                 <div class="referral-item">
                     <span class="name">${ref.username || 'User'}</span>
-                    <span class="bonus">+${ref.bonus || 50} 🪙</span>
+                    <span class="bonus">+${ref.bonus || 0} 🪙</span>
                     <span class="date">${new Date(ref.referredAt || ref.date || Date.now()).toLocaleDateString()}</span>
                 </div>
             `).join('');
@@ -2051,6 +2152,7 @@
                     updateReferUI();
                     updateWithdrawHistory();
                     updateProgressUI();
+                    updateSpeedBoostUI();
                     
                     if (appState.lastConversion) {
                         startConversionTimer();
@@ -2097,6 +2199,8 @@
             loadWeeklyRewards();
             loadVideoSettings();
             loadWithdrawSettings();
+            loadLevelConfig();
+            loadReferralConfig();
             checkBanStatus();
             loadReferralData();
             checkReferral();
@@ -2132,6 +2236,7 @@
                 updateUI();
                 updateWeeklyUI();
                 updateProgressUI();
+                updateSpeedBoostUI();
             }
         });
 
