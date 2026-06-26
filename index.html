@@ -186,29 +186,12 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            width: 100%;
-            justify-content: center;
         }
-        .speed-boost-btn:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 6px 30px rgba(249,115,22,0.4); }
+        .speed-boost-btn:hover { transform: scale(1.05); box-shadow: 0 6px 30px rgba(249,115,22,0.4); }
         .speed-boost-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
         .speed-boost-btn i { font-size: 16px; animation: spin 2s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .speed-boost-btn .boost-timer { font-size: 14px; margin-left: 4px; font-weight: bold; }
-        
-        /* Cooldown Text Style */
-        .boost-cooldown-text {
-            width: 100%;
-            text-align: center;
-            color: #fbbf24;
-            font-weight: bold;
-            font-size: 14px;
-            padding: 8px;
-            background: rgba(251,191,36,0.1);
-            border-radius: 30px;
-            border: 1px solid rgba(251,191,36,0.2);
-            display: none;
-        }
-
+        .speed-boost-btn .boost-timer { font-size: 14px; margin-left: 4px; }
         .speed-spinner-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -594,7 +577,6 @@
                 
                 <!-- SPEED BOOST BUTTON -->
                 <div class="speed-btn-container">
-                    <!-- New UI for Boost -->
                     <button class="speed-boost-btn" id="speedBoostBtn" onclick="activateSpeedBoost()">
                         <i class="fas fa-rocket"></i> Speed Boost <span class="boost-timer" id="boostTimer"></span>
                     </button>
@@ -742,6 +724,7 @@
             });
         }
 
+        // Popup Ad for Speed Boost
         function showRewardedPopup(callback) {
             show_11197472('pop').then(() => {
                 console.log('✅ Popup ad watched successfully!');
@@ -788,7 +771,7 @@
             videoLastWatchDate: null,
             videoReward: 10,
             videoDailyLimit: 5,
-            videoRefillThreshold: 5, // Admin sets this (Number of videos to refill)
+            videoRefillThreshold: 5,
             referrals: [],
             weekStart: null,
             progressCoins: 1000,
@@ -805,7 +788,7 @@
         let speedBoostTimerInterval = null; 
         let weeklyRewards = [10,15,20,25,30,40,50];
         let currentFilter = 'all';
-        const TOTAL_COINS = 1000; // Fixed refill amount
+        const TOTAL_COINS = 1000;
 
         const userRef = db.ref('users/' + userId);
         const tasksRef = db.ref('tasks');
@@ -813,7 +796,7 @@
         const withdrawRef = db.ref('withdrawSettings');
         const weeklyRewardsRef = db.ref('weeklyRewards');
         const videoSettingsRef = db.ref('videoSettings');
-        const speedBoostConfigRef = db.ref('speedBoostConfig'); // NEW
+        const speedBoostConfigRef = db.ref('speedBoostConfig');
         const levelConfigRef = db.ref('levelConfig');
         const referralConfigRef = db.ref('referralConfig');
         const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -845,90 +828,7 @@
             if (page === 'wallet') updateWithdrawHistory();
         }
 
-        // ==================== VIDEO SETTINGS (Dynamic from Admin) ====================
-        function loadVideoSettings() {
-            videoSettingsRef.on('value', (snapshot) => {
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    appState.videoReward = data.reward || 10;
-                    appState.videoDailyLimit = data.dailyLimit || 5;
-                    appState.videoRefillThreshold = data.refillThreshold || 5; // NEW: Admin sets this
-                }
-                updateVideoUI();
-            });
-        }
-
-        function updateVideoUI() {
-            const today = new Date().toDateString();
-            const isToday = appState.videoLastWatchDate === today;
-            const watched = isToday ? (appState.videoWatchedToday || 0) : 0;
-            const limit = appState.videoDailyLimit || 5;
-            const remaining = limit - watched;
-            
-            document.getElementById('videoReward').textContent = `+${appState.videoReward || 10} Coins per video`;
-            document.getElementById('videoLimit').textContent = `Today: ${watched} / ${limit} videos`;
-            
-            const btn = document.getElementById('videoBtn');
-            if (remaining <= 0) {
-                btn.disabled = true;
-                btn.textContent = '✅ Daily Limit Reached';
-                document.getElementById('videoWatched').textContent = '🎉 All videos watched today!';
-            } else {
-                btn.disabled = false;
-                btn.textContent = '▶ Watch Video';
-                document.getElementById('videoWatched').textContent = `${remaining} videos left today`;
-            }
-        }
-
-        function watchVideo() {
-            const today = new Date().toDateString();
-            const isToday = appState.videoLastWatchDate === today;
-            const watched = isToday ? (appState.videoWatchedToday || 0) : 0;
-            const limit = appState.videoDailyLimit || 5;
-            
-            if (watched >= limit) {
-                showToast('Daily limit reached!', 'error');
-                return;
-            }
-
-            showRewardedAd(function() {
-                const btn = document.getElementById('videoBtn');
-                btn.disabled = true;
-                btn.textContent = '⏳ Please wait...';
-
-                let seconds = 15;
-                const timerInterval = setInterval(() => {
-                    seconds--;
-                    btn.textContent = `⏳ ${seconds}s`;
-                    if (seconds <= 0) {
-                        clearInterval(timerInterval);
-                        btn.textContent = '▶ Watch Video';
-                        btn.disabled = false;
-                        appState.videoWatchedToday = watched + 1;
-                        appState.videoLastWatchDate = today;
-                        const reward = appState.videoReward || 10;
-                        appState.balance += reward;
-                        
-                        userRef.update({
-                            balance: appState.balance,
-                            videoWatchedToday: appState.videoWatchedToday,
-                            videoLastWatchDate: appState.videoLastWatchDate
-                        });
-
-                        document.getElementById('videoRewardText').textContent = `You earned +${reward} Coins! 📺`;
-                        document.getElementById('videoModal').classList.add('active');
-                        
-                        updateUI();
-                        updateLevelUI();
-                        updateVideoUI();
-                        showToast(`+${reward} Coins for watching video! 🎉`);
-                    }
-                }, 1000);
-            });
-        }
-
-
-        // ==================== CONVERSION RATE ====================
+        // ==================== CONVERSION RATE (Admin Configurable) ====================
         function loadConversionRate() {
             rateRef.on('value', (s) => {
                 appState.conversionRate = s.exists() ? s.val() : 1000;
@@ -1115,6 +1015,88 @@
             });
         }
 
+        // ==================== VIDEO SETTINGS (Dynamic from Admin) ====================
+        function loadVideoSettings() {
+            videoSettingsRef.on('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    appState.videoReward = data.reward || 10;
+                    appState.videoDailyLimit = data.dailyLimit || 5;
+                    appState.videoRefillThreshold = data.refillThreshold || 5;
+                }
+                updateVideoUI();
+            });
+        }
+
+        function updateVideoUI() {
+            const today = new Date().toDateString();
+            const isToday = appState.videoLastWatchDate === today;
+            const watched = isToday ? (appState.videoWatchedToday || 0) : 0;
+            const limit = appState.videoDailyLimit || 5;
+            const remaining = limit - watched;
+            
+            document.getElementById('videoReward').textContent = `+${appState.videoReward || 10} Coins per video`;
+            document.getElementById('videoLimit').textContent = `Today: ${watched} / ${limit} videos`;
+            
+            const btn = document.getElementById('videoBtn');
+            if (remaining <= 0) {
+                btn.disabled = true;
+                btn.textContent = '✅ Daily Limit Reached';
+                document.getElementById('videoWatched').textContent = '🎉 All videos watched today!';
+            } else {
+                btn.disabled = false;
+                btn.textContent = '▶ Watch Video';
+                document.getElementById('videoWatched').textContent = `${remaining} videos left today`;
+            }
+        }
+
+        function watchVideo() {
+            const today = new Date().toDateString();
+            const isToday = appState.videoLastWatchDate === today;
+            const watched = isToday ? (appState.videoWatchedToday || 0) : 0;
+            const limit = appState.videoDailyLimit || 5;
+            
+            if (watched >= limit) {
+                showToast('Daily limit reached!', 'error');
+                return;
+            }
+
+            showRewardedAd(function() {
+                const btn = document.getElementById('videoBtn');
+                btn.disabled = true;
+                btn.textContent = '⏳ Please wait...';
+
+                let seconds = 15;
+                const timerInterval = setInterval(() => {
+                    seconds--;
+                    btn.textContent = `⏳ ${seconds}s`;
+                    if (seconds <= 0) {
+                        clearInterval(timerInterval);
+                        btn.textContent = '▶ Watch Video';
+                        btn.disabled = false;
+                        appState.videoWatchedToday = watched + 1;
+                        appState.videoLastWatchDate = today;
+                        const reward = appState.videoReward || 10;
+                        appState.balance += reward;
+                        
+                        userRef.update({
+                            balance: appState.balance,
+                            videoWatchedToday: appState.videoWatchedToday,
+                            videoLastWatchDate: appState.videoLastWatchDate
+                        });
+
+                        document.getElementById('videoRewardText').textContent = `You earned +${reward} Coins! 📺`;
+                        document.getElementById('videoModal').classList.add('active');
+                        
+                        updateUI();
+                        updateLevelUI();
+                        updateVideoUI();
+                        showToast(`+${reward} Coins for watching video! 🎉`);
+                    }
+                }, 1000);
+            });
+        }
+
 
         // ==================== PROGRESS BAR ====================
         function updateProgressUI() {
@@ -1188,17 +1170,14 @@
             }, 5000);
         }
 
-        // ==================== FIXED VIDEO PROGRESS LOGIC (DB SAVED & DYNAMIC) ====================
         function startVideoProgress() {
             const btn = document.getElementById('progressWatchBtn');
-            // Fetch threshold from state
             const threshold = appState.videoRefillThreshold || 5; 
 
             if (appState.videoWatchedCount >= threshold) {
                 showToast(`✅ All ${threshold} videos watched! Refilling coins...`, 'success');
                 appState.progressCoins = TOTAL_COINS;
                 appState.videoWatchedCount = 0;
-                // Important: Save to DB so refresh doesn't break it
                 userRef.update({ progressCoins: appState.progressCoins, videoWatchedCount: 0 });
                 updateProgressUI();
                 showToast('🪙 1000 coins refilled! Press START to earn again.');
@@ -1216,11 +1195,8 @@
                     if (seconds <= 0) {
                         clearInterval(timerInterval);
                         btn.disabled = false;
-                        
-                        // Update count and SAVE to DB
                         appState.videoWatchedCount++;
                         userRef.update({ videoWatchedCount: appState.videoWatchedCount });
-                        
                         btn.textContent = `📺 Watch Videos (${appState.videoWatchedCount}/${threshold})`;
                         showToast(`📺 Video ${appState.videoWatchedCount}/${threshold} watched!`);
                         
@@ -1236,7 +1212,7 @@
             });
         }
 
-        // ==================== SPEED BOOST (Fixed Timer Display) ====================
+        // ==================== SPEED BOOST ====================
         function updateSpeedBoostUI() {
             const btn = document.getElementById('speedBoostBtn');
             const timerSpan = document.getElementById('boostTimer');
@@ -1245,18 +1221,15 @@
             
             if (appState.speedBoostCooldown > 0) {
                 const now = Date.now();
-                const timeLeft = Math.ceil((appState.speedBoostCooldown - now) / 1000); // seconds
+                const timeLeft = Math.ceil((appState.speedBoostCooldown - now) / 1000);
                 
                 if (timeLeft > 0) {
-                    // Hide button, show HTML text with Timer
                     btn.style.display = 'none';
                     cooldownTextDiv.style.display = 'block';
-                    
                     const minutes = Math.floor(timeLeft / 60);
                     const seconds = timeLeft % 60;
                     countdownSpan.textContent = `${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
                 } else {
-                    // Cooldown finished
                     btn.style.display = 'flex';
                     cooldownTextDiv.style.display = 'none';
                     timerSpan.textContent = '';
@@ -1270,17 +1243,14 @@
             }
         }
 
-        // Speed Boost Timer Loop (Runs every second to update the UI)
         setInterval(() => {
-            if(appState.speedBoostCooldown > 0) {
-                updateSpeedBoostUI();
-            }
+            if(appState.speedBoostCooldown > 0) updateSpeedBoostUI();
         }, 1000);
 
         function activateSpeedBoost() {
             const now = Date.now();
             if (appState.speedBoostCooldown > 0) {
-                updateSpeedBoostUI(); // Updates text
+                updateSpeedBoostUI();
                 return;
             }
 
@@ -1290,7 +1260,6 @@
             }
 
             showRewardedPopup(function() {
-                // --- Start Speed Boost ---
                 appState.isSpeedBoostActive = true;
                 document.getElementById('speedBoostBtn').disabled = true;
                 document.getElementById('speedBoostBtn').innerHTML = '<i class="fas fa-rocket"></i> Boost Active!';
@@ -1298,12 +1267,11 @@
                 const overlay = document.getElementById('speedSpinnerOverlay');
                 overlay.classList.add('active');
 
-                let timeLeft = 3; // Hardcoded for now, can be made dynamic using speedBoostConfigRef
+                let timeLeft = 3;
                 let progress = 0;
                 const speedTimerDisplay = document.getElementById('speedTimerDisplay');
                 const speedProgressFill = document.getElementById('speedProgressFill');
 
-                // Timer update every 100ms
                 const speedUpdateInterval = setInterval(() => {
                     timeLeft -= 0.1;
                     progress = ((3 - timeLeft) / 3) * 100;
@@ -1317,10 +1285,9 @@
                         document.getElementById('speedBoostBtn').disabled = false;
                         document.getElementById('speedBoostBtn').innerHTML = '<i class="fas fa-rocket"></i> Speed Boost <span class="boost-timer"></span>';
                         
-                        // Set cooldown (1 hour default if DB doesn't exist)
                         speedBoostConfigRef.once('value', snap => {
                             let config = snap.val();
-                            let cd = (config && config.cooldown) ? config.cooldown : 60; // default 60 mins
+                            let cd = (config && config.cooldown) ? config.cooldown : 60;
                             appState.speedBoostCooldown = Date.now() + (cd * 60 * 1000);
                             userRef.update({ speedBoostCooldown: appState.speedBoostCooldown });
                             updateSpeedBoostUI();
@@ -1329,23 +1296,16 @@
                     }
                 }, 100);
 
-                // --- Coin addition every 50ms (20 coins per second, total 60 in 3s) ---
                 let coinsAdded = 0;
                 speedBoostInterval = setInterval(() => {
                     if (appState.progressCoins > 0 && coinsAdded < 60) {
                         appState.progressCoins -= 1;
                         appState.balance += 1;
                         coinsAdded++;
-                        
-                        userRef.update({ 
-                            balance: appState.balance,
-                            progressCoins: appState.progressCoins
-                        });
-                        
+                        userRef.update({ balance: appState.balance, progressCoins: appState.progressCoins });
                         updateProgressUI();
                         updateUI();
                         updateLevelUI();
-
                         let coin = document.createElement('div');
                         coin.className = 'floating-coin';
                         coin.textContent = '+1 🪙';
@@ -1355,9 +1315,7 @@
                         setTimeout(() => coin.remove(), 1000);
                     } else {
                         clearInterval(speedBoostInterval);
-                        if (appState.progressCoins <= 0) {
-                            showToast('⛔ No coins left! Boost stopped.');
-                        }
+                        if (appState.progressCoins <= 0) showToast('⛔ No coins left! Boost stopped.');
                     }
                 }, 50);
             });
@@ -1371,17 +1329,6 @@
             levelConfigRef.on('value', (snapshot) => {
                 if (snapshot.exists()) {
                     levelConfig = snapshot.val();
-                } else {
-                    levelConfig = {
-                        levels: {
-                            1: { name: 'Bronze', emoji: '🥉', bonus: 2, requiredPoints: 0 },
-                            2: { name: 'Silver', emoji: '🥈', bonus: 5, requiredPoints: 100 },
-                            3: { name: 'Gold', emoji: '🥇', bonus: 10, requiredPoints: 300 },
-                            4: { name: 'Platinum', emoji: '💎', bonus: 20, requiredPoints: 600 },
-                            5: { name: 'Diamond', emoji: '👑', bonus: 30, requiredPoints: 1000 }
-                        }
-                    };
-                    levelConfigRef.set(levelConfig);
                 }
                 updateLevelUI();
                 renderLevelList();
@@ -1418,7 +1365,9 @@
         function calcLevel(coins, tasks, taps, streak, withdrawals) {
             let points = Math.floor((coins * 1) + (tasks * 50) + (taps * 0.1) + (streak * 10) + (withdrawals * 100));
             let level = 1;
-            
+            let currentRequired = 0;
+            let nextRequired = 0;
+
             if (levelConfig && levelConfig.levels) {
                 const levels = Object.keys(levelConfig.levels).map(Number).sort((a,b) => a-b);
                 for (let i = levels.length - 1; i >= 0; i--) {
@@ -1429,19 +1378,8 @@
                         break;
                     }
                 }
-            }
-            
-            let nextLevel = level + 1;
-            let currentRequired = 0;
-            let nextRequired = 0;
-            
-            if (levelConfig && levelConfig.levels) {
-                if (levelConfig.levels[level]) {
-                    currentRequired = levelConfig.levels[level].requiredPoints || 0;
-                }
-                if (levelConfig.levels[nextLevel]) {
-                    nextRequired = levelConfig.levels[nextLevel].requiredPoints || 0;
-                }
+                if (levelConfig.levels[level]) currentRequired = levelConfig.levels[level].requiredPoints || 0;
+                if (levelConfig.levels[level+1]) nextRequired = levelConfig.levels[level+1].requiredPoints || 0;
             }
             
             let progress = 0;
@@ -1452,12 +1390,10 @@
             }
             
             let tier = getLevelTier(level);
-            let nextTier = getLevelTier(nextLevel);
-            
             return {
                 level, points, currentRequired, nextRequired, progress: Math.floor(progress),
-                isMax: !levelConfig.levels || !levelConfig.levels[nextLevel],
-                tier, nextTier
+                isMax: !levelConfig.levels || !levelConfig.levels[level+1],
+                tier
             };
         }
 
@@ -1505,22 +1441,16 @@
 
         function renderLevelList() {
             const container = document.getElementById('levelList');
-            const data = calcLevel(
-                appState.balance, appState.completedTasks, 0,
-                appState.dailyStreak, appState.withdrawHistory ? appState.withdrawHistory.length : 0
-            );
+            const data = calcLevel(appState.balance, appState.completedTasks, 0, appState.dailyStreak, appState.withdrawHistory ? appState.withdrawHistory.length : 0);
             let html = '';
-            
             let levelNumbers = [];
             if (levelConfig && levelConfig.levels) {
                 levelNumbers = Object.keys(levelConfig.levels).map(Number).sort((a,b) => a-b);
-            } else {
-                for (let i = 1; i <= 100; i++) levelNumbers.push(i);
             }
             
             for (let i of levelNumbers) {
                 if (currentFilter !== 'all') {
-                    const filterMap = { 'bronze':[1,10], 'silver':[11,25], 'gold':[26,50], 'platinum':[51,75], 'diamond':[76,100] };
+                    const filterMap = { 'bronze':[1,20], 'silver':[21,40], 'gold':[41,60], 'platinum':[61,80], 'diamond':[81,100] };
                     const range = filterMap[currentFilter];
                     if (!range || i < range[0] || i > range[1]) continue;
                 }
@@ -1580,54 +1510,28 @@
         function renderTasks() {
             const container = document.getElementById('tasksContainer');
             const filteredTasks = getFilteredTasks();
-            
             if (!filteredTasks || filteredTasks.length === 0) {
                 container.innerHTML = '<div class="no-tasks">📭 No tasks available. Check back later!</div>';
                 return;
             }
-
             container.innerHTML = filteredTasks.map(task => {
                 const today = new Date().toDateString();
                 const isCompletedToday = appState.taskLastCompleted[task.id] === today;
-                
                 let actionHTML = '';
-                let statusText = '';
-                
-                if (isCompletedToday) {
-                    statusText = '✅ Done Today';
-                } else {
-                    statusText = '⏳ Incomplete';
-                }
-                
+                let statusText = isCompletedToday ? '✅ Done Today' : '⏳ Incomplete';
                 if (!isCompletedToday) {
                     if (task.type === 'link') {
                         let link = task.link || '#';
-                        actionHTML = `
-                            <a href="${link}" target="_blank" class="task-link" onclick="event.preventDefault(); window.open('${link}', '_blank'); setTimeout(() => completeTask('${task.id}'), 3000);">
-                                ${task.actionText || 'Go →'}
-                            </a>
-                        `;
+                        actionHTML = `<a href="${link}" target="_blank" class="task-link" onclick="event.preventDefault(); window.open('${link}', '_blank'); setTimeout(() => completeTask('${task.id}'), 3000);">${task.actionText || 'Go →'}</a>`;
                     } else if (task.type === 'button') {
-                        actionHTML = `
-                            <button class="task-btn" onclick="completeTask('${task.id}')">
-                                ${task.actionText || 'Complete'}
-                            </button>
-                        `;
+                        actionHTML = `<button class="task-btn" onclick="completeTask('${task.id}')">${task.actionText || 'Complete'}</button>`;
                     } else if (task.type === 'video') {
-                        actionHTML = `
-                            <button class="task-video-btn" onclick="watchTaskVideo('${task.id}')">
-                                📺 ${task.actionText || 'Watch Video'}
-                            </button>
-                        `;
+                        actionHTML = `<button class="task-video-btn" onclick="watchTaskVideo('${task.id}')">📺 ${task.actionText || 'Watch Video'}</button>`;
                     }
                 }
-
                 return `
                     <div class="task-card">
-                        <div class="task-header">
-                            <span class="task-title">${task.title}</span>
-                            <span class="task-reward">+${task.reward} 🪙</span>
-                        </div>
+                        <div class="task-header"><span class="task-title">${task.title}</span><span class="task-reward">+${task.reward} 🪙</span></div>
                         <div class="task-desc">${task.description || ''}</div>
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
                             ${actionHTML}
@@ -1652,58 +1556,32 @@
 
         function completeTask(taskId) {
             const today = new Date().toDateString();
-            if (appState.taskLastCompleted[taskId] === today) {
-                showToast('You already completed this task today!', 'error');
-                return;
-            }
-            
+            if (appState.taskLastCompleted[taskId] === today) { showToast('Already completed today!', 'error'); return; }
             let task = tasks.find(t => t.id === taskId);
             if (!task) return;
-            
             appState.taskLastCompleted[taskId] = today;
             appState.balance += task.reward;
             appState.completedTasks++;
-            
-            userRef.update({ 
-                balance: appState.balance, 
-                completedTasks: appState.completedTasks, 
-                taskLastCompleted: appState.taskLastCompleted
-            });
-            
+            userRef.update({ balance: appState.balance, completedTasks: appState.completedTasks, taskLastCompleted: appState.taskLastCompleted });
             document.getElementById('rewardText').textContent = `+${task.reward} Coins`;
             document.getElementById('successModal').classList.add('active');
-            updateUI();
-            updateLevelUI();
-            renderTasks();
+            updateUI(); updateLevelUI(); renderTasks();
             showToast(`🎉 +${task.reward} Coins for completing task!`);
         }
 
         function watchTaskVideo(taskId) {
             const today = new Date().toDateString();
-            if (appState.taskLastCompleted[taskId] === today) {
-                showToast('You already completed this task today!', 'error');
-                return;
-            }
-
+            if (appState.taskLastCompleted[taskId] === today) { showToast('Already completed today!', 'error'); return; }
             let task = tasks.find(t => t.id === taskId);
             if (!task) return;
-
             showRewardedAd(function() {
                 appState.taskLastCompleted[taskId] = today;
                 appState.balance += task.reward;
                 appState.completedTasks++;
-                
-                userRef.update({ 
-                    balance: appState.balance, 
-                    completedTasks: appState.completedTasks, 
-                    taskLastCompleted: appState.taskLastCompleted
-                });
-                
+                userRef.update({ balance: appState.balance, completedTasks: appState.completedTasks, taskLastCompleted: appState.taskLastCompleted });
                 document.getElementById('rewardText').textContent = `+${task.reward} Coins`;
                 document.getElementById('successModal').classList.add('active');
-                updateUI();
-                updateLevelUI();
-                renderTasks();
+                updateUI(); updateLevelUI(); renderTasks();
                 showToast(`🎉 +${task.reward} Coins for watching video!`);
             });
         }
@@ -1791,7 +1669,6 @@
             const today = new Date().getDay();
             if (day !== today) { showToast('Only today\'s reward!','error'); return; }
             showToast('⏳ Loading ad...');
-            
             showRewardedAd(function() {
                 if (!appState.weeklyAdWatched) appState.weeklyAdWatched = [];
                 if (!appState.weeklyAdWatched.includes(day)) {
@@ -1814,9 +1691,7 @@
             userRef.update({ balance: appState.balance, dailyStreak: appState.dailyStreak, weeklyClaimed: appState.weeklyClaimed });
             document.getElementById('weeklyBonusRewardText').textContent = `+${reward} Coins!`;
             document.getElementById('weeklyBonusModal').classList.add('active');
-            updateUI();
-            updateLevelUI();
-            showToast(`+${reward} coins!`);
+            updateUI(); updateLevelUI(); showToast(`+${reward} coins!`);
         }
 
         function openWeeklyPage() {
@@ -1837,16 +1712,12 @@
             const total = appState.referralCount || 0;
             const perReferralCoins = referralConfig.perReferralCoins || 50;
             const earned = total * perReferralCoins;
-            const bonus = Math.floor(total / 10) * 50;
-            
             document.getElementById('referTotalHome').textContent = total;
             document.getElementById('referEarnedHome').textContent = earned;
-            document.getElementById('referBonusHome').textContent = bonus;
-            
+            document.getElementById('referBonusHome').textContent = Math.floor(total / 10) * 50;
             const progress = Math.min((total / 10) * 100, 100);
             document.getElementById('referProgressFillHome').style.width = progress + '%';
             document.getElementById('referProgressTextHome').textContent = `${total} / 10`;
-            
             renderTiers();
         }
 
@@ -1859,7 +1730,6 @@
                 { level: 4, count: referralConfig.tier4?.count || 100, bonus: referralConfig.tier4?.bonus || 500, name: '💎 Platinum Referrer' },
                 { level: 5, count: referralConfig.tier5?.count || 200, bonus: referralConfig.tier5?.bonus || 1000, name: '👑 Diamond Referrer' }
             ];
-            
             let html = '';
             tiers.forEach(tier => {
                 const isClaimed = appState.referTiers && appState.referTiers[tier.level] === 1;
@@ -1885,68 +1755,42 @@
             const total = appState.referralCount || 0;
             if (total < 10) { showToast('Not enough referrals!','error'); return; }
             if (appState.referTiers && appState.referTiers[level] === 1) { showToast('Already claimed!','error'); return; }
-            
             appState.balance += bonus;
             if (!appState.referTiers) appState.referTiers = {};
             appState.referTiers[level] = 1;
             userRef.update({ balance: appState.balance, referTiers: appState.referTiers });
-            updateUI();
-            updateReferUI();
-            updateLevelUI();
+            updateUI(); updateReferUI(); updateLevelUI();
             showToast(`🎁 +${bonus} Coins from referral tier!`);
         }
 
-        // ==================== REFERRAL CODE HANDLING ====================
         function generateReferCode() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let code = '';
-            for (let i = 0; i < 8; i++) {
-                code += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
+            for (let i = 0; i < 8; i++) { code += chars.charAt(Math.floor(Math.random() * chars.length)); }
             return code;
         }
 
         function checkReferral() {
-            let startParam = '';
-            if (tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
-                startParam = tg.initDataUnsafe.start_param;
-            }
-            if (!startParam) {
-                const urlParams = new URLSearchParams(window.location.search);
-                startParam = urlParams.get('start') || urlParams.get('ref') || '';
-            }
+            let startParam = tg.initDataUnsafe?.start_param || new URLSearchParams(window.location.search).get('start') || '';
             if (startParam && startParam.startsWith('ref_')) {
                 const refCode = startParam.replace('ref_', '');
-                db.ref('users').orderByChild('referCode').equalTo(refCode).once('value', (snapshot) => {
+                db.ref('users').orderByChild('referCode').equalTo(refCode).once('value', snapshot => {
                     if (snapshot.exists()) {
-                        snapshot.forEach((child) => {
+                        snapshot.forEach(child => {
                             const referrerId = child.key;
                             if (referrerId !== userId) {
-                                db.ref('referrals/' + userId).once('value', (s) => {
+                                db.ref('referrals/' + userId).once('value', s => {
                                     if (!s.exists()) {
                                         const perReferralCoins = referralConfig.perReferralCoins || 50;
-                                        const newUserData = {
-                                            referredBy: referrerId,
-                                            referredAt: Date.now(),
-                                            username: tg.initDataUnsafe?.user?.username || 'User',
-                                            bonus: perReferralCoins,
-                                            userId: userId
-                                        };
+                                        const newUserData = { referredBy: referrerId, referredAt: Date.now(), username: tg.initDataUnsafe?.user?.username || 'User', bonus: perReferralCoins, userId: userId };
                                         db.ref('referrals/' + userId).set(newUserData).then(() => {
-                                            const referrerRef = db.ref('users/' + referrerId);
-                                            referrerRef.transaction((current) => {
+                                            db.ref('users/' + referrerId).transaction(current => {
                                                 if (current === null) return { referCount: 1, referrals: [newUserData] };
-                                                return {
-                                                    ...current,
-                                                    referCount: (current.referCount || 0) + 1,
-                                                    referrals: (current.referrals || []).concat([newUserData])
-                                                };
+                                                return { ...current, referCount: (current.referCount || 0) + 1, referrals: (current.referrals || []).concat([newUserData]) };
                                             }).then(() => {
                                                 userRef.update({ balance: (appState.balance || 0) + perReferralCoins });
                                                 appState.balance = (appState.balance || 0) + perReferralCoins;
-                                                updateUI();
-                                                updateLevelUI();
-                                                updateReferUI();
+                                                updateUI(); updateLevelUI(); updateReferUI();
                                                 showToast(`🎉 You got +${perReferralCoins} Coins from referral!`);
                                             });
                                         });
@@ -1963,113 +1807,58 @@
             const codeInput = document.getElementById('referCodeInput');
             const code = codeInput.value.trim();
             const submitBtn = document.getElementById('referCodeSubmitBtn');
-            
-            if (!code) {
-                showToast('Please enter a referral code!', 'error');
-                return;
-            }
-
-            userRef.once('value', (snap) => {
+            if (!code) { showToast('Please enter a referral code!', 'error'); return; }
+            userRef.once('value', snap => {
                 const data = snap.val() || {};
-                if (data.referCodeSubmitted) {
-                    showToast('You have already submitted a referral code!', 'error');
-                    return;
-                }
-
-                db.ref('users').orderByChild('referCode').equalTo(code).once('value', (snapshot) => {
+                if (data.referCodeSubmitted) { showToast('You have already submitted a referral code!', 'error'); return; }
+                db.ref('users').orderByChild('referCode').equalTo(code).once('value', snapshot => {
                     if (snapshot.exists()) {
-                        snapshot.forEach((child) => {
+                        snapshot.forEach(child => {
                             const referrerId = child.key;
-                            if (referrerId === userId) {
-                                showToast('You cannot use your own code!', 'error');
-                                return;
-                            }
-                            
+                            if (referrerId === userId) { showToast('You cannot use your own code!', 'error'); return; }
                             const perReferralCoins = referralConfig.perReferralCoins || 50;
-                            const newUserData = {
-                                referredBy: referrerId,
-                                referredAt: Date.now(),
-                                username: tg.initDataUnsafe?.user?.username || 'User',
-                                bonus: perReferralCoins,
-                                userId: userId
-                            };
-                            
+                            const newUserData = { referredBy: referrerId, referredAt: Date.now(), username: tg.initDataUnsafe?.user?.username || 'User', bonus: perReferralCoins, userId: userId };
                             db.ref('referrals/' + userId).set(newUserData).then(() => {
-                                const referrerRef = db.ref('users/' + referrerId);
-                                referrerRef.transaction((current) => {
+                                db.ref('users/' + referrerId).transaction(current => {
                                     if (current === null) return { referCount: 1, referrals: [newUserData] };
-                                    return {
-                                        ...current,
-                                        referCount: (current.referCount || 0) + 1,
-                                        referrals: (current.referrals || []).concat([newUserData])
-                                    };
+                                    return { ...current, referCount: (current.referCount || 0) + 1, referrals: (current.referrals || []).concat([newUserData]) };
                                 }).then(() => {
-                                    userRef.update({ 
-                                        balance: (appState.balance || 0) + perReferralCoins,
-                                        referCodeSubmitted: true 
-                                    });
+                                    userRef.update({ balance: (appState.balance || 0) + perReferralCoins, referCodeSubmitted: true });
                                     appState.balance = (appState.balance || 0) + perReferralCoins;
-                                    submitBtn.disabled = true;
-                                    submitBtn.textContent = '✅ Submitted';
-                                    codeInput.disabled = true;
-                                    updateUI();
-                                    updateLevelUI();
-                                    updateReferUI();
+                                    submitBtn.disabled = true; submitBtn.textContent = '✅ Submitted'; codeInput.disabled = true;
+                                    updateUI(); updateLevelUI(); updateReferUI();
                                     showToast(`🎉 Code accepted! +${perReferralCoins} Coins from referral!`);
                                 });
                             });
                         });
-                    } else {
-                        showToast('Invalid referral code!', 'error');
-                    }
+                    } else { showToast('Invalid referral code!', 'error'); }
                 });
             });
         }
 
         function loadReferralData() {
-            const refCodeRef = db.ref('users/' + userId + '/referCode');
-            refCodeRef.once('value', (s) => {
-                if (!s.exists()) {
-                    const code = generateReferCode();
-                    userRef.update({ referCode: code });
-                    appState.referCode = code;
-                } else {
-                    appState.referCode = s.val();
-                }
+            db.ref('users/' + userId + '/referCode').once('value', s => {
+                if (!s.exists()) { const code = generateReferCode(); userRef.update({ referCode: code }); appState.referCode = code; }
+                else { appState.referCode = s.val(); }
                 updateReferUI();
             });
-
-            db.ref('users/' + userId + '/referrals').on('value', (snapshot) => {
-                let count = 0;
-                let earn = 0;
-                let refs = [];
+            db.ref('users/' + userId + '/referrals').on('value', snapshot => {
+                let count = 0, earn = 0, refs = [];
                 if (snapshot.exists()) {
-                    snapshot.forEach((child) => {
-                        const val = child.val();
-                        count++;
-                        earn += (val.bonus || 0);
-                        refs.push({ id: child.key, ...val });
-                    });
+                    snapshot.forEach(child => { const val = child.val(); count++; earn += (val.bonus || 0); refs.push({ id: child.key, ...val }); });
                 }
-                appState.referralCount = count;
-                appState.referEarned = earn;
-                appState.referrals = refs;
-                updateReferUI();
-                loadReferralList();
+                appState.referralCount = count; appState.referEarned = earn; appState.referrals = refs;
+                updateReferUI(); loadReferralList();
             });
-
-            db.ref('referrals/' + userId).once('value', (s) => {
+            db.ref('referrals/' + userId).once('value', s => {
                 if (s.exists()) {
                     const data = s.val();
-                    if (data.referredBy) {
-                        if (!data.bonusClaimed) {
-                            const perReferralCoins = referralConfig.perReferralCoins || 50;
-                            appState.balance = (appState.balance || 0) + perReferralCoins;
-                            db.ref('referrals/' + userId).update({ bonusClaimed: true });
-                            userRef.update({ balance: appState.balance });
-                            updateUI();
-                            showToast(`🎉 Welcome! +${perReferralCoins} Coins from referral!`);
-                        }
+                    if (data.referredBy && !data.bonusClaimed) {
+                        const perReferralCoins = referralConfig.perReferralCoins || 50;
+                        appState.balance = (appState.balance || 0) + perReferralCoins;
+                        db.ref('referrals/' + userId).update({ bonusClaimed: true });
+                        userRef.update({ balance: appState.balance });
+                        updateUI(); showToast(`🎉 Welcome! +${perReferralCoins} Coins from referral!`);
                     }
                 }
             });
@@ -2078,12 +1867,7 @@
         function loadReferralList() {
             const container = document.getElementById('referralListHome');
             const refs = appState.referrals || [];
-            
-            if (refs.length === 0) {
-                container.innerHTML = '<p style="color:#94a3b8;font-size:13px;text-align:center;padding:10px;">No referrals yet</p>';
-                return;
-            }
-            
+            if (refs.length === 0) { container.innerHTML = '<p style="color:#94a3b8;font-size:13px;text-align:center;padding:10px;">No referrals yet</p>'; return; }
             const html = refs.slice(-20).reverse().map(ref => `
                 <div class="referral-item">
                     <span class="name">${ref.username || 'User'}</span>
@@ -2091,7 +1875,6 @@
                     <span class="date">${new Date(ref.referredAt || ref.date || Date.now()).toLocaleDateString()}</span>
                 </div>
             `).join('');
-            
             container.innerHTML = html;
         }
 
@@ -2102,14 +1885,14 @@
 
         // ==================== BAN CHECK ====================
         function checkBanStatus() {
-            userRef.child('banned').on('value', (snapshot) => {
+            userRef.child('banned').on('value', snapshot => {
                 const isBanned = snapshot.val() === true;
                 if (isBanned) {
                     appState.isBanned = true;
                     document.getElementById('bannedOverlay').classList.add('show');
                     document.getElementById('mainContent').style.display = 'none';
                     document.querySelector('.bottom-nav').style.display = 'none';
-                    userRef.child('banReason').once('value', (s) => {
+                    userRef.child('banReason').once('value', s => {
                         document.getElementById('banReason').textContent = `Reason: ${s.val() || 'Violation of terms'}`;
                     });
                 } else {
@@ -2123,24 +1906,15 @@
 
         // ==================== GEOLOCATION ====================
         let userIP = 'Unknown', userCountry = 'Unknown';
-
         function getUserLocation() {
-            fetch('https://ipapi.co/json/')
-                .then(res => res.json())
-                .then(data => {
-                    userIP = data.ip || 'Unknown';
-                    userCountry = data.country_name || 'Unknown';
-                    userRef.update({ ip: userIP, country: userCountry, lastLogin: new Date().toISOString() });
-                })
-                .catch(() => {
-                    fetch('https://api.ipify.org?format=json')
-                        .then(res => res.json())
-                        .then(data => {
-                            userIP = data.ip || 'Unknown';
-                            userRef.update({ ip: userIP, lastLogin: new Date().toISOString() });
-                        })
-                        .catch(() => {});
-                });
+            fetch('https://ipapi.co/json/').then(res => res.json()).then(data => {
+                userIP = data.ip || 'Unknown'; userCountry = data.country_name || 'Unknown';
+                userRef.update({ ip: userIP, country: userCountry, lastLogin: new Date().toISOString() });
+            }).catch(() => {
+                fetch('https://api.ipify.org?format=json').then(res => res.json()).then(data => {
+                    userIP = data.ip || 'Unknown'; userRef.update({ ip: userIP, lastLogin: new Date().toISOString() });
+                }).catch(() => {});
+            });
         }
 
         // ==================== UI UPDATE ====================
@@ -2168,9 +1942,7 @@
             toast._timeout = setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('active');
-        }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
         // ==================== INIT ====================
         function initApp() {
@@ -2215,124 +1987,59 @@
                     updateProgressUI();
                     updateSpeedBoostUI();
                     
-                    if (appState.lastConversion) {
-                        startConversionTimer();
-                    } else {
-                        appState.lastConversion = Date.now();
-                        userRef.update({ lastConversion: Date.now() });
-                        startConversionTimer();
-                    }
+                    if (appState.lastConversion) { startConversionTimer(); } 
+                    else { appState.lastConversion = Date.now(); userRef.update({ lastConversion: Date.now() }); startConversionTimer(); }
                 } else {
                     userRef.set({
-                        balance: 0,
-                        usdBalance: 0,
-                        completedTasks: 0,
-                        referCount: 0,
-                        dailyStreak: 0,
-                        tasksCompleted: [],
-                        weeklyClaimed: [],
-                        weeklyAdWatched: [],
-                        referCode: generateReferCode(),
-                        referTiers: {},
-                        videoWatchedToday: 0,
-                        videoLastWatchDate: null,
-                        withdrawHistory: [],
-                        lastLogin: new Date().toISOString(),
-                        progressCoins: 1000,
-                        videoWatchedCount: 0,
-                        speedBoostCooldown: 0,
-                        taskLastCompleted: {}
+                        balance: 0, usdBalance: 0, completedTasks: 0, referCount: 0, dailyStreak: 0, tasksCompleted: [],
+                        weeklyClaimed: [], weeklyAdWatched: [], referCode: generateReferCode(), referTiers: {},
+                        videoWatchedToday: 0, videoLastWatchDate: null, withdrawHistory: [], lastLogin: new Date().toISOString(),
+                        progressCoins: 1000, videoWatchedCount: 0, speedBoostCooldown: 0, taskLastCompleted: {}
                     });
-                    appState.referCode = generateReferCode();
-                    updateUI();
-                    updateLevelUI();
-                    startConversionTimer();
-                    updateProgressUI();
+                    appState.referCode = generateReferCode(); updateUI(); updateLevelUI(); startConversionTimer(); updateProgressUI();
                 }
-                
                 const botUsername = 'CoinQuist_bot';
                 const link = `https://t.me/${botUsername}?start=ref_${appState.referCode}`;
                 document.getElementById('referLinkHome').textContent = link;
             });
 
-            loadConversionRate();
-            loadTasksFromDB();
-            loadWeeklyRewards();
-            loadVideoSettings();
-            loadWithdrawSettings();
-            loadLevelConfig();
-            loadReferralConfig();
-            checkBanStatus();
-            loadReferralData();
-            checkReferral();
-            getUserLocation();
-            listenWithdrawStatus();
+            loadConversionRate(); loadTasksFromDB(); loadWeeklyRewards(); loadVideoSettings();
+            loadWithdrawSettings(); loadLevelConfig(); loadReferralConfig();
+            checkBanStatus(); loadReferralData(); checkReferral();
+            getUserLocation(); listenWithdrawStatus();
 
             setTimeout(updateWeeklyUI, 1000);
-            setTimeout(() => {
-                if (!appState.isBanned) {
-                    showToast('👋 Welcome to CoinQuest! Press START to earn!');
-                }
-            }, 1500);
+            setTimeout(() => { if (!appState.isBanned) showToast('👋 Welcome to CoinQuest! Press START to earn!'); }, 1500);
         }
 
         // ==================== START ====================
         document.addEventListener('DOMContentLoaded', initApp);
 
         // ---------- In-App Interstitial Ad Code ----------
-        show_11197472({
-          type: 'inApp',
-          inAppSettings: {
-            frequency: 2,
-            capping: 0.1,
-            interval: 30,
-            timeout: 5,
-            everyPage: false
-          }
-        });
-        // ------------------------------------------------
+        show_11197472({ type: 'inApp', inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false } });
 
         document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) {
-                updateUI();
-                updateWeeklyUI();
-                updateProgressUI();
-                updateSpeedBoostUI();
-            }
+            if (!document.hidden) { updateUI(); updateWeeklyUI(); updateProgressUI(); updateSpeedBoostUI(); }
         });
 
         document.addEventListener('dblclick', (e) => e.preventDefault());
 
         document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.classList.remove('active');
-                }
-            });
+            modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
         });
 
         window.addEventListener('error', (e) => {
             console.error('❌ Global error:', e.message);
-            if (e.message.includes('Firebase')) {
-                showToast('⚠️ Connection issue. Retrying...', 'error');
-            }
+            if (e.message.includes('Firebase')) showToast('⚠️ Connection issue. Retrying...', 'error');
         });
 
-        window.addEventListener('online', () => {
-            showToast('🔄 Connection restored!');
-        });
-
-        window.addEventListener('offline', () => {
-            showToast('⚠️ You are offline. Some features may not work.', 'error');
-        });
+        window.addEventListener('online', () => showToast('🔄 Connection restored!'));
+        window.addEventListener('offline', () => showToast('⚠️ You are offline. Some features may not work.', 'error'));
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                if (document.getElementById('levelOverlay').classList.contains('show')) {
-                    closeLevelPage();
-                } else if (document.getElementById('weeklyOverlay').classList.contains('show')) {
-                    closeWeeklyPage();
-                }
+                if (document.getElementById('levelOverlay').classList.contains('show')) closeLevelPage();
+                else if (document.getElementById('weeklyOverlay').classList.contains('show')) closeWeeklyPage();
             }
         });
 
