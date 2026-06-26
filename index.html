@@ -1,105 +1,527 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>🐹 Hamster Kombat Clone</title>
-    <!-- Tailwind CSS (CDN) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <!-- Telegram WebApp SDK -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>CoinQuest - Tap & Earn</title>
+    
+    <!-- Monetag SDK (Ads) -->
+    <script src='//libtl.com/sdk.js' data-zone='11197472' data-sdk='show_11197472'></script>
+    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .tap-btn { transition: transform 0.1s; }
-        .tap-btn:active { transform: scale(0.95); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        body { background: #0a0e27; color: #fff; padding-bottom: 80px; min-height: 100vh; }
+        .container { max-width: 500px; margin: 0 auto; padding: 16px; }
+        
+        .header { background: linear-gradient(135deg, #1e3a8a, #5b21b6); padding: 16px 18px; border-radius: 20px; margin-bottom: 16px; }
+        .user-info { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; }
+        .user-details h3 { font-size: 15px; }
+        .user-details .last-login { font-size: 10px; color: #94a3b8; }
+        .level-badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 2px 10px; border-radius: 10px; font-size: 11px; cursor: pointer; }
+        
+        .balance-card { background: rgba(255,255,255,0.08); padding: 14px; border-radius: 14px; text-align: center; }
+        .balance-label { font-size: 12px; color: #94a3b8; }
+        .balance-amount { font-size: 32px; font-weight: 800; background: linear-gradient(to right, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .usd-value { color: #22c55e; font-size: 15px; font-weight: bold; }
+        .total-usd-earned { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+        
+        .level-section { background: rgba(255,255,255,0.04); border-radius: 10px; padding: 8px 12px; margin-top: 6px; cursor: pointer; }
+        .level-section .level-row { display: flex; justify-content: space-between; align-items: center; }
+        .level-section .level-title { font-size: 12px; font-weight: bold; }
+        .level-section .level-number { font-size: 16px; font-weight: bold; color: #fbbf24; }
+        .level-section .level-arrow { color: #94a3b8; font-size: 14px; }
+        .level-section .level-progress { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 4px; overflow: hidden; }
+        .level-section .level-progress .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 2px; }
+        .level-section .level-points { font-size: 10px; color: #94a3b8; margin-top: 2px; display: flex; justify-content: space-between; }
+        
+        .conversion-timer { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.15); border-radius: 10px; padding: 8px; margin-top: 8px; }
+        .conversion-timer .label { font-size: 10px; color: #94a3b8; }
+        .conversion-timer .time { font-size: 15px; font-weight: bold; color: #22c55e; }
+        .conversion-timer .rate-info { font-size: 10px; color: #94a3b8; margin-top: 2px; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+        .stat-card { background: #1a1f3a; padding: 10px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.04); }
+        .stat-icon { font-size: 18px; margin-bottom: 2px; }
+        .stat-value { font-size: 18px; font-weight: bold; color: #3b82f6; }
+        .stat-label { color: #94a3b8; font-size: 10px; }
+        
+        .weekly-bonus-btn { background: linear-gradient(135deg, #7c3aed, #2563eb); padding: 12px 14px; border-radius: 14px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+        .weekly-bonus-btn .bonus-text h4 { font-size: 14px; }
+        .weekly-bonus-btn .bonus-text p { font-size: 11px; opacity: 0.9; }
+        .weekly-bonus-btn .arrow { font-size: 20px; color: rgba(255,255,255,0.7); }
+        .weekly-bonus-btn .day-progress { display: flex; gap: 3px; margin-top: 4px; }
+        .weekly-bonus-btn .day-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.2); }
+        .weekly-bonus-btn .day-dot.active { background: #fbbf24; }
+        .weekly-bonus-btn .day-dot.claimed { background: #22c55e; }
+        .weekly-bonus-btn .day-dot.locked { background: rgba(255,255,255,0.1); }
+        
+        .tap-section { text-align: center; padding: 20px 0; margin-bottom: 16px; }
+        .tap-coin { width: 160px; height: 160px; background: radial-gradient(circle at 30% 30%, #fbbf24, #f59e0b); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; cursor: pointer; box-shadow: 0 0 40px rgba(251,191,36,0.25); transition: transform 0.1s; user-select: none; -webkit-tap-highlight-color: transparent; position: relative; }
+        .tap-coin:active { transform: scale(0.92); }
+        .tap-coin .coin-icon { font-size: 64px; color: #0a0e27; }
+        .tap-coin .tap-text { position: absolute; bottom: 24px; font-size: 12px; color: rgba(0,0,0,0.4); font-weight: bold; }
+        .tap-stats { display: flex; justify-content: center; gap: 24px; margin-top: 12px; }
+        .tap-stats .stat { text-align: center; }
+        .tap-stats .stat .number { font-size: 18px; font-weight: bold; color: #fbbf24; }
+        .tap-stats .stat .label { font-size: 11px; color: #94a3b8; }
+        
+        .recharge-timer { text-align: center; margin-top: 8px; padding: 12px; background: rgba(255,255,255,0.04); border-radius: 10px; }
+        .recharge-timer .watch-video-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; padding: 8px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 13px; margin-top: 6px; }
+        .recharge-timer .watch-video-btn:active { transform: scale(0.95); }
+        .recharge-timer .status-text { font-size: 13px; font-weight: bold; margin-top: 4px; }
+        .recharge-timer .status-text.full { color: #22c55e; }
+        .recharge-timer .status-text.empty { color: #ef4444; }
+        .recharge-timer .energy-display { font-size: 16px; font-weight: bold; color: #fbbf24; margin-top: 4px; }
+        
+        /* Enhanced Tap Section */
+        .tap-section-enhanced { background: linear-gradient(145deg, #1a1f3a, #0f1535); border-radius: 24px; padding: 24px 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; }
+        .tap-section-enhanced .tap-coin { width: 180px; height: 180px; background: radial-gradient(circle at 30% 30%, #fcd34d, #f59e0b); box-shadow: 0 0 60px rgba(251,191,36,0.4), inset 0 -4px 10px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.2); }
+        .tap-section-enhanced .tap-coin .coin-icon { font-size: 80px; color: #0a0e27; text-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+        .tap-section-enhanced .tap-coin .tap-text { bottom: 20px; font-size: 14px; color: rgba(0,0,0,0.5); }
+        .tap-section-enhanced .tap-stats .stat .number { font-size: 22px; }
+        .tap-section-enhanced .tap-stats .stat .label { font-size: 12px; }
+        .tap-section-enhanced .recharge-timer { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); }
+        .tap-section-enhanced .recharge-timer .watch-video-btn { background: linear-gradient(135deg, #f97316, #ea580c); }
+        
+        .energy-offer-section { background: #1a1f3a; border-radius: 12px; padding: 12px; margin-top: 12px; border: 1px solid rgba(255,255,255,0.04); }
+        .energy-offer-section .offer-title { font-size: 12px; color: #94a3b8; margin-bottom: 8px; text-align: center; }
+        .energy-offer-card { background: rgba(255,255,255,0.04); border-radius: 10px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .energy-offer-card:last-child { margin-bottom: 0; }
+        .energy-offer-card .offer-info .energy-amount { font-size: 15px; font-weight: bold; color: #fbbf24; }
+        .energy-offer-card .offer-info .offer-price { font-size: 11px; color: #94a3b8; }
+        .energy-offer-card .buy-btn { background: linear-gradient(135deg, #06b6d4, #3b82f6); color: #fff; padding: 4px 14px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; font-size: 12px; }
+        .energy-offer-card .buy-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .energy-offer-card .buy-btn.bought { background: #22c55e; }
+        .energy-offer-card.locked { opacity: 0.5; filter: grayscale(0.5); }
+        .offer-limit { font-size: 10px; color: #94a3b8; }
+        
+        .floating-coin { position: fixed; font-size: 28px; pointer-events: none; z-index: 1000; animation: floatUp 1s ease-out forwards; }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-130px) scale(0.5); } }
+        
+        .page { display: none; min-height: 60vh; padding-top: 10px; }
+        .page.active { display: block; }
+        .page-header { font-size: 20px; font-weight: bold; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid rgba(255,255,255,0.06); }
+        
+        .video-card { background: #1a1f3a; border-radius: 12px; padding: 20px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.04); text-align: center; }
+        .video-card .video-icon { font-size: 48px; margin-bottom: 8px; }
+        .video-card .video-title { font-size: 16px; font-weight: bold; }
+        .video-card .video-desc { font-size: 12px; color: #94a3b8; margin: 4px 0; }
+        .video-card .video-reward { font-size: 14px; color: #22c55e; font-weight: bold; }
+        .video-card .video-btn { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; padding: 10px 30px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 14px; margin-top: 10px; }
+        .video-card .video-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .video-card .video-limit { font-size: 11px; color: #94a3b8; margin-top: 6px; }
+        .video-card .video-watched { font-size: 12px; color: #22c55e; margin-top: 4px; }
+        
+        .task-card { background: #1a1f3a; border-radius: 12px; padding: 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.04); }
+        .task-card .task-header { display: flex; justify-content: space-between; align-items: center; }
+        .task-card .task-title { font-size: 15px; font-weight: bold; }
+        .task-card .task-reward { color: #22c55e; font-weight: bold; font-size: 14px; }
+        .task-card .task-desc { font-size: 12px; color: #94a3b8; margin: 4px 0; }
+        .task-card .task-btn { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; padding: 6px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 13px; }
+        .task-card .task-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .task-card .task-btn.completed { background: #22c55e; }
+        .task-card .task-progress { background: rgba(255,255,255,0.08); height: 4px; border-radius: 2px; margin-top: 8px; overflow: hidden; }
+        .task-card .task-progress .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 2px; }
+        .task-card .task-link { color: #3b82f6; text-decoration: none; font-size: 12px; display: inline-block; margin-top: 4px; }
+        .no-tasks { text-align: center; padding: 30px; color: #6b7280; font-size: 14px; }
+        
+        .refer-link-box { background: #1a1f3a; border-radius: 12px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.04); text-align: center; }
+        .refer-link-box .link { background: #0a0e27; padding: 10px; border-radius: 8px; font-size: 13px; color: #3b82f6; word-break: break-all; margin: 8px 0; border: 1px solid rgba(59,130,246,0.2); }
+        .refer-link-box .copy-btn { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; padding: 6px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 13px; }
+        .refer-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+        .refer-stats .stat { background: #1a1f3a; padding: 10px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.04); }
+        .refer-stats .stat .number { font-size: 20px; font-weight: bold; color: #fbbf24; }
+        .refer-stats .stat .label { font-size: 10px; color: #94a3b8; }
+        .refer-tier { background: #1a1f3a; border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.04); display: flex; justify-content: space-between; align-items: center; }
+        .refer-tier .tier-info .tier-name { font-size: 14px; font-weight: bold; }
+        .refer-tier .tier-info .tier-desc { font-size: 11px; color: #94a3b8; }
+        .refer-tier .tier-status { font-size: 13px; font-weight: bold; }
+        .refer-tier .tier-status.claimed { color: #22c55e; }
+        .refer-tier .tier-status.locked { color: #6b7280; }
+        .refer-tier .tier-status.available { color: #fbbf24; cursor: pointer; }
+        .refer-progress { background: #1a1f3a; border-radius: 12px; padding: 14px; border: 1px solid rgba(255,255,255,0.04); }
+        .refer-progress .progress-bar { width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; margin-top: 8px; overflow: hidden; }
+        .refer-progress .progress-bar .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 3px; }
+        .refer-progress .progress-text { display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; margin-top: 4px; }
+        .referral-list-box { background: #1a1f3a; border-radius: 12px; padding: 14px; margin-top: 12px; border: 1px solid rgba(255,255,255,0.04); max-height: 200px; overflow-y: auto; }
+        .referral-list-box .list-title { font-size: 13px; color: #94a3b8; margin-bottom: 8px; }
+        .referral-list-box::-webkit-scrollbar { width: 3px; }
+        .referral-list-box::-webkit-scrollbar-track { background: rgba(255,255,255,0.04); border-radius: 2px; }
+        .referral-list-box::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 2px; }
+        .referral-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .referral-item:last-child { border-bottom: none; }
+        .referral-item .name { font-size: 13px; }
+        .referral-item .bonus { color: #22c55e; font-size: 12px; font-weight: bold; }
+        .referral-item .date { font-size: 10px; color: #6b7280; }
+        
+        .wallet-card { background: #1a1f3a; padding: 20px; border-radius: 14px; text-align: center; }
+        .wallet-card .wallet-balance { font-size: 42px; font-weight: 800; color: #fbbf24; }
+        .wallet-card .wallet-usd { color: #22c55e; font-size: 18px; font-weight: bold; margin-top: 4px; }
+        .wallet-card .wallet-total { background: rgba(34,197,94,0.08); border-radius: 6px; padding: 8px; margin-top: 10px; }
+        .wallet-card .wallet-total .label { font-size: 12px; color: #94a3b8; }
+        .wallet-card .wallet-total .value { font-size: 16px; font-weight: bold; color: #22c55e; }
+        .wallet-card .wallet-conversion { background: rgba(59,130,246,0.08); border-radius: 6px; padding: 8px; margin-top: 8px; }
+        .wallet-card .wallet-conversion .label { font-size: 11px; color: #94a3b8; }
+        .wallet-card .wallet-conversion .value { font-size: 13px; color: #3b82f6; font-weight: bold; }
+        .wallet-card .withdraw-section { margin-top: 12px; padding: 12px; background: rgba(239,68,68,0.08); border-radius: 8px; border: 1px solid rgba(239,68,68,0.15); }
+        .wallet-card .withdraw-section .withdraw-btn { margin-top: 8px; padding: 8px 20px; background: linear-gradient(135deg, #22c55e, #16a34a); border: none; border-radius: 6px; color: #fff; font-weight: bold; cursor: pointer; width: 100%; font-size: 13px; }
+        .wallet-card .withdraw-section .withdraw-btn:disabled { background: #6b7280; cursor: not-allowed; }
+        .wallet-card .withdraw-history { margin-top: 12px; padding: 8px; background: rgba(255,255,255,0.04); border-radius: 6px; max-height: 180px; overflow-y: auto; text-align: left; }
+        .wallet-card .withdraw-history .title { font-size: 10px; color: #94a3b8; margin-bottom: 4px; }
+        .withdraw-history-item { padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .withdraw-history-item:last-child { border-bottom: none; }
+        .withdraw-history-item .amount { font-weight: bold; color: #fbbf24; }
+        .withdraw-history-item .status-pending { color: #f59e0b; }
+        .withdraw-history-item .status-approved { color: #22c55e; }
+        .withdraw-history-item .status-cancelled { color: #ef4444; }
+        .withdraw-history-item .date { font-size: 9px; color: #6b7280; }
+        
+        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; background: rgba(17,24,39,0.95); backdrop-filter: blur(20px); display: flex; justify-content: space-around; padding: 10px 8px; border-top: 1px solid rgba(255,255,255,0.06); z-index: 1000; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; color: #6b7280; font-size: 9px; cursor: pointer; flex: 1; }
+        .nav-item.active { color: #3b82f6; }
+        .nav-item i { font-size: 18px; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: #1e293b; padding: 20px; border-radius: 16px; width: 90%; max-width: 340px; text-align: center; }
+        .modal-content button { background: linear-gradient(135deg, #06b6d4, #3b82f6); color: #fff; padding: 10px 32px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; margin-top: 8px; }
+        .success-animation { font-size: 48px; margin-bottom: 12px; }
+        .modal-content h3 { font-size: 20px; margin-bottom: 6px; }
+        .modal-content p { color: #94a3b8; margin-bottom: 12px; }
+        
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #22c55e; color: #fff; padding: 10px 20px; border-radius: 10px; font-weight: bold; z-index: 9999; display: none; font-size: 14px; }
+        .toast.show { display: block; animation: slideDown 0.3s ease-out; }
+        .toast.error { background: #ef4444; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-100%); } to { opacity: 1; transform: translateY(0); } }
+        
+        .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #0a0e27; z-index: 9998; display: none; overflow-y: auto; padding-bottom: 80px; }
+        .overlay.show { display: block; }
+        .overlay-header { background: linear-gradient(135deg, #1e3a8a, #5b21b6); padding: 16px 18px; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 10px; }
+        .overlay-header .back-btn { background: rgba(255,255,255,0.15); border: none; color: #fff; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+        .overlay-header h2 { font-size: 18px; flex: 1; text-align: center; margin-right: 50px; }
+        .overlay-content { padding: 14px; }
+        
+        .current-level-card { background: #1a1f3a; border-radius: 14px; padding: 16px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.04); text-align: center; }
+        .current-level-card .level-emoji { font-size: 40px; }
+        .current-level-card .level-number { font-size: 26px; font-weight: bold; color: #fbbf24; }
+        .current-level-card .level-title { font-size: 16px; color: #94a3b8; }
+        .current-level-card .level-points { font-size: 13px; color: #94a3b8; margin-top: 4px; }
+        .current-level-card .level-progress { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin-top: 10px; overflow: hidden; }
+        .current-level-card .level-progress .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 3px; }
+        .current-level-card .level-progress-text { display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; margin-top: 4px; }
+        .reward-section { background: #1a1f3a; border-radius: 12px; padding: 12px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.04); }
+        .reward-section .reward-title { font-size: 13px; color: #94a3b8; margin-bottom: 6px; }
+        .reward-section .reward-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .reward-section .reward-item:last-child { border-bottom: none; }
+        .reward-section .reward-item .value { color: #fbbf24; font-weight: bold; font-size: 13px; }
+        .filter-tabs { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; }
+        .filter-tabs .tab { padding: 4px 14px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); background: transparent; color: #94a3b8; cursor: pointer; font-size: 12px; white-space: nowrap; }
+        .filter-tabs .tab.active { background: linear-gradient(135deg, #7c3aed, #2563eb); border-color: transparent; color: #fff; }
+        .level-list-title { font-size: 16px; font-weight: bold; margin: 12px 0; display: flex; align-items: center; gap: 8px; }
+        .level-list-title span { font-size: 12px; color: #94a3b8; font-weight: normal; }
+        .level-item { background: #1a1f3a; border-radius: 10px; padding: 10px 14px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(255,255,255,0.04); }
+        .level-item.active { border-color: #fbbf24; background: rgba(251,191,36,0.05); }
+        .level-item.locked { opacity: 0.5; }
+        .level-item .level-info { display: flex; align-items: center; gap: 10px; }
+        .level-item .level-info .num { font-size: 14px; font-weight: bold; color: #94a3b8; min-width: 26px; }
+        .level-item .level-info .name { font-size: 13px; }
+        .level-item .level-info .emoji { font-size: 18px; }
+        .level-item .level-info .badge { font-size: 9px; padding: 2px 6px; border-radius: 8px; background: rgba(251,191,36,0.2); color: #fbbf24; }
+        .level-item .level-reward { font-size: 12px; color: #22c55e; }
+        .level-item .level-check { color: #22c55e; font-size: 16px; }
+        .level-list { max-height: 350px; overflow-y: auto; }
+        .level-list::-webkit-scrollbar { width: 3px; }
+        .level-list::-webkit-scrollbar-track { background: rgba(255,255,255,0.04); border-radius: 2px; }
+        .level-list::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 2px; }
+        
+        .weekly-overlay .day-box { background: #1a1f3a; border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.04); display: flex; align-items: center; justify-content: space-between; }
+        .weekly-overlay .day-box .day-info .day-name { font-size: 14px; font-weight: bold; }
+        .weekly-overlay .day-box .day-info .day-reward { font-size: 11px; color: #94a3b8; }
+        .weekly-overlay .day-box .day-status { padding: 4px 14px; border-radius: 10px; font-size: 11px; font-weight: bold; border: none; cursor: pointer; }
+        .weekly-overlay .day-box .day-status.available { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; }
+        .weekly-overlay .day-box .day-status.claimed { background: #334155; color: #94a3b8; cursor: default; }
+        .weekly-overlay .day-box .day-status.locked { background: #1e293b; color: #6b7280; cursor: default; }
+        .weekly-overlay .day-box .day-status.ad-required { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
+        .weekly-overlay .day-box .ad-box { width: 100%; margin-top: 8px; padding: 10px; background: rgba(255,255,255,0.04); border-radius: 10px; display: none; }
+        .weekly-overlay .day-box .ad-box.show { display: block; }
+        .weekly-overlay .day-box .ad-box .claim-btn { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; padding: 6px 16px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; margin-top: 6px; width: 100%; }
+        
+        .banned-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 99999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 20px; text-align: center; }
+        .banned-overlay.show { display: flex; }
+        .banned-overlay h1 { color: #ef4444; font-size: 28px; margin-bottom: 10px; }
+        .banned-overlay p { color: #94a3b8; max-width: 380px; line-height: 1.5; }
+        .banned-overlay .ban-reason { background: #1a1f3a; padding: 14px; border-radius: 10px; margin-top: 12px; max-width: 380px; color: #fbbf24; border: 1px solid rgba(239,68,68,0.2); }
+        
+        .main-content.hide { display: none; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .hidden { display: none !important; }
+        .loading { text-align: center; padding: 30px; color: #6b7280; }
+        .loading-spinner { border: 3px solid rgba(255,255,255,0.08); border-top: 3px solid #3b82f6; border-radius: 50%; width: 32px; height: 32px; animation: spin 1s linear infinite; margin: 0 auto 12px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <div id="app" class="min-h-screen bg-gray-900 text-white p-4">
-        <!-- নেভিগেশন বার -->
-        <nav class="flex justify-around bg-gray-800 p-3 rounded-xl mb-4 fixed bottom-0 left-0 right-0 z-10 border-t border-gray-700">
-            <button onclick="showPage('home')" class="flex flex-col items-center text-yellow-400">
-                <span class="text-2xl">🏠</span>
-                <span class="text-xs">হোম</span>
-            </button>
-            <button onclick="showPage('wallet')" class="flex flex-col items-center text-gray-400">
-                <span class="text-2xl">💰</span>
-                <span class="text-xs">ওয়ালেট</span>
-            </button>
-            <button onclick="showPage('history')" class="flex flex-col items-center text-gray-400">
-                <span class="text-2xl">📜</span>
-                <span class="text-xs">হিস্ট্রি</span>
-            </button>
-        </nav>
+    <!-- BANNED OVERLAY -->
+    <div class="banned-overlay" id="bannedOverlay">
+        <h1>🚫 Account Banned</h1>
+        <p>Your account has been suspended by the administrator.</p>
+        <div class="ban-reason" id="banReason">Reason: Violation of terms</div>
+        <p style="margin-top:12px;font-size:12px;color:#6b7280;">Contact support if you think this is a mistake.</p>
+    </div>
 
-        <!-- পেজ কন্টেইনার -->
-        <div id="page-container" class="pb-20">
-            <!-- হোম পেজ -->
-            <div id="home" class="page">
-                <div class="text-center mt-4">
-                    <h1 class="text-4xl font-bold">🐹 Hamster Kombat</h1>
-                    <p class="text-gray-400 mt-1">ট্যাপ করে কয়েন সংগ্রহ করুন!</p>
+    <!-- LEVEL OVERLAY -->
+    <div class="overlay" id="levelOverlay">
+        <div class="overlay-header">
+            <button class="back-btn" onclick="closeLevelPage()"><i class="fas fa-arrow-left"></i> Back</button>
+            <h2>🏆 Level System</h2>
+        </div>
+        <div class="overlay-content">
+            <div class="current-level-card">
+                <div class="level-emoji" id="levelCurrentEmoji">🥉</div>
+                <div class="level-number" id="levelCurrentNumber">Level 1</div>
+                <div class="level-title" id="levelCurrentTitle">Bronze</div>
+                <div class="level-points" id="levelCurrentPointsText">0 / 100 XP</div>
+                <div class="level-progress"><div class="fill" id="levelProgressFill2" style="width:0%;"></div></div>
+                <div class="level-progress-text"><span id="levelProgressText2">0%</span><span id="levelNextInfo">Next Level: 2</span></div>
+            </div>
+            <div class="reward-section">
+                <div class="reward-title">🎁 Current Level Rewards</div>
+                <div class="reward-item"><span>🪙 Bonus Earnings</span><span class="value" id="levelBonusPercent">+2%</span></div>
+                <div class="reward-item"><span>📋 Exclusive Tasks</span><span class="value" id="levelExclusiveTasks">🔒 Locked</span></div>
+                <div class="reward-item"><span>🎯 Daily Bonus</span><span class="value" id="levelDailyBonus">+10 Coins</span></div>
+            </div>
+            <div class="filter-tabs">
+                <button class="tab active" data-filter="all" onclick="filterLevels('all',this)">📋 All</button>
+                <button class="tab" data-filter="bronze" onclick="filterLevels('bronze',this)">🥉 Bronze</button>
+                <button class="tab" data-filter="silver" onclick="filterLevels('silver',this)">🥈 Silver</button>
+                <button class="tab" data-filter="gold" onclick="filterLevels('gold',this)">🥇 Gold</button>
+                <button class="tab" data-filter="platinum" onclick="filterLevels('platinum',this)">💎 Platinum</button>
+                <button class="tab" data-filter="diamond" onclick="filterLevels('diamond',this)">👑 Diamond</button>
+            </div>
+            <div class="level-list-title">📊 All Levels <span>100 Levels</span></div>
+            <div class="level-list" id="levelList"><div class="loading"><div class="loading-spinner"></div><p>Loading...</p></div></div>
+        </div>
+    </div>
+
+    <!-- WEEKLY OVERLAY -->
+    <div class="overlay weekly-overlay" id="weeklyOverlay">
+        <div class="overlay-header">
+            <button class="back-btn" onclick="closeWeeklyPage()"><i class="fas fa-arrow-left"></i> Back</button>
+            <h2>📅 Weekly Rewards</h2>
+        </div>
+        <div class="overlay-content"><div id="weeklyDaysContainer"></div></div>
+    </div>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="container main-content" id="mainContent">
+        
+        <!-- ===== HEADER ===== -->
+        <div class="header">
+            <div class="user-info">
+                <div class="avatar" onclick="openLevelPage()">👤</div>
+                <div class="user-details">
+                    <h3 id="userName">User</h3>
+                    <div class="last-login" id="lastLoginDisplay">📅 Last Login: --</div>
+                    <span class="level-badge" onclick="openLevelPage()" id="userLevelBadge">Level 1 👆</span>
                 </div>
-
-                <div class="mt-8 text-center">
-                    <div class="text-6xl font-bold text-yellow-400" id="coinDisplay">0</div>
-                    <div class="text-sm text-gray-400 mt-1">🪙 কয়েন</div>
-                </div>
-
-                <div class="mt-4 text-center">
-                    <div class="text-xl" id="energyDisplay">⚡ 100/100</div>
-                    <div class="w-64 mx-auto bg-gray-700 h-2 rounded-full mt-1">
-                        <div id="energyBar" class="bg-yellow-400 h-2 rounded-full" style="width:100%"></div>
+            </div>
+            <div class="balance-card">
+                <div class="balance-label">💰 Coins Balance</div>
+                <div class="balance-amount" id="balance">0</div>
+                <div class="usd-value" id="usdValue">≈ $0.00 USD</div>
+                <div class="total-usd-earned" id="totalUsdEarned">💵 Total USD Earned: $0.00</div>
+                <div class="level-section" onclick="openLevelPage()">
+                    <div class="level-row">
+                        <span class="level-title" id="levelTitle">🥉 Bronze</span>
+                        <span class="level-number" id="levelNumber">Level 1</span>
+                        <span class="level-arrow">➜</span>
                     </div>
+                    <div class="level-progress"><div class="fill" id="levelProgressFill" style="width:0%;"></div></div>
+                    <div class="level-points"><span id="levelCurrentPoints">0</span><span id="levelNextPoints">/ 100</span></div>
                 </div>
-
-                <div class="mt-8 flex justify-center">
-                    <button id="tapBtn" onclick="handleTap()" class="tap-btn bg-yellow-500 hover:bg-yellow-600 text-gray-900 text-2xl px-12 py-6 rounded-full shadow-lg font-bold">
-                        👆 TAP
-                    </button>
-                </div>
-
-                <div class="mt-6 text-center text-sm text-gray-500">
-                    <p>রিফারাল: <span id="referralCount">0</span> | লেভেল: <span id="level">1</span></p>
+                <div class="conversion-timer">
+                    <div class="label">⏰ Next Auto Conversion</div>
+                    <div class="time" id="conversionCountdown">--:--:--</div>
+                    <div class="rate-info" id="rateInfo">Rate: 1 USD = 1000 Coins</div>
                 </div>
             </div>
+        </div>
 
-            <!-- ওয়ালেট পেজ -->
-            <div id="wallet" class="page hidden">
-                <h2 class="text-2xl font-bold">💰 ওয়ালেট</h2>
-                <div class="mt-4 bg-gray-800 p-4 rounded-xl">
-                    <p class="text-gray-400">হ্যামস্টার কয়েন</p>
-                    <p class="text-3xl font-bold text-yellow-400" id="walletCoins">0</p>
+        <!-- ===== STATS ===== -->
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-value" id="completedTasks">0</div><div class="stat-label">Tasks Done</div></div>
+            <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-value" id="referralCount">0</div><div class="stat-label">Referrals</div></div>
+            <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-value" id="dailyStreak">0</div><div class="stat-label">Day Streak</div></div>
+        </div>
+
+        <!-- ===== WEEKLY BONUS ===== -->
+        <div class="weekly-bonus-btn" onclick="openWeeklyPage()">
+            <div class="bonus-text">
+                <h4>📅 Weekly Bonus</h4>
+                <p id="weeklyBonusDesc">Tap to claim your rewards!</p>
+                <div class="day-progress" id="weeklyProgress">
+                    <div class="day-dot" data-day="0"></div>
+                    <div class="day-dot" data-day="1"></div>
+                    <div class="day-dot" data-day="2"></div>
+                    <div class="day-dot" data-day="3"></div>
+                    <div class="day-dot" data-day="4"></div>
+                    <div class="day-dot" data-day="5"></div>
+                    <div class="day-dot" data-day="6"></div>
                 </div>
-                <div class="mt-4 bg-gray-800 p-4 rounded-xl">
-                    <p class="text-gray-400">টাকা (USD)</p>
-                    <p class="text-3xl font-bold text-green-400" id="walletUsd">$0.00</p>
+            </div>
+            <div class="arrow">➜</div>
+        </div>
+
+        <!-- ===== PAGE: HOME (Enhanced Tap) ===== -->
+        <div class="page active" id="pageHome">
+            <div class="tap-section-enhanced">
+                <div class="tap-coin" onclick="handleTap(event)">
+                    <span class="coin-icon">🪙</span>
+                    <span class="tap-text">TAP ME</span>
                 </div>
-                <button onclick="withdraw()" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-xl w-full">
-                    💸 উইথড্র করুন
-                </button>
+                <div class="tap-stats">
+                    <div class="stat"><div class="number" id="tapCount">0</div><div class="label">Total Taps</div></div>
+                    <div class="stat"><div class="number" id="tapEnergy">100</div><div class="label">Energy ⚡</div></div>
+                </div>
+                <div class="recharge-timer" id="rechargeTimer">
+                    <!-- Dynamic content: energy display + ad button / countdown -->
+                </div>
+                <div class="energy-offer-section">
+                    <div class="offer-title">⚡ Buy Energy with Coins</div>
+                    <div id="energyOffersContainer"><div class="loading"><p>Loading offers...</p></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== PAGE: EARN ===== -->
+        <div class="page" id="pageEarn">
+            <h2 class="page-header">📺 Earn Coins</h2>
+            <div class="video-card">
+                <div class="video-icon">📺</div>
+                <div class="video-title">Watch Video & Earn</div>
+                <div class="video-desc">Watch short videos to earn coins!</div>
+                <div class="video-reward" id="videoReward">+10 Coins per video</div>
+                <div class="video-limit" id="videoLimit">Today: 0 / 5 videos</div>
+                <button class="video-btn" id="videoBtn" onclick="watchVideo()">▶ Watch Video</button>
+                <div class="video-watched" id="videoWatched"></div>
+            </div>
+        </div>
+
+        <!-- ===== PAGE: TASKS ===== -->
+        <div class="page" id="pageTasks">
+            <h2 class="page-header">📋 Tasks</h2>
+            <div class="tasks-section" id="tasksContainer">
+                <div class="no-tasks">No tasks available. Check back later!</div>
+            </div>
+        </div>
+
+        <!-- ===== PAGE: REFER ===== -->
+        <div class="page" id="pageRefer">
+            <h2 class="page-header">👥 Refer & Earn</h2>
+            <div class="refer-link-box">
+                <p style="font-size:13px;color:#94a3b8;">Your Referral Link</p>
+                <div class="link" id="referLinkHome">Loading...</div>
+                <button class="copy-btn" onclick="copyReferLinkHome()"><i class="fas fa-copy"></i> Copy Link</button>
+            </div>
+            
+            <div class="refer-stats">
+                <div class="stat"><div class="number" id="referTotalHome">0</div><div class="label">Total Referrals</div></div>
+                <div class="stat"><div class="number" id="referEarnedHome">0</div><div class="label">Coins Earned</div></div>
+                <div class="stat"><div class="number" id="referBonusHome">0</div><div class="label">Bonus Ready</div></div>
             </div>
 
-            <!-- হিস্ট্রি পেজ -->
-            <div id="history" class="page hidden">
-                <h2 class="text-2xl font-bold">📜 হিস্ট্রি</h2>
-                <div id="historyList" class="mt-4 space-y-2">
-                    <!-- ডায়নামিক্যালি লোড হবে -->
+            <div class="refer-progress">
+                <p style="font-size:13px;color:#94a3b8;">📊 Referral Progress</p>
+                <div class="progress-bar"><div class="fill" id="referProgressFillHome" style="width:0%;"></div></div>
+                <div class="progress-text"><span id="referProgressTextHome">0 / 10</span><span>Next Bonus: 10 Referrals</span></div>
+            </div>
+
+            <div style="margin-top:12px;">
+                <h4 style="font-size:14px;margin-bottom:8px;">🎁 Tier Bonuses</h4>
+                <div id="referTierListHome"></div>
+            </div>
+
+            <div class="referral-list-box">
+                <div class="list-title">📋 Referral History</div>
+                <div id="referralListHome"><p style="color:#6b7280;font-size:13px;text-align:center;padding:10px;">No referrals yet</p></div>
+            </div>
+        </div>
+
+        <!-- ===== PAGE: WALLET ===== -->
+        <div class="page" id="pageWallet">
+            <h2 class="page-header">💰 Wallet</h2>
+            <div class="wallet-card">
+                <p style="color:#94a3b8;font-size:13px;">Coins Balance</p>
+                <div class="wallet-balance" id="walletBalance">0</div>
+                <div class="wallet-usd" id="walletUsd">≈ $0.00 USD</div>
+                
+                <div class="wallet-total">
+                    <div class="label">💵 Total USD Earned</div>
+                    <div class="value" id="walletTotalUsd">$0.00</div>
+                </div>
+                
+                <div class="wallet-conversion">
+                    <div class="label">⏰ Next Auto Conversion</div>
+                    <div class="value" id="walletNextConversion">--:--:--</div>
+                </div>
+                
+                <div class="withdraw-section">
+                    <p style="font-size:11px;color:#94a3b8;">💳 Withdraw</p>
+                    <p style="font-size:13px;font-weight:bold;color:#fbbf24;" id="withdrawInfo">Min: $10.00 USD</p>
+                    <p style="font-size:11px;color:#94a3b8;" id="withdrawStatus">You have: $0.00 USD</p>
+                    <button class="withdraw-btn" id="withdrawBtn" onclick="withdraw()">Withdraw Now</button>
+                </div>
+                
+                <div class="withdraw-history">
+                    <div class="title">📜 Withdraw History</div>
+                    <div id="withdrawHistory" style="font-size:11px;color:#94a3b8;"></div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- ===== BOTTOM NAV ===== -->
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchPage('home', event)"><i class="fas fa-home"></i><span>Home</span></div>
+        <div class="nav-item" onclick="switchPage('earn', event)"><i class="fas fa-video"></i><span>Earn</span></div>
+        <div class="nav-item" onclick="switchPage('tasks', event)"><i class="fas fa-tasks"></i><span>Tasks</span></div>
+        <div class="nav-item" onclick="switchPage('refer', event)"><i class="fas fa-users"></i><span>Refer</span></div>
+        <div class="nav-item" onclick="switchPage('wallet', event)"><i class="fas fa-wallet"></i><span>Wallet</span></div>
+    </div>
+
+    <!-- ===== MODALS ===== -->
+    <div class="modal" id="successModal"><div class="modal-content"><div class="success-animation">🎉</div><h3>Task Completed!</h3><p id="rewardText">+50 Coins</p><button onclick="closeModal('successModal')">Awesome!</button></div></div>
+    <div class="modal" id="energyBuyModal"><div class="modal-content"><div class="success-animation">⚡</div><h3>Energy Purchased!</h3><p id="energyBuyText">+20 Energy</p><button onclick="closeModal('energyBuyModal')">Great!</button></div></div>
+    <div class="modal" id="conversionModal"><div class="modal-content"><div class="success-animation">💰</div><h3>Coins Converted!</h3><p id="conversionText">Coins → USD</p><button onclick="closeModal('conversionModal')">Awesome!</button></div></div>
+    <div class="modal" id="weeklyBonusModal"><div class="modal-content"><div class="success-animation">📅</div><h3>Weekly Bonus Claimed!</h3><p id="weeklyBonusRewardText">+50 Coins</p><button onclick="closeModal('weeklyBonusModal')">Awesome!</button></div></div>
+    <div class="modal" id="withdrawModal"><div class="modal-content"><div class="success-animation">💳</div><h3 id="withdrawModalTitle">Withdrawal</h3><p id="withdrawModalText">Processing...</p><button onclick="closeModal('withdrawModal')">OK</button></div></div>
+    <div class="modal" id="adModal"><div class="modal-content"><div class="success-animation">📺</div><h3>Watch Ad to Claim</h3><p id="adModalText">Please watch the ad</p><div id="adModalContent"></div><button onclick="closeModal('adModal')">Skip</button></div></div>
+    <div class="modal" id="videoModal"><div class="modal-content"><div class="success-animation">📺</div><h3>Video Watched!</h3><p id="videoRewardText">You earned +10 Coins</p><button onclick="closeModal('videoModal')">Awesome!</button></div></div>
+
+    <div class="toast" id="toast"></div>
+
     <script>
-        // ============================================================
-        // ১. FIREBASE কনফিগারেশন (আপনার JSON থেকে নেওয়া)
-        // ============================================================
+        // ==================== MONETAG REWARDED AD ====================
+        function showRewardedAd(callback) {
+            // Monetag Rewarded Interstitial
+            show_11197472().then(() => {
+                console.log('✅ Ad watched successfully!');
+                if (callback) callback();
+            }).catch((err) => {
+                console.log('Ad error:', err);
+                if (callback) callback(); // still call callback to avoid stuck
+            });
+        }
+
+        // ==================== FIREBASE ====================
         const firebaseConfig = {
             apiKey: "AIzaSyAqCNHhu9oaBDea85tAH-iHucHczZnR7nY",
             authDomain: "tolaka-exc-reverb-b1afd.firebaseapp.com",
@@ -109,218 +531,1347 @@
             messagingSenderId: "25114300036",
             appId: "1:25114300036:android:579e5c869a075113603cd1"
         };
-
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
+        const db = firebase.database();
 
-        // ============================================================
-        // ২. টেলিগ্রাম অটো লগইন + ইউজার আইডি
-        // ============================================================
-        let userId = "demo_user_123"; // ডিফল্ট
-
-        const tg = window.Telegram?.WebApp;
-        if (tg) {
-            tg.expand();
-            const user = tg.initDataUnsafe?.user;
-            if (user) {
-                userId = String(user.id);
-                console.log("✅ Telegram user:", userId);
-            } else {
-                console.warn("⚠️ Telegram user not found, using demo ID");
-            }
-        } else {
-            console.warn("⚠️ Not in Telegram WebApp, using demo ID");
+        // ==================== TG ====================
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        let userId = 'default_user';
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            userId = tg.initDataUnsafe.user.id.toString();
         }
 
-        // ============================================================
-        // ৩. গ্লোবাল ভেরিয়েবল
-        // ============================================================
-        let coins = 0;
-        let energy = 100;
-        let maxEnergy = 100;
-        let level = 1;
-        let referralCount = 0;
-        let history = [];
-
-        // ============================================================
-        // ৪. ফায়ারবেস থেকে ডেটা লোড
-        // ============================================================
-        async function loadUserData() {
-            try {
-                const docRef = db.collection('users').doc(userId);
-                const docSnap = await docRef.get();
-
-                if (docSnap.exists) {
-                    const data = docSnap.data();
-                    coins = data.coins || 0;
-                    energy = data.energy || 100;
-                    level = data.level || 1;
-                    referralCount = data.referralCount || 0;
-                    history = data.history || [];
-                } else {
-                    // নতুন ইউজার - ডিফল্ট ডেটা সেট
-                    await docRef.set({
-                        coins: 0,
-                        energy: 100,
-                        level: 1,
-                        referralCount: 0,
-                        history: [],
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                }
-                updateUI();
-            } catch (error) {
-                console.error("Firebase error:", error);
-            }
-        }
-
-        // ============================================================
-        // ৫. ফায়ারবেসে ডেটা সেভ
-        // ============================================================
-        async function saveUserData() {
-            try {
-                const docRef = db.collection('users').doc(userId);
-                await docRef.update({
-                    coins: coins,
-                    energy: energy,
-                    level: level,
-                    referralCount: referralCount,
-                    history: history
-                });
-            } catch (error) {
-                console.error("Save error:", error);
-            }
-        }
-
-        // ============================================================
-        // ৬. UI আপডেট ফাংশন
-        // ============================================================
-        function updateUI() {
-            document.getElementById('coinDisplay').textContent = coins;
-            document.getElementById('walletCoins').textContent = coins;
-            document.getElementById('walletUsd').textContent = `$${(coins * 0.001).toFixed(2)}`;
-            document.getElementById('energyDisplay').textContent = `⚡ ${energy}/${maxEnergy}`;
-            document.getElementById('energyBar').style.width = `${(energy / maxEnergy) * 100}%`;
-            document.getElementById('level').textContent = level;
-            document.getElementById('referralCount').textContent = referralCount;
-            
-            // হিস্ট্রি রেন্ডার
-            const historyList = document.getElementById('historyList');
-            historyList.innerHTML = '';
-            if (history.length === 0) {
-                historyList.innerHTML = '<p class="text-gray-500 text-center">কোনো লেনদেন নেই</p>';
-            } else {
-                history.slice().reverse().forEach(h => {
-                    const div = document.createElement('div');
-                    div.className = 'bg-gray-800 p-3 rounded-xl flex justify-between items-center';
-                    div.innerHTML = `
-                        <span>${h.action}</span>
-                        <span class="${h.amount > 0 ? 'text-green-400' : 'text-red-400'}">${h.amount > 0 ? '+' : ''}${h.amount}</span>
-                        <span class="text-gray-500 text-xs">${h.date || 'আজ'}</span>
-                    `;
-                    historyList.appendChild(div);
-                });
-            }
-        }
-
-        // ============================================================
-        // ৭. ট্যাপ হ্যান্ডলার
-        // ============================================================
-        async function handleTap() {
-            if (energy <= 0) {
-                // এনার্জি রিচার্জ (১০ সেকেন্ডে ১)
-                alert("⚡ এনার্জি শেষ! ১০ সেকেন্ডে ১ রিচার্জ হবে।");
-                return;
-            }
-
-            // ট্যাপ করুন
-            coins += 1;
-            energy -= 1;
-
-            // লেভেল আপ (প্রতি ১০০ কয়েনে)
-            const newLevel = Math.floor(coins / 100) + 1;
-            if (newLevel > level) {
-                level = newLevel;
-                history.push({ action: `লেভেল ${level}`, amount: 0, date: new Date().toLocaleDateString() });
-            }
-
-            // হিস্ট্রি যোগ
-            history.push({ action: 'ট্যাপ', amount: 1, date: new Date().toLocaleTimeString() });
-
-            // UI আপডেট
-            updateUI();
-
-            // ফায়ারবেসে সেভ (throttled)
-            await saveUserData();
-        }
-
-        // ============================================================
-        // ৮. এনার্জি রিচার্জ (প্রতি ১০ সেকেন্ডে +১)
-        // ============================================================
-        setInterval(async () => {
-            if (energy < maxEnergy) {
-                energy += 1;
-                updateUI();
-                await saveUserData();
-            }
-        }, 10000);
-
-        // ============================================================
-        // ৯. পেজ পরিবর্তন ফাংশন
-        // ============================================================
-        function showPage(pageName) {
-            document.querySelectorAll('.page').forEach(el => el.classList.add('hidden'));
-            document.getElementById(pageName).classList.remove('hidden');
-            
-            // নেভিগেশন হাইলাইট
-            document.querySelectorAll('nav button').forEach(btn => {
-                btn.classList.remove('text-yellow-400');
-                btn.classList.add('text-gray-400');
-            });
-            // হোমের জন্য আলাদা
-            if (pageName === 'home') {
-                document.querySelector('nav button:first-child').classList.remove('text-gray-400');
-                document.querySelector('nav button:first-child').classList.add('text-yellow-400');
-            }
-        }
-
-        // ============================================================
-        // ১০. উইথড্র ফাংশন (ডেমো)
-        // ============================================================
-        function withdraw() {
-            if (coins < 100) {
-                alert("উইথড্র করতে কমপক্ষে ১০০ কয়েন লাগবে!");
-                return;
-            }
-            const amount = prompt("কত কয়েন উইথড্র করবেন? (১০০ এর বেশি)");
-            if (amount && !isNaN(amount) && amount >= 100 && amount <= coins) {
-                coins -= parseInt(amount);
-                history.push({ action: 'উইথড্র', amount: -parseInt(amount), date: new Date().toLocaleTimeString() });
-                updateUI();
-                saveUserData();
-                alert(`✅ ${amount} কয়েন উইথড্র করা হয়েছে!`);
-            }
-        }
-
-        // ============================================================
-        // ১১. অ্যাপ লোড হওয়ার সময়
-        // ============================================================
-        window.onload = async function() {
-            await loadUserData();
-            // ডিফল্ট পেজ হোম
-            showPage('home');
-            console.log('🚀 Hamster Kombat ready!');
+        // ==================== STATE ====================
+        let appState = {
+            balance: 0, usdBalance: 0, completedTasks: 0, referralCount: 0,
+            dailyStreak: 0, userLevel: 1, tasksCompleted: [],
+            weeklyClaimed: [], weeklyAdWatched: [],
+            tapCount: 0, tapEnergy: 100, purchasedOffers: {},
+            lastConversion: null, conversionRate: 1000, minWithdraw: 10,
+            isBanned: false, banReason: '', withdrawHistory: [],
+            lastLogin: null,
+            referCode: '',
+            referEarned: 0,
+            referTiers: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+            videoWatchedToday: 0,
+            videoLastWatchDate: null,
+            videoReward: 10,
+            videoDailyLimit: 5,
+            energyVideoReward: 20,
+            referrals: [],
+            weekStart: null,
+            energyRechargeStart: null // timestamp when energy became 0
         };
 
-        // ============================================================
-        // ১২. লগইন (Telegram auto-login handled above)
-        // ============================================================
-        // Firebase Auth এর সাথে সংযুক্ত করতে চাইলে:
-        // auth.signInAnonymously().catch(console.error);
-        // কিন্তু Telegram auto-login এর জন্য ব্যাকএন্ড লাগবে।
-        // ডেমোতে আমরা সরাসরি Firebase Firestore ব্যবহার করছি।
-    </script>
+        let tasks = [], energyOffers = [];
+        let conversionTimerInterval = null;
+        let rechargeTimerInterval = null;
+        let isTapping = false, weeklyRewards = [10,15,20,25,30,40,50];
+        let currentFilter = 'all';
 
+        const userRef = db.ref('users/' + userId);
+        const tasksRef = db.ref('tasks');
+        const offersRef = db.ref('energyOffers');
+        const rateRef = db.ref('conversionRate');
+        const withdrawRef = db.ref('withdrawSettings');
+        const weeklyRewardsRef = db.ref('weeklyRewards');
+        const videoSettingsRef = db.ref('videoSettings');
+        const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+        // ==================== PAGE NAVIGATION ====================
+        function switchPage(page, event) {
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add('active');
+            }
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            
+            const pageMap = {
+                'home': 'pageHome',
+                'earn': 'pageEarn',
+                'tasks': 'pageTasks',
+                'refer': 'pageRefer',
+                'wallet': 'pageWallet'
+            };
+            
+            const targetPage = document.getElementById(pageMap[page]);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+            
+            if (page === 'tasks') renderTasks();
+            if (page === 'refer') { updateReferUI(); loadReferralList(); }
+            if (page === 'earn') updateVideoUI();
+            if (page === 'wallet') updateWithdrawHistory();
+        }
+
+        // ==================== CONVERSION ====================
+        function loadConversionRate() {
+            rateRef.on('value', (s) => {
+                appState.conversionRate = s.exists() ? s.val() : 1000;
+                if (!s.exists()) rateRef.set(1000);
+                updateUSDDisplay();
+            });
+        }
+
+        function updateUSDDisplay() {
+            const usdValue = (appState.balance / appState.conversionRate).toFixed(2);
+            document.getElementById('usdValue').textContent = `≈ $${usdValue} USD`;
+            document.getElementById('walletUsd').textContent = `≈ $${usdValue} USD`;
+            document.getElementById('walletBalance').textContent = appState.balance;
+            
+            const totalUsd = appState.usdBalance.toFixed(2);
+            document.getElementById('totalUsdEarned').textContent = `💵 Total USD Earned: $${totalUsd}`;
+            document.getElementById('walletTotalUsd').textContent = `$${totalUsd}`;
+            document.getElementById('rateInfo').textContent = `Rate: 1 USD = ${appState.conversionRate} Coins`;
+            updateWithdrawUI();
+            updateWithdrawHistory();
+        }
+
+        function performConversion() {
+            if (appState.balance > 0) {
+                const earned = appState.balance / appState.conversionRate;
+                appState.usdBalance += earned;
+                const coins = appState.balance;
+                appState.balance = 0;
+                appState.lastConversion = Date.now();
+                
+                userRef.update({ balance: 0, usdBalance: appState.usdBalance, lastConversion: appState.lastConversion });
+                
+                document.getElementById('conversionText').textContent = 
+                    `${coins.toLocaleString()} Coins → $${earned.toFixed(2)} USD (Rate: 1 USD = ${appState.conversionRate} Coins)`;
+                document.getElementById('conversionModal').classList.add('active');
+                updateUI();
+                showToast(`💰 Converted ${coins} Coins to $${earned.toFixed(2)} USD!`);
+            } else {
+                appState.lastConversion = Date.now();
+                userRef.update({ lastConversion: appState.lastConversion });
+            }
+            if (conversionTimerInterval) { clearInterval(conversionTimerInterval); conversionTimerInterval = null; }
+            startConversionTimer();
+        }
+
+        function startConversionTimer() {
+            if (conversionTimerInterval) clearInterval(conversionTimerInterval);
+            let now = Date.now();
+            if (!appState.lastConversion) { appState.lastConversion = now; userRef.update({ lastConversion: now }); }
+            let next = appState.lastConversion + (24 * 60 * 60 * 1000);
+            let rem = next - now;
+            if (rem <= 0) { performConversion(); return; }
+            conversionTimerInterval = setInterval(() => {
+                let r = next - Date.now();
+                if (r <= 0) { clearInterval(conversionTimerInterval); conversionTimerInterval = null; performConversion(); return; }
+                let h = Math.floor(r / (60*60*1000)), m = Math.floor((r % (60*60*1000)) / (60*1000)), s = Math.floor((r % (60*1000)) / 1000);
+                document.getElementById('conversionCountdown').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+                document.getElementById('walletNextConversion').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            }, 1000);
+            let h = Math.floor(rem / (60*60*1000)), m = Math.floor((rem % (60*60*1000)) / (60*1000)), s = Math.floor((rem % (60*1000)) / 1000);
+            document.getElementById('conversionCountdown').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            document.getElementById('walletNextConversion').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        }
+
+        // ==================== WITHDRAW ====================
+        function loadWithdrawSettings() {
+            withdrawRef.on('value', (s) => {
+                if (s.exists()) { 
+                    let d = s.val(); 
+                    appState.minWithdraw = d.minAmount || 10; 
+                }
+                updateWithdrawUI();
+            });
+        }
+
+        function updateWithdrawUI() {
+            let bal = appState.usdBalance || 0, min = appState.minWithdraw || 10;
+            document.getElementById('withdrawInfo').textContent = `Min: $${min.toFixed(2)} USD`;
+            document.getElementById('withdrawStatus').textContent = `You have: $${bal.toFixed(2)} USD`;
+            let btn = document.getElementById('withdrawBtn');
+            if (bal >= min) { btn.disabled = false; btn.textContent = 'Withdraw Now'; } 
+            else { btn.disabled = true; btn.textContent = `Need $${(min - bal).toFixed(2)} more`; }
+        }
+
+        function withdraw() {
+            let bal = appState.usdBalance || 0, min = appState.minWithdraw || 10;
+            if (bal < min) { showToast(`Minimum $${min} USD required!`, 'error'); return; }
+            
+            // No ads for withdraw, just process
+            let amount = bal, id = Date.now().toString();
+            
+            const withdrawData = {
+                userId: userId,
+                username: tg.initDataUnsafe?.user?.username || 'User',
+                amount: amount,
+                status: 'pending',
+                requestedAt: new Date().toISOString(),
+                ip: userIP,
+                country: userCountry
+            };
+            
+            db.ref('withdrawRequests/' + id).set(withdrawData);
+            
+            appState.usdBalance = 0;
+            
+            if (!appState.withdrawHistory) appState.withdrawHistory = [];
+            
+            appState.withdrawHistory.push({
+                id: id,
+                amount: amount,
+                status: 'pending',
+                date: new Date().toISOString()
+            });
+            
+            userRef.update({ usdBalance: 0, withdrawHistory: appState.withdrawHistory });
+            
+            document.getElementById('withdrawModalTitle').textContent = '💰 Request Sent!';
+            document.getElementById('withdrawModalText').textContent = `$${amount.toFixed(2)} pending approval.`;
+            document.getElementById('withdrawModal').classList.add('active');
+            
+            updateUI();
+            updateUSDDisplay();
+            updateWithdrawHistory();
+            showToast(`$${amount.toFixed(2)} sent for approval!`);
+        }
+
+        function updateWithdrawHistory() {
+            const container = document.getElementById('withdrawHistory');
+            if (!appState.withdrawHistory || appState.withdrawHistory.length === 0) {
+                container.innerHTML = '<span style="color:#6b7280;font-size:10px;">No withdrawals yet</span>';
+                return;
+            }
+            
+            const statusLabels = {
+                pending: '⏳ Pending',
+                approved: '✅ Approved',
+                cancelled: '❌ Cancelled',
+                processing: '🔄 Processing'
+            };
+            
+            container.innerHTML = appState.withdrawHistory.slice(-10).reverse().map(w => {
+                let cancelReasonHTML = '';
+                if (w.status === 'cancelled' && w.cancelReason) {
+                    cancelReasonHTML = `<div style="font-size:10px;color:#ef4444;">⚠️ ${w.cancelReason}</div>`;
+                }
+                
+                return `
+                    <div class="withdraw-history-item">
+                        <div>
+                            <span class="amount">$${w.amount.toFixed(2)}</span>
+                            ${cancelReasonHTML}
+                        </div>
+                        <div style="text-align:right;">
+                            <span class="status-${w.status}" style="font-size:10px;font-weight:bold;">${statusLabels[w.status] || w.status}</span>
+                            <div class="date">${new Date(w.date).toLocaleDateString()}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function listenWithdrawStatus() {
+            db.ref('withdrawRequests').orderByChild('userId').equalTo(userId).on('child_changed', (snapshot) => {
+                const data = snapshot.val();
+                if (data && data.userId === userId) {
+                    if (appState.withdrawHistory) {
+                        const existingIndex = appState.withdrawHistory.findIndex(h => h.id === snapshot.key);
+                        if (existingIndex !== -1) {
+                            appState.withdrawHistory[existingIndex].status = data.status;
+                            if (data.cancelReason) {
+                                appState.withdrawHistory[existingIndex].cancelReason = data.cancelReason;
+                            }
+                            
+                            if (data.status === 'cancelled' && data.amount) {
+                                appState.usdBalance = (appState.usdBalance || 0) + data.amount;
+                                userRef.update({ usdBalance: appState.usdBalance });
+                                showToast(`⚠️ Withdrawal cancelled: ${data.cancelReason || 'No reason provided'}`, 'error');
+                            }
+                            
+                            userRef.update({ withdrawHistory: appState.withdrawHistory });
+                            updateUI();
+                            updateUSDDisplay();
+                            updateWithdrawHistory();
+                        }
+                    }
+                }
+            });
+        }
+
+        // ==================== VIDEO SETTINGS ====================
+        function loadVideoSettings() {
+            videoSettingsRef.on('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    appState.videoReward = data.reward || 10;
+                    appState.videoDailyLimit = data.dailyLimit || 5;
+                }
+                updateVideoUI();
+            });
+        }
+
+        function updateVideoUI() {
+            const today = new Date().toDateString();
+            const isToday = appState.videoLastWatchDate === today;
+            const watched = isToday ? (appState.videoWatchedToday || 0) : 0;
+            const limit = appState.videoDailyLimit || 5;
+            const remaining = limit - watched;
+            
+            document.getElementById('videoReward').textContent = `+${appState.videoReward || 10} Coins per video`;
+            document.getElementById('videoLimit').textContent = `Today: ${watched} / ${limit} videos`;
+            
+            const btn = document.getElementById('videoBtn');
+            if (remaining <= 0) {
+                btn.disabled = true;
+                btn.textContent = '✅ Daily Limit Reached';
+                document.getElementById('videoWatched').textContent = '🎉 All videos watched today!';
+            } else {
+                btn.disabled = false;
+                btn.textContent = '▶ Watch Video';
+                document.getElementById('videoWatched').textContent = `${remaining} videos left today`;
+            }
+        }
+
+        function watchVideo() {
+            const today = new Date().toDateString();
+            const isToday = appState.videoLastWatchDate === today;
+            const watched = isToday ? (appState.videoWatchedToday || 0) : 0;
+            const limit = appState.videoDailyLimit || 5;
+            
+            if (watched >= limit) {
+                showToast('Daily limit reached!', 'error');
+                return;
+            }
+
+            // Use Monetag rewarded ad
+            showRewardedAd(function() {
+                appState.videoWatchedToday = watched + 1;
+                appState.videoLastWatchDate = today;
+                const reward = appState.videoReward || 10;
+                appState.balance += reward;
+                
+                userRef.update({
+                    balance: appState.balance,
+                    videoWatchedToday: appState.videoWatchedToday,
+                    videoLastWatchDate: appState.videoLastWatchDate
+                });
+
+                document.getElementById('videoRewardText').textContent = `You earned +${reward} Coins! 📺`;
+                document.getElementById('videoModal').classList.add('active');
+                
+                updateUI();
+                updateLevelUI();
+                updateVideoUI();
+                showToast(`+${reward} Coins for watching video! 🎉`);
+            });
+        }
+
+        // ==================== ENERGY RECHARGE (TIMER + AD) ====================
+        // 1 hour = 3600 seconds for full 100 energy
+        const RECHARGE_TIME = 3600; // seconds
+
+        function startRechargeTimer() {
+            if (rechargeTimerInterval) clearInterval(rechargeTimerInterval);
+            
+            // If energy is already full, don't start timer
+            if (appState.tapEnergy >= 100) {
+                updateRechargeTimer();
+                return;
+            }
+
+            // If energy is 0, set recharge start time if not set
+            if (appState.tapEnergy === 0 && !appState.energyRechargeStart) {
+                appState.energyRechargeStart = Date.now();
+                userRef.update({ energyRechargeStart: appState.energyRechargeStart });
+            }
+
+            // If energy > 0 but less than 100, we might have partial recharge from timer
+            // We'll compute based on stored start time or just show current energy
+
+            updateRechargeTimer(); // initial update
+
+            rechargeTimerInterval = setInterval(() => {
+                updateRechargeTimer();
+            }, 1000);
+        }
+
+        function updateRechargeTimer() {
+            let div = document.getElementById('rechargeTimer');
+            
+            // If energy is full
+            if (appState.tapEnergy >= 100) {
+                if (rechargeTimerInterval) {
+                    clearInterval(rechargeTimerInterval);
+                    rechargeTimerInterval = null;
+                }
+                appState.energyRechargeStart = null; // reset
+                userRef.update({ energyRechargeStart: null });
+                
+                div.innerHTML = `
+                    <div class="status-text full">✅ Energy Full! Keep Tapping!</div>
+                    <div class="energy-display">${appState.tapEnergy}/100 Energy</div>
+                    <button class="watch-video-btn" onclick="watchVideoForEnergy()">
+                        📺 Watch Video for +20 Energy
+                    </button>
+                `;
+                return;
+            }
+
+            // Energy is less than 100
+            // If energy is 0, we show timer countdown if recharge started
+            if (appState.tapEnergy === 0 && appState.energyRechargeStart) {
+                const elapsed = Math.floor((Date.now() - appState.energyRechargeStart) / 1000);
+                const remaining = Math.max(0, RECHARGE_TIME - elapsed);
+                
+                if (remaining <= 0) {
+                    // Recharge complete!
+                    appState.tapEnergy = 100;
+                    appState.energyRechargeStart = null;
+                    userRef.update({ tapEnergy: 100, energyRechargeStart: null });
+                    updateRechargeTimer(); // will show full
+                    showToast('⚡ Energy fully recharged!');
+                    return;
+                }
+
+                // Show countdown
+                const hours = Math.floor(remaining / 3600);
+                const minutes = Math.floor((remaining % 3600) / 60);
+                const seconds = remaining % 60;
+                const timeStr = `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+
+                div.innerHTML = `
+                    <div class="energy-display">0/100 Energy</div>
+                    <div class="status-text empty">⏳ Recharging in ${timeStr}</div>
+                    <button class="watch-video-btn" onclick="watchVideoForEnergy()">
+                        📺 Watch Video for +20 Energy
+                    </button>
+                `;
+                return;
+            }
+
+            // Energy > 0 but < 100: show current energy and ad button
+            // But also check if we have a recharge start time (could be partial)
+            if (appState.energyRechargeStart) {
+                // We might have partially recharged from timer. Let's compute.
+                const elapsed = Math.floor((Date.now() - appState.energyRechargeStart) / 1000);
+                const totalRecharge = Math.min(100, Math.floor((elapsed / RECHARGE_TIME) * 100));
+                if (totalRecharge > appState.tapEnergy) {
+                    appState.tapEnergy = Math.min(100, totalRecharge);
+                    userRef.update({ tapEnergy: appState.tapEnergy });
+                }
+                if (appState.tapEnergy >= 100) {
+                    appState.energyRechargeStart = null;
+                    userRef.update({ energyRechargeStart: null });
+                    updateRechargeTimer();
+                    return;
+                }
+            }
+
+            // Show current energy + ad button
+            div.innerHTML = `
+                <div class="energy-display">${appState.tapEnergy}/100 Energy</div>
+                <div class="status-text ${appState.tapEnergy === 0 ? 'empty' : ''}">
+                    ${appState.tapEnergy === 0 ? '⛔ No Energy! Watch video to recharge!' : '⚡ Energy remaining'}
+                </div>
+                <button class="watch-video-btn" onclick="watchVideoForEnergy()">
+                    📺 Watch Video for +20 Energy
+                </button>
+            `;
+        }
+
+        // ==================== WATCH VIDEO FOR ENERGY (Monetag Ad) ====================
+        function watchVideoForEnergy() {
+            if (appState.tapEnergy >= 100) {
+                showToast('Energy is already full!', 'error');
+                return;
+            }
+            
+            // Show Monetag rewarded ad
+            showRewardedAd(function() {
+                const energyGain = appState.energyVideoReward || 20;
+                appState.tapEnergy = Math.min(100, appState.tapEnergy + energyGain);
+                // If energy becomes 100, clear recharge start
+                if (appState.tapEnergy >= 100) {
+                    appState.energyRechargeStart = null;
+                } else if (appState.tapEnergy > 0 && appState.energyRechargeStart) {
+                    // If energy > 0 and we have a recharge timer, we might want to adjust?
+                    // We'll keep it simple: if energy > 0, we don't need timer, but we keep the start if it was set.
+                    // Actually, if energy > 0, we can clear the start because timer not needed (energy will be used)
+                    // But we might want to continue recharging if energy is not full? 
+                    // For simplicity, if energy > 0, we clear the start so timer won't override.
+                    appState.energyRechargeStart = null;
+                }
+                userRef.update({
+                    tapEnergy: appState.tapEnergy,
+                    energyRechargeStart: appState.energyRechargeStart
+                });
+                updateTapUI();
+                updateRechargeTimer();
+                showToast(`⚡ +${energyGain} Energy from video!`);
+            });
+        }
+
+        // ==================== TAP ====================
+        function handleTap(event) {
+            // Energy 0 হলে ট্যাপ বন্ধ - Error দেখাবে
+            if (appState.tapEnergy <= 0) {
+                showToast('⛔ No Energy! Watch video or wait for recharge!', 'error');
+                return;
+            }
+            
+            if (isTapping) return;
+            isTapping = true;
+            
+            appState.tapEnergy -= 1;
+            appState.tapCount += 1;
+            let reward = Math.floor(Math.random() * 3) + 1;
+            appState.balance += reward;
+            
+            updateUI();
+            updateTapUI();
+            updateLevelUI();
+            
+            // If energy becomes 0, start recharge timer
+            if (appState.tapEnergy === 0) {
+                appState.energyRechargeStart = Date.now();
+                userRef.update({ energyRechargeStart: appState.energyRechargeStart });
+                startRechargeTimer();
+            } else {
+                // If energy > 0, update recharge timer display
+                updateRechargeTimer();
+            }
+            
+            userRef.update({ 
+                balance: appState.balance, 
+                tapCount: appState.tapCount, 
+                tapEnergy: appState.tapEnergy,
+                energyRechargeStart: appState.energyRechargeStart
+            }).catch(() => {});
+            
+            // Floating coin animation
+            let coin = document.createElement('div');
+            coin.className = 'floating-coin';
+            coin.textContent = `+${reward} 🪙`;
+            let x = event.touches ? event.touches[0].clientX : (event.clientX || window.innerWidth/2);
+            let y = event.touches ? event.touches[0].clientY : (event.clientY || window.innerHeight/2);
+            coin.style.left = (x - 20) + 'px';
+            coin.style.top = (y - 20) + 'px';
+            document.body.appendChild(coin);
+            setTimeout(() => coin.remove(), 1000);
+            
+            if (navigator.vibrate) navigator.vibrate(10);
+            
+            isTapping = false;
+        }
+
+        function updateTapUI() {
+            document.getElementById('tapCount').textContent = appState.tapCount;
+            document.getElementById('tapEnergy').textContent = appState.tapEnergy;
+        }
+
+        // ==================== LEVEL SYSTEM ====================
+        function getLevelTier(level) {
+            if (level >= 76) return { name:'Diamond', emoji:'👑', bonus:30 };
+            if (level >= 51) return { name:'Platinum', emoji:'💎', bonus:20 };
+            if (level >= 26) return { name:'Gold', emoji:'🥇', bonus:10 };
+            if (level >= 11) return { name:'Silver', emoji:'🥈', bonus:5 };
+            return { name:'Bronze', emoji:'🥉', bonus:2 };
+        }
+
+        function calcLevel(coins, tasks, taps, streak, withdrawals) {
+            let points = Math.floor((coins * 1) + (tasks * 50) + (taps * 0.1) + (streak * 10) + (withdrawals * 100));
+            let level = 1, totalReq = 0;
+            for (let i = 1; i <= 100; i++) {
+                totalReq += i * 100;
+                if (points >= totalReq) level = i;
+                else break;
+            }
+            let currentTotal = 0;
+            for (let i = 1; i <= level; i++) currentTotal += i * 100;
+            let progress = ((points - currentTotal) / ((level + 1) * 100)) * 100;
+            if (progress > 100) progress = 100;
+            if (progress < 0) progress = 0;
+            let tier = getLevelTier(level);
+            return {
+                level, points, currentTotal, progress: Math.floor(progress),
+                required: (level + 1) * 100, isMax: level >= 100,
+                tier, nextTier: level < 100 ? getLevelTier(level + 1) : null
+            };
+        }
+
+        function updateLevelUI() {
+            const data = calcLevel(
+                appState.balance, appState.completedTasks, appState.tapCount,
+                appState.dailyStreak, appState.withdrawHistory ? appState.withdrawHistory.length : 0
+            );
+            const t = data.tier;
+            document.getElementById('levelTitle').textContent = `${t.emoji} ${t.name}`;
+            document.getElementById('levelNumber').textContent = `Level ${data.level}`;
+            document.getElementById('levelProgressFill').style.width = `${data.progress}%`;
+            if (data.isMax) {
+                document.getElementById('levelCurrentPoints').textContent = `${data.points}`;
+                document.getElementById('levelNextPoints').textContent = '⭐ MAX';
+            } else {
+                document.getElementById('levelCurrentPoints').textContent = data.points - data.currentTotal;
+                document.getElementById('levelNextPoints').textContent = `/ ${data.required}`;
+            }
+            document.getElementById('userLevelBadge').textContent = `Level ${data.level} 👆`;
+            appState.userLevel = data.level;
+            
+            document.getElementById('levelCurrentEmoji').textContent = t.emoji;
+            document.getElementById('levelCurrentNumber').textContent = `Level ${data.level}`;
+            document.getElementById('levelCurrentTitle').textContent = t.name;
+            if (data.isMax) {
+                document.getElementById('levelCurrentPointsText').textContent = '🏆 MAX LEVEL!';
+                document.getElementById('levelProgressFill2').style.width = '100%';
+                document.getElementById('levelProgressText2').textContent = '100%';
+                document.getElementById('levelNextInfo').textContent = '⭐ MAX';
+            } else {
+                document.getElementById('levelCurrentPointsText').textContent = `${data.points - data.currentTotal} / ${data.required} XP`;
+                document.getElementById('levelProgressFill2').style.width = `${data.progress}%`;
+                document.getElementById('levelProgressText2').textContent = `${data.progress}%`;
+                document.getElementById('levelNextInfo').textContent = `Next: ${data.level + 1}`;
+            }
+            document.getElementById('levelBonusPercent').textContent = `+${t.bonus}%`;
+            document.getElementById('levelDailyBonus').textContent = `${10 + t.bonus} Coins`;
+            let isExclusive = data.level >= 10;
+            document.getElementById('levelExclusiveTasks').textContent = isExclusive ? '✅ Unlocked' : '🔒 Locked';
+            document.getElementById('levelExclusiveTasks').style.color = isExclusive ? '#22c55e' : '#94a3b8';
+        }
+
+        function renderLevelList() {
+            const container = document.getElementById('levelList');
+            const data = calcLevel(
+                appState.balance, appState.completedTasks, appState.tapCount,
+                appState.dailyStreak, appState.withdrawHistory ? appState.withdrawHistory.length : 0
+            );
+            let html = '';
+            const filterMap = { 'bronze':[1,10], 'silver':[11,25], 'gold':[26,50], 'platinum':[51,75], 'diamond':[76,100] };
+            for (let i = 1; i <= 100; i++) {
+                if (currentFilter !== 'all') {
+                    const range = filterMap[currentFilter];
+                    if (!range || i < range[0] || i > range[1]) continue;
+                }
+                const t = getLevelTier(i);
+                const isUnlocked = data.level >= i;
+                const isCurrent = data.level === i;
+                html += `
+                    <div class="level-item ${isCurrent ? 'active' : ''} ${!isUnlocked ? 'locked' : ''}">
+                        <div class="level-info">
+                            <span class="num">${i}</span>
+                            <span class="emoji">${t.emoji}</span>
+                            <span class="name">${t.name}</span>
+                            ${isCurrent ? '<span class="badge">👈 Current</span>' : ''}
+                            ${!isUnlocked ? '<span class="badge" style="background:rgba(239,68,68,0.2);color:#ef4444;">🔒</span>' : ''}
+                        </div>
+                        <div class="level-reward">+${t.bonus}%</div>
+                        ${isCurrent ? '<div class="level-check">✅</div>' : ''}
+                    </div>
+                `;
+            }
+            container.innerHTML = html || '<div class="loading"><p>No levels found</p></div>';
+        }
+
+        function filterLevels(filter, btn) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-tabs .tab').forEach(t => t.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderLevelList();
+        }
+
+        function openLevelPage() {
+            document.getElementById('levelOverlay').classList.add('show');
+            document.getElementById('mainContent').classList.add('hide');
+            document.querySelector('.bottom-nav').style.display = 'none';
+            renderLevelList();
+        }
+        function closeLevelPage() {
+            document.getElementById('levelOverlay').classList.remove('show');
+            document.getElementById('mainContent').classList.remove('hide');
+            document.querySelector('.bottom-nav').style.display = 'flex';
+        }
+
+        // ==================== WEEKLY BONUS ====================
+        function getWeekKey() { let d=new Date(); let day=d.getDay(); let diff=d.getDate()-day; d.setDate(diff); d.setHours(0,0,0,0); return d.toDateString(); }
+        
+        function loadWeeklyRewards() {
+            weeklyRewardsRef.on('value', (s) => {
+                if (s.exists()) { let data=s.val(); weeklyRewards = [0,1,2,3,4,5,6].map(i => data[i] || [10,15,20,25,30,40,50][i]); }
+                updateWeeklyUI();
+            });
+        }
+
+        function updateWeeklyUI() {
+            const weekKey = getWeekKey();
+            if (!appState.weekStart || appState.weekStart !== weekKey) {
+                appState.weekStart = weekKey; appState.weeklyClaimed = []; appState.weeklyAdWatched = [];
+                userRef.update({ weekStart: weekKey, weeklyClaimed: [], weeklyAdWatched: [] });
+            }
+            const today = new Date().getDay();
+            document.querySelectorAll('.day-dot').forEach((dot, i) => {
+                dot.classList.remove('active','claimed','locked');
+                if (i < today) { if (appState.weeklyClaimed && appState.weeklyClaimed.includes(i)) dot.classList.add('claimed'); else dot.classList.add('locked'); }
+                else if (i === today) dot.classList.add('active');
+                else dot.classList.add('locked');
+            });
+            let count = appState.weeklyClaimed ? appState.weeklyClaimed.length : 0;
+            document.getElementById('weeklyBonusDesc').textContent = count >= 7 ? '🎉 All claimed!' : `📅 ${count}/7 days`;
+            renderWeeklyDays();
+        }
+
+        function renderWeeklyDays() {
+            const container = document.getElementById('weeklyDaysContainer');
+            const today = new Date().getDay();
+            let html = '';
+            for (let i = 0; i < 7; i++) {
+                const isClaimed = appState.weeklyClaimed && appState.weeklyClaimed.includes(i);
+                const adWatched = appState.weeklyAdWatched && appState.weeklyAdWatched.includes(i);
+                let status = 'locked', statusText = '🔒 Locked', cls = 'locked';
+                if (isClaimed) { status = 'claimed'; statusText = '✅ Claimed'; cls = 'claimed'; }
+                else if (i === today) {
+                    if (adWatched) { status = 'available'; statusText = '🎁 Claim Now'; cls = 'available'; }
+                    else { status = 'ad-required'; statusText = '📺 Watch Ad'; cls = 'ad-required'; }
+                } else if (i < today && !isClaimed) { status = 'locked'; statusText = '🔒 Missed'; cls = 'locked'; }
+                else { status = 'locked'; statusText = '🔒 Coming Soon'; cls = 'locked'; }
+                const reward = weeklyRewards[i] || 10;
+                html += `
+                    <div class="day-box">
+                        <div class="day-info">
+                            <span class="day-name">${DAYS[i]}</span>
+                            <span class="day-reward">+${reward} 🪙</span>
+                        </div>
+                        <button class="day-status ${cls}" onclick="handleDayClick(${i})" ${status==='locked'||status==='claimed'?'disabled':''}>
+                            ${statusText}
+                        </button>
+                    </div>
+                `;
+                if (status === 'ad-required' && !isClaimed) {
+                    html += `
+                        <div class="day-box" style="border-color:rgba(251,191,36,0.3);">
+                            <div class="ad-box show">
+                                <div class="ad-label">📺 Watch Ad to Unlock</div>
+                                <button class="claim-btn" onclick="watchAdAndClaim(${i})">🎬 Watch & Claim</button>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            container.innerHTML = html;
+        }
+
+        function handleDayClick(day) {
+            const today = new Date().getDay();
+            if (appState.weeklyClaimed && appState.weeklyClaimed.includes(day)) { showToast('Already claimed!','error'); return; }
+            if (day !== today) { showToast('Only today\'s reward!','error'); return; }
+            if (!(appState.weeklyAdWatched && appState.weeklyAdWatched.includes(day))) { showToast('Watch ad first!','error'); return; }
+            claimWeeklyReward(day);
+        }
+
+        function watchAdAndClaim(day) {
+            const today = new Date().getDay();
+            if (day !== today) { showToast('Only today\'s reward!','error'); return; }
+            showToast('⏳ Loading ad...');
+            
+            // Monetag rewarded ad
+            showRewardedAd(function() {
+                if (!appState.weeklyAdWatched) appState.weeklyAdWatched = [];
+                if (!appState.weeklyAdWatched.includes(day)) {
+                    appState.weeklyAdWatched.push(day);
+                    userRef.update({ weeklyAdWatched: appState.weeklyAdWatched });
+                }
+                document.getElementById('adModalText').textContent = '✅ Ad watched!';
+                document.getElementById('adModalContent').innerHTML = `<div style="padding:10px;background:#0a0e27;border-radius:6px;margin:10px 0;"><p style="color:#22c55e;font-size:15px;">🎉 Ad Completed!</p></div>`;
+                document.getElementById('adModal').classList.add('active');
+                setTimeout(() => { document.getElementById('adModal').classList.remove('active'); claimWeeklyReward(day); }, 1500);
+            });
+        }
+
+        function claimWeeklyReward(day) {
+            const reward = weeklyRewards[day] || 10;
+            appState.balance += reward;
+            appState.dailyStreak++;
+            if (!appState.weeklyClaimed) appState.weeklyClaimed = [];
+            if (!appState.weeklyClaimed.includes(day)) appState.weeklyClaimed.push(day);
+            userRef.update({ balance: appState.balance, dailyStreak: appState.dailyStreak, weeklyClaimed: appState.weeklyClaimed });
+            document.getElementById('weeklyBonusRewardText').textContent = `+${reward} Coins!`;
+            document.getElementById('weeklyBonusModal').classList.add('active');
+            updateUI();
+            updateLevelUI();
+            showToast(`+${reward} coins!`);
+        }
+
+        function openWeeklyPage() {
+            document.getElementById('weeklyOverlay').classList.add('show');
+            document.getElementById('mainContent').classList.add('hide');
+            document.querySelector('.bottom-nav').style.display = 'none';
+            renderWeeklyDays();
+        }
+        function closeWeeklyPage() {
+            document.getElementById('weeklyOverlay').classList.remove('show');
+            document.getElementById('mainContent').classList.remove('hide');
+            document.querySelector('.bottom-nav').style.display = 'flex';
+            updateWeeklyUI();
+        }
+
+        // ==================== TASKS ====================
+        function loadTasksFromDB() {
+            tasksRef.on('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    tasks = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                    renderTasks();
+                } else {
+                    tasks = [];
+                    renderTasks();
+                }
+            });
+        }
+
+        function renderTasks() {
+            const container = document.getElementById('tasksContainer');
+            if (!tasks || tasks.length === 0) {
+                container.innerHTML = '<div class="no-tasks">📭 No tasks available. Check back later!</div>';
+                return;
+            }
+
+            container.innerHTML = tasks.map(task => {
+                const isCompleted = appState.tasksCompleted.includes(task.id);
+                const progressPercent = Math.min((task.progress / task.maxProgress) * 100, 100);
+                
+                let actionHTML = '';
+                if (task.type === 'link') {
+                    let link = task.link || '#';
+                    actionHTML = `
+                        <a href="${link}" target="_blank" class="task-link" onclick="if(!${isCompleted}){event.preventDefault();window.open('${link}','_blank');setTimeout(()=>completeTask('${task.id}'),5000);}">
+                            ${isCompleted ? '✓ Completed' : (task.actionText || 'Go →')}
+                        </a>
+                    `;
+                } else {
+                    actionHTML = `
+                        <button class="task-btn ${isCompleted ? 'completed' : ''}" ${isCompleted ? 'disabled' : ''} onclick="completeTask('${task.id}')">
+                            ${isCompleted ? '✓ Completed' : (task.actionText || 'Complete')}
+                        </button>
+                    `;
+                }
+
+                return `
+                    <div class="task-card">
+                        <div class="task-header">
+                            <span class="task-title">${task.title}</span>
+                            <span class="task-reward">+${task.reward} 🪙</span>
+                        </div>
+                        <div class="task-desc">${task.description || ''}</div>
+                        ${task.type === 'link' && !isCompleted ? actionHTML : ''}
+                        <div class="task-progress"><div class="fill" style="width:${progressPercent}%"></div></div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
+                            <span style="font-size:11px;color:#94a3b8;">${task.participants || 0} participants</span>
+                            ${task.type !== 'link' ? actionHTML : ''}
+                            ${isCompleted ? '<span style="color:#22c55e;font-size:12px;">✓ Done</span>' : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function completeTask(taskId) {
+            let task = tasks.find(t => t.id === taskId);
+            if (!task || appState.tasksCompleted.includes(taskId)) return;
+            completeTaskAction(taskId);
+        }
+
+        function completeTaskAction(taskId) {
+            let task = tasks.find(t => t.id === taskId);
+            if (!task || appState.tasksCompleted.includes(taskId)) return;
+            
+            tasksRef.child(taskId).update({ progress: task.progress + 1 }).then(() => {
+                tasksRef.child(taskId).once('value', (s) => {
+                    let updated = s.val();
+                    if (updated.progress >= updated.maxProgress && !appState.tasksCompleted.includes(taskId)) {
+                        appState.tasksCompleted.push(taskId);
+                        appState.balance += updated.reward;
+                        appState.completedTasks++;
+                        userRef.update({ balance: appState.balance, completedTasks: appState.completedTasks, tasksCompleted: appState.tasksCompleted });
+                        document.getElementById('rewardText').textContent = `+${updated.reward} Coins`;
+                        document.getElementById('successModal').classList.add('active');
+                        updateUI();
+                        updateLevelUI();
+                        renderTasks();
+                    }
+                });
+            }).catch((e) => showToast('Error: '+e.message,'error'));
+        }
+
+        // ==================== OFFERS ====================
+        function loadOffers() {
+            offersRef.on('value', (s) => {
+                energyOffers = s.exists() ? Object.keys(s.val()).map(k => ({ id: k, ...s.val()[k] })) : [];
+                renderOffers();
+            });
+        }
+
+        function renderOffers() {
+            let container = document.getElementById('energyOffersContainer');
+            let userOffers = energyOffers.filter(o => !o.userId || o.userId === '' || o.userId === userId);
+            if (userOffers.length === 0) { container.innerHTML = '<div style="text-align:center;color:#94a3b8;font-size:12px;padding:8px;">No offers available</div>'; return; }
+            container.innerHTML = userOffers.map(o => {
+                let bought = appState.purchasedOffers[o.id] || 0;
+                let limitReached = o.limit > 0 && bought >= o.limit;
+                return `
+                    <div class="energy-offer-card ${limitReached ? 'locked' : ''}">
+                        <div class="offer-info">
+                            <span class="energy-amount">⚡ +${o.energy} Energy</span>
+                            <span class="offer-price">${o.price} 🪙 Coins</span>
+                            ${o.limit > 0 ? `<span class="offer-limit">Used: ${bought}/${o.limit}</span>` : ''}
+                        </div>
+                        <button class="buy-btn ${limitReached ? 'bought' : ''}" ${limitReached ? 'disabled' : ''} onclick="buyEnergy('${o.id}',${o.energy},${o.price})">
+                            ${limitReached ? '✓ Used' : 'Buy'}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function buyEnergy(id, energy, price) {
+            if (appState.balance < price) { showToast(`Need ${price} coins`,'error'); return; }
+            let offer = energyOffers.find(o => o.id === id);
+            if (!offer) return;
+            let bought = appState.purchasedOffers[id] || 0;
+            if (offer.limit > 0 && bought >= offer.limit) { showToast('Limit reached!','error'); return; }
+            appState.balance -= price;
+            appState.tapEnergy = Math.min(100, appState.tapEnergy + energy);
+            appState.purchasedOffers[id] = bought + 1;
+            // If energy becomes full, clear recharge timer
+            if (appState.tapEnergy >= 100) {
+                appState.energyRechargeStart = null;
+            } else if (appState.energyRechargeStart) {
+                // If energy > 0 and we had a timer, clear it because energy bought
+                appState.energyRechargeStart = null;
+            }
+            userRef.update({ balance: appState.balance, tapEnergy: appState.tapEnergy, purchasedOffers: appState.purchasedOffers, energyRechargeStart: appState.energyRechargeStart });
+            updateUI();
+            updateTapUI();
+            renderOffers();
+            updateRechargeTimer();
+            document.getElementById('energyBuyText').textContent = `+${energy} Energy!`;
+            document.getElementById('energyBuyModal').classList.add('active');
+            showToast(`+${energy} Energy!`);
+        }
+
+        // ==================== REFERRAL SYSTEM ====================
+        const TIERS = [
+            { level: 1, count: 10, bonus: 50, name: '🥉 Bronze Referrer' },
+            { level: 2, count: 25, bonus: 150, name: '🥈 Silver Referrer' },
+            { level: 3, count: 50, bonus: 300, name: '🥇 Gold Referrer' },
+            { level: 4, count: 100, bonus: 500, name: '💎 Platinum Referrer' },
+            { level: 5, count: 200, bonus: 1000, name: '👑 Diamond Referrer' }
+        ];
+
+        function generateReferCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 8; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
+
+        function checkReferral() {
+            let startParam = '';
+            if (tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
+                startParam = tg.initDataUnsafe.start_param;
+            }
+            if (!startParam) {
+                const urlParams = new URLSearchParams(window.location.search);
+                startParam = urlParams.get('start') || urlParams.get('ref') || '';
+            }
+            if (startParam && startParam.startsWith('ref_')) {
+                const refCode = startParam.replace('ref_', '');
+                db.ref('users').orderByChild('referCode').equalTo(refCode).once('value', (snapshot) => {
+                    if (snapshot.exists()) {
+                        snapshot.forEach((child) => {
+                            const referrerId = child.key;
+                            if (referrerId !== userId) {
+                                db.ref('referrals/' + userId).once('value', (s) => {
+                                    if (!s.exists()) {
+                                        const refData = {
+                                            referredBy: referrerId,
+                                            referredAt: Date.now(),
+                                            username: tg.initDataUnsafe?.user?.username || 'User',
+                                            bonus: 50,
+                                            userId: userId
+                                        };
+                                        db.ref('referrals/' + userId).set(refData).then(() => {
+                                            db.ref('users/' + referrerId + '/referCount').transaction((current) => {
+                                                return (current || 0) + 1;
+                                            });
+                                            userRef.update({ balance: (appState.balance || 0) + 50 });
+                                            appState.balance = (appState.balance || 0) + 50;
+                                            updateUI();
+                                            updateLevelUI();
+                                            updateReferUI();
+                                            showToast('🎉 You got +50 Coins from referral!');
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        }
+
+        function loadReferralData() {
+            const refCodeRef = db.ref('users/' + userId + '/referCode');
+            refCodeRef.once('value', (s) => {
+                if (!s.exists()) {
+                    const code = generateReferCode();
+                    userRef.update({ referCode: code });
+                    appState.referCode = code;
+                } else {
+                    appState.referCode = s.val();
+                }
+                updateReferUI();
+            });
+
+            db.ref('referrals').orderByChild('referredBy').equalTo(userId).on('value', (snapshot) => {
+                let count = 0;
+                let earn = 0;
+                let refs = [];
+                if (snapshot.exists()) {
+                    snapshot.forEach((child) => {
+                        const val = child.val();
+                        count++;
+                        earn += (val.bonus || 50);
+                        refs.push({ id: child.key, ...val });
+                    });
+                }
+                appState.referralCount = count;
+                appState.referEarned = earn;
+                appState.referrals = refs;
+                updateReferUI();
+                loadReferralList();
+            });
+
+            db.ref('referrals/' + userId).once('value', (s) => {
+                if (s.exists()) {
+                    const data = s.val();
+                    if (data.referredBy) {
+                        if (!data.bonusClaimed) {
+                            appState.balance = (appState.balance || 0) + 50;
+                            db.ref('referrals/' + userId).update({ bonusClaimed: true });
+                            userRef.update({ balance: appState.balance });
+                            updateUI();
+                            showToast('🎉 Welcome! +50 Coins from referral!');
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateReferUI() {
+            const total = appState.referralCount || 0;
+            const earned = appState.referEarned || 0;
+            const bonus = Math.floor(total / 10) * 50;
+            
+            document.getElementById('referTotalHome').textContent = total;
+            document.getElementById('referEarnedHome').textContent = earned;
+            document.getElementById('referBonusHome').textContent = bonus;
+            
+            const progress = Math.min((total / 10) * 100, 100);
+            document.getElementById('referProgressFillHome').style.width = progress + '%';
+            document.getElementById('referProgressTextHome').textContent = `${total} / 10`;
+            
+            renderTiers();
+        }
+
+        function renderTiers() {
+            const total = appState.referralCount || 0;
+            let html = '';
+            TIERS.forEach(tier => {
+                const isClaimed = appState.referTiers && appState.referTiers[tier.level] === 1;
+                const isAvailable = total >= tier.count && !isClaimed;
+                const status = isClaimed ? '✅ Claimed' : (isAvailable ? '🎁 Claim Now' : `🔒 ${tier.count} needed`);
+                const cls = isClaimed ? 'claimed' : (isAvailable ? 'available' : 'locked');
+                html += `
+                    <div class="refer-tier">
+                        <div class="tier-info">
+                            <span class="tier-name">${tier.name}</span>
+                            <span class="tier-desc">${tier.count} referrals • +${tier.bonus} Coins</span>
+                        </div>
+                        <span class="tier-status ${cls}" ${isAvailable ? `onclick="claimTier(${tier.level},${tier.bonus})"` : ''}>
+                            ${status}
+                        </span>
+                    </div>
+                `;
+            });
+            document.getElementById('referTierListHome').innerHTML = html;
+        }
+
+        function claimTier(level, bonus) {
+            const total = appState.referralCount || 0;
+            const tier = TIERS.find(t => t.level === level);
+            if (!tier || total < tier.count) { showToast('Not enough referrals!','error'); return; }
+            if (appState.referTiers && appState.referTiers[level] === 1) { showToast('Already claimed!','error'); return; }
+            
+            appState.balance += bonus;
+            if (!appState.referTiers) appState.referTiers = {};
+            appState.referTiers[level] = 1;
+            userRef.update({ balance: appState.balance, referTiers: appState.referTiers });
+            updateUI();
+            updateReferUI();
+            updateLevelUI();
+            showToast(`🎁 +${bonus} Coins from ${tier.name}!`);
+        }
+
+        function loadReferralList() {
+            const container = document.getElementById('referralListHome');
+            const refs = appState.referrals || [];
+            
+            if (refs.length === 0) {
+                container.innerHTML = '<p style="color:#6b7280;font-size:13px;text-align:center;padding:10px;">No referrals yet</p>';
+                return;
+            }
+            
+            const html = refs.slice(-20).reverse().map(ref => `
+                <div class="referral-item">
+                    <span class="name">${ref.username || 'User'}</span>
+                    <span class="bonus">+${ref.bonus || 50} 🪙</span>
+                    <span class="date">${new Date(ref.referredAt).toLocaleDateString()}</span>
+                </div>
+            `).join('');
+            
+            container.innerHTML = html;
+        }
+
+        function copyReferLinkHome() {
+            const link = document.getElementById('referLinkHome').textContent;
+            navigator.clipboard.writeText(link).then(() => showToast('📋 Copied!')).catch(() => showToast('📋 Copy manually','error'));
+        }
+
+        // ==================== BAN CHECK ====================
+        function checkBanStatus() {
+            userRef.child('banned').on('value', (snapshot) => {
+                const isBanned = snapshot.val() === true;
+                if (isBanned) {
+                    appState.isBanned = true;
+                    document.getElementById('bannedOverlay').classList.add('show');
+                    document.getElementById('mainContent').style.display = 'none';
+                    document.querySelector('.bottom-nav').style.display = 'none';
+                    userRef.child('banReason').once('value', (s) => {
+                        document.getElementById('banReason').textContent = `Reason: ${s.val() || 'Violation of terms'}`;
+                    });
+                } else {
+                    appState.isBanned = false;
+                    document.getElementById('bannedOverlay').classList.remove('show');
+                    document.getElementById('mainContent').style.display = 'block';
+                    document.querySelector('.bottom-nav').style.display = 'flex';
+                }
+            });
+        }
+
+        // ==================== GEOLOCATION ====================
+        let userIP = 'Unknown', userCountry = 'Unknown';
+
+        function getUserLocation() {
+            fetch('https://ipapi.co/json/')
+                .then(res => res.json())
+                .then(data => {
+                    userIP = data.ip || 'Unknown';
+                    userCountry = data.country_name || 'Unknown';
+                    userRef.update({ ip: userIP, country: userCountry, lastLogin: new Date().toISOString() });
+                })
+                .catch(() => {
+                    fetch('https://api.ipify.org?format=json')
+                        .then(res => res.json())
+                        .then(data => {
+                            userIP = data.ip || 'Unknown';
+                            userRef.update({ ip: userIP, lastLogin: new Date().toISOString() });
+                        })
+                        .catch(() => {});
+                });
+        }
+
+        // ==================== UI UPDATE ====================
+        function updateUI() {
+            document.getElementById('balance').textContent = appState.balance.toLocaleString();
+            document.getElementById('completedTasks').textContent = appState.completedTasks || 0;
+            document.getElementById('referralCount').textContent = appState.referralCount || 0;
+            document.getElementById('dailyStreak').textContent = appState.dailyStreak || 0;
+            document.getElementById('walletBalance').textContent = appState.balance;
+            updateUSDDisplay();
+            updateTapUI();
+            updateLevelUI();
+            updateWithdrawUI();
+            updateVideoUI();
+        }
+
+        // ==================== TOAST ====================
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show';
+            if (type === 'error') toast.classList.add('error');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        // ==================== INIT ====================
+        function initApp() {
+            userRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    appState.balance = data.balance || 0;
+                    appState.usdBalance = data.usdBalance || 0;
+                    appState.completedTasks = data.completedTasks || 0;
+                    appState.referralCount = data.referCount || 0;
+                    appState.dailyStreak = data.dailyStreak || 0;
+                    appState.tapCount = data.tapCount || 0;
+                    appState.tapEnergy = data.tapEnergy || 100;
+                    appState.tasksCompleted = data.tasksCompleted || [];
+                    appState.weeklyClaimed = data.weeklyClaimed || [];
+                    appState.weeklyAdWatched = data.weeklyAdWatched || [];
+                    appState.purchasedOffers = data.purchasedOffers || {};
+                    appState.lastConversion = data.lastConversion || null;
+                    appState.weekStart = data.weekStart || null;
+                    appState.referCode = data.referCode || '';
+                    appState.referEarned = data.referEarned || 0;
+                    appState.referTiers = data.referTiers || {};
+                    appState.referrals = data.referrals || [];
+                    appState.videoWatchedToday = data.videoWatchedToday || 0;
+                    appState.videoLastWatchDate = data.videoLastWatchDate || null;
+                    appState.withdrawHistory = data.withdrawHistory || [];
+                    appState.lastLogin = data.lastLogin || null;
+                    appState.energyRechargeStart = data.energyRechargeStart || null;
+                    
+                    const username = tg.initDataUnsafe?.user?.username || 'User';
+                    document.getElementById('userName').textContent = username;
+                    
+                    if (appState.lastLogin) {
+                        document.getElementById('lastLoginDisplay').textContent = `📅 Last Login: ${new Date(appState.lastLogin).toLocaleString()}`;
+                    }
+                    
+                    updateUI();
+                    updateLevelUI();
+                    updateVideoUI();
+                    updateReferUI();
+                    updateWithdrawHistory();
+                    updateRechargeTimer(); // this will start timer if needed
+                    
+                    if (appState.lastConversion) {
+                        startConversionTimer();
+                    } else {
+                        appState.lastConversion = Date.now();
+                        userRef.update({ lastConversion: Date.now() });
+                        startConversionTimer();
+                    }
+
+                    // If energy is 0 and recharge start exists, start timer
+                    if (appState.tapEnergy === 0 && appState.energyRechargeStart) {
+                        startRechargeTimer();
+                    }
+                } else {
+                    userRef.set({
+                        balance: 0,
+                        usdBalance: 0,
+                        completedTasks: 0,
+                        referCount: 0,
+                        dailyStreak: 0,
+                        tapCount: 0,
+                        tapEnergy: 100,
+                        tasksCompleted: [],
+                        weeklyClaimed: [],
+                        weeklyAdWatched: [],
+                        purchasedOffers: {},
+                        referCode: generateReferCode(),
+                        referTiers: {},
+                        videoWatchedToday: 0,
+                        videoLastWatchDate: null,
+                        withdrawHistory: [],
+                        lastLogin: new Date().toISOString(),
+                        energyRechargeStart: null
+                    });
+                    appState.referCode = generateReferCode();
+                    updateUI();
+                    updateLevelUI();
+                    updateRechargeTimer();
+                    startConversionTimer();
+                }
+                
+                const link = `https://t.me/${tg.initDataUnsafe?.user?.username || 'CoinQuestBot'}?start=ref_${appState.referCode}`;
+                document.getElementById('referLinkHome').textContent = link;
+            });
+
+            loadConversionRate();
+            loadTasksFromDB();
+            loadOffers();
+            loadWeeklyRewards();
+            loadVideoSettings();
+            loadWithdrawSettings();
+            checkBanStatus();
+            loadReferralData();
+            checkReferral();
+            getUserLocation();
+            listenWithdrawStatus();
+
+            setTimeout(updateWeeklyUI, 1000);
+            setTimeout(() => {
+                if (!appState.isBanned) {
+                    showToast('👋 Welcome to CoinQuest! Tap the coin to earn!');
+                }
+            }, 1500);
+        }
+
+        // ==================== START ====================
+        document.addEventListener('DOMContentLoaded', initApp);
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                updateUI();
+                updateWeeklyUI();
+                updateRechargeTimer();
+            }
+        });
+
+        document.addEventListener('dblclick', (e) => e.preventDefault());
+
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+
+        window.addEventListener('error', (e) => {
+            console.error('❌ Global error:', e.message);
+            if (e.message.includes('Firebase')) {
+                showToast('⚠️ Connection issue. Retrying...', 'error');
+            }
+        });
+
+        window.addEventListener('online', () => {
+            showToast('🔄 Connection restored!');
+        });
+
+        window.addEventListener('offline', () => {
+            showToast('⚠️ You are offline. Some features may not work.', 'error');
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (document.getElementById('levelOverlay').classList.contains('show')) {
+                    closeLevelPage();
+                } else if (document.getElementById('weeklyOverlay').classList.contains('show')) {
+                    closeWeeklyPage();
+                }
+            }
+        });
+
+        console.log('✅ CoinQuest App Loaded Successfully');
+        console.log('📊 User ID:', userId);
+        console.log('🎯 Monetag Ad SDK Integrated');
+    </script>
 </body>
 </html>
