@@ -69,17 +69,11 @@
         .tap-stats .stat .label { font-size: 11px; color: #94a3b8; }
         
         .recharge-timer { text-align: center; margin-top: 8px; padding: 12px; background: rgba(255,255,255,0.04); border-radius: 10px; }
-        .recharge-timer .time { font-weight: bold; color: #22c55e; font-size: 20px; }
-        .recharge-timer .full { color: #22c55e; font-size: 16px; }
-        .recharge-timer .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-top: 8px; overflow: hidden; }
-        .recharge-timer .progress-bar .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 4px; transition: width 1s; }
         .recharge-timer .watch-video-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; padding: 6px 18px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 12px; margin-top: 6px; }
-        .recharge-timer .sub-timer { font-size: 13px; color: #fbbf24; margin-top: 2px; }
+        .recharge-timer .watch-video-btn:active { transform: scale(0.95); }
         .recharge-timer .status-text { font-size: 13px; font-weight: bold; margin-top: 4px; }
-        .recharge-timer .status-text.recharging { color: #fbbf24; }
         .recharge-timer .status-text.full { color: #22c55e; }
         .recharge-timer .status-text.empty { color: #ef4444; }
-        .recharge-timer .recharge-info { font-size: 11px; color: #94a3b8; margin-top: 4px; }
         
         .energy-offer-section { background: #1a1f3a; border-radius: 12px; padding: 12px; margin-top: 12px; border: 1px solid rgba(255,255,255,0.04); }
         .energy-offer-section .offer-title { font-size: 12px; color: #94a3b8; margin-bottom: 8px; text-align: center; }
@@ -570,7 +564,6 @@
             lastConversion: null, conversionRate: 1000, minWithdraw: 10,
             isBanned: false, banReason: '', withdrawHistory: [],
             lastLogin: null,
-            lastRechargeTime: Date.now(),
             referCode: '',
             referEarned: 0,
             referTiers: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
@@ -580,13 +573,12 @@
             videoDailyLimit: 5,
             energyVideoReward: 20,
             referrals: [],
-            weekStart: null,
-            isRecharging: false
+            weekStart: null
         };
 
         let tasks = [], energyOffers = [];
-        let conversionTimerInterval = null, rechargeInterval = null, timerInterval = null;
-        let remainingSeconds = 0, subTimerSeconds = 0, isTapping = false, weeklyRewards = [10,15,20,25,30,40,50];
+        let conversionTimerInterval = null;
+        let isTapping = false, weeklyRewards = [10,15,20,25,30,40,50];
         let currentFilter = 'all';
 
         const userRef = db.ref('users/' + userId);
@@ -891,25 +883,9 @@
             
             showAdsGramRewarded(function() {
                 const energyGain = appState.energyVideoReward || 20;
-                let newEnergy = appState.tapEnergy + energyGain;
-                if (newEnergy > 100) newEnergy = 100;
-                appState.tapEnergy = newEnergy;
-                appState.lastRechargeTime = Date.now();
-                
-                // রিচার্জ স্টপ
-                if (appState.tapEnergy >= 100) {
-                    appState.isRecharging = false;
-                    clearInterval(rechargeInterval);
-                    clearInterval(timerInterval);
-                    rechargeInterval = null;
-                    timerInterval = null;
-                    remainingSeconds = 0;
-                    subTimerSeconds = 0;
-                }
-                
+                appState.tapEnergy = Math.min(100, appState.tapEnergy + energyGain);
                 userRef.update({
-                    tapEnergy: appState.tapEnergy,
-                    lastRechargeTime: appState.lastRechargeTime
+                    tapEnergy: appState.tapEnergy
                 });
                 updateTapUI();
                 updateRechargeTimer();
@@ -917,184 +893,38 @@
             });
         }
 
-        // ==================== ENERGY RECHARGE SYSTEM - FULLY FIXED ====================
-        // 1 ঘন্টায় 100 Energy রিচার্জ হবে (প্রতি 36 সেকেন্ডে 1 Energy)
-
-        function startRecharge() {
-            if (rechargeInterval) clearInterval(rechargeInterval);
-            if (timerInterval) clearInterval(timerInterval);
-
-            const now = Date.now();
-            const PER_ENERGY_TIME = 36; // 3600 / 100 = 36 সেকেন্ড
-            
-            // ===== 1. চেক করা আগে থেকে কত Energy রিচার্জ হয়েছে =====
-            const elapsed = Math.floor((now - (appState.lastRechargeTime || now)) / 1000);
-            const energyGained = Math.floor(elapsed / PER_ENERGY_TIME);
-            
-            if (energyGained > 0 && appState.tapEnergy < 100) {
-                let newEnergy = appState.tapEnergy + energyGained;
-                if (newEnergy > 100) newEnergy = 100;
-                appState.tapEnergy = newEnergy;
-                appState.lastRechargeTime = now;
-                
-                userRef.update({ 
-                    tapEnergy: appState.tapEnergy,
-                    lastRechargeTime: now 
-                });
-            }
-            
-            // ===== 2. বাকি Energy রিচার্জ হতে কত সময় লাগবে =====
-            const remainingEnergy = 100 - appState.tapEnergy;
-            let remainingSecs = remainingEnergy * PER_ENERGY_TIME;
-            if (remainingSecs < 0) remainingSecs = 0;
-            
-            // ===== 3. সাব টাইমার (36 সেকেন্ড) =====
-            const elapsed2 = Math.floor((now - appState.lastRechargeTime) / 1000);
-            subTimerSeconds = PER_ENERGY_TIME - (elapsed2 % PER_ENERGY_TIME);
-            if (subTimerSeconds <= 0) subTimerSeconds = PER_ENERGY_TIME;
-            
-            // ===== 4. গ্লোবাল ভেরিয়েবল আপডেট =====
-            remainingSeconds = remainingSecs;
-            appState.isRecharging = true;
-            
-            // ===== 5. UI আপডেট =====
-            updateRechargeTimer();
-            
-            // ===== 6. টাইমার (প্রতি সেকেন্ডে কাউন্টডাউন) =====
-            timerInterval = setInterval(() => {
-                if (appState.tapEnergy < 100) {
-                    if (remainingSeconds > 0) {
-                        remainingSeconds--;
-                    }
-                    if (subTimerSeconds > 0) {
-                        subTimerSeconds--;
-                    }
-                    updateRechargeTimer();
-                } else {
-                    updateRechargeTimer();
-                }
-            }, 1000);
-            
-            // ===== 7. রিচার্জ চেক (প্রতি সেকেন্ডে) - FIXED =====
-            rechargeInterval = setInterval(() => {
-                if (appState.tapEnergy < 100) {
-                    const now2 = Date.now();
-                    const elapsed3 = Math.floor((now2 - appState.lastRechargeTime) / 1000);
-                    
-                    // 36 সেকেন্ড পার হলে 1 Energy যোগ কর
-                    if (elapsed3 >= PER_ENERGY_TIME) {
-                        // ===== IMPORTANT: ১ করে Energy বাড়বে =====
-                        let newEnergy = appState.tapEnergy + 1;
-                        
-                        // ===== Energy 100 এর বেশি হলে 100 সেট কর =====
-                        if (newEnergy > 100) newEnergy = 100;
-                        appState.tapEnergy = newEnergy;
-                        
-                        // ===== lastRechargeTime আপডেট =====
-                        appState.lastRechargeTime = now2;
-                        
-                        // ===== রিমেইনিং সেকেন্ড রিক্যালকুলেট =====
-                        const remEnergy = 100 - appState.tapEnergy;
-                        remainingSeconds = remEnergy * PER_ENERGY_TIME;
-                        if (remainingSeconds < 0) remainingSeconds = 0;
-                        
-                        // ===== সাব টাইমার রিসেট =====
-                        subTimerSeconds = PER_ENERGY_TIME;
-                        
-                        updateTapUI();
-                        updateRechargeTimer();
-                        
-                        userRef.update({ 
-                            tapEnergy: appState.tapEnergy,
-                            lastRechargeTime: appState.lastRechargeTime 
-                        });
-                        
-                        // ===== Energy 100 হলে টাইমার বন্ধ =====
-                        if (appState.tapEnergy >= 100) {
-                            appState.isRecharging = false;
-                            clearInterval(rechargeInterval);
-                            clearInterval(timerInterval);
-                            rechargeInterval = null;
-                            timerInterval = null;
-                            remainingSeconds = 0;
-                            subTimerSeconds = 0;
-                            updateRechargeTimer();
-                            
-                            // ===== IMPORTANT: ট্যাপ চালু করার জন্য =====
-                            showToast('✅ Energy Full! You can tap again!');
-                        }
-                    }
-                }
-            }, 1000);
-        }
-
+        // ==================== UPDATE RECHARGE TIMER (শুধু স্ট্যাটাস দেখাবে, টাইমার নাই) ====================
         function updateRechargeTimer() {
             let div = document.getElementById('rechargeTimer');
             
-            // ===== Energy ফুল থাকলে =====
+            // Energy ফুল থাকলে
             if (appState.tapEnergy >= 100) {
                 div.innerHTML = `
-                    <div class="full">✅ Energy Full! Keep Tapping!</div>
+                    <div class="status-text full">✅ Energy Full! Keep Tapping!</div>
                     <div style="margin-top:6px;font-size:11px;color:#94a3b8;">${appState.tapEnergy}/100 Energy</div>
-                    <div class="progress-bar"><div class="fill" style="width:100%;"></div></div>
-                    <div class="status-text full">🔋 Ready to Tap!</div>
+                    <button class="watch-video-btn" onclick="watchVideoForEnergy()">
+                        📺 Watch Video for +20 Energy
+                    </button>
                 `;
                 return;
             }
             
-            // ===== বাকি Energy ক্যালকুলেশন =====
-            const PER_ENERGY_TIME = 36;
-            const remainingEnergy = 100 - appState.tapEnergy;
-            let remainingSecs = remainingEnergy * PER_ENERGY_TIME;
-            if (remainingSecs < 0) remainingSecs = 0;
-            
-            // ===== টাইমার দেখানোর জন্য (1 ঘন্টার টাইমার) =====
-            let hours = Math.floor(remainingSecs / 3600);
-            let minutes = Math.floor((remainingSecs % 3600) / 60);
-            let seconds = Math.floor(remainingSecs % 60);
-            
-            let timeText = '';
-            if (hours > 0) {
-                timeText = `${hours}h ${minutes}m ${seconds}s`;
-            } else if (minutes > 0) {
-                timeText = `${minutes}m ${seconds}s`;
-            } else {
-                timeText = `${seconds}s`;
-            }
-            
-            // ===== সাব টাইমার (36 সেকেন্ড) =====
-            let subTimeText = `${subTimerSeconds}s`;
-            
-            // ===== প্রগ্রেস বার =====
-            const progress = ((100 - remainingEnergy) / 100) * 100;
-            
-            // ===== স্ট্যাটাস টেক্সট =====
-            let statusText = '⚡ Recharging...';
-            let statusClass = 'recharging';
-            if (appState.tapEnergy === 0) {
-                statusText = '⛔ No Energy! Waiting for recharge...';
-                statusClass = 'empty';
-            }
-            
+            // Energy কম থাকলে
             div.innerHTML = `
-                <div style="font-size:12px;color:#94a3b8;">⚡ Energy Recharge</div>
-                <div class="time">${timeText}</div>
+                <div style="font-size:12px;color:#94a3b8;">⚡ Energy Status</div>
                 <div style="font-size:11px;color:#94a3b8;">${appState.tapEnergy}/100 Energy</div>
-                <div class="progress-bar"><div class="fill" style="width:${progress}%;"></div></div>
-                <div class="sub-timer">⏳ Next Energy in: ${subTimeText}</div>
-                <div class="status-text ${statusClass}">${statusText}</div>
+                ${appState.tapEnergy === 0 ? '<div class="status-text empty">⛔ No Energy! Watch video to recharge!</div>' : ''}
                 <button class="watch-video-btn" onclick="watchVideoForEnergy()">
                     📺 Watch Video for +20 Energy
                 </button>
-                <div class="recharge-info">💡 Full recharge in 1 hour</div>
             `;
         }
 
-        // ==================== TAP (Energy 0 হলে ট্যাপ বন্ধ) ====================
+        // ==================== TAP ====================
         function handleTap(event) {
-            // ===== Energy 0 হলে ট্যাপ বন্ধ =====
+            // Energy 0 হলে ট্যাপ বন্ধ
             if (appState.tapEnergy <= 0) {
-                showToast('⛔ No Energy! Wait 1 hour for full recharge!', 'error');
+                showToast('⛔ No Energy! Watch video to recharge!', 'error');
                 return;
             }
             
@@ -1129,18 +959,9 @@
             
             if (navigator.vibrate) navigator.vibrate(10);
             
-            // ===== Energy 0 হলে রিচার্জ স্টার্ট =====
-            if (appState.tapEnergy <= 0) {
-                if (rechargeInterval) clearInterval(rechargeInterval);
-                if (timerInterval) clearInterval(timerInterval);
-                appState.lastRechargeTime = Date.now();
-                userRef.update({ lastRechargeTime: appState.lastRechargeTime });
-                startRecharge();
-            } else if (appState.tapEnergy < 100) {
-                // ===== Energy কমে গেলে রিচার্জ চালু =====
-                if (!rechargeInterval) {
-                    startRecharge();
-                }
+            // Energy কমে গেলে UI আপডেট
+            if (appState.tapEnergy < 100) {
+                updateRechargeTimer();
             }
             
             isTapping = false;
@@ -1519,29 +1340,15 @@
             let bought = appState.purchasedOffers[id] || 0;
             if (offer.limit > 0 && bought >= offer.limit) { showToast('Limit reached!','error'); return; }
             appState.balance -= price;
-            let newEnergy = appState.tapEnergy + energy;
-            if (newEnergy > 100) newEnergy = 100;
-            appState.tapEnergy = newEnergy;
+            appState.tapEnergy = Math.min(100, appState.tapEnergy + energy);
             appState.purchasedOffers[id] = bought + 1;
-            
-            // রিচার্জ স্টপ
-            if (appState.tapEnergy >= 100) {
-                appState.isRecharging = false;
-                clearInterval(rechargeInterval);
-                clearInterval(timerInterval);
-                rechargeInterval = null;
-                timerInterval = null;
-                remainingSeconds = 0;
-                subTimerSeconds = 0;
-            }
-            
             userRef.update({ balance: appState.balance, tapEnergy: appState.tapEnergy, purchasedOffers: appState.purchasedOffers });
             updateUI();
             updateTapUI();
             renderOffers();
+            updateRechargeTimer();
             document.getElementById('energyBuyText').textContent = `+${energy} Energy!`;
             document.getElementById('energyBuyModal').classList.add('active');
-            if (appState.tapEnergy < 100) startRecharge();
             showToast(`+${energy} Energy!`);
         }
 
@@ -1824,7 +1631,6 @@
                     appState.weeklyAdWatched = data.weeklyAdWatched || [];
                     appState.purchasedOffers = data.purchasedOffers || {};
                     appState.lastConversion = data.lastConversion || null;
-                    appState.lastRechargeTime = data.lastRechargeTime || Date.now();
                     appState.weekStart = data.weekStart || null;
                     appState.referCode = data.referCode || '';
                     appState.referEarned = data.referEarned || 0;
@@ -1847,13 +1653,7 @@
                     updateVideoUI();
                     updateReferUI();
                     updateWithdrawHistory();
-                    
-                    // Energy 100 না হলে রিচার্জ স্টার্ট
-                    if (appState.tapEnergy < 100) {
-                        startRecharge();
-                    } else {
-                        updateRechargeTimer();
-                    }
+                    updateRechargeTimer();
                     
                     if (appState.lastConversion) {
                         startConversionTimer();
@@ -1885,8 +1685,8 @@
                     appState.referCode = generateReferCode();
                     updateUI();
                     updateLevelUI();
-                    startConversionTimer();
                     updateRechargeTimer();
+                    startConversionTimer();
                 }
                 
                 const link = `https://t.me/${tg.initDataUnsafe?.user?.username || 'CoinQuestBot'}?start=ref_${appState.referCode}`;
@@ -1918,21 +1718,9 @@
 
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden) {
-                if (appState.tapEnergy < 100) {
-                    const now = Date.now();
-                    const elapsed = Math.floor((now - appState.lastRechargeTime) / 1000);
-                    const PER_ENERGY_TIME = 36;
-                    const energyGained = Math.floor(elapsed / PER_ENERGY_TIME);
-                    if (energyGained > 0) {
-                        appState.tapEnergy = Math.min(100, appState.tapEnergy + energyGained);
-                        appState.lastRechargeTime = now;
-                        userRef.update({ tapEnergy: appState.tapEnergy, lastRechargeTime: now });
-                        updateTapUI();
-                        updateRechargeTimer();
-                    }
-                }
                 updateUI();
                 updateWeeklyUI();
+                updateRechargeTimer();
             }
         });
 
@@ -1955,9 +1743,6 @@
 
         window.addEventListener('online', () => {
             showToast('🔄 Connection restored!');
-            if (appState.tapEnergy < 100) {
-                startRecharge();
-            }
         });
 
         window.addEventListener('offline', () => {
