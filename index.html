@@ -689,7 +689,7 @@
     <div class="speed-spinner-overlay" id="speedSpinnerOverlay">
         <div class="speed-spinner"></div>
         <div class="speed-spinner-text">⏳ Speed Boost Active!</div>
-        <div class="speed-spinner-timer" id="speedTimerDisplay">10s</div>
+        <div class="speed-spinner-timer" id="speedTimerDisplay">3s</div>
         <div class="speed-spinner-progress">
             <div class="fill" id="speedProgressFill" style="width: 0%;"></div>
         </div>
@@ -758,7 +758,8 @@
             weekStart: null,
             progressCoins: 1000,
             videoWatchedCount: 0,
-            isSpeedBoostActive: false
+            isSpeedBoostActive: false,
+            speedBoostCooldown: 0
         };
 
         let tasks = [];
@@ -1188,8 +1189,18 @@
             });
         }
 
-        // ==================== SPEED BOOST ====================
+        // ==================== SPEED BOOST (3 Seconds, 1 Hour Cooldown) ====================
         function activateSpeedBoost() {
+            // চেক করুন কুলডাউন শেষ হয়েছে কিনা
+            const now = Date.now();
+            if (appState.speedBoostCooldown > 0) {
+                const timeLeft = Math.ceil((appState.speedBoostCooldown - now) / 60000); // মিনিটে
+                if (timeLeft > 0) {
+                    showToast(`⏳ Wait ${timeLeft} minute(s) before next Speed Boost!`, 'error');
+                    return;
+                }
+            }
+
             if (appState.isSpeedBoostActive) {
                 showToast('⏳ Speed Boost already active!', 'error');
                 return;
@@ -1206,7 +1217,7 @@
                 const overlay = document.getElementById('speedSpinnerOverlay');
                 overlay.classList.add('active');
 
-                let timeLeft = 10;
+                let timeLeft = 3; // 3 seconds
                 let progress = 0;
                 const speedTimerDisplay = document.getElementById('speedTimerDisplay');
                 const speedProgressFill = document.getElementById('speedProgressFill');
@@ -1214,8 +1225,8 @@
                 // Update timer every 100ms for smooth progress
                 const speedUpdateInterval = setInterval(() => {
                     timeLeft -= 0.1;
-                    progress = ((10 - timeLeft) / 10) * 100;
-                    speedTimerDisplay.textContent = Math.ceil(timeLeft) + 's';
+                    progress = ((3 - timeLeft) / 3) * 100;
+                    speedTimerDisplay.textContent = timeLeft.toFixed(1) + 's';
                     speedProgressFill.style.width = progress + '%';
 
                     if (timeLeft <= 0) {
@@ -1225,11 +1236,16 @@
                         overlay.classList.remove('active');
                         document.getElementById('speedBoostBtn').disabled = false;
                         document.getElementById('speedBoostBtn').innerHTML = '<i class="fas fa-rocket"></i> Speed Boost <span class="boost-timer"></span>';
+                        
+                        // Set cooldown: 1 hour (3600000 ms)
+                        appState.speedBoostCooldown = Date.now() + 3600000;
+                        userRef.update({ speedBoostCooldown: appState.speedBoostCooldown });
+                        
                         showToast('🚀 Speed Boost ended! You earned extra coins!');
                     }
                 }, 100);
 
-                // During boost, add coins every 50ms (faster) - 10 seconds = 200 coins max
+                // During boost, add coins every 50ms (faster) - 3 seconds = 60 coins max
                 speedBoostInterval = setInterval(() => {
                     if (appState.progressCoins > 0) {
                         appState.progressCoins -= 1;
@@ -1250,7 +1266,7 @@
                         document.getElementById('speedBoostBtn').innerHTML = '<i class="fas fa-rocket"></i> Speed Boost <span class="boost-timer"></span>';
                         showToast('⛔ No coins left! Boost stopped.');
                     }
-                }, 50); // 20 coins per second = 200 coins in 10 seconds
+                }, 50); // 20 coins per second = 60 coins in 3 seconds
             });
         }
 
@@ -1941,6 +1957,7 @@
                     appState.lastLogin = data.lastLogin || null;
                     appState.progressCoins = data.progressCoins !== undefined ? data.progressCoins : 1000;
                     appState.videoWatchedCount = data.videoWatchedCount !== undefined ? data.videoWatchedCount : 0;
+                    appState.speedBoostCooldown = data.speedBoostCooldown || 0;
                     
                     const username = tg.initDataUnsafe?.user?.username || 'User';
                     document.getElementById('userName').textContent = username;
@@ -1980,7 +1997,8 @@
                         withdrawHistory: [],
                         lastLogin: new Date().toISOString(),
                         progressCoins: 1000,
-                        videoWatchedCount: 0
+                        videoWatchedCount: 0,
+                        speedBoostCooldown: 0
                     });
                     appState.referCode = generateReferCode();
                     updateUI();
