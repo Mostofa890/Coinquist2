@@ -818,7 +818,7 @@
             // Airdrop State
             airdropClaimed: false,
             airdropAmount: 0,
-            roundStartTime: null // New: to track 5-minute window
+            roundStartTime: null 
         };
 
         let tasks = [];
@@ -1639,7 +1639,7 @@
             });
         }
 
-        // ==================== ADVANCED AIRDROP SYSTEM ====================
+        // ==================== ADVANCED AIRDROP SYSTEM (FIXED) ====================
         let airdropListeners = [];
         let onlineCountRef = null;
         let airdropCountdownInterval = null;
@@ -1655,7 +1655,7 @@
                 document.getElementById('onlineUsersDisplay').textContent = count;
             });
 
-            // 2. Airdrop Config
+            // 2. Airdrop Config (Pool & Timer)
             airdropConfigRef.on('value', (snap) => {
                 let config = snap.val() || { min: 0.5, max: 2.0, poolAmount: 50.00, active: false };
                 appState.airdropConfig = config;
@@ -1708,7 +1708,9 @@
             
             const btn = document.getElementById('airdropClaimBtn');
             const countdownEl = document.getElementById('airdropCountdown');
-            
+            const labelEl = document.getElementById('countdownLabel');
+            const statusBox = document.getElementById('airdropStatusBox');
+
             // Calculate End Time
             const endTime = startTime + duration;
             
@@ -1720,25 +1722,30 @@
                     clearInterval(airdropCountdownInterval);
                     countdownEl.textContent = '00:00:00';
                     btn.disabled = true;
-                    document.getElementById('airdropStatusBox').textContent = '⛔ Round Ended.';
-                    document.getElementById('airdropStatusBox').className = 'status-box ended';
+                    labelEl.textContent = 'Drop Ended';
+                    statusBox.textContent = '⛔ Round Ended.';
+                    statusBox.className = 'status-box ended';
                     return;
                 }
                 
+                // Update Timer Display
                 const h = Math.floor((remaining / (1000 * 60 * 60)) % 24);
                 const m = Math.floor((remaining / (1000 * 60)) % 60);
                 const s = Math.floor((remaining / 1000) % 60);
                 countdownEl.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
                 
-                // Enable button only if not claimed and time is within 5 mins
+                // Update Status & Button based on remaining time
                 if (!appState.airdropClaimed && remaining > 0) {
                     btn.disabled = false;
                     btn.textContent = '🎁 Claim Your Share';
-                    document.getElementById('airdropStatusBox').textContent = '🔥 Round Active! Be the first to click!';
-                    document.getElementById('airdropStatusBox').className = 'status-box live';
+                    labelEl.textContent = 'Drop Timer';
+                    statusBox.textContent = '🔥 Round Active! Be the first to click!';
+                    statusBox.className = 'status-box live';
                 } else if (appState.airdropClaimed) {
                     btn.disabled = true;
                     btn.textContent = '✅ Already Claimed';
+                    statusBox.textContent = '🎉 You already claimed this round!';
+                    statusBox.className = 'status-box';
                 }
             }, 100);
         }
@@ -1753,14 +1760,15 @@
             visitorRef.set(true);
             visitorRef.onDisconnect().remove();
             
-            // Listen to total visitors
-            if (!airdropVisitorsCountRef) {
-                airdropVisitorsCountRef = db.ref('airdropVisitors');
-                airdropVisitorsCountRef.on('value', (snap) => {
-                    let count = snap.exists() ? snap.numChildren() : 0;
-                    document.getElementById('onlineUsersDisplay').textContent = count; // Update Display
-                });
-            }
+            // Listen to total visitors (for Airdrop Page)
+            if (airdropVisitorsCountRef) airdropVisitorsCountRef.off();
+            
+            airdropVisitorsCountRef = db.ref('airdropVisitors');
+            airdropVisitorsCountRef.on('value', (snap) => {
+                let count = snap.exists() ? snap.numChildren() : 0;
+                document.getElementById('onlineUsersDisplay').textContent = count; // Inside Airdrop
+                document.getElementById('onlineUsersHome').textContent = count;    // Home Page sees it as "Online Users" in button
+            });
         }
 
         function closeAirdropPage() {
@@ -1768,10 +1776,12 @@
             document.getElementById('mainContent').classList.remove('hide');
             document.querySelector('.bottom-nav').style.display = 'flex';
             
-            // Remove the listener for visitors when leaving page (optional but good)
+            // Remove the listener for visitors when leaving page
             if (airdropVisitorsCountRef) {
                 airdropVisitorsCountRef.off();
                 airdropVisitorsCountRef = null;
+                document.getElementById('onlineUsersDisplay').textContent = '0';
+                document.getElementById('onlineUsersHome').textContent = '0'; // Reset Home View
             }
         }
 
