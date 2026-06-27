@@ -64,18 +64,16 @@
         .stat-value { font-size: 16px; font-weight: 800; background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .stat-label { color: #94a3b8; font-size: 9px; margin-top: 2px; }
 
-        /* ===== WEEKLY BONUS ===== */
-        .weekly-bonus-btn { background: rgba(255,255,255,0.05); backdrop-filter: blur(8px); padding: 10px 14px; border-radius: 16px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 20px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); }
-        .weekly-bonus-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 30px rgba(0,0,0,0.3); }
-        .weekly-bonus-btn .bonus-text h4 { font-size: 14px; font-weight: 700; color: #fff; }
-        .weekly-bonus-btn .bonus-text p { font-size: 10px; opacity: 0.9; color: #94a3b8; }
-        .weekly-bonus-btn .arrow { font-size: 18px; color: rgba(255,255,255,0.5); transition: transform 0.2s; }
-        .weekly-bonus-btn:hover .arrow { transform: translateX(4px); }
-        .weekly-bonus-btn .day-progress { display: flex; gap: 3px; margin-top: 4px; }
-        .weekly-bonus-btn .day-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.1); transition: all 0.3s; }
-        .weekly-bonus-btn .day-dot.active { background: #fbbf24; box-shadow: 0 0 12px rgba(251,191,36,0.5); }
-        .weekly-bonus-btn .day-dot.claimed { background: #34d399; }
-        .weekly-bonus-btn .day-dot.locked { background: rgba(255,255,255,0.05); }
+        /* ===== AIRDROP & LIVE COUNTER (Replaces Weekly Bonus) ===== */
+        .airdrop-btn { background: rgba(255,255,255,0.05); backdrop-filter: blur(8px); padding: 10px 14px; border-radius: 16px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 20px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); }
+        .airdrop-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 30px rgba(0,0,0,0.3); }
+        .airdrop-btn .bonus-text h4 { font-size: 14px; font-weight: 700; color: #fff; }
+        .airdrop-btn .bonus-text p { font-size: 10px; opacity: 0.9; color: #94a3b8; }
+        .airdrop-btn .arrow { font-size: 18px; color: rgba(255,255,255,0.5); transition: transform 0.2s; }
+        .airdrop-btn:hover .arrow { transform: translateX(4px); }
+        .airdrop-btn .live-users { display: flex; align-items: center; gap: 4px; margin-top: 4px; color: #10b981; font-size: 12px; font-weight: bold; }
+        .airdrop-btn .live-users .dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
 
         /* ===== NEW MODERN PROGRESS BAR (SMALLER) ===== */
         .tap-section-enhanced { background: rgba(255,255,255,0.03); backdrop-filter: blur(12px); border-radius: 24px; padding: 20px 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); margin-bottom: 14px; }
@@ -407,25 +405,30 @@
         .level-item .level-reward { font-size: 12px; color: #10b981; }
         .level-item .level-check { color: #10b981; font-size: 16px; }
 
-        /* ===== WEEKLY OVERLAY ===== */
-        .weekly-overlay .weekly-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 10px; padding: 8px 0; }
-        .weekly-overlay .day-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 16px; padding: 12px 8px; text-align: center; border: 1px solid rgba(255,255,255,0.08); transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.2); position: relative; overflow: hidden; }
-        .weekly-overlay .day-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
-        .weekly-overlay .day-card .day-emoji { font-size: 28px; display: block; margin-bottom: 4px; }
-        .weekly-overlay .day-card .day-name { font-size: 11px; font-weight: 600; color: #fff; }
-        .weekly-overlay .day-card .day-reward { font-size: 10px; color: #94a3b8; margin-top: 2px; }
-        .weekly-overlay .day-card .day-status { margin-top: 6px; padding: 4px 10px; border-radius: 16px; font-size: 9px; font-weight: 700; border: none; cursor: pointer; transition: all 0.2s; width: 100%; }
-        .weekly-overlay .day-card .day-status.available { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
-        .weekly-overlay .day-card .day-status.claimed { background: rgba(255,255,255,0.1); color: #94a3b8; cursor: default; }
-        .weekly-overlay .day-card .day-status.locked { background: rgba(255,255,255,0.05); color: #64748b; cursor: default; }
-        .weekly-overlay .day-card .day-status.ad-required { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
-        .weekly-overlay .day-card .day-status:disabled { opacity: 0.6; }
-        .weekly-overlay .day-card .ad-box { margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 10px; display: none; border: 1px solid rgba(255,255,255,0.08); }
-        .weekly-overlay .day-card .ad-box.show { display: block; }
-        .weekly-overlay .day-card .ad-box .claim-btn { background: linear-gradient(135deg, #10b981, #059669); color: #fff; padding: 4px 12px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; margin-top: 4px; width: 100%; font-size: 11px; }
+        /* ===== AIRDROP OVERLAY (Replaces Weekly Overlay) ===== */
+        .airdrop-overlay .airdrop-grid { display: grid; grid-template-columns: 1fr; gap: 10px; padding: 8px 0; }
+        .airdrop-overlay .info-box { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 16px; padding: 16px; border: 1px solid rgba(255,255,255,0.08); text-align: center; }
+        .airdrop-overlay .info-box .big-number { font-size: 36px; font-weight: 900; color: #fbbf24; }
+        .airdrop-overlay .info-box .label { color: #94a3b8; font-size: 13px; margin-top: 4px; }
+        .airdrop-overlay .claim-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; padding: 12px 24px; border: none; border-radius: 30px; font-weight: 700; font-size: 16px; cursor: pointer; margin-top: 15px; width: 100%; box-shadow: 0 4px 20px rgba(245,158,11,0.3); transition: all 0.2s; }
+        .airdrop-overlay .claim-btn:hover:not(:disabled) { transform: scale(1.02); box-shadow: 0 6px 30px rgba(245,158,11,0.4); }
+        .airdrop-overlay .claim-btn:disabled { background: #64748b; cursor: not-allowed; box-shadow: none; }
+        
+        .airdrop-list { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 12px; padding: 12px; margin-top: 12px; border: 1px solid rgba(255,255,255,0.08); max-height: 300px; overflow-y: auto; }
+        .airdrop-list .list-title { font-size: 12px; color: #94a3b8; margin-bottom: 8px; text-align: center; }
+        .airdrop-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px; }
+        .airdrop-item:last-child { border-bottom: none; }
+        .airdrop-item .name { color: #fff; font-weight: 500; }
+        .airdrop-item .time { color: #94a3b8; font-size: 10px; }
+
+        /* ===== OFFLINE OVERLAY (NEW) ===== */
+        .offline-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 99999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; }
+        .offline-overlay.show { display: flex; }
+        .offline-overlay h1 { color: #ef4444; font-size: 26px; margin-bottom: 10px; }
+        .offline-overlay p { color: #94a3b8; max-width: 380px; line-height: 1.6; }
 
         /* ===== BANNED ===== */
-        .banned-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 99999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; }
+        .banned-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 99998; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; }
         .banned-overlay.show { display: flex; }
         .banned-overlay h1 { color: #ef4444; font-size: 26px; margin-bottom: 10px; }
         .banned-overlay p { color: #94a3b8; max-width: 380px; line-height: 1.6; }
@@ -438,6 +441,12 @@
     </style>
 </head>
 <body>
+
+    <!-- OFFLINE OVERLAY -->
+    <div class="offline-overlay" id="offlineOverlay">
+        <h1>⚠️ No Internet Connection</h1>
+        <p>Please check your network connection. The app will resume automatically once you are back online.</p>
+    </div>
 
     <!-- BANNED OVERLAY -->
     <div class="banned-overlay" id="bannedOverlay">
@@ -481,14 +490,30 @@
         </div>
     </div>
 
-    <!-- WEEKLY OVERLAY -->
-    <div class="overlay weekly-overlay" id="weeklyOverlay">
+    <!-- AIRDROP OVERLAY (Replaces Weekly Overlay) -->
+    <div class="overlay airdrop-overlay" id="airdropOverlay">
         <div class="overlay-header">
-            <button class="back-btn" onclick="closeWeeklyPage()"><i class="fas fa-arrow-left"></i> Back</button>
-            <h2>📅 Weekly Rewards</h2>
+            <button class="back-btn" onclick="closeAirdropPage()"><i class="fas fa-arrow-left"></i> Back</button>
+            <h2>📢 Live AirDrop</h2>
         </div>
         <div class="overlay-content">
-            <div class="weekly-grid" id="weeklyGridContainer"></div>
+            <div class="airdrop-grid">
+                <div class="info-box">
+                    <div class="live-users"><span class="dot"></span> <span id="onlineUsersDisplay">0</span> Users Online</div>
+                    <div class="big-number" id="airdropPoolDisplay">$0.00</div>
+                    <div class="label">Current Reward Pool</div>
+                    
+                    <button class="claim-btn" id="airdropClaimBtn" onclick="claimAirdrop()">
+                        🎁 Claim Your Share
+                    </button>
+                    <p style="font-size:11px;color:#94a3b8;margin-top:8px;">Be the first to click and claim!</p>
+                </div>
+
+                <div class="airdrop-list">
+                    <div class="list-title">👥 Waiting List</div>
+                    <div id="airdropListContainer"><p style="color:#94a3b8;font-size:13px;text-align:center;padding:10px;">No one has claimed yet...</p></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -534,19 +559,14 @@
             <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-value" id="dailyStreak">0</div><div class="stat-label">Day Streak</div></div>
         </div>
 
-        <!-- ===== WEEKLY BONUS ===== -->
-        <div class="weekly-bonus-btn" onclick="openWeeklyPage()">
+        <!-- ===== AIRDROP BUTTON (Replaces Weekly Bonus) ===== -->
+        <div class="airdrop-btn" onclick="openAirdropPage()">
             <div class="bonus-text">
-                <h4>📅 Weekly Bonus</h4>
-                <p id="weeklyBonusDesc">Tap to claim your rewards!</p>
-                <div class="day-progress" id="weeklyProgress">
-                    <div class="day-dot" data-day="0"></div>
-                    <div class="day-dot" data-day="1"></div>
-                    <div class="day-dot" data-day="2"></div>
-                    <div class="day-dot" data-day="3"></div>
-                    <div class="day-dot" data-day="4"></div>
-                    <div class="day-dot" data-day="5"></div>
-                    <div class="day-dot" data-day="6"></div>
+                <h4>📢 Live AirDrop</h4>
+                <p id="airdropDesc">Tap to claim your share!</p>
+                <div class="live-users">
+                    <span class="dot"></span>
+                    <span id="onlineUsersHome">0</span> Users Online
                 </div>
             </div>
             <div class="arrow">➜</div>
@@ -695,7 +715,7 @@
     <!-- ===== MODALS ===== -->
     <div class="modal" id="successModal"><div class="modal-content"><div class="success-animation">🎉</div><h3>Task Completed!</h3><p id="rewardText">+50 Coins</p><button onclick="closeModal('successModal')">Awesome!</button></div></div>
     <div class="modal" id="conversionModal"><div class="modal-content"><div class="success-animation">💰</div><h3>Coins Converted!</h3><p id="conversionText">Coins → USD</p><button onclick="closeModal('conversionModal')">Awesome!</button></div></div>
-    <div class="modal" id="weeklyBonusModal"><div class="modal-content"><div class="success-animation">📅</div><h3>Weekly Bonus Claimed!</h3><p id="weeklyBonusRewardText">+50 Coins</p><button onclick="closeModal('weeklyBonusModal')">Awesome!</button></div></div>
+    <div class="modal" id="airdropModal"><div class="modal-content"><div class="success-animation">💰</div><h3>AirDrop Claimed!</h3><p id="airdropRewardText">You won +$0.00!</p><button onclick="closeModal('airdropModal')">Awesome!</button></div></div>
     <div class="modal" id="withdrawModal"><div class="modal-content"><div class="success-animation">💳</div><h3 id="withdrawModalTitle">Withdrawal</h3><p id="withdrawModalText">Processing...</p><button onclick="closeModal('withdrawModal')">OK</button></div></div>
     <div class="modal" id="adModal"><div class="modal-content"><div class="success-animation">📺</div><h3>Watch Ad to Claim</h3><p id="adModalText">Please watch the ad</p><div id="adModalContent"></div><button onclick="closeModal('adModal')">Skip</button></div></div>
     <div class="modal" id="videoModal"><div class="modal-content"><div class="success-animation">📺</div><h3>Video Watched!</h3><p id="videoRewardText">You earned +10 Coins</p><button onclick="closeModal('videoModal')">Awesome!</button></div></div>
@@ -752,18 +772,14 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
         let userId = 'default_user';
-        let tgUsername = 'User';
-        
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
             userId = tg.initDataUnsafe.user.id.toString();
-            tgUsername = tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name || 'User';
         }
 
         // ==================== STATE ====================
         let appState = {
             balance: 0, usdBalance: 0, completedTasks: 0, referralCount: 0,
             dailyStreak: 0, userLevel: 1, tasksCompleted: [],
-            weeklyClaimed: [], weeklyAdWatched: [],
             lastConversion: null, conversionRate: 1000, minWithdraw: 10,
             isBanned: false, banReason: '', withdrawHistory: [],
             lastLogin: null,
@@ -781,7 +797,10 @@
             videoWatchedCount: 0,
             isSpeedBoostActive: false,
             speedBoostCooldown: 0,
-            taskLastCompleted: {}
+            taskLastCompleted: {},
+            // New Airdrop State
+            airdropClaimed: false,
+            airdropAmount: 0
         };
 
         let tasks = [];
@@ -789,7 +808,6 @@
         let progressInterval = null;
         let speedBoostInterval = null;
         let speedBoostTimerInterval = null; 
-        let weeklyRewards = [10,15,20,25,30,40,50];
         let currentFilter = 'all';
         const TOTAL_COINS = 1000;
 
@@ -797,12 +815,12 @@
         const tasksRef = db.ref('tasks');
         const rateRef = db.ref('conversionRate');
         const withdrawRef = db.ref('withdrawSettings');
-        const weeklyRewardsRef = db.ref('weeklyRewards');
         const videoSettingsRef = db.ref('videoSettings');
         const speedBoostConfigRef = db.ref('speedBoostConfig');
         const levelConfigRef = db.ref('levelConfig');
         const referralConfigRef = db.ref('referralConfig');
-        const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+        const airdropConfigRef = db.ref('airdropConfig'); // NEW
+        const connectedRef = db.ref('.info/connected'); // Connection status
 
         // ==================== PAGE NAVIGATION ====================
         function switchPage(page, event) {
@@ -831,7 +849,7 @@
             if (page === 'wallet') updateWithdrawHistory();
         }
 
-        // ==================== CONVERSION RATE (Admin Configurable) ====================
+        // ==================== CONVERSION RATE ====================
         function loadConversionRate() {
             rateRef.on('value', (s) => {
                 appState.conversionRate = s.exists() ? s.val() : 1000;
@@ -924,7 +942,7 @@
             
             const withdrawData = {
                 userId: userId,
-                username: tgUsername,
+                username: tg.initDataUnsafe?.user?.username || 'User',
                 amount: amount,
                 status: 'pending',
                 requestedAt: new Date().toISOString()
@@ -1018,7 +1036,7 @@
             });
         }
 
-        // ==================== VIDEO SETTINGS (Dynamic from Admin) ====================
+        // ==================== VIDEO SETTINGS ====================
         function loadVideoSettings() {
             videoSettingsRef.on('value', (snapshot) => {
                 if (snapshot.exists()) {
@@ -1589,126 +1607,147 @@
             });
         }
 
-        // ==================== WEEKLY BONUS ====================
-        function getWeekKey() { 
-            let now = new Date();
-            let dayOfWeek = now.getDay();
-            let diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); 
-            let monday = new Date(now.setDate(diff));
-            monday.setHours(0,0,0,0);
-            return monday.toDateString(); 
-        }
-        
-        function loadWeeklyRewards() {
-            weeklyRewardsRef.on('value', (s) => {
-                if (s.exists()) { let data=s.val(); weeklyRewards = [0,1,2,3,4,5,6].map(i => data[i] || [10,15,20,25,30,40,50][i]); }
-                updateWeeklyUI();
+        // ==================== AIRDROP SYSTEM (Replaces Weekly) ====================
+        let airdropListeners = [];
+        let onlineCountRef = null;
+
+        function loadAirdropData() {
+            // Listen to online user count
+            onlineCountRef = db.ref('presence/onlineCount');
+            onlineCountRef.on('value', (snap) => {
+                let count = snap.val() || 0;
+                document.getElementById('onlineUsersHome').textContent = count;
+                document.getElementById('onlineUsersDisplay').textContent = count;
             });
-        }
 
-        function updateWeeklyUI() {
-            const weekKey = getWeekKey();
-            if (!appState.weekStart || appState.weekStart !== weekKey) {
-                appState.weekStart = weekKey; appState.weeklyClaimed = []; appState.weeklyAdWatched = [];
-                userRef.update({ weekStart: weekKey, weeklyClaimed: [], weeklyAdWatched: [] });
-            }
-            const today = new Date().getDay();
-            document.querySelectorAll('.day-dot').forEach((dot, i) => {
-                dot.classList.remove('active','claimed','locked');
-                if (i < today) { if (appState.weeklyClaimed && appState.weeklyClaimed.includes(i)) dot.classList.add('claimed'); else dot.classList.add('locked'); }
-                else if (i === today) dot.classList.add('active');
-                else dot.classList.add('locked');
+            // Listen to Airdrop Config (Pool Amount)
+            airdropConfigRef.on('value', (snap) => {
+                let config = snap.val() || { min: 0.5, max: 2.0, limit: 50 };
+                appState.airdropConfig = config;
+                document.getElementById('airdropPoolDisplay').textContent = `$${config.poolAmount || 50.00}`;
             });
-            let count = appState.weeklyClaimed ? appState.weeklyClaimed.length : 0;
-            document.getElementById('weeklyBonusDesc').textContent = count >= 7 ? '🎉 All claimed!' : `📅 ${count}/7 days`;
-            renderWeeklyGrid();
-        }
 
-        function renderWeeklyGrid() {
-            const container = document.getElementById('weeklyGridContainer');
-            const today = new Date().getDay();
-            const emojis = ['🌙','☀️','🌤️','🌈','🌊','🔥','🌟'];
-            let html = '';
-            for (let i = 0; i < 7; i++) {
-                const isClaimed = appState.weeklyClaimed && appState.weeklyClaimed.includes(i);
-                const adWatched = appState.weeklyAdWatched && appState.weeklyAdWatched.includes(i);
-                let status = 'locked', statusText = '🔒', cls = 'locked';
-                if (isClaimed) { status = 'claimed'; statusText = '✅'; cls = 'claimed'; }
-                else if (i === today) {
-                    if (adWatched) { status = 'available'; statusText = '🎁'; cls = 'available'; }
-                    else { status = 'ad-required'; statusText = '📺'; cls = 'ad-required'; }
-                } else if (i < today && !isClaimed) { status = 'locked'; statusText = '❌'; cls = 'locked'; }
-                else { status = 'locked'; statusText = '🔒'; cls = 'locked'; }
-                const reward = weeklyRewards[i] || 10;
-                html += `
-                    <div class="day-card">
-                        <span class="day-emoji">${emojis[i]}</span>
-                        <div class="day-name">${DAYS[i].slice(0,3)}</div>
-                        <div class="day-reward">+${reward} 🪙</div>
-                        <button class="day-status ${cls}" onclick="handleDayClick(${i})" ${status==='locked'||status==='claimed'?'disabled':''}>
-                            ${statusText}
-                        </button>
-                        ${status === 'ad-required' && !isClaimed ? `
-                            <div class="ad-box show">
-                                <div class="ad-label">📺 Watch Ad</div>
-                                <button class="claim-btn" onclick="watchAdAndClaim(${i})">🎬 Watch & Claim</button>
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-            }
-            container.innerHTML = html;
-        }
-
-        function handleDayClick(day) {
-            const today = new Date().getDay();
-            if (appState.weeklyClaimed && appState.weeklyClaimed.includes(day)) { showToast('Already claimed!','error'); return; }
-            if (day !== today) { showToast('Only today\'s reward!','error'); return; }
-            if (!(appState.weeklyAdWatched && appState.weeklyAdWatched.includes(day))) { showToast('Watch ad first!','error'); return; }
-            claimWeeklyReward(day);
-        }
-
-        function watchAdAndClaim(day) {
-            const today = new Date().getDay();
-            if (day !== today) { showToast('Only today\'s reward!','error'); return; }
-            showToast('⏳ Loading ad...');
-            showRewardedAd(function() {
-                if (!appState.weeklyAdWatched) appState.weeklyAdWatched = [];
-                if (!appState.weeklyAdWatched.includes(day)) {
-                    appState.weeklyAdWatched.push(day);
-                    userRef.update({ weeklyAdWatched: appState.weeklyAdWatched });
+            // Listen to Airdrop Claim List
+            const airdropListRef = db.ref('airdropList').orderByChild('timestamp').limitToLast(50);
+            airdropListRef.on('value', (snap) => {
+                const container = document.getElementById('airdropListContainer');
+                if (!snap.exists()) {
+                    container.innerHTML = '<p style="color:#94a3b8;font-size:13px;text-align:center;padding:10px;">No one has claimed yet...</p>';
+                    return;
                 }
-                document.getElementById('adModalText').textContent = '✅ Ad watched!';
-                document.getElementById('adModalContent').innerHTML = `<div style="padding:10px;background:rgba(255,255,255,0.05);border-radius:8px;margin:10px 0;"><p style="color:#10b981;font-size:15px;">🎉 Ad Completed!</p></div>`;
-                document.getElementById('adModal').classList.add('active');
-                setTimeout(() => { document.getElementById('adModal').classList.remove('active'); claimWeeklyReward(day); }, 1500);
+                let html = '';
+                let list = [];
+                snap.forEach(child => { list.push({ id: child.key, ...child.val() }); });
+                list.reverse().forEach(item => {
+                    let timeAgo = Math.floor((Date.now() - item.timestamp) / 60000);
+                    let timeStr = timeAgo < 1 ? 'Just now' : `${timeAgo}m ago`;
+                    html += `<div class="airdrop-item"><span class="name">${item.username || 'Anonymous'}</span><span class="time">+$${item.amount.toFixed(2)} • ${timeStr}</span></div>`;
+                });
+                container.innerHTML = html || '<p style="color:#94a3b8;font-size:13px;text-align:center;padding:10px;">No claims yet</p>';
+            });
+
+            // Check if current user already claimed
+            db.ref('users/' + userId + '/airdropClaimed').once('value', (snap) => {
+                appState.airdropClaimed = snap.val() || false;
+                if(appState.airdropClaimed) {
+                    document.getElementById('airdropClaimBtn').disabled = true;
+                    document.getElementById('airdropClaimBtn').textContent = '✅ Already Claimed';
+                }
             });
         }
 
-        function claimWeeklyReward(day) {
-            const reward = weeklyRewards[day] || 10;
-            appState.balance += reward;
-            appState.dailyStreak++;
-            if (!appState.weeklyClaimed) appState.weeklyClaimed = [];
-            if (!appState.weeklyClaimed.includes(day)) appState.weeklyClaimed.push(day);
-            userRef.update({ balance: appState.balance, dailyStreak: appState.dailyStreak, weeklyClaimed: appState.weeklyClaimed });
-            document.getElementById('weeklyBonusRewardText').textContent = `+${reward} Coins!`;
-            document.getElementById('weeklyBonusModal').classList.add('active');
-            updateUI(); updateLevelUI(); showToast(`+${reward} coins!`);
-        }
-
-        function openWeeklyPage() {
-            document.getElementById('weeklyOverlay').classList.add('show');
+        function openAirdropPage() {
+            document.getElementById('airdropOverlay').classList.add('show');
             document.getElementById('mainContent').classList.add('hide');
             document.querySelector('.bottom-nav').style.display = 'none';
-            renderWeeklyGrid();
         }
-        function closeWeeklyPage() {
-            document.getElementById('weeklyOverlay').classList.remove('show');
+
+        function closeAirdropPage() {
+            document.getElementById('airdropOverlay').classList.remove('show');
             document.getElementById('mainContent').classList.remove('hide');
             document.querySelector('.bottom-nav').style.display = 'flex';
-            updateWeeklyUI();
         }
+
+        function claimAirdrop() {
+            const btn = document.getElementById('airdropClaimBtn');
+            
+            // Check if already claimed
+            if(appState.airdropClaimed) {
+                showToast('You already claimed this round!', 'error');
+                return;
+            }
+
+            // Disable button to prevent double clicking
+            btn.disabled = true;
+            btn.textContent = '⏳ Processing...';
+
+            // Generate Random Amount (Min/Max from Admin Config)
+            let config = appState.airdropConfig || { min: 0.5, max: 2.0 };
+            let amount = Math.random() * (config.max - config.min) + config.min;
+            // Convert to Coins based on rate
+            let coinsWon = Math.floor(amount * appState.conversionRate);
+
+            // Save to Airdrop List and User Profile
+            const updateData = {};
+            const claimData = {
+                userId: userId,
+                username: tg.initDataUnsafe?.user?.username || 'User',
+                amount: amount,
+                coins: coinsWon,
+                timestamp: Date.now()
+            };
+
+            // Update user balance and mark as claimed
+            updateData['users/' + userId + '/balance'] = firebase.database.ServerValue.increment(coinsWon);
+            updateData['users/' + userId + '/airdropClaimed'] = true;
+            updateData['airdropList/' + Date.now()] = claimData;
+
+            // Update local appState
+            appState.balance += coinsWon;
+            appState.airdropClaimed = true;
+
+            db.ref().update(updateData).then(() => {
+                document.getElementById('airdropRewardText').textContent = `You won +$${amount.toFixed(2)} (${coinsWon} Coins)!`;
+                document.getElementById('airdropModal').classList.add('active');
+                showToast(`🎉 +${coinsWon} Coins from AirDrop!`);
+                updateUI();
+                updateLevelUI();
+                // Update the button to show claimed
+                btn.textContent = '✅ Already Claimed';
+                closeAirdropPage();
+            }).catch(err => {
+                console.error(err);
+                showToast('Error claiming airdrop. Try again.', 'error');
+                btn.disabled = false;
+                btn.textContent = '🎁 Claim Your Share';
+                appState.airdropClaimed = false; // revert local state
+            });
+        }
+
+
+        // ==================== OFFLINE HANDLER (NEW) ====================
+        function checkConnection() {
+            const offlineOverlay = document.getElementById('offlineOverlay');
+            const mainContent = document.getElementById('mainContent');
+            const bottomNav = document.querySelector('.bottom-nav');
+            
+            if (navigator.onLine) {
+                // Hide offline overlay
+                offlineOverlay.classList.remove('show');
+                mainContent.style.display = 'block';
+                bottomNav.style.display = 'flex';
+            } else {
+                // Show offline overlay, block all interactions
+                offlineOverlay.classList.add('show');
+                mainContent.style.display = 'none';
+                bottomNav.style.display = 'none';
+            }
+        }
+
+        // Listen to online/offline events
+        window.addEventListener('online', checkConnection);
+        window.addEventListener('offline', checkConnection);
+
 
         // ==================== REFERRAL SYSTEM ====================
         function updateReferUI() {
@@ -1949,11 +1988,8 @@
 
         // ==================== INIT ====================
         function initApp() {
-            // Update TG Username and UserID to Database automatically
-            userRef.update({
-                username: tgUsername,
-                lastLogin: new Date().toISOString()
-            });
+            // Initial Offline Check
+            checkConnection();
 
             userRef.on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -1964,8 +2000,6 @@
                     appState.referralCount = data.referCount || 0;
                     appState.dailyStreak = data.dailyStreak || 0;
                     appState.tasksCompleted = data.tasksCompleted || [];
-                    appState.weeklyClaimed = data.weeklyClaimed || [];
-                    appState.weeklyAdWatched = data.weeklyAdWatched || [];
                     appState.lastConversion = data.lastConversion || null;
                     appState.weekStart = data.weekStart || null;
                     appState.referCode = data.referCode || '';
@@ -1980,8 +2014,10 @@
                     appState.videoWatchedCount = data.videoWatchedCount !== undefined ? data.videoWatchedCount : 0;
                     appState.speedBoostCooldown = data.speedBoostCooldown || 0;
                     appState.taskLastCompleted = data.taskLastCompleted || {};
+                    appState.airdropClaimed = data.airdropClaimed || false;
                     
-                    document.getElementById('userName').textContent = tgUsername;
+                    const username = tg.initDataUnsafe?.user?.username || 'User';
+                    document.getElementById('userName').textContent = username;
                     
                     if (appState.lastLogin) {
                         document.getElementById('lastLoginDisplay').textContent = `📅 Last Login: ${new Date(appState.lastLogin).toLocaleString()}`;
@@ -1999,11 +2035,11 @@
                     else { appState.lastConversion = Date.now(); userRef.update({ lastConversion: Date.now() }); startConversionTimer(); }
                 } else {
                     userRef.set({
-                        username: tgUsername,
                         balance: 0, usdBalance: 0, completedTasks: 0, referCount: 0, dailyStreak: 0, tasksCompleted: [],
-                        weeklyClaimed: [], weeklyAdWatched: [], referCode: generateReferCode(), referTiers: {},
+                        referCode: generateReferCode(), referTiers: {},
                         videoWatchedToday: 0, videoLastWatchDate: null, withdrawHistory: [], lastLogin: new Date().toISOString(),
-                        progressCoins: 1000, videoWatchedCount: 0, speedBoostCooldown: 0, taskLastCompleted: {}
+                        progressCoins: 1000, videoWatchedCount: 0, speedBoostCooldown: 0, taskLastCompleted: {},
+                        airdropClaimed: false
                     });
                     appState.referCode = generateReferCode(); updateUI(); updateLevelUI(); startConversionTimer(); updateProgressUI();
                 }
@@ -2012,12 +2048,12 @@
                 document.getElementById('referLinkHome').textContent = link;
             });
 
-            loadConversionRate(); loadTasksFromDB(); loadWeeklyRewards(); loadVideoSettings();
+            loadConversionRate(); loadTasksFromDB(); loadVideoSettings();
             loadWithdrawSettings(); loadLevelConfig(); loadReferralConfig();
+            loadAirdropData(); // Load new Airdrop data
             checkBanStatus(); loadReferralData(); checkReferral();
             getUserLocation(); listenWithdrawStatus();
 
-            setTimeout(updateWeeklyUI, 1000);
             setTimeout(() => { if (!appState.isBanned) showToast('👋 Welcome to CoinQuest! Press START to earn!'); }, 1500);
         }
 
@@ -2028,7 +2064,7 @@
         show_11197472({ type: 'inApp', inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false } });
 
         document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) { updateUI(); updateWeeklyUI(); updateProgressUI(); updateSpeedBoostUI(); }
+            if (!document.hidden) { updateUI(); updateProgressUI(); updateSpeedBoostUI(); }
         });
 
         document.addEventListener('dblclick', (e) => e.preventDefault());
@@ -2042,19 +2078,15 @@
             if (e.message.includes('Firebase')) showToast('⚠️ Connection issue. Retrying...', 'error');
         });
 
-        window.addEventListener('online', () => showToast('🔄 Connection restored!'));
-        window.addEventListener('offline', () => showToast('⚠️ You are offline. Some features may not work.', 'error'));
-
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 if (document.getElementById('levelOverlay').classList.contains('show')) closeLevelPage();
-                else if (document.getElementById('weeklyOverlay').classList.contains('show')) closeWeeklyPage();
+                else if (document.getElementById('airdropOverlay').classList.contains('show')) closeAirdropPage();
             }
         });
 
         console.log('✅ CoinQuest App Loaded Successfully');
         console.log('📊 User ID:', userId);
-        console.log('👤 TG Username:', tgUsername);
         console.log('🎯 Monetag Ad SDK Integrated');
     </script>
 </body>
