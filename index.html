@@ -2,777 +2,356 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>CoinQuest - Tap & Earn</title>
-    
-    <!-- Monetag SDK (Ads) -->
-    <script src='//libtl.com/sdk.js' data-zone='11197472' data-sdk='show_11197472'></script>
-    
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoinQuest - Admin Panel</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
-        /* ===== GLOBAL ===== */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; }
-        body { background: #0f172a; color: #e2e8f0; padding-bottom: 70px; min-height: 100vh; background: radial-gradient(circle at 20% 30%, #1e293b, #0f172a); }
-        .container { max-width: 500px; margin: 0 auto; padding: 12px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #0f172a; color: #e2e8f0; display: flex; height: 100vh; overflow: hidden; }
         
-        /* ===== SCROLLBAR ===== */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #1e293b; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 4px; }
-
-        /* ===== HEADER ===== */
-        .header { background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); padding: 12px 16px; border-radius: 20px; margin-bottom: 14px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
-        .user-info { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .avatar { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #3b82f6); display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; box-shadow: 0 4px 12px rgba(139,92,246,0.3); transition: transform 0.2s; color: #fff; }
-        .avatar:hover { transform: scale(1.05); }
-        .user-details h3 { font-size: 14px; font-weight: 600; color: #fff; }
-        .user-details .last-login { font-size: 9px; color: #94a3b8; }
-        .level-badge { display: inline-block; background: rgba(251,191,36,0.15); backdrop-filter: blur(4px); padding: 2px 10px; border-radius: 20px; font-size: 10px; cursor: pointer; border: 1px solid rgba(251,191,36,0.3); transition: all 0.2s; color: #fbbf24; }
-        .level-badge:hover { background: rgba(251,191,36,0.25); }
-
-        .balance-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(8px); padding: 12px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); }
-        .balance-label { font-size: 10px; color: #94a3b8; letter-spacing: 1px; }
-        .balance-amount { font-size: 28px; font-weight: 900; background: linear-gradient(to right, #fcd34d, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 30px rgba(251,191,36,0.2); }
-        .usd-value { color: #10b981; font-size: 14px; font-weight: bold; }
-        .total-usd-earned { font-size: 10px; color: #94a3b8; margin-top: 2px; }
-
-        .level-section { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 6px 12px; margin-top: 6px; cursor: pointer; transition: background 0.2s; border: 1px solid rgba(255,255,255,0.05); }
-        .level-section:hover { background: rgba(255,255,255,0.1); }
-        .level-section .level-row { display: flex; justify-content: space-between; align-items: center; }
-        .level-section .level-title { font-size: 10px; font-weight: bold; color: #94a3b8; }
-        .level-section .level-number { font-size: 14px; font-weight: bold; color: #fbbf24; }
-        .level-section .level-arrow { color: #94a3b8; font-size: 12px; transition: transform 0.2s; }
-        .level-section:hover .level-arrow { transform: translateX(4px); }
-        .level-section .level-progress { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-top: 4px; overflow: hidden; }
-        .level-section .level-progress .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 4px; box-shadow: 0 0 10px rgba(251,191,36,0.3); }
-        .level-section .level-points { font-size: 9px; color: #94a3b8; margin-top: 2px; display: flex; justify-content: space-between; }
-
-        .conversion-timer { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.15); border-radius: 10px; padding: 8px; margin-top: 8px; }
-        .conversion-timer .label { font-size: 9px; color: #94a3b8; }
-        .conversion-timer .time { font-size: 14px; font-weight: bold; color: #10b981; }
-        .conversion-timer .rate-info { font-size: 9px; color: #94a3b8; margin-top: 2px; }
-
-        /* ===== STATS ===== */
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
-        .stat-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(4px); padding: 10px 8px; border-radius: 14px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: transform 0.2s; border: 1px solid rgba(255,255,255,0.05); }
-        .stat-card:hover { transform: translateY(-2px); }
-        .stat-icon { font-size: 18px; margin-bottom: 4px; }
-        .stat-value { font-size: 16px; font-weight: 800; background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .stat-label { color: #94a3b8; font-size: 9px; margin-top: 2px; }
-
-        /* ===== AIRDROP & LIVE COUNTER ===== */
-        .airdrop-btn { background: rgba(255,255,255,0.05); backdrop-filter: blur(8px); padding: 10px 14px; border-radius: 16px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 20px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); }
-        .airdrop-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 30px rgba(0,0,0,0.3); }
-        .airdrop-btn .bonus-text h4 { font-size: 14px; font-weight: 700; color: #fff; }
-        .airdrop-btn .bonus-text p { font-size: 10px; opacity: 0.9; color: #94a3b8; }
-        .airdrop-btn .arrow { font-size: 18px; color: rgba(255,255,255,0.5); transition: transform 0.2s; }
-        .airdrop-btn:hover .arrow { transform: translateX(4px); }
-        .airdrop-btn .live-users { display: flex; align-items: center; gap: 4px; margin-top: 4px; color: #10b981; font-size: 12px; font-weight: bold; }
-        .airdrop-btn .live-users .dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
-
-        /* ===== NEW MODERN PROGRESS BAR (SMALLER) ===== */
-        .tap-section-enhanced { background: rgba(255,255,255,0.03); backdrop-filter: blur(12px); border-radius: 24px; padding: 20px 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); margin-bottom: 14px; }
+        /* Sidebar */
+        .sidebar { width: 260px; background: #1e293b; height: 100%; padding: 20px; overflow-y: auto; border-right: 1px solid #334155; }
+        .sidebar h2 { color: #fbbf24; margin-bottom: 30px; font-size: 22px; text-align: center; }
+        .sidebar .nav-item { padding: 12px 15px; margin: 5px 0; border-radius: 10px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 12px; color: #94a3b8; }
+        .sidebar .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .sidebar .nav-item.active { background: #3b82f6; color: #fff; box-shadow: 0 4px 12px rgba(59,130,246,0.2); }
         
-        .progress-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            padding: 6px 0;
-        }
-        .progress-coin-display {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(251,191,36,0.1);
-            padding: 6px 16px;
-            border-radius: 30px;
-            border: 1px solid rgba(251,191,36,0.2);
-        }
-        .progress-coin-icon { font-size: 22px; }
-        .progress-coin-count { font-size: 22px; font-weight: 800; color: #fbbf24; }
-        .progress-bar-wrapper {
-            width: 100%;
-            max-width: 400px;
-        }
-        .progress-bar-bg {
-            width: 100%;
-            height: 14px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 20px;
-            overflow: hidden;
-            position: relative;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
-        }
-        .progress-bar-fill {
-            height: 100%;
-            background: linear-gradient(135deg, #fbbf24, #f59e0b, #f97316);
-            border-radius: 20px;
-            transition: width 0.3s ease;
-            box-shadow: 0 0 20px rgba(251,191,36,0.3);
-        }
-        .progress-percent {
-            font-size: 12px;
-            color: #94a3b8;
-            margin-top: 4px;
-            text-align: center;
-            font-weight: 600;
-        }
-        .progress-start-btn {
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            color: #fff;
-            padding: 10px 30px;
-            border: none;
-            border-radius: 30px;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(59,130,246,0.3);
-            transition: all 0.2s;
-            letter-spacing: 1px;
-        }
-        .progress-start-btn:hover { transform: scale(1.05); box-shadow: 0 6px 30px rgba(59,130,246,0.4); }
-        .progress-start-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-        .progress-watch-btn {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: #fff;
-            padding: 10px 30px;
-            border: none;
-            border-radius: 30px;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(16,185,129,0.3);
-            transition: all 0.2s;
-            letter-spacing: 1px;
-        }
-        .progress-watch-btn:hover { transform: scale(1.05); box-shadow: 0 6px 30px rgba(16,185,129,0.4); }
-        .progress-watch-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .progress-status {
-            font-size: 12px;
-            color: #94a3b8;
-            text-align: center;
-            width: 100%;
-            margin-top: 4px;
-            font-weight: 500;
-        }
-        .hidden { display: none !important; }
+        /* Main Content */
+        .main { flex: 1; padding: 20px 30px; overflow-y: auto; height: 100vh; }
+        .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #334155; padding-bottom: 15px; }
+        .header-bar h3 { color: #fbbf24; }
+        
+        /* Cards */
+        .dashboard-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; }
+        .stat-card .title { color: #94a3b8; font-size: 13px; }
+        .stat-card .value { font-size: 24px; font-weight: bold; color: #fff; margin-top: 5px; }
+        .stat-card .value.blue { color: #3b82f6; }
+        .stat-card .value.green { color: #10b981; }
+        .stat-card .value.yellow { color: #fbbf24; }
+        .stat-card .value.red { color: #ef4444; }
 
-        /* ===== SPEED BOOST BUTTON ===== */
-        .speed-btn-container {
-            margin-top: 10px;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-        }
-        .speed-boost-btn {
-            background: linear-gradient(135deg, #f97316, #f59e0b);
-            color: #fff;
-            padding: 8px 20px;
-            border: none;
-            border-radius: 30px;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(249,115,22,0.3);
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .speed-boost-btn:hover { transform: scale(1.05); box-shadow: 0 6px 30px rgba(249,115,22,0.4); }
-        .speed-boost-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-        .speed-boost-btn i { font-size: 16px; animation: spin 2s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .speed-boost-btn .boost-timer { font-size: 14px; margin-left: 4px; }
-        .speed-spinner-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(8px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            flex-direction: column;
-        }
-        .speed-spinner-overlay.active { display: flex; }
-        .speed-spinner {
-            width: 80px;
-            height: 80px;
-            border: 6px solid rgba(255,255,255,0.1);
-            border-top: 6px solid #fbbf24;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-        .speed-spinner-text {
-            color: #fff;
-            font-size: 18px;
-            font-weight: 700;
-        }
-        .speed-spinner-timer {
-            color: #fbbf24;
-            font-size: 24px;
-            font-weight: 800;
-            margin-top: 10px;
-        }
-        .speed-spinner-progress {
-            width: 200px;
-            height: 6px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            margin-top: 10px;
-            overflow: hidden;
-        }
-        .speed-spinner-progress .fill {
-            height: 100%;
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            border-radius: 10px;
-            width: 0%;
-            transition: width 0.1s;
-        }
+        /* Tables & Lists */
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin: 20px 0 15px 0; }
+        .section-header h4 { font-size: 18px; color: #fff; }
+        .section-header button { background: #3b82f6; border: none; padding: 8px 15px; border-radius: 8px; color: #fff; cursor: pointer; font-weight: 600; transition: 0.2s; }
+        .section-header button:hover { background: #2563eb; }
+        .section-header button.green { background: #10b981; }
+        .section-header button.green:hover { background: #059669; }
+        
+        .table-container { background: #1e293b; border-radius: 12px; border: 1px solid #334155; overflow: hidden; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #334155; font-size: 14px; }
+        th { background: #0f172a; color: #94a3b8; font-weight: 600; }
+        tr:hover { background: rgba(255,255,255,0.02); }
+        
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .badge.pending { background: #f59e0b; color: #fff; }
+        .badge.approved { background: #10b981; color: #fff; }
+        .badge.cancelled { background: #ef4444; color: #fff; }
 
-        /* ===== FLOATING COIN ===== */
-        .floating-coin { position: fixed; font-size: 28px; pointer-events: none; z-index: 1000; animation: floatUp 1s ease-out forwards; text-shadow: 0 0 20px rgba(251,191,36,0.4); }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); } 100% { opacity: 0; transform: translateY(-140px) scale(0.6) rotate(20deg); } }
+        .action-btn { background: transparent; border: none; color: #94a3b8; cursor: pointer; margin: 0 5px; transition: 0.2s; }
+        .action-btn:hover { color: #fff; }
+        .action-btn.delete:hover { color: #ef4444; }
+        .action-btn.edit:hover { color: #3b82f6; }
+        .action-btn.approve { color: #10b981; }
+        .action-btn.approve:hover { color: #34d399; }
+        .action-btn.cancel { color: #ef4444; }
+        .action-btn.cancel:hover { color: #f87171; }
 
-        /* ===== PAGES ===== */
-        .page { display: none; min-height: 60vh; padding-top: 8px; }
-        .page.active { display: block; }
-        .page-header { font-size: 18px; font-weight: 800; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        /* ===== TASK PAGE FILTERS ===== */
-        .task-filters { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 4px; }
-        .task-filters .filter-btn { padding: 4px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #94a3b8; cursor: pointer; font-size: 11px; white-space: nowrap; transition: all 0.2s; }
-        .task-filters .filter-btn.active { background: linear-gradient(135deg, #8b5cf6, #3b82f6); border-color: transparent; color: #fff; box-shadow: 0 4px 16px rgba(139,92,246,0.2); }
-        .task-filters .filter-btn:hover:not(.active) { background: rgba(255,255,255,0.05); }
-
-        /* ===== VIDEO CARD (for earning page) ===== */
-        .video-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(8px); border-radius: 16px; padding: 18px 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.08); text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
-        .video-card .video-title { font-size: 16px; font-weight: 700; color: #fff; }
-        .video-card .video-desc { font-size: 11px; color: #94a3b8; margin: 4px 0; }
-        .video-card .video-reward { font-size: 14px; color: #10b981; font-weight: bold; }
-        .video-card .video-btn { background: linear-gradient(135deg, #10b981, #059669); color: #fff; padding: 10px 28px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; font-size: 14px; margin-top: 10px; box-shadow: 0 4px 20px rgba(16,185,129,0.2); transition: all 0.2s; }
-        .video-card .video-btn:active { transform: scale(0.95); }
-        .video-card .video-btn:hover { box-shadow: 0 6px 28px rgba(16,185,129,0.3); transform: translateY(-2px); }
-        .video-card .video-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-        .video-card .video-limit { font-size: 10px; color: #94a3b8; margin-top: 6px; }
-        .video-card .video-watched { font-size: 11px; color: #10b981; margin-top: 4px; }
-
-        /* ===== TASK CARD (Dynamic) ===== */
-        .task-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 14px; padding: 14px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.08); transition: transform 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-        .task-card:hover { transform: translateY(-2px); }
-        .task-card .task-header { display: flex; justify-content: space-between; align-items: center; }
-        .task-card .task-title { font-size: 14px; font-weight: 600; color: #fff; }
-        .task-card .task-reward { color: #10b981; font-weight: bold; font-size: 14px; }
-        .task-card .task-desc { font-size: 11px; color: #94a3b8; margin: 4px 0; }
-        .task-card .task-btn { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; padding: 6px 20px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 12px; transition: all 0.2s; box-shadow: 0 2px 12px rgba(59,130,246,0.2); }
-        .task-card .task-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .task-card .task-btn.completed { background: #10b981; }
-        .task-card .task-link { color: #3b82f6; text-decoration: none; font-size: 11px; display: inline-block; margin-top: 4px; }
-        .task-card .task-video-btn { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; padding: 6px 20px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 12px; transition: all 0.2s; box-shadow: 0 2px 12px rgba(239,68,68,0.2); }
-        .task-card .task-video-btn:hover { transform: scale(1.05); }
-        .task-card .task-video-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .task-card .task-progress { background: rgba(255,255,255,0.1); height: 4px; border-radius: 4px; margin-top: 8px; overflow: hidden; }
-        .task-card .task-progress .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 4px; }
-        .task-card .task-status { font-size: 10px; margin-top: 4px; }
-
-        /* ===== REFER ===== */
-        .refer-link-box { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 14px; padding: 14px; margin-bottom: 14px; border: 1px solid rgba(255,255,255,0.08); text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-        .refer-link-box .link { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; font-size: 12px; color: #3b82f6; word-break: break-all; margin: 8px 0; border: 1px solid rgba(255,255,255,0.05); }
-        .refer-link-box .copy-btn { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; padding: 6px 20px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 12px; transition: all 0.2s; box-shadow: 0 2px 12px rgba(59,130,246,0.2); }
-        .refer-link-box .copy-btn:hover { transform: translateY(-2px); }
-
-        .refer-code-input-box { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 14px; padding: 14px; margin-bottom: 14px; border: 1px solid rgba(255,255,255,0.08); text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-        .refer-code-input-box input { width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; font-size: 13px; color: #fff; margin-bottom: 8px; outline: none; }
-        .refer-code-input-box input:focus { border-color: #3b82f6; }
-        .refer-code-input-box button { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; padding: 6px 20px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 12px; transition: all 0.2s; box-shadow: 0 2px 12px rgba(59,130,246,0.2); }
-        .refer-code-input-box button:hover { transform: translateY(-2px); }
-        .refer-code-input-box button:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .refer-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
-        .refer-stats .stat { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); padding: 10px 8px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-        .refer-stats .stat .number { font-size: 18px; font-weight: 800; color: #fbbf24; }
-        .refer-stats .stat .label { font-size: 9px; color: #94a3b8; }
-
-        .refer-tier { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 12px; padding: 10px 14px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-        .refer-tier .tier-info .tier-name { font-size: 13px; font-weight: 600; color: #fff; }
-        .refer-tier .tier-info .tier-desc { font-size: 10px; color: #94a3b8; }
-        .refer-tier .tier-status { font-size: 12px; font-weight: 700; }
-        .refer-tier .tier-status.claimed { color: #10b981; }
-        .refer-tier .tier-status.locked { color: #64748b; }
-        .refer-tier .tier-status.available { color: #fbbf24; cursor: pointer; }
-
-        .refer-progress { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 12px; padding: 12px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-        .refer-progress .progress-bar { width: 100%; height: 5px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-top: 8px; overflow: hidden; }
-        .refer-progress .progress-bar .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 4px; }
-        .refer-progress .progress-text { display: flex; justify-content: space-between; font-size: 10px; color: #94a3b8; margin-top: 4px; }
-
-        .referral-list-box { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 12px; padding: 12px; margin-top: 12px; border: 1px solid rgba(255,255,255,0.08); max-height: 180px; overflow-y: auto; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-        .referral-list-box .list-title { font-size: 12px; color: #94a3b8; margin-bottom: 8px; }
-        .referral-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .referral-item:last-child { border-bottom: none; }
-        .referral-item .name { font-size: 12px; font-weight: 500; color: #fff; }
-        .referral-item .bonus { color: #10b981; font-size: 11px; font-weight: bold; }
-        .referral-item .date { font-size: 9px; color: #94a3b8; }
-
-        /* ===== WALLET ===== */
-        .wallet-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(8px); padding: 18px 16px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
-        .wallet-card .wallet-balance { font-size: 36px; font-weight: 900; background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 30px rgba(251,191,36,0.1); }
-        .wallet-card .wallet-usd { color: #10b981; font-size: 18px; font-weight: bold; margin-top: 4px; }
-        .wallet-card .wallet-total { background: rgba(16,185,129,0.1); border-radius: 10px; padding: 8px; margin-top: 12px; border: 1px solid rgba(16,185,129,0.15); }
-        .wallet-card .wallet-total .label { font-size: 11px; color: #94a3b8; }
-        .wallet-card .wallet-total .value { font-size: 16px; font-weight: bold; color: #10b981; }
-        .wallet-card .wallet-conversion { background: rgba(59,130,246,0.1); border-radius: 10px; padding: 8px; margin-top: 10px; border: 1px solid rgba(59,130,246,0.15); }
-        .wallet-card .wallet-conversion .label { font-size: 10px; color: #94a3b8; }
-        .wallet-card .wallet-conversion .value { font-size: 13px; color: #3b82f6; font-weight: bold; }
-        .wallet-card .withdraw-section { margin-top: 14px; padding: 12px; background: rgba(239,68,68,0.1); border-radius: 12px; border: 1px solid rgba(239,68,68,0.15); }
-        .wallet-card .withdraw-section .withdraw-btn { margin-top: 8px; padding: 8px 20px; background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; width: 100%; font-size: 13px; box-shadow: 0 4px 20px rgba(16,185,129,0.2); transition: all 0.2s; }
-        .wallet-card .withdraw-section .withdraw-btn:disabled { background: #64748b; cursor: not-allowed; box-shadow: none; }
-        .wallet-card .withdraw-history { margin-top: 12px; padding: 8px; background: rgba(255,255,255,0.03); border-radius: 10px; max-height: 150px; overflow-y: auto; text-align: left; border: 1px solid rgba(255,255,255,0.05); }
-        .wallet-card .withdraw-history .title { font-size: 9px; color: #94a3b8; margin-bottom: 4px; }
-        .withdraw-history-item { padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
-        .withdraw-history-item:last-child { border-bottom: none; }
-        .withdraw-history-item .amount { font-weight: bold; color: #fbbf24; }
-        .withdraw-history-item .status-pending { color: #f59e0b; }
-        .withdraw-history-item .status-approved { color: #10b981; }
-        .withdraw-history-item .status-cancelled { color: #ef4444; }
-        .withdraw-history-item .date { font-size: 8px; color: #94a3b8; }
-
-        /* ===== BOTTOM NAV ===== */
-        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; background: rgba(15,23,42,0.9); backdrop-filter: blur(24px); display: flex; justify-content: space-around; padding: 8px 4px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; box-shadow: 0 -4px 20px rgba(0,0,0,0.3); }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; color: #64748b; font-size: 9px; cursor: pointer; flex: 1; transition: color 0.2s; }
-        .nav-item.active { color: #fbbf24; }
-        .nav-item i { font-size: 18px; transition: transform 0.2s; }
-        .nav-item:hover i { transform: translateY(-2px); }
-        .nav-item.active i { text-shadow: 0 0 20px rgba(251,191,36,0.1); }
-
-        /* ===== MODALS ===== */
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; }
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000; }
         .modal.active { display: flex; }
-        .modal-content { background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); padding: 20px; border-radius: 20px; width: 90%; max-width: 320px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); }
-        .modal-content button { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; padding: 10px 28px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; margin-top: 10px; transition: transform 0.2s; }
-        .modal-content button:hover { transform: scale(1.03); }
-        .success-animation { font-size: 48px; margin-bottom: 12px; }
-        .modal-content h3 { font-size: 20px; margin-bottom: 6px; color: #fff; }
-        .modal-content p { color: #94a3b8; margin-bottom: 10px; }
+        .modal-content { background: #1e293b; padding: 25px; border-radius: 12px; width: 90%; max-width: 450px; border: 1px solid #334155; }
+        .modal-content h3 { margin-bottom: 15px; color: #fff; }
+        .modal-content input, .modal-content select, .modal-content textarea { width: 100%; padding: 10px; margin-bottom: 15px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #fff; }
+        .modal-content input:focus, .modal-content select:focus { outline: 2px solid #3b82f6; border-color: transparent; }
+        .modal-content .btn-group { display: flex; gap: 10px; justify-content: flex-end; }
+        .modal-content .btn-group button { padding: 8px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .modal-content .btn-group .save { background: #3b82f6; color: #fff; }
+        .modal-content .btn-group .cancel-modal { background: #64748b; color: #fff; }
 
-        /* ===== TOAST ===== */
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #10b981; color: #fff; padding: 10px 20px; border-radius: 14px; font-weight: 700; z-index: 9999; display: none; font-size: 14px; box-shadow: 0 8px 32px rgba(16,185,129,0.2); }
-        .toast.show { display: block; animation: slideDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .toast.error { background: #ef4444; box-shadow: 0 8px 32px rgba(239,68,68,0.2); }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-80px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .settings-card { background: #1e293b; padding: 15px; border-radius: 10px; border: 1px solid #334155; }
+        .settings-card label { display: block; margin: 10px 0 5px 0; color: #94a3b8; font-size: 13px; }
+        .settings-card input { width: 100%; padding: 8px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; color: #fff; }
+        .settings-card textarea { width: 100%; padding: 8px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; color: #fff; resize: vertical; }
+        .settings-card button { margin-top: 15px; background: #3b82f6; border: none; padding: 8px 15px; border-radius: 6px; color: #fff; cursor: pointer; width: 100%; }
 
-        /* ===== OVERLAYS ===== */
-        .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9998; display: none; overflow-y: auto; padding-bottom: 70px; }
-        .overlay.show { display: block; }
-        .overlay-header { background: rgba(15,23,42,0.9); backdrop-filter: blur(8px); padding: 12px 16px; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
-        .overlay-header .back-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 6px 14px; border-radius: 10px; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 6px; transition: background 0.2s; }
-        .overlay-header .back-btn:hover { background: rgba(255,255,255,0.2); }
-        .overlay-header h2 { font-size: 18px; flex: 1; text-align: center; margin-right: 40px; color: #fff; }
-        .overlay-content { padding: 14px; }
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
 
-        /* ===== LEVEL ===== */
-        .current-level-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 16px; padding: 16px; margin-bottom: 14px; border: 1px solid rgba(255,255,255,0.08); text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-        .current-level-card .level-emoji { font-size: 40px; }
-        .current-level-card .level-number { font-size: 24px; font-weight: 900; color: #fbbf24; }
-        .current-level-card .level-title { font-size: 15px; color: #94a3b8; }
-        .current-level-card .level-points { font-size: 12px; color: #94a3b8; margin-top: 4px; }
-        .current-level-card .level-progress { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 6px; margin-top: 10px; overflow: hidden; }
-        .current-level-card .level-progress .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 6px; }
-        .current-level-card .level-progress-text { display: flex; justify-content: space-between; font-size: 10px; color: #94a3b8; margin-top: 4px; }
-
-        .filter-tabs { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 4px; }
-        .filter-tabs .tab { padding: 4px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #94a3b8; cursor: pointer; font-size: 11px; white-space: nowrap; transition: all 0.2s; }
-        .filter-tabs .tab.active { background: linear-gradient(135deg, #8b5cf6, #3b82f6); border-color: transparent; color: #fff; box-shadow: 0 4px 16px rgba(139,92,246,0.2); }
-        .filter-tabs .tab:hover:not(.active) { background: rgba(255,255,255,0.05); }
-
-        .level-list-title { font-size: 16px; font-weight: 700; margin: 12px 0; display: flex; align-items: center; gap: 8px; color: #fff; }
-        .level-item { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 12px; padding: 10px 14px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(255,255,255,0.08); transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-        .level-item.active { border-color: #fbbf24; background: rgba(251,191,36,0.05); box-shadow: 0 0 20px rgba(251,191,36,0.05); }
-        .level-item.locked { opacity: 0.4; }
-        .level-item .level-info { display: flex; align-items: center; gap: 10px; }
-        .level-item .level-info .num { font-size: 13px; font-weight: bold; color: #94a3b8; min-width: 24px; }
-        .level-item .level-info .name { font-size: 13px; color: #fff; }
-        .level-item .level-info .emoji { font-size: 18px; }
-        .level-item .level-info .badge { font-size: 9px; padding: 2px 8px; border-radius: 20px; background: rgba(251,191,36,0.1); color: #fbbf24; }
-        .level-item .level-reward { font-size: 12px; color: #10b981; }
-        .level-item .level-check { color: #10b981; font-size: 16px; }
-
-        /* ===== AIRDROP OVERLAY (ADVANCED) ===== */
-        .airdrop-overlay .airdrop-grid { display: grid; grid-template-columns: 1fr; gap: 10px; padding: 8px 0; }
-        .airdrop-overlay .info-box { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 16px; padding: 16px; border: 1px solid rgba(255,255,255,0.08); text-align: center; }
-        .airdrop-overlay .info-box .big-number { font-size: 36px; font-weight: 900; color: #fbbf24; }
-        .airdrop-overlay .info-box .label { color: #94a3b8; font-size: 13px; margin-top: 4px; }
-        
-        .airdrop-overlay .countdown-area { display: flex; flex-direction: column; align-items: center; margin: 15px 0; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); }
-        .airdrop-overlay .countdown-area .countdown-timer { font-size: 32px; font-weight: bold; color: #fbbf24; letter-spacing: 2px; font-variant-numeric: tabular-nums; }
-        .airdrop-overlay .countdown-area .countdown-label { font-size: 12px; color: #94a3b8; margin-bottom: 4px; }
-        
-        .airdrop-overlay .claim-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; padding: 12px 24px; border: none; border-radius: 30px; font-weight: 700; font-size: 16px; cursor: pointer; margin-top: 15px; width: 100%; box-shadow: 0 4px 20px rgba(245,158,11,0.3); transition: all 0.2s; }
-        .airdrop-overlay .claim-btn:hover:not(:disabled) { transform: scale(1.02); box-shadow: 0 6px 30px rgba(245,158,11,0.4); }
-        .airdrop-overlay .claim-btn:disabled { background: #64748b; cursor: not-allowed; box-shadow: none; }
-        
-        .airdrop-overlay .status-box { font-size: 14px; margin-top: 10px; padding: 8px; border-radius: 8px; font-weight: bold; color: #fff; }
-        .airdrop-overlay .status-box.live { background: rgba(16,185,129,0.1); color: #10b981; border: 1px solid rgba(16,185,129,0.1); }
-        .airdrop-overlay .status-box.ended { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.1); }
-
-        .airdrop-list { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 12px; padding: 12px; margin-top: 12px; border: 1px solid rgba(255,255,255,0.08); max-height: 300px; overflow-y: auto; }
-        .airdrop-list .list-title { font-size: 12px; color: #94a3b8; margin-bottom: 8px; text-align: center; }
-        .airdrop-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px; }
-        .airdrop-item:last-child { border-bottom: none; }
-        .airdrop-item .name { color: #fff; font-weight: 500; }
-        .airdrop-item .time { color: #94a3b8; font-size: 10px; }
-        .airdrop-item.winner { background: rgba(251,191,36,0.1); border-left: 3px solid #fbbf24; padding-left: 8px; border-radius: 4px; }
-
-        /* ===== OFFLINE OVERLAY ===== */
-        .offline-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 99999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; }
-        .offline-overlay.show { display: flex; }
-        .offline-overlay h1 { color: #ef4444; font-size: 26px; margin-bottom: 10px; }
-        .offline-overlay p { color: #94a3b8; max-width: 380px; line-height: 1.6; }
-
-        /* ===== BANNED ===== */
-        .banned-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 99998; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; }
-        .banned-overlay.show { display: flex; }
-        .banned-overlay h1 { color: #ef4444; font-size: 26px; margin-bottom: 10px; }
-        .banned-overlay p { color: #94a3b8; max-width: 380px; line-height: 1.6; }
-        .banned-overlay .ban-reason { background: rgba(255,255,255,0.05); padding: 14px; border-radius: 12px; margin-top: 12px; max-width: 380px; color: #fbbf24; border: 1px solid rgba(239,68,68,0.15); }
-
+        /* Utility */
         .hidden { display: none !important; }
-        .loading { text-align: center; padding: 24px; color: #94a3b8; }
-        .loading-spinner { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #3b82f6; border-radius: 50%; width: 32px; height: 32px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <!-- OFFLINE OVERLAY -->
-    <div class="offline-overlay" id="offlineOverlay">
-        <h1>⚠️ No Internet Connection</h1>
-        <p>Please check your network connection. The app will resume automatically once you are back online.</p>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>⚡ Admin Panel</h2>
+        <div class="nav-item active" onclick="switchTab('dashboard', this)"><i class="fas fa-chart-pie"></i> Dashboard</div>
+        <div class="nav-item" onclick="switchTab('users', this)"><i class="fas fa-users"></i> Users</div>
+        <div class="nav-item" onclick="switchTab('tasks', this)"><i class="fas fa-tasks"></i> Tasks</div>
+        <div class="nav-item" onclick="switchTab('withdraw', this)"><i class="fas fa-money-bill-wave"></i> Withdraw</div>
+        <div class="nav-item" onclick="switchTab('offers', this)"><i class="fas fa-bullhorn"></i> Offers & Notify</div>
+        <div class="nav-item" onclick="switchTab('settings', this)"><i class="fas fa-cog"></i> Settings</div>
     </div>
 
-    <!-- BANNED OVERLAY -->
-    <div class="banned-overlay" id="bannedOverlay">
-        <h1>🚫 Account Banned</h1>
-        <p>Your account has been suspended by the administrator.</p>
-        <div class="ban-reason" id="banReason">Reason: Violation of terms</div>
-        <p style="margin-top:12px;font-size:12px;color:#64748b;">Contact support if you think this is a mistake.</p>
-    </div>
+    <!-- Main Content -->
+    <div class="main">
 
-    <!-- LEVEL OVERLAY -->
-    <div class="overlay" id="levelOverlay">
-        <div class="overlay-header">
-            <button class="back-btn" onclick="closeLevelPage()"><i class="fas fa-arrow-left"></i> Back</button>
-            <h2>🏆 Level System</h2>
+        <!-- Header -->
+        <div class="header-bar">
+            <h3>📊 Control Center</h3>
+            <span id="liveTime" style="color:#94a3b8;font-size:14px;"></span>
         </div>
-        <div class="overlay-content">
-            <div class="current-level-card">
-                <div class="level-emoji" id="levelCurrentEmoji">🥉</div>
-                <div class="level-number" id="levelCurrentNumber">Level 1</div>
-                <div class="level-title" id="levelCurrentTitle">Bronze</div>
-                <div class="level-points" id="levelCurrentPointsText">0 / 100 XP</div>
-                <div class="level-progress"><div class="fill" id="levelProgressFill2" style="width:0%;"></div></div>
-                <div class="level-progress-text"><span id="levelProgressText2">0%</span><span id="levelNextInfo">Next Level: 2</span></div>
-            </div>
-            <div class="reward-section">
-                <div class="reward-title">🎁 Current Level Rewards</div>
-                <div class="reward-item"><span>🪙 Bonus Earnings</span><span class="value" id="levelBonusPercent">+2%</span></div>
-                <div class="reward-item"><span>📋 Exclusive Tasks</span><span class="value" id="levelExclusiveTasks">🔒 Locked</span></div>
-                <div class="reward-item"><span>🎯 Daily Bonus</span><span class="value" id="levelDailyBonus">+10 Coins</span></div>
-            </div>
-            <div class="filter-tabs">
-                <button class="tab active" data-filter="all" onclick="filterLevels('all',this)">📋 All</button>
-                <button class="tab" data-filter="bronze" onclick="filterLevels('bronze',this)">🥉 Bronze</button>
-                <button class="tab" data-filter="silver" onclick="filterLevels('silver',this)">🥈 Silver</button>
-                <button class="tab" data-filter="gold" onclick="filterLevels('gold',this)">🥇 Gold</button>
-                <button class="tab" data-filter="platinum" onclick="filterLevels('platinum',this)">💎 Platinum</button>
-                <button class="tab" data-filter="diamond" onclick="filterLevels('diamond',this)">👑 Diamond</button>
-            </div>
-            <div class="level-list-title">📊 All Levels <span>100 Levels</span></div>
-            <div class="level-list" id="levelList"><div class="loading"><div class="loading-spinner"></div><p>Loading...</p></div></div>
-        </div>
-    </div>
 
-    <!-- AIRDROP OVERLAY (Advanced Countdown & Winner List) -->
-    <div class="overlay airdrop-overlay" id="airdropOverlay">
-        <div class="overlay-header">
-            <button class="back-btn" onclick="closeAirdropPage()"><i class="fas fa-arrow-left"></i> Back</button>
-            <h2>📢 Live AirDrop</h2>
+        <!-- SECTION: DASHBOARD -->
+        <div id="tabDashboard">
+            <div class="dashboard-cards">
+                <div class="stat-card"><div class="title">Total Users</div><div class="value blue" id="totalUsers">0</div></div>
+                <div class="stat-card"><div class="title">Total Coins in App</div><div class="value yellow" id="totalCoins">0</div></div>
+                <div class="stat-card"><div class="title">Pending Withdraws</div><div class="value red" id="pendingWithdraws">0</div></div>
+                <div class="stat-card"><div class="title">Total Withdrawn (USD)</div><div class="value green" id="totalWithdrawn">$0</div></div>
+            </div>
         </div>
-        <div class="overlay-content">
-            <div class="airdrop-grid">
-                <div class="info-box">
-                    <div class="live-users"><span class="dot"></span> <span id="onlineUsersDisplay">0</span> Users Online</div>
-                    <div class="big-number" id="airdropPoolDisplay">$0.00</div>
-                    <div class="label">Current Reward Pool</div>
-                    
-                    <!-- COUNTDOWN AREA -->
-                    <div class="countdown-area">
-                        <div class="countdown-label" id="countdownLabel">Drop Timer</div>
-                        <div class="countdown-timer" id="airdropCountdown">--:--:--</div>
-                    </div>
 
-                    <div class="status-box" id="airdropStatusBox">⏳ Waiting for next round...</div>
-                    
-                    <button class="claim-btn" id="airdropClaimBtn" onclick="claimAirdrop()" disabled>
-                        🎁 Claim Your Share
-                    </button>
+        <!-- SECTION: USERS -->
+        <div id="tabUsers" class="hidden">
+            <div class="section-header">
+                <h4>👥 All Users (Username & ID Collected)</h4>
+                <button onclick="refreshUsers()"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>User ID</th><th>Username</th><th>Coins</th><th>USD</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody id="usersTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SECTION: TASKS -->
+        <div id="tabTasks" class="hidden">
+            <div class="section-header">
+                <h4>📋 Manage Tasks</h4>
+                <button onclick="openTaskModal()"><i class="fas fa-plus"></i> Add Task</button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Title</th><th>Type</th><th>Reward</th><th>Action</th></tr></thead>
+                    <tbody id="tasksTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SECTION: WITHDRAW -->
+        <div id="tabWithdraw" class="hidden">
+            <div class="section-header">
+                <h4>💳 Withdraw Requests</h4>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>User</th><th>Amount (USD)</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+                    <tbody id="withdrawTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SECTION: OFFERS & NOTIFICATIONS -->
+        <div id="tabOffers" class="hidden">
+            <div class="section-header">
+                <h4>📢 Send Offers & Notifications</h4>
+            </div>
+            <div class="settings-grid">
+                <div class="settings-card">
+                    <h5>📧 Send to Specific User</h5>
+                    <label>User ID (From Users Tab)</label>
+                    <input type="text" id="offerUserId" placeholder="Paste User ID here">
+                    <label>Offer / Message Title</label>
+                    <input type="text" id="offerTitle" placeholder="e.g. Special Bonus!">
+                    <label>Message Details</label>
+                    <textarea id="offerMessage" rows="3" placeholder="Write your message here..."></textarea>
+                    <label>Reward Coins (Optional)</label>
+                    <input type="number" id="offerReward" value="0">
+                    <button onclick="sendOfferToUser()">Send to User</button>
                 </div>
 
-                <div class="airdrop-list">
-                    <div class="list-title">🏆 Winner List</div>
-                    <div id="airdropListContainer"><p style="color:#94a3b8;font-size:13px;text-align:center;padding:10px;">Waiting for the first claim...</p></div>
+                <div class="settings-card">
+                    <h5>📢 Broadcast to All Users</h5>
+                    <label>Broadcast Title</label>
+                    <input type="text" id="broadcastTitle" placeholder="e.g. Global Update!">
+                    <label>Broadcast Message</label>
+                    <textarea id="broadcastMessage" rows="3" placeholder="Write message for everyone..."></textarea>
+                    <label>Reward Coins (Optional)</label>
+                    <input type="number" id="broadcastReward" value="0">
+                    <button onclick="sendBroadcast()" style="background:#10b981;">Broadcast to All</button>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== MAIN CONTENT ===== -->
-    <div class="container main-content" id="mainContent">
-        
-        <!-- ===== HEADER ===== -->
-        <div class="header">
-            <div class="user-info">
-                <div class="avatar" onclick="openLevelPage()">👤</div>
-                <div class="user-details">
-                    <h3 id="userName">User</h3>
-                    <div class="last-login" id="lastLoginDisplay">📅 Last Login: --</div>
-                    <span class="level-badge" onclick="openLevelPage()" id="userLevelBadge">Level 1 👆</span>
-                </div>
-            </div>
-            <div class="balance-card">
-                <div class="balance-label">💰 Coins Balance</div>
-                <div class="balance-amount" id="balance">0</div>
-                <div class="usd-value" id="usdValue">≈ $0.00 USD</div>
-                <div class="total-usd-earned" id="totalUsdEarned">💵 Total USD Earned: $0.00</div>
-                <div class="level-section" onclick="openLevelPage()">
-                    <div class="level-row">
-                        <span class="level-title" id="levelTitle">🥉 Bronze</span>
-                        <span class="level-number" id="levelNumber">Level 1</span>
-                        <span class="level-arrow">➜</span>
-                    </div>
-                    <div class="level-progress"><div class="fill" id="levelProgressFill" style="width:0%;"></div></div>
-                    <div class="level-points"><span id="levelCurrentPoints">0</span><span id="levelNextPoints">/ 100</span></div>
-                </div>
-                <div class="conversion-timer">
-                    <div class="label">⏰ Next Auto Conversion</div>
-                    <div class="time" id="conversionCountdown">--:--:--</div>
-                    <div class="rate-info" id="rateInfo">Rate: 1 USD = 1000 Coins</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ===== STATS ===== -->
-        <div class="stats-grid">
-            <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-value" id="completedTasks">0</div><div class="stat-label">Tasks Done</div></div>
-            <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-value" id="referralCount">0</div><div class="stat-label">Referrals</div></div>
-            <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-value" id="dailyStreak">0</div><div class="stat-label">Day Streak</div></div>
-        </div>
-
-        <!-- ===== AIRDROP BUTTON (Replaces Weekly Bonus) ===== -->
-        <div class="airdrop-btn" onclick="openAirdropPage()">
-            <div class="bonus-text">
-                <h4>📢 Live AirDrop</h4>
-                <p id="airdropDesc">Tap to claim your share!</p>
-                <div class="live-users">
-                    <span class="dot"></span>
-                    <span id="onlineUsersHome">0</span> Users Online
-                </div>
-            </div>
-            <div class="arrow">➜</div>
-        </div>
-
-        <!-- ===== PAGE: HOME (NEW PROGRESS BAR) ===== -->
-        <div class="page active" id="pageHome">
-            <div class="tap-section-enhanced">
-                <div class="progress-container">
-                    <div class="progress-coin-display">
-                        <span class="progress-coin-icon">🪙</span>
-                        <span class="progress-coin-count" id="progressCoinCount">1000</span>
-                    </div>
-                    <div class="progress-bar-wrapper">
-                        <div class="progress-bar-bg">
-                            <div class="progress-bar-fill" id="progressBarFill" style="width: 100%;"></div>
-                        </div>
-                        <div class="progress-percent" id="progressPercent">100%</div>
-                    </div>
-                    <button class="progress-start-btn" id="progressStartBtn" onclick="startProgress()">
-                        ▶ START
-                    </button>
-                    <button class="progress-watch-btn hidden" id="progressWatchBtn" onclick="startVideoProgress()">
-                        📺 Watch Videos (0/5)
-                    </button>
-                </div>
-                <div class="progress-status" id="progressStatus">Ready to start!</div>
-                
-                <!-- SPEED BOOST BUTTON -->
-                <div class="speed-btn-container">
-                    <button class="speed-boost-btn" id="speedBoostBtn" onclick="activateSpeedBoost()">
-                        <i class="fas fa-rocket"></i> Speed Boost <span class="boost-timer" id="boostTimer"></span>
-                    </button>
-                    <div class="boost-cooldown-text" id="boostCooldownText">⏳ Wait <span id="boostCountdownDisplay">00:00</span> to reuse</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ===== PAGE: EARN ===== -->
-        <div class="page" id="pageEarn">
-            <h2 class="page-header">📺 Earn Coins</h2>
-            <div class="video-card">
-                <div class="video-title">Watch Video & Earn</div>
-                <div class="video-desc">Watch short videos to earn coins!</div>
-                <div class="video-reward" id="videoReward">+10 Coins per video</div>
-                <div class="video-limit" id="videoLimit">Today: 0 / 5 videos</div>
-                <button class="video-btn" id="videoBtn" onclick="watchVideo()">▶ Watch Video</button>
-                <div class="video-watched" id="videoWatched"></div>
-            </div>
-        </div>
-
-        <!-- ===== PAGE: TASKS (Dynamic) ===== -->
-        <div class="page" id="pageTasks">
-            <h2 class="page-header">📋 Tasks</h2>
-            <div class="task-filters">
-                <button class="filter-btn active" data-filter="all" onclick="filterTasks('all', this)">📋 All</button>
-                <button class="filter-btn" data-filter="link" onclick="filterTasks('link', this)">🔗 Link</button>
-                <button class="filter-btn" data-filter="button" onclick="filterTasks('button', this)">🟦 Button</button>
-                <button class="filter-btn" data-filter="video" onclick="filterTasks('video', this)">📺 Video</button>
-            </div>
-            <div class="tasks-section" id="tasksContainer">
-                <div class="no-tasks">No tasks available. Check back later!</div>
-            </div>
-        </div>
-
-        <!-- ===== PAGE: REFER ===== -->
-        <div class="page" id="pageRefer">
-            <h2 class="page-header">👥 Refer & Earn</h2>
-            <div class="refer-link-box">
-                <p style="font-size:13px;color:#94a3b8;">Your Referral Link</p>
-                <div class="link" id="referLinkHome">Loading...</div>
-                <button class="copy-btn" onclick="copyReferLinkHome()"><i class="fas fa-copy"></i> Copy Link</button>
             </div>
             
-            <div class="refer-code-input-box">
-                <p style="font-size:13px;color:#94a3b8;margin-bottom:8px;">📝 Enter Referral Code</p>
-                <input type="text" id="referCodeInput" placeholder="Enter code here...">
-                <button id="referCodeSubmitBtn" onclick="submitReferCode()">Submit Code</button>
+            <div class="section-header" style="margin-top:20px;">
+                <h4>📜 Offer History</h4>
             </div>
-
-            <div class="refer-stats">
-                <div class="stat"><div class="number" id="referTotalHome">0</div><div class="label">Total Referrals</div></div>
-                <div class="stat"><div class="number" id="referEarnedHome">0</div><div class="label">Coins Earned</div></div>
-                <div class="stat"><div class="number" id="referBonusHome">0</div><div class="label">Bonus Ready</div></div>
-            </div>
-
-            <div class="refer-progress">
-                <p style="font-size:13px;color:#94a3b8;">📊 Referral Progress</p>
-                <div class="progress-bar"><div class="fill" id="referProgressFillHome" style="width:0%;"></div></div>
-                <div class="progress-text"><span id="referProgressTextHome">0 / 10</span><span>Next Bonus: 10 Referrals</span></div>
-            </div>
-
-            <div style="margin-top:12px;">
-                <h4 style="font-size:14px;margin-bottom:8px;">🎁 Tier Bonuses</h4>
-                <div id="referTierListHome"></div>
-            </div>
-
-            <div class="referral-list-box">
-                <div class="list-title">📋 Referral History</div>
-                <div id="referralListHome"><p style="color:#94a3b8;font-size:13px;text-align:center;padding:10px;">No referrals yet</p></div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Target User</th><th>Title</th><th>Status</th><th>Date</th></tr></thead>
+                    <tbody id="offersTableBody"></tbody>
+                </table>
             </div>
         </div>
 
-        <!-- ===== PAGE: WALLET ===== -->
-        <div class="page" id="pageWallet">
-            <h2 class="page-header">💰 Wallet</h2>
-            <div class="wallet-card">
-                <p style="color:#94a3b8;font-size:13px;">Coins Balance</p>
-                <div class="wallet-balance" id="walletBalance">0</div>
-                <div class="wallet-usd" id="walletUsd">≈ $0.00 USD</div>
+        <!-- SECTION: SETTINGS -->
+        <div id="tabSettings" class="hidden">
+            <h4 style="margin-bottom:15px;">⚙️ Global Settings</h4>
+            <div class="settings-grid">
                 
-                <div class="wallet-total">
-                    <div class="label">💵 Total USD Earned</div>
-                    <div class="value" id="walletTotalUsd">$0.00</div>
+                <div class="settings-card">
+                    <h5>💰 Conversion & Limits</h5>
+                    <label>Conversion Rate (1 USD = ? Coins)</label>
+                    <input type="number" id="setConversionRate" value="1000">
+                    <label>Min Withdraw (USD)</label>
+                    <input type="number" id="setMinWithdraw" value="10">
+                    <button onclick="saveGeneralSettings()">Save Settings</button>
                 </div>
-                
-                <div class="wallet-conversion">
-                    <div class="label">⏰ Next Auto Conversion</div>
-                    <div class="value" id="walletNextConversion">--:--:--</div>
+
+                <div class="settings-card">
+                    <h5>📺 Video Settings</h5>
+                    <label>Reward per Video (Coins)</label>
+                    <input type="number" id="setVideoReward" value="10">
+                    <label>Daily Video Limit</label>
+                    <input type="number" id="setVideoLimit" value="5">
+                    <label style="margin-top: 10px;">Videos to Refill (Threshold)</label>
+                    <input type="number" id="setVideoThreshold" value="5">
+                    <button onclick="saveVideoSettings()" style="margin-top: 20px;">Save Video Settings</button>
                 </div>
-                
-                <div class="withdraw-section">
-                    <p style="font-size:11px;color:#94a3b8;">💳 Withdraw</p>
-                    <p style="font-size:13px;font-weight:bold;color:#fbbf24;" id="withdrawInfo">Min: $10.00 USD</p>
-                    <p style="font-size:11px;color:#94a3b8;" id="withdrawStatus">You have: $0.00 USD</p>
-                    <button class="withdraw-btn" id="withdrawBtn" onclick="withdraw()">Withdraw Now</button>
+
+                <!-- NEW: ADVANCED AIRDROP SETTINGS (Timer Based) -->
+                <div class="settings-card" style="grid-column: span 1;">
+                    <h5>📢 Live AirDrop Settings</h5>
+                    <label>Total Pool Amount ($)</label>
+                    <input type="number" id="setAirdropPool" value="50.00" step="0.01">
+                    <label>Min Reward per User ($)</label>
+                    <input type="number" id="setAirdropMin" value="0.50" step="0.01">
+                    <label>Max Reward per User ($)</label>
+                    <input type="number" id="setAirdropMax" value="2.00" step="0.01">
+                    <label>Participant Limit (Max Users)</label>
+                    <input type="number" id="setAirdropLimit" value="50">
+                    
+                    <label style="margin-top: 10px; color: #fbbf24;">⏰ Drop Start Time</label>
+                    <input type="datetime-local" id="setAirdropStart">
+                    
+                    <button onclick="saveAirdropSettings()" style="margin-top: 20px;">Save AirDrop Settings</button>
+                    <p style="font-size:10px;color:#64748b;margin-top:5px;">Users will see a live 5-minute countdown and claim button based on this start time.</p>
                 </div>
-                
-                <div class="withdraw-history">
-                    <div class="title">📜 Withdraw History</div>
-                    <div id="withdrawHistory" style="font-size:11px;color:#94a3b8;"></div>
+
+                <!-- 100 LEVELS CONFIG (1-100, 200 XP increment) -->
+                <div class="settings-card" style="grid-column: span 1;">
+                    <h5>🏅 Level Config (1 to 100)</h5>
+                    <p style="font-size:12px;color:#94a3b8;margin-bottom:10px;">System automatically sets <strong>200 XP</strong> per level up to 100.</p>
+                    
+                    <label>Level 1 XP</label><input type="number" id="setL1" value="0">
+                    <label>Level 2 XP</label><input type="number" id="setL2" value="200">
+                    <label>Level 3 XP</label><input type="number" id="setL3" value="400">
+                    <label>Level 4 XP</label><input type="number" id="setL4" value="600">
+                    <label>Level 5 XP</label><input type="number" id="setL5" value="800">
+                    
+                    <button onclick="saveLevelSettings()" style="margin-top:15px;">Generate & Save 100 Levels</button>
+                    <p style="font-size:10px;color:#64748b;margin-top:5px;">This will set standard XP (200 increments) up to Level 100.</p>
                 </div>
+
+                <!-- SPEED BOOST -->
+                <div class="settings-card">
+                    <h5>⚡ Speed Boost Settings</h5>
+                    <label>Boost Duration (Seconds)</label>
+                    <input type="number" id="setBoostDuration" value="3">
+                    <label>Cooldown Time (Minutes)</label>
+                    <input type="number" id="setBoostCooldown" value="60">
+                    <button onclick="saveBoostSettings()">Save Boost Settings</button>
+                </div>
+
+                <!-- REFERRAL TIERS -->
+                <div class="settings-card" style="grid-column: span 1;">
+                    <h5>👥 Referral Tiers & Bonuses</h5>
+                    
+                    <label style="margin-top:15px;color:#fbbf24;">🥉 Bronze Tier</label>
+                    <div style="display:flex;gap:10px;">
+                        <div style="flex:1;"><label>Needed</label><input type="number" id="setRef1Count" value="10"></div>
+                        <div style="flex:1;"><label>Bonus</label><input type="number" id="setRef1Bonus" value="50"></div>
+                    </div>
+
+                    <label style="margin-top:10px;color:#94a3b8;">🥈 Silver Tier</label>
+                    <div style="display:flex;gap:10px;">
+                        <div style="flex:1;"><label>Needed</label><input type="number" id="setRef2Count" value="25"></div>
+                        <div style="flex:1;"><label>Bonus</label><input type="number" id="setRef2Bonus" value="150"></div>
+                    </div>
+
+                    <label style="margin-top:10px;color:#fbbf24;">🥇 Gold Tier</label>
+                    <div style="display:flex;gap:10px;">
+                        <div style="flex:1;"><label>Needed</label><input type="number" id="setRef3Count" value="50"></div>
+                        <div style="flex:1;"><label>Bonus</label><input type="number" id="setRef3Bonus" value="300"></div>
+                    </div>
+
+                    <label style="margin-top:10px;color:#38bdf8;">💎 Platinum Tier</label>
+                    <div style="display:flex;gap:10px;">
+                        <div style="flex:1;"><label>Needed</label><input type="number" id="setRef4Count" value="100"></div>
+                        <div style="flex:1;"><label>Bonus</label><input type="number" id="setRef4Bonus" value="500"></div>
+                    </div>
+
+                    <label style="margin-top:10px;color:#a78bfa;">👑 Diamond Tier</label>
+                    <div style="display:flex;gap:10px;">
+                        <div style="flex:1;"><label>Needed</label><input type="number" id="setRef5Count" value="200"></div>
+                        <div style="flex:1;"><label>Bonus</label><input type="number" id="setRef5Bonus" value="1000"></div>
+                    </div>
+
+                    <button onclick="saveReferralSettings()" style="margin-top:20px;">Save Referral Tiers</button>
+                </div>
+
             </div>
         </div>
     </div>
 
-    <!-- ===== BOTTOM NAV ===== -->
-    <div class="bottom-nav">
-        <div class="nav-item active" onclick="switchPage('home', event)"><i class="fas fa-home"></i><span>Home</span></div>
-        <div class="nav-item" onclick="switchPage('earn', event)"><i class="fas fa-video"></i><span>Earn</span></div>
-        <div class="nav-item" onclick="switchPage('tasks', event)"><i class="fas fa-tasks"></i><span>Tasks</span></div>
-        <div class="nav-item" onclick="switchPage('refer', event)"><i class="fas fa-users"></i><span>Refer</span></div>
-        <div class="nav-item" onclick="switchPage('wallet', event)"><i class="fas fa-wallet"></i><span>Wallet</span></div>
+    <!-- MODALS -->
+    <div class="modal" id="taskModal">
+        <div class="modal-content">
+            <h3 id="taskModalTitle">Add New Task</h3>
+            <input type="hidden" id="editTaskId">
+            <input type="text" id="taskTitle" placeholder="Task Title">
+            <input type="number" id="taskReward" placeholder="Reward Coins">
+            <select id="taskType">
+                <option value="link">Link Task</option>
+                <option value="button">Button Task</option>
+                <option value="video">Video Task</option>
+            </select>
+            <input type="text" id="taskLink" placeholder="URL (For Link Tasks)">
+            <input type="text" id="taskActionText" placeholder="Button Text (e.g. 'Go', 'Watch')">
+            <div class="btn-group">
+                <button class="cancel-modal" onclick="closeModal('taskModal')">Cancel</button>
+                <button class="save" onclick="saveTask()">Save Task</button>
+            </div>
+        </div>
     </div>
 
-    <!-- ===== MODALS ===== -->
-    <div class="modal" id="successModal"><div class="modal-content"><div class="success-animation">🎉</div><h3>Task Completed!</h3><p id="rewardText">+50 Coins</p><button onclick="closeModal('successModal')">Awesome!</button></div></div>
-    <div class="modal" id="conversionModal"><div class="modal-content"><div class="success-animation">💰</div><h3>Coins Converted!</h3><p id="conversionText">Coins → USD</p><button onclick="closeModal('conversionModal')">Awesome!</button></div></div>
-    <div class="modal" id="airdropModal"><div class="modal-content"><div class="success-animation">💰</div><h3>AirDrop Claimed!</h3><p id="airdropRewardText">You won +$0.00!</p><button onclick="closeModal('airdropModal')">Awesome!</button></div></div>
-    <div class="modal" id="withdrawModal"><div class="modal-content"><div class="success-animation">💳</div><h3 id="withdrawModalTitle">Withdrawal</h3><p id="withdrawModalText">Processing...</p><button onclick="closeModal('withdrawModal')">OK</button></div></div>
-    <div class="modal" id="adModal"><div class="modal-content"><div class="success-animation">📺</div><h3>Watch Ad to Claim</h3><p id="adModalText">Please watch the ad</p><div id="adModalContent"></div><button onclick="closeModal('adModal')">Skip</button></div></div>
-    <div class="modal" id="videoModal"><div class="modal-content"><div class="success-animation">📺</div><h3>Video Watched!</h3><p id="videoRewardText">You earned +10 Coins</p><button onclick="closeModal('videoModal')">Awesome!</button></div></div>
-
-    <div class="toast" id="toast"></div>
-
-    <!-- SPEED BOOST OVERLAY -->
-    <div class="speed-spinner-overlay" id="speedSpinnerOverlay">
-        <div class="speed-spinner"></div>
-        <div class="speed-spinner-text">⏳ Speed Boost Active!</div>
-        <div class="speed-spinner-timer" id="speedTimerDisplay">3s</div>
-        <div class="speed-spinner-progress">
-            <div class="fill" id="speedProgressFill" style="width: 0%;"></div>
+    <div class="modal" id="editUserModal">
+        <div class="modal-content">
+            <h3>Edit User</h3>
+            <input type="hidden" id="editUserId">
+            <label>Coins</label>
+            <input type="number" id="editUserCoins">
+            <label>USD</label>
+            <input type="number" id="editUserUsd">
+            <div class="btn-group">
+                <button class="cancel-modal" onclick="closeModal('editUserModal')">Cancel</button>
+                <button class="save" onclick="saveUserEdit()">Update User</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // ==================== MONETAG REWARDED AD ====================
-        function showRewardedAd(callback) {
-            show_11197472().then(() => {
-                console.log('✅ Ad watched successfully!');
-                if (callback) callback();
-            }).catch((err) => {
-                console.log('Ad error:', err);
-                if (callback) callback();
-            });
-        }
-
-        // Popup Ad for Speed Boost
-        function showRewardedPopup(callback) {
-            show_11197472('pop').then(() => {
-                console.log('✅ Popup ad watched successfully!');
-                if (callback) callback();
-            }).catch((err) => {
-                console.log('Popup ad error:', err);
-                if (callback) callback();
-            });
-        }
-
-        // ==================== FIREBASE ====================
+        // --- FIREBASE CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyAqCNHhu9oaBDea85tAH-iHucHczZnR7nY",
             authDomain: "tolaka-exc-reverb-b1afd.firebaseapp.com",
@@ -785,1428 +364,468 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // ==================== TG ====================
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-        let userId = 'default_user';
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            userId = tg.initDataUnsafe.user.id.toString();
-        }
-
-        // ==================== STATE ====================
-        let appState = {
-            balance: 0, usdBalance: 0, completedTasks: 0, referralCount: 0,
-            dailyStreak: 0, userLevel: 1, tasksCompleted: [],
-            lastConversion: null, conversionRate: 1000, minWithdraw: 10,
-            isBanned: false, banReason: '', withdrawHistory: [],
-            lastLogin: null,
-            referCode: '',
-            referEarned: 0,
-            referTiers: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
-            videoWatchedToday: 0,
-            videoLastWatchDate: null,
-            videoReward: 10,
-            videoDailyLimit: 5,
-            videoRefillThreshold: 5,
-            referrals: [],
-            weekStart: null,
-            progressCoins: 1000,
-            videoWatchedCount: 0,
-            isSpeedBoostActive: false,
-            speedBoostCooldown: 0,
-            taskLastCompleted: {},
-            // Airdrop State
-            airdropClaimed: false,
-            airdropAmount: 0
-        };
-
-        let tasks = [];
-        let conversionTimerInterval = null;
-        let progressInterval = null;
-        let speedBoostInterval = null;
-        let speedBoostTimerInterval = null; 
-        let currentFilter = 'all';
-        const TOTAL_COINS = 1000;
-
-        const userRef = db.ref('users/' + userId);
-        const tasksRef = db.ref('tasks');
-        const rateRef = db.ref('conversionRate');
-        const withdrawRef = db.ref('withdrawSettings');
-        const videoSettingsRef = db.ref('videoSettings');
-        const speedBoostConfigRef = db.ref('speedBoostConfig');
-        const levelConfigRef = db.ref('levelConfig');
-        const referralConfigRef = db.ref('referralConfig');
-        const airdropConfigRef = db.ref('airdropConfig'); 
-        const connectedRef = db.ref('.info/connected'); 
-
-        // ==================== PAGE NAVIGATION ====================
-        function switchPage(page, event) {
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            if (event && event.currentTarget) {
-                event.currentTarget.classList.add('active');
-            }
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            
-            const pageMap = {
-                'home': 'pageHome',
-                'earn': 'pageEarn',
-                'tasks': 'pageTasks',
-                'refer': 'pageRefer',
-                'wallet': 'pageWallet'
-            };
-            
-            const targetPage = document.getElementById(pageMap[page]);
-            if (targetPage) {
-                targetPage.classList.add('active');
-            }
-            
-            if (page === 'tasks') renderTasks();
-            if (page === 'refer') { updateReferUI(); loadReferralList(); }
-            if (page === 'earn') updateVideoUI();
-            if (page === 'wallet') updateWithdrawHistory();
-        }
-
-        // ==================== CONVERSION RATE ====================
-        function loadConversionRate() {
-            rateRef.on('value', (s) => {
-                appState.conversionRate = s.exists() ? s.val() : 1000;
-                if (!s.exists()) rateRef.set(1000);
-                updateUSDDisplay();
-            });
-        }
-
-        function updateUSDDisplay() {
-            const usdValue = (appState.balance / appState.conversionRate).toFixed(2);
-            document.getElementById('usdValue').textContent = `≈ $${usdValue} USD`;
-            document.getElementById('walletUsd').textContent = `≈ $${usdValue} USD`;
-            document.getElementById('walletBalance').textContent = appState.balance;
-            
-            const totalUsd = appState.usdBalance.toFixed(2);
-            document.getElementById('totalUsdEarned').textContent = `💵 Total USD Earned: $${totalUsd}`;
-            document.getElementById('walletTotalUsd').textContent = `$${totalUsd}`;
-            document.getElementById('rateInfo').textContent = `Rate: 1 USD = ${appState.conversionRate} Coins`;
-            updateWithdrawUI();
-            updateWithdrawHistory();
-        }
-
-        function performConversion() {
-            if (appState.balance > 0) {
-                const earned = appState.balance / appState.conversionRate;
-                appState.usdBalance += earned;
-                const coins = appState.balance;
-                appState.balance = 0;
-                appState.lastConversion = Date.now();
-                
-                userRef.update({ balance: 0, usdBalance: appState.usdBalance, lastConversion: appState.lastConversion });
-                
-                document.getElementById('conversionText').textContent = 
-                    `${coins.toLocaleString()} Coins → $${earned.toFixed(2)} USD (Rate: 1 USD = ${appState.conversionRate} Coins)`;
-                document.getElementById('conversionModal').classList.add('active');
-                updateUI();
-                showToast(`💰 Converted ${coins} Coins to $${earned.toFixed(2)} USD!`);
-            } else {
-                appState.lastConversion = Date.now();
-                userRef.update({ lastConversion: appState.lastConversion });
-            }
-            if (conversionTimerInterval) { clearInterval(conversionTimerInterval); conversionTimerInterval = null; }
-            startConversionTimer();
-        }
-
-        function startConversionTimer() {
-            if (conversionTimerInterval) clearInterval(conversionTimerInterval);
-            let now = Date.now();
-            if (!appState.lastConversion) { appState.lastConversion = now; userRef.update({ lastConversion: now }); }
-            let next = appState.lastConversion + (24 * 60 * 60 * 1000);
-            let rem = next - now;
-            if (rem <= 0) { performConversion(); return; }
-            conversionTimerInterval = setInterval(() => {
-                let r = next - Date.now();
-                if (r <= 0) { clearInterval(conversionTimerInterval); conversionTimerInterval = null; performConversion(); return; }
-                let h = Math.floor(r / (60*60*1000)), m = Math.floor((r % (60*60*1000)) / (60*1000)), s = Math.floor((r % (60*1000)) / 1000);
-                document.getElementById('conversionCountdown').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-                document.getElementById('walletNextConversion').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-            }, 1000);
-            let h = Math.floor(rem / (60*60*1000)), m = Math.floor((rem % (60*60*1000)) / (60*1000)), s = Math.floor((rem % (60*1000)) / 1000);
-            document.getElementById('conversionCountdown').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-            document.getElementById('walletNextConversion').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-        }
-
-        // ==================== WITHDRAW ====================
-        function loadWithdrawSettings() {
-            withdrawRef.on('value', (s) => {
-                if (s.exists()) { 
-                    let d = s.val(); 
-                    appState.minWithdraw = d.minAmount || 10; 
-                }
-                updateWithdrawUI();
-            });
-        }
-
-        function updateWithdrawUI() {
-            let bal = appState.usdBalance || 0, min = appState.minWithdraw || 10;
-            document.getElementById('withdrawInfo').textContent = `Min: $${min.toFixed(2)} USD`;
-            document.getElementById('withdrawStatus').textContent = `You have: $${bal.toFixed(2)} USD`;
-            let btn = document.getElementById('withdrawBtn');
-            if (bal >= min) { btn.disabled = false; btn.textContent = 'Withdraw Now'; } 
-            else { btn.disabled = true; btn.textContent = `Need $${(min - bal).toFixed(2)} more`; }
-        }
-
-        function withdraw() {
-            let bal = appState.usdBalance || 0, min = appState.minWithdraw || 10;
-            if (bal < min) { showToast(`Minimum $${min} USD required!`, 'error'); return; }
-            
-            let amount = bal, id = Date.now().toString();
-            
-            const withdrawData = {
-                userId: userId,
-                username: tg.initDataUnsafe?.user?.username || 'User',
-                amount: amount,
-                status: 'pending',
-                requestedAt: new Date().toISOString()
-            };
-            
-            db.ref('withdrawRequests/' + id).set(withdrawData);
-            
-            appState.usdBalance = 0;
-            
-            if (!appState.withdrawHistory) appState.withdrawHistory = [];
-            
-            appState.withdrawHistory.push({
-                id: id,
-                amount: amount,
-                status: 'pending',
-                date: new Date().toISOString()
-            });
-            
-            userRef.update({ usdBalance: 0, withdrawHistory: appState.withdrawHistory });
-            
-            document.getElementById('withdrawModalTitle').textContent = '💰 Request Sent!';
-            document.getElementById('withdrawModalText').textContent = `$${amount.toFixed(2)} pending approval.`;
-            document.getElementById('withdrawModal').classList.add('active');
-            
-            updateUI();
-            updateUSDDisplay();
-            updateWithdrawHistory();
-            showToast(`$${amount.toFixed(2)} sent for approval!`);
-        }
-
-        function updateWithdrawHistory() {
-            const container = document.getElementById('withdrawHistory');
-            if (!appState.withdrawHistory || appState.withdrawHistory.length === 0) {
-                container.innerHTML = '<span style="color:#94a3b8;font-size:10px;">No withdrawals yet</span>';
-                return;
-            }
-            
-            const statusLabels = {
-                pending: '⏳ Pending',
-                approved: '✅ Approved',
-                cancelled: '❌ Cancelled',
-                processing: '🔄 Processing'
-            };
-            
-            container.innerHTML = appState.withdrawHistory.slice(-10).reverse().map(w => {
-                let cancelReasonHTML = '';
-                if (w.status === 'cancelled' && w.cancelReason) {
-                    cancelReasonHTML = `<div style="font-size:10px;color:#ef4444;">⚠️ ${w.cancelReason}</div>`;
-                }
-                
-                return `
-                    <div class="withdraw-history-item">
-                        <div>
-                            <span class="amount">$${w.amount.toFixed(2)}</span>
-                            ${cancelReasonHTML}
-                        </div>
-                        <div style="text-align:right;">
-                            <span class="status-${w.status}" style="font-size:10px;font-weight:bold;">${statusLabels[w.status] || w.status}</span>
-                            <div class="date">${new Date(w.date).toLocaleDateString()}</div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function listenWithdrawStatus() {
-            db.ref('withdrawRequests').orderByChild('userId').equalTo(userId).on('child_changed', (snapshot) => {
-                const data = snapshot.val();
-                if (data && data.userId === userId) {
-                    if (appState.withdrawHistory) {
-                        const existingIndex = appState.withdrawHistory.findIndex(h => h.id === snapshot.key);
-                        if (existingIndex !== -1) {
-                            appState.withdrawHistory[existingIndex].status = data.status;
-                            if (data.cancelReason) {
-                                appState.withdrawHistory[existingIndex].cancelReason = data.cancelReason;
-                            }
-                            
-                            if (data.status === 'cancelled' && data.amount) {
-                                appState.usdBalance = (appState.usdBalance || 0) + data.amount;
-                                userRef.update({ usdBalance: appState.usdBalance });
-                                showToast(`⚠️ Withdrawal cancelled: ${data.cancelReason || 'No reason provided'}`, 'error');
-                            }
-                            
-                            userRef.update({ withdrawHistory: appState.withdrawHistory });
-                            updateUI();
-                            updateUSDDisplay();
-                            updateWithdrawHistory();
-                        }
-                    }
-                }
-            });
-        }
-
-        // ==================== VIDEO SETTINGS ====================
-        function loadVideoSettings() {
-            videoSettingsRef.on('value', (snapshot) => {
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    appState.videoReward = data.reward || 10;
-                    appState.videoDailyLimit = data.dailyLimit || 5;
-                    appState.videoRefillThreshold = data.refillThreshold || 5;
-                }
-                updateVideoUI();
-            });
-        }
-
-        function updateVideoUI() {
-            const today = new Date().toDateString();
-            const isToday = appState.videoLastWatchDate === today;
-            const watched = isToday ? (appState.videoWatchedToday || 0) : 0;
-            const limit = appState.videoDailyLimit || 5;
-            const remaining = limit - watched;
-            
-            document.getElementById('videoReward').textContent = `+${appState.videoReward || 10} Coins per video`;
-            document.getElementById('videoLimit').textContent = `Today: ${watched} / ${limit} videos`;
-            
-            const btn = document.getElementById('videoBtn');
-            if (remaining <= 0) {
-                btn.disabled = true;
-                btn.textContent = '✅ Daily Limit Reached';
-                document.getElementById('videoWatched').textContent = '🎉 All videos watched today!';
-            } else {
-                btn.disabled = false;
-                btn.textContent = '▶ Watch Video';
-                document.getElementById('videoWatched').textContent = `${remaining} videos left today`;
-            }
-        }
-
-        function watchVideo() {
-            const today = new Date().toDateString();
-            const isToday = appState.videoLastWatchDate === today;
-            const watched = isToday ? (appState.videoWatchedToday || 0) : 0;
-            const limit = appState.videoDailyLimit || 5;
-            
-            if (watched >= limit) {
-                showToast('Daily limit reached!', 'error');
-                return;
-            }
-
-            showRewardedAd(function() {
-                const btn = document.getElementById('videoBtn');
-                btn.disabled = true;
-                btn.textContent = '⏳ Please wait...';
-
-                let seconds = 15;
-                const timerInterval = setInterval(() => {
-                    seconds--;
-                    btn.textContent = `⏳ ${seconds}s`;
-                    if (seconds <= 0) {
-                        clearInterval(timerInterval);
-                        btn.textContent = '▶ Watch Video';
-                        btn.disabled = false;
-                        appState.videoWatchedToday = watched + 1;
-                        appState.videoLastWatchDate = today;
-                        const reward = appState.videoReward || 10;
-                        appState.balance += reward;
-                        
-                        userRef.update({
-                            balance: appState.balance,
-                            videoWatchedToday: appState.videoWatchedToday,
-                            videoLastWatchDate: appState.videoLastWatchDate
-                        });
-
-                        document.getElementById('videoRewardText').textContent = `You earned +${reward} Coins! 📺`;
-                        document.getElementById('videoModal').classList.add('active');
-                        
-                        updateUI();
-                        updateLevelUI();
-                        updateVideoUI();
-                        showToast(`+${reward} Coins for watching video! 🎉`);
-                    }
-                }, 1000);
-            });
-        }
-
-        // ==================== PROGRESS BAR (With Offline Fix) ====================
-        function updateProgressUI() {
-            const fill = document.getElementById('progressBarFill');
-            const count = document.getElementById('progressCoinCount');
-            const percent = document.getElementById('progressPercent');
-            const status = document.getElementById('progressStatus');
-            
-            fill.style.width = (appState.progressCoins / TOTAL_COINS * 100) + '%';
-            count.textContent = appState.progressCoins;
-            percent.textContent = Math.round(appState.progressCoins / TOTAL_COINS * 100) + '%';
-            
-            if (appState.progressCoins === 0) {
-                status.textContent = '🎯 All coins earned! Watch videos to refill.';
-                document.getElementById('progressWatchBtn').classList.remove('hidden');
-                document.getElementById('progressStartBtn').classList.add('hidden');
-            } else if (appState.progressCoins === TOTAL_COINS) {
-                status.textContent = '✅ Full! Press START to begin.';
-                document.getElementById('progressWatchBtn').classList.add('hidden');
-                document.getElementById('progressStartBtn').classList.remove('hidden');
-                document.getElementById('progressStartBtn').disabled = false;
-                document.getElementById('progressStartBtn').textContent = '▶ START';
-            } else {
-                status.textContent = `⏳ Earning... ${appState.progressCoins} coins left`;
-                document.getElementById('progressWatchBtn').classList.add('hidden');
-                document.getElementById('progressStartBtn').classList.remove('hidden');
-            }
-        }
-
-        function startProgress() {
-            if (progressInterval) return;
-            if (appState.progressCoins <= 0) {
-                showToast('❌ No coins left! Watch videos first.', 'error');
-                updateProgressUI();
-                return;
-            }
-            // If offline, don't start
-            if (!navigator.onLine) {
-                showToast('⚠️ No internet. Mining paused.', 'error');
-                return;
-            }
-            
-            const btn = document.getElementById('progressStartBtn');
-            btn.disabled = true;
-            btn.textContent = '⏳ Running...';
-            
-            progressInterval = setInterval(() => {
-                if (appState.progressCoins <= 0) {
-                    clearInterval(progressInterval);
-                    progressInterval = null;
-                    btn.disabled = false;
-                    btn.textContent = '▶ START';
-                    updateProgressUI();
-                    showToast('🎉 All coins earned! Watch videos to refill.');
-                    return;
-                }
-                
-                // If user goes offline while mining, stop the interval
-                if (!navigator.onLine) {
-                    clearInterval(progressInterval);
-                    progressInterval = null;
-                    btn.disabled = false;
-                    btn.textContent = '▶ START';
-                    showToast('⚠️ Internet lost. Mining paused.', 'error');
-                    return;
-                }
-
-                appState.progressCoins -= 1;
-                appState.balance += 1;
-                userRef.update({ 
-                    balance: appState.balance,
-                    progressCoins: appState.progressCoins
-                });
-                
-                let coin = document.createElement('div');
-                coin.className = 'floating-coin';
-                coin.textContent = '+1 🪙';
-                coin.style.left = (Math.random() * 80 + 10) + '%';
-                coin.style.top = '30%';
-                document.body.appendChild(coin);
-                setTimeout(() => coin.remove(), 1000);
-                
-                updateProgressUI();
-                updateUI();
-                updateLevelUI();
-            }, 5000);
-        }
-
-        function startVideoProgress() {
-            const btn = document.getElementById('progressWatchBtn');
-            const threshold = appState.videoRefillThreshold || 5; 
-
-            if (appState.videoWatchedCount >= threshold) {
-                showToast(`✅ All ${threshold} videos watched! Refilling coins...`, 'success');
-                appState.progressCoins = TOTAL_COINS;
-                appState.videoWatchedCount = 0;
-                userRef.update({ progressCoins: appState.progressCoins, videoWatchedCount: 0 });
-                updateProgressUI();
-                showToast('🪙 1000 coins refilled! Press START to earn again.');
-                return;
-            }
-            
-            btn.disabled = true;
-            btn.textContent = '⏳ Watching...';
-            
-            showRewardedAd(function() {
-                let seconds = 15;
-                const timerInterval = setInterval(() => {
-                    seconds--;
-                    btn.textContent = `⏳ ${seconds}s`;
-                    if (seconds <= 0) {
-                        clearInterval(timerInterval);
-                        btn.disabled = false;
-                        appState.videoWatchedCount++;
-                        userRef.update({ videoWatchedCount: appState.videoWatchedCount });
-                        btn.textContent = `📺 Watch Videos (${appState.videoWatchedCount}/${threshold})`;
-                        showToast(`📺 Video ${appState.videoWatchedCount}/${threshold} watched!`);
-                        
-                        if (appState.videoWatchedCount >= threshold) {
-                            appState.progressCoins = TOTAL_COINS;
-                            appState.videoWatchedCount = 0;
-                            userRef.update({ progressCoins: appState.progressCoins, videoWatchedCount: 0 });
-                            updateProgressUI();
-                            showToast(`🪙 ${TOTAL_COINS} coins refilled! Press START to earn again.`);
-                        }
-                    }
-                }, 1000);
-            });
-        }
-
-        // ==================== SPEED BOOST ====================
-        function updateSpeedBoostUI() {
-            const btn = document.getElementById('speedBoostBtn');
-            const timerSpan = document.getElementById('boostTimer');
-            const cooldownTextDiv = document.getElementById('boostCooldownText');
-            const countdownSpan = document.getElementById('boostCountdownDisplay');
-            
-            if (appState.speedBoostCooldown > 0) {
-                const now = Date.now();
-                const timeLeft = Math.ceil((appState.speedBoostCooldown - now) / 1000);
-                
-                if (timeLeft > 0) {
-                    btn.style.display = 'none';
-                    cooldownTextDiv.style.display = 'block';
-                    const minutes = Math.floor(timeLeft / 60);
-                    const seconds = timeLeft % 60;
-                    countdownSpan.textContent = `${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
-                } else {
-                    btn.style.display = 'flex';
-                    cooldownTextDiv.style.display = 'none';
-                    timerSpan.textContent = '';
-                    appState.speedBoostCooldown = 0;
-                    userRef.update({ speedBoostCooldown: 0 });
-                }
-            } else {
-                btn.style.display = 'flex';
-                cooldownTextDiv.style.display = 'none';
-                timerSpan.textContent = '';
-            }
-        }
-
-        setInterval(() => {
-            if(appState.speedBoostCooldown > 0) updateSpeedBoostUI();
-        }, 1000);
-
-        function activateSpeedBoost() {
-            const now = Date.now();
-            if (appState.speedBoostCooldown > 0) {
-                updateSpeedBoostUI();
-                return;
-            }
-
-            if (appState.isSpeedBoostActive) {
-                showToast('⏳ Speed Boost already active!', 'error');
-                return;
-            }
-
-            showRewardedPopup(function() {
-                appState.isSpeedBoostActive = true;
-                document.getElementById('speedBoostBtn').disabled = true;
-                document.getElementById('speedBoostBtn').innerHTML = '<i class="fas fa-rocket"></i> Boost Active!';
-
-                const overlay = document.getElementById('speedSpinnerOverlay');
-                overlay.classList.add('active');
-
-                let timeLeft = 3;
-                let progress = 0;
-                const speedTimerDisplay = document.getElementById('speedTimerDisplay');
-                const speedProgressFill = document.getElementById('speedProgressFill');
-
-                const speedUpdateInterval = setInterval(() => {
-                    timeLeft -= 0.1;
-                    progress = ((3 - timeLeft) / 3) * 100;
-                    speedTimerDisplay.textContent = timeLeft.toFixed(1) + 's';
-                    speedProgressFill.style.width = progress + '%';
-
-                    if (timeLeft <= 0) {
-                        clearInterval(speedUpdateInterval);
-                        appState.isSpeedBoostActive = false;
-                        overlay.classList.remove('active');
-                        document.getElementById('speedBoostBtn').disabled = false;
-                        document.getElementById('speedBoostBtn').innerHTML = '<i class="fas fa-rocket"></i> Speed Boost <span class="boost-timer"></span>';
-                        
-                        speedBoostConfigRef.once('value', snap => {
-                            let config = snap.val();
-                            let cd = (config && config.cooldown) ? config.cooldown : 60;
-                            appState.speedBoostCooldown = Date.now() + (cd * 60 * 1000);
-                            userRef.update({ speedBoostCooldown: appState.speedBoostCooldown });
-                            updateSpeedBoostUI();
-                            showToast(`🚀 Speed Boost ended! Cooldown: ${cd} minute(s).`);
-                        });
-                    }
-                }, 100);
-
-                let coinsAdded = 0;
-                speedBoostInterval = setInterval(() => {
-                    if (appState.progressCoins > 0 && coinsAdded < 60) {
-                        appState.progressCoins -= 1;
-                        appState.balance += 1;
-                        coinsAdded++;
-                        userRef.update({ balance: appState.balance, progressCoins: appState.progressCoins });
-                        updateProgressUI();
-                        updateUI();
-                        updateLevelUI();
-                        let coin = document.createElement('div');
-                        coin.className = 'floating-coin';
-                        coin.textContent = '+1 🪙';
-                        coin.style.left = (Math.random() * 80 + 10) + '%';
-                        coin.style.top = '30%';
-                        document.body.appendChild(coin);
-                        setTimeout(() => coin.remove(), 1000);
-                    } else {
-                        clearInterval(speedBoostInterval);
-                        if (appState.progressCoins <= 0) showToast('⛔ No coins left! Boost stopped.');
-                    }
-                }, 50);
-            });
-        }
-
-        // ==================== LEVEL SYSTEM ====================
-        let levelConfig = {};
-        let referralConfig = {};
-
-        function loadLevelConfig() {
-            levelConfigRef.on('value', (snapshot) => {
-                if (snapshot.exists()) {
-                    levelConfig = snapshot.val();
-                }
-                updateLevelUI();
-                renderLevelList();
-            });
-        }
-
-        function loadReferralConfig() {
-            referralConfigRef.on('value', (snapshot) => {
-                if (snapshot.exists()) {
-                    referralConfig = snapshot.val();
-                } else {
-                    referralConfig = {
-                        perReferralCoins: 50,
-                        tier1: { count: 10, bonus: 50 },
-                        tier2: { count: 25, bonus: 150 },
-                        tier3: { count: 50, bonus: 300 },
-                        tier4: { count: 100, bonus: 500 },
-                        tier5: { count: 200, bonus: 1000 }
-                    };
-                    referralConfigRef.set(referralConfig);
-                }
-                updateReferUI();
-            });
-        }
-
-        function getLevelTier(level) {
-            if (levelConfig && levelConfig.levels && levelConfig.levels[level]) {
-                const lvl = levelConfig.levels[level];
-                return { name: lvl.name || 'Unknown', emoji: lvl.emoji || '🪙', bonus: lvl.bonus || 0 };
-            }
-            return { name: 'Level ' + level, emoji: '🪙', bonus: 0 };
-        }
-
-        function calcLevel(coins, tasks, taps, streak, withdrawals) {
-            let points = Math.floor((coins * 1) + (tasks * 50) + (taps * 0.1) + (streak * 10) + (withdrawals * 100));
-            let level = 1;
-            let currentRequired = 0;
-            let nextRequired = 0;
-
-            if (levelConfig && levelConfig.levels) {
-                const levels = Object.keys(levelConfig.levels).map(Number).sort((a,b) => a-b);
-                for (let i = levels.length - 1; i >= 0; i--) {
-                    const lvlNum = levels[i];
-                    const lvlData = levelConfig.levels[lvlNum];
-                    if (points >= lvlData.requiredPoints) {
-                        level = lvlNum;
-                        break;
-                    }
-                }
-                if (levelConfig.levels[level]) currentRequired = levelConfig.levels[level].requiredPoints || 0;
-                if (levelConfig.levels[level+1]) nextRequired = levelConfig.levels[level+1].requiredPoints || 0;
-            }
-            
-            let progress = 0;
-            if (nextRequired > currentRequired) {
-                progress = ((points - currentRequired) / (nextRequired - currentRequired)) * 100;
-                if (progress > 100) progress = 100;
-                if (progress < 0) progress = 0;
-            }
-            
-            let tier = getLevelTier(level);
-            return {
-                level, points, currentRequired, nextRequired, progress: Math.floor(progress),
-                isMax: !levelConfig.levels || !levelConfig.levels[level+1],
-                tier
-            };
-        }
-
-        function updateLevelUI() {
-            const data = calcLevel(
-                appState.balance, appState.completedTasks, 0,
-                appState.dailyStreak, appState.withdrawHistory ? appState.withdrawHistory.length : 0
-            );
-            const t = data.tier;
-            document.getElementById('levelTitle').textContent = `${t.emoji} ${t.name}`;
-            document.getElementById('levelNumber').textContent = `Level ${data.level}`;
-            document.getElementById('levelProgressFill').style.width = `${data.progress}%`;
-            
-            if (data.isMax) {
-                document.getElementById('levelCurrentPoints').textContent = `${data.points}`;
-                document.getElementById('levelNextPoints').textContent = '⭐ MAX';
-            } else {
-                document.getElementById('levelCurrentPoints').textContent = data.points - data.currentRequired;
-                document.getElementById('levelNextPoints').textContent = `/ ${data.nextRequired - data.currentRequired}`;
-            }
-            document.getElementById('userLevelBadge').textContent = `Level ${data.level} 👆`;
-            appState.userLevel = data.level;
-            
-            document.getElementById('levelCurrentEmoji').textContent = t.emoji;
-            document.getElementById('levelCurrentNumber').textContent = `Level ${data.level}`;
-            document.getElementById('levelCurrentTitle').textContent = t.name;
-            
-            if (data.isMax) {
-                document.getElementById('levelCurrentPointsText').textContent = '🏆 MAX LEVEL!';
-                document.getElementById('levelProgressFill2').style.width = '100%';
-                document.getElementById('levelProgressText2').textContent = '100%';
-                document.getElementById('levelNextInfo').textContent = '⭐ MAX';
-            } else {
-                document.getElementById('levelCurrentPointsText').textContent = `${data.points - data.currentRequired} / ${data.nextRequired - data.currentRequired} XP`;
-                document.getElementById('levelProgressFill2').style.width = `${data.progress}%`;
-                document.getElementById('levelProgressText2').textContent = `${data.progress}%`;
-                document.getElementById('levelNextInfo').textContent = `Next: ${data.level + 1}`;
-            }
-            document.getElementById('levelBonusPercent').textContent = `+${t.bonus}%`;
-            document.getElementById('levelDailyBonus').textContent = `${10 + t.bonus} Coins`;
-            let isExclusive = data.level >= 10;
-            document.getElementById('levelExclusiveTasks').textContent = isExclusive ? '✅ Unlocked' : '🔒 Locked';
-            document.getElementById('levelExclusiveTasks').style.color = isExclusive ? '#10b981' : '#94a3b8';
-        }
-
-        function renderLevelList() {
-            const container = document.getElementById('levelList');
-            const data = calcLevel(appState.balance, appState.completedTasks, 0, appState.dailyStreak, appState.withdrawHistory ? appState.withdrawHistory.length : 0);
-            let html = '';
-            let levelNumbers = [];
-            if (levelConfig && levelConfig.levels) {
-                levelNumbers = Object.keys(levelConfig.levels).map(Number).sort((a,b) => a-b);
-            }
-            
-            for (let i of levelNumbers) {
-                if (currentFilter !== 'all') {
-                    const filterMap = { 'bronze':[1,20], 'silver':[21,40], 'gold':[41,60], 'platinum':[61,80], 'diamond':[81,100] };
-                    const range = filterMap[currentFilter];
-                    if (!range || i < range[0] || i > range[1]) continue;
-                }
-                const t = getLevelTier(i);
-                const isUnlocked = data.level >= i;
-                const isCurrent = data.level === i;
-                html += `
-                    <div class="level-item ${isCurrent ? 'active' : ''} ${!isUnlocked ? 'locked' : ''}">
-                        <div class="level-info">
-                            <span class="num">${i}</span>
-                            <span class="emoji">${t.emoji}</span>
-                            <span class="name">${t.name}</span>
-                            ${isCurrent ? '<span class="badge">👈 Current</span>' : ''}
-                            ${!isUnlocked ? '<span class="badge" style="background:rgba(239,68,68,0.1);color:#ef4444;">🔒</span>' : ''}
-                        </div>
-                        <div class="level-reward">+${t.bonus}%</div>
-                        ${isCurrent ? '<div class="level-check">✅</div>' : ''}
-                    </div>
-                `;
-            }
-            container.innerHTML = html || '<div class="loading"><p>No levels found</p></div>';
-        }
-
-        function filterLevels(filter, btn) {
-            currentFilter = filter;
-            document.querySelectorAll('.filter-tabs .tab').forEach(t => t.classList.remove('active'));
-            if (btn) btn.classList.add('active');
-            renderLevelList();
-        }
-
-        function openLevelPage() {
-            document.getElementById('levelOverlay').classList.add('show');
-            document.getElementById('mainContent').classList.add('hide');
-            document.querySelector('.bottom-nav').style.display = 'none';
-            renderLevelList();
-        }
-        function closeLevelPage() {
-            document.getElementById('levelOverlay').classList.remove('show');
-            document.getElementById('mainContent').classList.remove('hide');
-            document.querySelector('.bottom-nav').style.display = 'flex';
-        }
-
-        // ==================== DYNAMIC TASKS ====================
-        function loadTasksFromDB() {
-            tasksRef.on('value', (snapshot) => {
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    tasks = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-                    renderTasks();
-                } else {
-                    tasks = [];
-                    renderTasks();
-                }
-            });
-        }
-
-        function renderTasks() {
-            const container = document.getElementById('tasksContainer');
-            const filteredTasks = getFilteredTasks();
-            if (!filteredTasks || filteredTasks.length === 0) {
-                container.innerHTML = '<div class="no-tasks">📭 No tasks available. Check back later!</div>';
-                return;
-            }
-            container.innerHTML = filteredTasks.map(task => {
-                const today = new Date().toDateString();
-                const isCompletedToday = appState.taskLastCompleted[task.id] === today;
-                let actionHTML = '';
-                let statusText = isCompletedToday ? '✅ Done Today' : '⏳ Incomplete';
-                if (!isCompletedToday) {
-                    if (task.type === 'link') {
-                        let link = task.link || '#';
-                        actionHTML = `<a href="${link}" target="_blank" class="task-link" onclick="event.preventDefault(); window.open('${link}', '_blank'); setTimeout(() => completeTask('${task.id}'), 3000);">${task.actionText || 'Go →'}</a>`;
-                    } else if (task.type === 'button') {
-                        actionHTML = `<button class="task-btn" onclick="completeTask('${task.id}')">${task.actionText || 'Complete'}</button>`;
-                    } else if (task.type === 'video') {
-                        actionHTML = `<button class="task-video-btn" onclick="watchTaskVideo('${task.id}')">📺 ${task.actionText || 'Watch Video'}</button>`;
-                    }
-                }
-                return `
-                    <div class="task-card">
-                        <div class="task-header"><span class="task-title">${task.title}</span><span class="task-reward">+${task.reward} 🪙</span></div>
-                        <div class="task-desc">${task.description || ''}</div>
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
-                            ${actionHTML}
-                            <span class="task-status">${statusText}</span>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function getFilteredTasks() {
-            if (currentFilter === 'all') return tasks;
-            return tasks.filter(task => task.type === currentFilter);
-        }
-
-        function filterTasks(filter, btn) {
-            currentFilter = filter;
-            document.querySelectorAll('.task-filters .filter-btn').forEach(b => b.classList.remove('active'));
-            if (btn) btn.classList.add('active');
-            renderTasks();
-        }
-
-        function completeTask(taskId) {
-            const today = new Date().toDateString();
-            if (appState.taskLastCompleted[taskId] === today) { showToast('Already completed today!', 'error'); return; }
-            let task = tasks.find(t => t.id === taskId);
-            if (!task) return;
-            appState.taskLastCompleted[taskId] = today;
-            appState.balance += task.reward;
-            appState.completedTasks++;
-            userRef.update({ balance: appState.balance, completedTasks: appState.completedTasks, taskLastCompleted: appState.taskLastCompleted });
-            document.getElementById('rewardText').textContent = `+${task.reward} Coins`;
-            document.getElementById('successModal').classList.add('active');
-            updateUI(); updateLevelUI(); renderTasks();
-            showToast(`🎉 +${task.reward} Coins for completing task!`);
-        }
-
-        function watchTaskVideo(taskId) {
-            const today = new Date().toDateString();
-            if (appState.taskLastCompleted[taskId] === today) { showToast('Already completed today!', 'error'); return; }
-            let task = tasks.find(t => t.id === taskId);
-            if (!task) return;
-            showRewardedAd(function() {
-                appState.taskLastCompleted[taskId] = today;
-                appState.balance += task.reward;
-                appState.completedTasks++;
-                userRef.update({ balance: appState.balance, completedTasks: appState.completedTasks, taskLastCompleted: appState.taskLastCompleted });
-                document.getElementById('rewardText').textContent = `+${task.reward} Coins`;
-                document.getElementById('successModal').classList.add('active');
-                updateUI(); updateLevelUI(); renderTasks();
-                showToast(`🎉 +${task.reward} Coins for watching video!`);
-            });
-        }
-
-        // ==================== ADVANCED AIRDROP SYSTEM (FIXED TIMER) ====================
-        let airdropListeners = [];
-        let onlineCountRef = null;
-        let airdropCountdownInterval = null;
-        let airdropVisitorsRef = null;
-        let airdropVisitorsCountRef = null;
-
-        function loadAirdropData() {
-            // 1. Online User Count (Global)
-            onlineCountRef = db.ref('presence/onlineCount');
-            onlineCountRef.on('value', (snap) => {
-                let count = snap.val() || 0;
-                document.getElementById('onlineUsersHome').textContent = count;
-                document.getElementById('onlineUsersDisplay').textContent = count;
-            });
-
-            // 2. Airdrop Config (Pool & Timer)
-            airdropConfigRef.on('value', (snap) => {
-                let config = snap.val() || { min: 0.5, max: 2.0, poolAmount: 50.00, active: false };
-                appState.airdropConfig = config;
-                document.getElementById('airdropPoolDisplay').textContent = `$${config.poolAmount || 50.00}`;
-                
-                // **FIXED LOGIC:** Use Admin's "startTime" to start a 5-minute countdown
-                if (config.startTime) {
-                    startAirdropCountdown(config.startTime, 300000); // 300,000 ms = 5 minutes
-                } else {
-                    // Default state if no timer set
-                    document.getElementById('airdropCountdown').textContent = '--:--:--';
-                    document.getElementById('airdropClaimBtn').disabled = true;
-                    document.getElementById('airdropStatusBox').textContent = '⏳ Waiting for admin to set timer...';
-                }
-            });
-
-            // 3. Airdrop Winner List (Last 50 claims)
-            const airdropListRef = db.ref('airdropList').orderByChild('timestamp').limitToLast(50);
-            airdropListRef.on('value', (snap) => {
-                const container = document.getElementById('airdropListContainer');
-                if (!snap.exists()) {
-                    container.innerHTML = '<p style="color:#94a3b8;font-size:13px;text-align:center;padding:10px;">Waiting for the first claim...</p>';
-                    return;
-                }
-                let html = '';
-                let list = [];
-                snap.forEach(child => { list.push({ id: child.key, ...child.val() }); });
-                
-                // Sort by timestamp descending (Newest first)
-                list.sort((a,b) => b.timestamp - a.timestamp);
-
-                // Highlight the first winner
-                list.forEach((item, index) => {
-                    let timeAgo = Math.floor((Date.now() - item.timestamp) / 60000);
-                    let timeStr = timeAgo < 1 ? 'Just now' : `${timeAgo}m ago`;
-                    let isWinner = index === 0 ? 'winner' : '';
-                    html += `<div class="airdrop-item ${isWinner}"><span class="name">${index === 0 ? '👑 ' : ''}${item.username || 'Anonymous'}</span><span class="time">+$${item.amount.toFixed(2)} • ${timeStr}</span></div>`;
-                });
-                container.innerHTML = html || '<p style="color:#94a3b8;font-size:13px;text-align:center;padding:10px;">Waiting for the first claim...</p>';
-            });
-
-            // Check if current user already claimed
-            db.ref('users/' + userId + '/airdropClaimed').once('value', (snap) => {
-                appState.airdropClaimed = snap.val() || false;
-            });
-        }
-
-        function startAirdropCountdown(startTime, duration) {
-            if (airdropCountdownInterval) clearInterval(airdropCountdownInterval);
-            
-            const btn = document.getElementById('airdropClaimBtn');
-            const countdownEl = document.getElementById('airdropCountdown');
-            const labelEl = document.getElementById('countdownLabel');
-            const statusBox = document.getElementById('airdropStatusBox');
-
-            // Calculate End Time
-            const endTime = startTime + duration;
-            
-            airdropCountdownInterval = setInterval(() => {
-                const now = Date.now();
-                const remaining = endTime - now;
-                
-                if (remaining <= 0) {
-                    clearInterval(airdropCountdownInterval);
-                    countdownEl.textContent = '00:00:00';
-                    btn.disabled = true;
-                    labelEl.textContent = 'Drop Ended';
-                    statusBox.textContent = '⛔ Round Ended.';
-                    statusBox.className = 'status-box ended';
-                    return;
-                }
-                
-                // Update Timer Display
-                const h = Math.floor((remaining / (1000 * 60 * 60)) % 24);
-                const m = Math.floor((remaining / (1000 * 60)) % 60);
-                const s = Math.floor((remaining / 1000) % 60);
-                countdownEl.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-                
-                // Update Status & Button based on remaining time
-                if (!appState.airdropClaimed && remaining > 0) {
-                    btn.disabled = false;
-                    btn.textContent = '🎁 Claim Your Share';
-                    labelEl.textContent = 'Drop Timer';
-                    statusBox.textContent = '🔥 Round Active! Be the first to click!';
-                    statusBox.className = 'status-box live';
-                } else if (appState.airdropClaimed) {
-                    btn.disabled = true;
-                    btn.textContent = '✅ Already Claimed';
-                    statusBox.textContent = '🎉 You already claimed this round!';
-                    statusBox.className = 'status-box';
-                }
-            }, 100);
-        }
-
-        function openAirdropPage() {
-            document.getElementById('airdropOverlay').classList.add('show');
-            document.getElementById('mainContent').classList.add('hide');
-            document.querySelector('.bottom-nav').style.display = 'none';
-            
-            // Handle Live Visitor Count for Airdrop Page
-            const visitorRef = db.ref('airdropVisitors/' + userId);
-            visitorRef.set(true);
-            visitorRef.onDisconnect().remove();
-            
-            // Listen to total visitors (for Airdrop Page)
-            if (airdropVisitorsCountRef) airdropVisitorsCountRef.off();
-            
-            airdropVisitorsCountRef = db.ref('airdropVisitors');
-            airdropVisitorsCountRef.on('value', (snap) => {
-                let count = snap.exists() ? snap.numChildren() : 0;
-                document.getElementById('onlineUsersDisplay').textContent = count; // Inside Airdrop
-                document.getElementById('onlineUsersHome').textContent = count;    // Home Page sees it as "Online Users" in button
-            });
-        }
-
-        function closeAirdropPage() {
-            document.getElementById('airdropOverlay').classList.remove('show');
-            document.getElementById('mainContent').classList.remove('hide');
-            document.querySelector('.bottom-nav').style.display = 'flex';
-            
-            // Remove the listener for visitors when leaving page
-            if (airdropVisitorsCountRef) {
-                airdropVisitorsCountRef.off();
-                airdropVisitorsCountRef = null;
-                document.getElementById('onlineUsersDisplay').textContent = '0';
-                document.getElementById('onlineUsersHome').textContent = '0'; // Reset Home View
-            }
-        }
-
-        function claimAirdrop() {
-            const btn = document.getElementById('airdropClaimBtn');
-            
-            // Check if already claimed
-            if(appState.airdropClaimed) {
-                showToast('You already claimed this round!', 'error');
-                return;
-            }
-
-            btn.disabled = true;
-            btn.textContent = '⏳ Processing...';
-
-            // Generate Random Amount
-            let config = appState.airdropConfig || { min: 0.5, max: 2.0 };
-            let amount = Math.random() * (config.max - config.min) + config.min;
-            let coinsWon = Math.floor(amount * appState.conversionRate);
-
-            const updateData = {};
-            const claimData = {
-                userId: userId,
-                username: tg.initDataUnsafe?.user?.username || 'User',
-                amount: amount,
-                coins: coinsWon,
-                timestamp: Date.now()
-            };
-
-            updateData['users/' + userId + '/balance'] = firebase.database.ServerValue.increment(coinsWon);
-            updateData['users/' + userId + '/airdropClaimed'] = true;
-            updateData['airdropList/' + Date.now()] = claimData;
-
-            // Reset local state
-            appState.balance += coinsWon;
-            appState.airdropClaimed = true;
-
-            db.ref().update(updateData).then(() => {
-                document.getElementById('airdropRewardText').textContent = `You won +$${amount.toFixed(2)} (${coinsWon} Coins)!`;
-                document.getElementById('airdropModal').classList.add('active');
-                showToast(`🎉 +${coinsWon} Coins from AirDrop!`);
-                updateUI();
-                updateLevelUI();
-                // Update button state
-                btn.textContent = '✅ Already Claimed';
-                btn.disabled = true;
-                closeAirdropPage();
-            }).catch(err => {
-                console.error(err);
-                showToast('Error claiming airdrop. Try again.', 'error');
-                btn.disabled = false;
-                btn.textContent = '🎁 Claim Your Share';
-                appState.airdropClaimed = false;
-            });
-        }
-
-        // ==================== OFFLINE HANDLER (Stops Mining) ====================
-        function checkConnection() {
-            const offlineOverlay = document.getElementById('offlineOverlay');
-            const mainContent = document.getElementById('mainContent');
-            const bottomNav = document.querySelector('.bottom-nav');
-            
-            if (navigator.onLine) {
-                offlineOverlay.classList.remove('show');
-                mainContent.style.display = 'block';
-                bottomNav.style.display = 'flex';
-                // Resume mining if needed is handled by interval checks
-            } else {
-                offlineOverlay.classList.add('show');
-                mainContent.style.display = 'none';
-                bottomNav.style.display = 'none';
-                
-                // Force stop mining
-                if (progressInterval) {
-                    clearInterval(progressInterval);
-                    progressInterval = null;
-                    document.getElementById('progressStartBtn').disabled = false;
-                    document.getElementById('progressStartBtn').textContent = '▶ START';
-                    showToast('⚠️ Internet lost. Mining paused.', 'error');
-                }
-            }
-        }
-
-        window.addEventListener('online', checkConnection);
-        window.addEventListener('offline', checkConnection);
-
-
-        // ==================== REFERRAL SYSTEM ====================
-        function updateReferUI() {
-            const total = appState.referralCount || 0;
-            const perReferralCoins = referralConfig.perReferralCoins || 50;
-            const earned = total * perReferralCoins;
-            document.getElementById('referTotalHome').textContent = total;
-            document.getElementById('referEarnedHome').textContent = earned;
-            document.getElementById('referBonusHome').textContent = Math.floor(total / 10) * 50;
-            const progress = Math.min((total / 10) * 100, 100);
-            document.getElementById('referProgressFillHome').style.width = progress + '%';
-            document.getElementById('referProgressTextHome').textContent = `${total} / 10`;
-            renderTiers();
-        }
-
-        function renderTiers() {
-            const total = appState.referralCount || 0;
-            const tiers = [
-                { level: 1, count: referralConfig.tier1?.count || 10, bonus: referralConfig.tier1?.bonus || 50, name: '🥉 Bronze Referrer' },
-                { level: 2, count: referralConfig.tier2?.count || 25, bonus: referralConfig.tier2?.bonus || 150, name: '🥈 Silver Referrer' },
-                { level: 3, count: referralConfig.tier3?.count || 50, bonus: referralConfig.tier3?.bonus || 300, name: '🥇 Gold Referrer' },
-                { level: 4, count: referralConfig.tier4?.count || 100, bonus: referralConfig.tier4?.bonus || 500, name: '💎 Platinum Referrer' },
-                { level: 5, count: referralConfig.tier5?.count || 200, bonus: referralConfig.tier5?.bonus || 1000, name: '👑 Diamond Referrer' }
-            ];
-            let html = '';
-            tiers.forEach(tier => {
-                const isClaimed = appState.referTiers && appState.referTiers[tier.level] === 1;
-                const isAvailable = total >= tier.count && !isClaimed;
-                const status = isClaimed ? '✅ Claimed' : (isAvailable ? '🎁 Claim Now' : `🔒 ${tier.count} needed`);
-                const cls = isClaimed ? 'claimed' : (isAvailable ? 'available' : 'locked');
-                html += `
-                    <div class="refer-tier">
-                        <div class="tier-info">
-                            <span class="tier-name">${tier.name}</span>
-                            <span class="tier-desc">${tier.count} referrals • +${tier.bonus} Coins</span>
-                        </div>
-                        <span class="tier-status ${cls}" ${isAvailable ? `onclick="claimTier(${tier.level},${tier.bonus})"` : ''}>
-                            ${status}
-                        </span>
-                    </div>
-                `;
-            });
-            document.getElementById('referTierListHome').innerHTML = html;
-        }
-
-        function claimTier(level, bonus) {
-            const total = appState.referralCount || 0;
-            if (total < 10) { showToast('Not enough referrals!','error'); return; }
-            if (appState.referTiers && appState.referTiers[level] === 1) { showToast('Already claimed!','error'); return; }
-            appState.balance += bonus;
-            if (!appState.referTiers) appState.referTiers = {};
-            appState.referTiers[level] = 1;
-            userRef.update({ balance: appState.balance, referTiers: appState.referTiers });
-            updateUI(); updateReferUI(); updateLevelUI();
-            showToast(`🎁 +${bonus} Coins from referral tier!`);
-        }
-
-        function generateReferCode() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let code = '';
-            for (let i = 0; i < 8; i++) { code += chars.charAt(Math.floor(Math.random() * chars.length)); }
-            return code;
-        }
-
-        function checkReferral() {
-            let startParam = tg.initDataUnsafe?.start_param || new URLSearchParams(window.location.search).get('start') || '';
-            if (startParam && startParam.startsWith('ref_')) {
-                const refCode = startParam.replace('ref_', '');
-                db.ref('users').orderByChild('referCode').equalTo(refCode).once('value', snapshot => {
-                    if (snapshot.exists()) {
-                        snapshot.forEach(child => {
-                            const referrerId = child.key;
-                            if (referrerId !== userId) {
-                                db.ref('referrals/' + userId).once('value', s => {
-                                    if (!s.exists()) {
-                                        const perReferralCoins = referralConfig.perReferralCoins || 50;
-                                        const newUserData = { referredBy: referrerId, referredAt: Date.now(), username: tg.initDataUnsafe?.user?.username || 'User', bonus: perReferralCoins, userId: userId };
-                                        db.ref('referrals/' + userId).set(newUserData).then(() => {
-                                            db.ref('users/' + referrerId).transaction(current => {
-                                                if (current === null) return { referCount: 1, referrals: [newUserData] };
-                                                return { ...current, referCount: (current.referCount || 0) + 1, referrals: (current.referrals || []).concat([newUserData]) };
-                                            }).then(() => {
-                                                userRef.update({ balance: (appState.balance || 0) + perReferralCoins });
-                                                appState.balance = (appState.balance || 0) + perReferralCoins;
-                                                updateUI(); updateLevelUI(); updateReferUI();
-                                                showToast(`🎉 You got +${perReferralCoins} Coins from referral!`);
-                                            });
-                                        });
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
-            }
-        }
-
-        function submitReferCode() {
-            const codeInput = document.getElementById('referCodeInput');
-            const code = codeInput.value.trim();
-            const submitBtn = document.getElementById('referCodeSubmitBtn');
-            if (!code) { showToast('Please enter a referral code!', 'error'); return; }
-            userRef.once('value', snap => {
-                const data = snap.val() || {};
-                if (data.referCodeSubmitted) { showToast('You have already submitted a referral code!', 'error'); return; }
-                db.ref('users').orderByChild('referCode').equalTo(code).once('value', snapshot => {
-                    if (snapshot.exists()) {
-                        snapshot.forEach(child => {
-                            const referrerId = child.key;
-                            if (referrerId === userId) { showToast('You cannot use your own code!', 'error'); return; }
-                            const perReferralCoins = referralConfig.perReferralCoins || 50;
-                            const newUserData = { referredBy: referrerId, referredAt: Date.now(), username: tg.initDataUnsafe?.user?.username || 'User', bonus: perReferralCoins, userId: userId };
-                            db.ref('referrals/' + userId).set(newUserData).then(() => {
-                                db.ref('users/' + referrerId).transaction(current => {
-                                    if (current === null) return { referCount: 1, referrals: [newUserData] };
-                                    return { ...current, referCount: (current.referCount || 0) + 1, referrals: (current.referrals || []).concat([newUserData]) };
-                                }).then(() => {
-                                    userRef.update({ balance: (appState.balance || 0) + perReferralCoins, referCodeSubmitted: true });
-                                    appState.balance = (appState.balance || 0) + perReferralCoins;
-                                    submitBtn.disabled = true; submitBtn.textContent = '✅ Submitted'; codeInput.disabled = true;
-                                    updateUI(); updateLevelUI(); updateReferUI();
-                                    showToast(`🎉 Code accepted! +${perReferralCoins} Coins from referral!`);
-                                });
-                            });
-                        });
-                    } else { showToast('Invalid referral code!', 'error'); }
-                });
-            });
-        }
-
-        function loadReferralData() {
-            db.ref('users/' + userId + '/referCode').once('value', s => {
-                if (!s.exists()) { const code = generateReferCode(); userRef.update({ referCode: code }); appState.referCode = code; }
-                else { appState.referCode = s.val(); }
-                updateReferUI();
-            });
-            db.ref('users/' + userId + '/referrals').on('value', snapshot => {
-                let count = 0, earn = 0, refs = [];
-                if (snapshot.exists()) {
-                    snapshot.forEach(child => { const val = child.val(); count++; earn += (val.bonus || 0); refs.push({ id: child.key, ...val }); });
-                }
-                appState.referralCount = count; appState.referEarned = earn; appState.referrals = refs;
-                updateReferUI(); loadReferralList();
-            });
-            db.ref('referrals/' + userId).once('value', s => {
-                if (s.exists()) {
-                    const data = s.val();
-                    if (data.referredBy && !data.bonusClaimed) {
-                        const perReferralCoins = referralConfig.perReferralCoins || 50;
-                        appState.balance = (appState.balance || 0) + perReferralCoins;
-                        db.ref('referrals/' + userId).update({ bonusClaimed: true });
-                        userRef.update({ balance: appState.balance });
-                        updateUI(); showToast(`🎉 Welcome! +${perReferralCoins} Coins from referral!`);
-                    }
-                }
-            });
-        }
-
-        function loadReferralList() {
-            const container = document.getElementById('referralListHome');
-            const refs = appState.referrals || [];
-            if (refs.length === 0) { container.innerHTML = '<p style="color:#94a3b8;font-size:13px;text-align:center;padding:10px;">No referrals yet</p>'; return; }
-            const html = refs.slice(-20).reverse().map(ref => `
-                <div class="referral-item">
-                    <span class="name">${ref.username || 'User'}</span>
-                    <span class="bonus">+${ref.bonus || 0} 🪙</span>
-                    <span class="date">${new Date(ref.referredAt || ref.date || Date.now()).toLocaleDateString()}</span>
-                </div>
-            `).join('');
-            container.innerHTML = html;
-        }
-
-        function copyReferLinkHome() {
-            const link = document.getElementById('referLinkHome').textContent;
-            navigator.clipboard.writeText(link).then(() => showToast('📋 Copied!')).catch(() => showToast('📋 Copy manually','error'));
-        }
-
-        // ==================== BAN CHECK ====================
-        function checkBanStatus() {
-            userRef.child('banned').on('value', snapshot => {
-                const isBanned = snapshot.val() === true;
-                if (isBanned) {
-                    appState.isBanned = true;
-                    document.getElementById('bannedOverlay').classList.add('show');
-                    document.getElementById('mainContent').style.display = 'none';
-                    document.querySelector('.bottom-nav').style.display = 'none';
-                    userRef.child('banReason').once('value', s => {
-                        document.getElementById('banReason').textContent = `Reason: ${s.val() || 'Violation of terms'}`;
-                    });
-                } else {
-                    appState.isBanned = false;
-                    document.getElementById('bannedOverlay').classList.remove('show');
-                    document.getElementById('mainContent').style.display = 'block';
-                    document.querySelector('.bottom-nav').style.display = 'flex';
-                }
-            });
-        }
-
-        // ==================== GEOLOCATION ====================
-        let userIP = 'Unknown', userCountry = 'Unknown';
-        function getUserLocation() {
-            fetch('https://ipapi.co/json/').then(res => res.json()).then(data => {
-                userIP = data.ip || 'Unknown'; userCountry = data.country_name || 'Unknown';
-                userRef.update({ ip: userIP, country: userCountry, lastLogin: new Date().toISOString() });
-            }).catch(() => {
-                fetch('https://api.ipify.org?format=json').then(res => res.json()).then(data => {
-                    userIP = data.ip || 'Unknown'; userRef.update({ ip: userIP, lastLogin: new Date().toISOString() });
-                }).catch(() => {});
-            });
-        }
-
-        // ==================== UI UPDATE ====================
-        function updateUI() {
-            document.getElementById('balance').textContent = appState.balance.toLocaleString();
-            document.getElementById('completedTasks').textContent = appState.completedTasks || 0;
-            document.getElementById('referralCount').textContent = appState.referralCount || 0;
-            document.getElementById('dailyStreak').textContent = appState.dailyStreak || 0;
-            document.getElementById('walletBalance').textContent = appState.balance;
-            updateUSDDisplay();
-            updateLevelUI();
-            updateWithdrawUI();
-            updateVideoUI();
-            updateProgressUI();
-            updateSpeedBoostUI();
-        }
-
-        // ==================== TOAST ====================
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.className = 'toast show';
-            if (type === 'error') toast.classList.add('error');
-            clearTimeout(toast._timeout);
-            toast._timeout = setTimeout(() => toast.classList.remove('show'), 3000);
+        // --- UI Navigation ---
+        function switchTab(tabId, element) {
+            document.querySelectorAll('.sidebar .nav-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            document.querySelectorAll('.main > div[id^="tab"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById('tab' + tabId.charAt(0).toUpperCase() + tabId.slice(1)).classList.remove('hidden');
+            if(tabId === 'dashboard') loadDashboardData();
+            if(tabId === 'users') loadUsers();
+            if(tabId === 'tasks') loadTasks();
+            if(tabId === 'withdraw') loadWithdraws();
+            if(tabId === 'offers') loadOffersHistory();
+            if(tabId === 'settings') loadSettingsInputs();
         }
 
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-        // ==================== INIT ====================
-        function initApp() {
-            // Initial Offline Check
-            checkConnection();
+        // --- Clock ---
+        setInterval(() => {
+            document.getElementById('liveTime').textContent = new Date().toLocaleString();
+        }, 1000);
 
-            userRef.on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    appState.balance = data.balance || 0;
-                    appState.usdBalance = data.usdBalance || 0;
-                    appState.completedTasks = data.completedTasks || 0;
-                    appState.referralCount = data.referCount || 0;
-                    appState.dailyStreak = data.dailyStreak || 0;
-                    appState.tasksCompleted = data.tasksCompleted || [];
-                    appState.lastConversion = data.lastConversion || null;
-                    appState.weekStart = data.weekStart || null;
-                    appState.referCode = data.referCode || '';
-                    appState.referEarned = data.referEarned || 0;
-                    appState.referTiers = data.referTiers || {};
-                    appState.referrals = data.referrals || [];
-                    appState.videoWatchedToday = data.videoWatchedToday || 0;
-                    appState.videoLastWatchDate = data.videoLastWatchDate || null;
-                    appState.withdrawHistory = data.withdrawHistory || [];
-                    appState.lastLogin = data.lastLogin || null;
-                    appState.progressCoins = data.progressCoins !== undefined ? data.progressCoins : 1000;
-                    appState.videoWatchedCount = data.videoWatchedCount !== undefined ? data.videoWatchedCount : 0;
-                    appState.speedBoostCooldown = data.speedBoostCooldown || 0;
-                    appState.taskLastCompleted = data.taskLastCompleted || {};
-                    appState.airdropClaimed = data.airdropClaimed || false;
-                    
-                    const username = tg.initDataUnsafe?.user?.username || 'User';
-                    document.getElementById('userName').textContent = username;
-                    
-                    if (appState.lastLogin) {
-                        document.getElementById('lastLoginDisplay').textContent = `📅 Last Login: ${new Date(appState.lastLogin).toLocaleString()}`;
-                    }
-                    
-                    updateUI();
-                    updateLevelUI();
-                    updateVideoUI();
-                    updateReferUI();
-                    updateWithdrawHistory();
-                    updateProgressUI();
-                    updateSpeedBoostUI();
-                    
-                    if (appState.lastConversion) { startConversionTimer(); } 
-                    else { appState.lastConversion = Date.now(); userRef.update({ lastConversion: Date.now() }); startConversionTimer(); }
-                } else {
-                    userRef.set({
-                        balance: 0, usdBalance: 0, completedTasks: 0, referCount: 0, dailyStreak: 0, tasksCompleted: [],
-                        referCode: generateReferCode(), referTiers: {},
-                        videoWatchedToday: 0, videoLastWatchDate: null, withdrawHistory: [], lastLogin: new Date().toISOString(),
-                        progressCoins: 1000, videoWatchedCount: 0, speedBoostCooldown: 0, taskLastCompleted: {},
-                        airdropClaimed: false
-                    });
-                    appState.referCode = generateReferCode(); updateUI(); updateLevelUI(); startConversionTimer(); updateProgressUI();
+        // ================= DASHBOARD =================
+        function loadDashboardData() {
+            db.ref('users').once('value', snap => {
+                let users = 0, coins = 0;
+                if(snap.exists()){
+                    snap.forEach(child => { users++; coins += child.val().balance || 0; });
                 }
-                const botUsername = 'CoinQuist_bot';
-                const link = `https://t.me/${botUsername}?start=ref_${appState.referCode}`;
-                document.getElementById('referLinkHome').textContent = link;
+                document.getElementById('totalUsers').textContent = users;
+                document.getElementById('totalCoins').textContent = coins.toLocaleString();
             });
 
-            loadConversionRate(); loadTasksFromDB(); loadVideoSettings();
-            loadWithdrawSettings(); loadLevelConfig(); loadReferralConfig();
-            loadAirdropData(); // Load new Airdrop data
-            checkBanStatus(); loadReferralData(); checkReferral();
-            getUserLocation(); listenWithdrawStatus();
-
-            setTimeout(() => { if (!appState.isBanned) showToast('👋 Welcome to CoinQuest! Press START to earn!'); }, 1500);
+            db.ref('withdrawRequests').once('value', snap => {
+                let pending = 0, totalWithdrawn = 0;
+                if(snap.exists()){
+                    snap.forEach(child => {
+                        let w = child.val();
+                        if(w.status === 'pending') pending++;
+                        if(w.status === 'approved') totalWithdrawn += w.amount || 0;
+                    });
+                }
+                document.getElementById('pendingWithdraws').textContent = pending;
+                document.getElementById('totalWithdrawn').textContent = '$' + totalWithdrawn.toFixed(2);
+            });
         }
 
-        // ==================== START ====================
-        document.addEventListener('DOMContentLoaded', initApp);
+        // ================= USERS (USERNAME & ID COLLECTED) =================
+        function loadUsers() {
+            db.ref('users').once('value', snap => {
+                let html = '';
+                if(snap.exists()){
+                    snap.forEach(child => {
+                        let u = child.val();
+                        let status = u.banned ? '<span class="badge" style="background:#ef4444;">Banned</span>' : '<span class="badge" style="background:#10b981;">Active</span>';
+                        html += `
+                            <tr>
+                                <td style="font-size:12px;color:#94a3b8;">${child.key.slice(0,12)}...</td>
+                                <td style="font-weight:bold;color:#fbbf24;">${u.username || 'User'}</td>
+                                <td>${u.balance || 0}</td>
+                                <td>$${(u.usdBalance || 0).toFixed(2)}</td>
+                                <td>${status}</td>
+                                <td>
+                                    <button class="action-btn edit" onclick="openEditUser('${child.key}')"><i class="fas fa-edit"></i></button>
+                                    ${u.banned ? `<button class="action-btn" onclick="toggleBan('${child.key}', false)"><i class="fas fa-check-circle" style="color:#10b981;"></i></button>` 
+                                    : `<button class="action-btn" onclick="toggleBan('${child.key}', true)"><i class="fas fa-ban" style="color:#ef4444;"></i></button>`}
+                                </td>
+                            </tr>
+                        `;
+                    });
+                } else { html = `<tr><td colspan="6" style="text-align:center;color:#94a3b8;">No users found</td></tr>`; }
+                document.getElementById('usersTableBody').innerHTML = html;
+            });
+        }
 
-        // ---------- In-App Interstitial Ad Code ----------
-        show_11197472({ type: 'inApp', inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false } });
+        function openEditUser(id) {
+            document.getElementById('editUserId').value = id;
+            db.ref('users/' + id).once('value', snap => {
+                let u = snap.val();
+                document.getElementById('editUserCoins').value = u.balance || 0;
+                document.getElementById('editUserUsd').value = u.usdBalance || 0;
+                document.getElementById('editUserModal').classList.add('active');
+            });
+        }
 
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) { updateUI(); updateProgressUI(); updateSpeedBoostUI(); }
-        });
+        function saveUserEdit() {
+            let id = document.getElementById('editUserId').value;
+            let coins = parseInt(document.getElementById('editUserCoins').value) || 0;
+            let usd = parseFloat(document.getElementById('editUserUsd').value) || 0;
+            db.ref('users/' + id).update({ balance: coins, usdBalance: usd }).then(() => {
+                closeModal('editUserModal');
+                loadUsers();
+                alert('User updated successfully!');
+            });
+        }
 
-        document.addEventListener('dblclick', (e) => e.preventDefault());
-
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
-        });
-
-        window.addEventListener('error', (e) => {
-            console.error('❌ Global error:', e.message);
-            if (e.message.includes('Firebase')) showToast('⚠️ Connection issue. Retrying...', 'error');
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                if (document.getElementById('levelOverlay').classList.contains('show')) closeLevelPage();
-                else if (document.getElementById('airdropOverlay').classList.contains('show')) closeAirdropPage();
+        function toggleBan(id, status) {
+            if(confirm(status ? "Ban this user?" : "Unban this user?")) {
+                db.ref('users/' + id).update({ banned: status }).then(() => loadUsers());
             }
+        }
+        function refreshUsers(){ loadUsers(); }
+
+        // ================= TASKS =================
+        function loadTasks() {
+            db.ref('tasks').once('value', snap => {
+                let html = '';
+                if(snap.exists()){
+                    snap.forEach(child => {
+                        let t = child.val();
+                        html += `
+                            <tr>
+                                <td>${t.title}</td>
+                                <td><span class="badge" style="background:#3b82f6;">${t.type}</span></td>
+                                <td>${t.reward}</td>
+                                <td>
+                                    <button class="action-btn edit" onclick="openTaskModal('${child.key}')"><i class="fas fa-edit"></i></button>
+                                    <button class="action-btn delete" onclick="deleteTask('${child.key}')"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                } else { html = `<tr><td colspan="4" style="text-align:center;color:#94a3b8;">No tasks added</td></tr>`; }
+                document.getElementById('tasksTableBody').innerHTML = html;
+            });
+        }
+
+        function openTaskModal(id = null) {
+            document.getElementById('editTaskId').value = id || '';
+            document.getElementById('taskModalTitle').textContent = id ? 'Edit Task' : 'Add New Task';
+            document.getElementById('taskTitle').value = '';
+            document.getElementById('taskReward').value = '';
+            document.getElementById('taskType').value = 'link';
+            document.getElementById('taskLink').value = '';
+            document.getElementById('taskActionText').value = '';
+
+            if(id) {
+                db.ref('tasks/' + id).once('value', snap => {
+                    let t = snap.val();
+                    document.getElementById('taskTitle').value = t.title || '';
+                    document.getElementById('taskReward').value = t.reward || 0;
+                    document.getElementById('taskType').value = t.type || 'link';
+                    document.getElementById('taskLink').value = t.link || '';
+                    document.getElementById('taskActionText').value = t.actionText || '';
+                });
+            }
+            document.getElementById('taskModal').classList.add('active');
+        }
+
+        function saveTask() {
+            let id = document.getElementById('editTaskId').value;
+            let data = {
+                title: document.getElementById('taskTitle').value,
+                reward: parseInt(document.getElementById('taskReward').value) || 0,
+                type: document.getElementById('taskType').value,
+                link: document.getElementById('taskLink').value,
+                actionText: document.getElementById('taskActionText').value
+            };
+            if(!data.title) return alert("Task title is required");
+
+            if(id) { db.ref('tasks/' + id).update(data); }
+            else { db.ref('tasks').push(data); }
+            
+            closeModal('taskModal');
+            loadTasks();
+        }
+
+        function deleteTask(id) {
+            if(confirm("Delete this task?")) {
+                db.ref('tasks/' + id).remove().then(() => loadTasks());
+            }
+        }
+
+        // ================= WITHDRAW =================
+        function loadWithdraws() {
+            db.ref('withdrawRequests').once('value', snap => {
+                let html = '';
+                if(snap.exists()){
+                    let list = [];
+                    snap.forEach(child => { list.push({ id: child.key, ...child.val() }); });
+                    list.reverse().forEach(w => {
+                        let statusClass = w.status === 'pending' ? 'pending' : (w.status === 'approved' ? 'approved' : 'cancelled');
+                        let actions = '';
+                        if(w.status === 'pending') {
+                            actions = `
+                                <button class="action-btn approve" onclick="updateWithdraw('${w.id}', 'approved')"><i class="fas fa-check"></i></button>
+                                <button class="action-btn cancel" onclick="updateWithdraw('${w.id}', 'cancelled')"><i class="fas fa-times"></i></button>
+                            `;
+                        } else { actions = `<span style="color:#64748b;">Completed</span>`; }
+
+                        html += `
+                            <tr>
+                                <td>${w.username || 'User'}</td>
+                                <td>$${(w.amount || 0).toFixed(2)}</td>
+                                <td style="font-size:12px;">${new Date(w.requestedAt).toLocaleDateString()}</td>
+                                <td><span class="badge ${statusClass}">${w.status}</span></td>
+                                <td>${actions}</td>
+                            </tr>
+                        `;
+                    });
+                } else { html = `<tr><td colspan="5" style="text-align:center;color:#94a3b8;">No requests found</td></tr>`; }
+                document.getElementById('withdrawTableBody').innerHTML = html;
+            });
+        }
+
+        function updateWithdraw(id, status) {
+            if(!confirm(`Mark this withdrawal as ${status}?`)) return;
+            db.ref('withdrawRequests/' + id).update({ status: status }).then(() => loadWithdraws());
+        }
+
+        // ================= OFFERS & NOTIFICATIONS =================
+        function loadOffersHistory() {
+            db.ref('offersHistory').once('value', snap => {
+                let html = '';
+                if(snap.exists()){
+                    let list = [];
+                    snap.forEach(child => { list.push({ id: child.key, ...child.val() }); });
+                    list.reverse().forEach(o => {
+                        html += `
+                            <tr>
+                                <td>${o.targetUserId || 'All Users'}</td>
+                                <td>${o.title}</td>
+                                <td><span class="badge" style="background:#3b82f6;">${o.status || 'Sent'}</span></td>
+                                <td style="font-size:12px;">${new Date(o.timestamp).toLocaleDateString()}</td>
+                            </tr>
+                        `;
+                    });
+                } else { html = `<tr><td colspan="4" style="text-align:center;color:#94a3b8;">No offers sent yet</td></tr>`; }
+                document.getElementById('offersTableBody').innerHTML = html;
+            });
+        }
+
+        function sendOfferToUser() {
+            let userId = document.getElementById('offerUserId').value.trim();
+            let title = document.getElementById('offerTitle').value.trim();
+            let message = document.getElementById('offerMessage').value.trim();
+            let reward = parseInt(document.getElementById('offerReward').value) || 0;
+
+            if(!userId || !title || !message) {
+                alert("Please fill in User ID, Title, and Message.");
+                return;
+            }
+
+            let offerData = {
+                title: title,
+                message: message,
+                reward: reward,
+                status: 'unread',
+                timestamp: Date.now(),
+                type: 'personal'
+            };
+
+            db.ref('users/' + userId + '/notifications').push(offerData).then(() => {
+                db.ref('offersHistory').push({
+                    ...offerData,
+                    targetUserId: userId,
+                    status: 'Sent'
+                });
+                alert('Offer sent successfully to user: ' + userId);
+                document.getElementById('offerUserId').value = '';
+                document.getElementById('offerTitle').value = '';
+                document.getElementById('offerMessage').value = '';
+                document.getElementById('offerReward').value = '0';
+                loadOffersHistory();
+            }).catch(err => alert('Error sending offer: ' + err.message));
+        }
+
+        function sendBroadcast() {
+            let title = document.getElementById('broadcastTitle').value.trim();
+            let message = document.getElementById('broadcastMessage').value.trim();
+            let reward = parseInt(document.getElementById('broadcastReward').value) || 0;
+
+            if(!title || !message) {
+                alert("Please fill in Title and Message.");
+                return;
+            }
+
+            if(!confirm("Are you sure you want to send this to ALL users? This may take some time.")) return;
+
+            db.ref('users').once('value', snap => {
+                let updates = {};
+                let broadcastData = {
+                    title: title,
+                    message: message,
+                    reward: reward,
+                    status: 'unread',
+                    timestamp: Date.now(),
+                    type: 'broadcast'
+                };
+
+                if(snap.exists()){
+                    snap.forEach(child => {
+                        let userId = child.key;
+                        updates['users/' + userId + '/notifications'] = broadcastData;
+                    });
+                    updates['offersHistory'] = {
+                        ...broadcastData,
+                        targetUserId: 'All Users',
+                        status: 'Broadcasted'
+                    };
+
+                    db.ref().update(updates).then(() => {
+                        alert('Broadcast sent to all users successfully!');
+                        document.getElementById('broadcastTitle').value = '';
+                        document.getElementById('broadcastMessage').value = '';
+                        document.getElementById('broadcastReward').value = '0';
+                        loadOffersHistory();
+                    }).catch(err => alert('Error broadcasting: ' + err.message));
+                } else {
+                    alert("No users found to broadcast to.");
+                }
+            });
+        }
+
+        // ================= SETTINGS =================
+        function loadSettingsInputs() {
+            db.ref('conversionRate').once('value', s => document.getElementById('setConversionRate').value = s.val() || 1000);
+            db.ref('withdrawSettings/minAmount').once('value', s => document.getElementById('setMinWithdraw').value = s.val() || 10);
+            
+            db.ref('videoSettings/reward').once('value', s => document.getElementById('setVideoReward').value = s.val() || 10);
+            db.ref('videoSettings/dailyLimit').once('value', s => document.getElementById('setVideoLimit').value = s.val() || 5);
+            db.ref('videoSettings/refillThreshold').once('value', s => document.getElementById('setVideoThreshold').value = s.val() || 5);
+            
+            // Load Airdrop Settings (New Timer)
+            db.ref('airdropConfig/poolAmount').once('value', s => document.getElementById('setAirdropPool').value = s.val() || 50.00);
+            db.ref('airdropConfig/min').once('value', s => document.getElementById('setAirdropMin').value = s.val() || 0.50);
+            db.ref('airdropConfig/max').once('value', s => document.getElementById('setAirdropMax').value = s.val() || 2.00);
+            db.ref('airdropConfig/limit').once('value', s => document.getElementById('setAirdropLimit').value = s.val() || 50);
+            
+            // Load Airdrop Start Time
+            db.ref('airdropConfig/startTime').once('value', s => {
+                let val = s.val();
+                if(val) {
+                    document.getElementById('setAirdropStart').value = new Date(val).toISOString().slice(0, 16);
+                } else {
+                    document.getElementById('setAirdropStart').value = '';
+                }
+            });
+
+            db.ref('levelConfig/levels/1/requiredPoints').once('value', s => document.getElementById('setL1').value = s.val() || 0);
+            db.ref('levelConfig/levels/2/requiredPoints').once('value', s => document.getElementById('setL2').value = s.val() || 200);
+            db.ref('levelConfig/levels/3/requiredPoints').once('value', s => document.getElementById('setL3').value = s.val() || 400);
+            db.ref('levelConfig/levels/4/requiredPoints').once('value', s => document.getElementById('setL4').value = s.val() || 600);
+            db.ref('levelConfig/levels/5/requiredPoints').once('value', s => document.getElementById('setL5').value = s.val() || 800);
+
+            db.ref('speedBoostConfig/duration').once('value', s => document.getElementById('setBoostDuration').value = s.val() || 3);
+            db.ref('speedBoostConfig/cooldown').once('value', s => document.getElementById('setBoostCooldown').value = s.val() || 60);
+
+            for(let i=1; i<=5; i++) {
+                db.ref('referralConfig/tier' + i + '/count').once('value', s => {
+                    document.getElementById('setRef' + i + 'Count').value = s.val() || [10,25,50,100,200][i-1];
+                });
+                db.ref('referralConfig/tier' + i + '/bonus').once('value', s => {
+                    document.getElementById('setRef' + i + 'Bonus').value = s.val() || [50,150,300,500,1000][i-1];
+                });
+            }
+        }
+
+        function saveGeneralSettings() {
+            let rate = parseInt(document.getElementById('setConversionRate').value) || 1000;
+            let min = parseFloat(document.getElementById('setMinWithdraw').value) || 10;
+            db.ref('conversionRate').set(rate);
+            db.ref('withdrawSettings').update({ minAmount: min });
+            alert('Settings saved!');
+        }
+
+        function saveVideoSettings() {
+            let reward = parseInt(document.getElementById('setVideoReward').value) || 10;
+            let limit = parseInt(document.getElementById('setVideoLimit').value) || 5;
+            let threshold = parseInt(document.getElementById('setVideoThreshold').value) || 5;
+            
+            db.ref('videoSettings').update({ 
+                reward: reward, 
+                dailyLimit: limit,
+                refillThreshold: threshold 
+            });
+            alert('Video settings saved!');
+        }
+
+        // NEW: Save Advanced AirDrop Settings
+        function saveAirdropSettings() {
+            let pool = parseFloat(document.getElementById('setAirdropPool').value) || 50.00;
+            let min = parseFloat(document.getElementById('setAirdropMin').value) || 0.50;
+            let max = parseFloat(document.getElementById('setAirdropMax').value) || 2.00;
+            let limit = parseInt(document.getElementById('setAirdropLimit').value) || 50;
+            let startInput = document.getElementById('setAirdropStart').value;
+
+            if(min >= max) {
+                alert("Min Reward must be less than Max Reward!");
+                return;
+            }
+
+            let updateData = {
+                poolAmount: pool,
+                min: min,
+                max: max,
+                limit: limit
+            };
+
+            // Convert datetime-local string to Timestamp
+            if(startInput) {
+                updateData.startTime = new Date(startInput).getTime();
+            } else {
+                updateData.startTime = null;
+            }
+
+            db.ref('airdropConfig').update(updateData).then(() => {
+                alert('AirDrop settings (including timer) saved successfully!');
+            }).catch(err => alert('Error saving: ' + err.message));
+        }
+
+        function saveLevelSettings() {
+            let levels = {};
+            for (let i = 1; i <= 100; i++) {
+                let xp = (i - 1) * 200; // Level 1 = 0, Level 2 = 200, Level 100 = 19800
+                let tierEmoji = '🪙';
+                let tierBonus = 0;
+                
+                if(i <= 20) { tierEmoji = '🥉'; tierBonus = 2; }
+                else if(i <= 40) { tierEmoji = '🥈'; tierBonus = 5; }
+                else if(i <= 60) { tierEmoji = '🥇'; tierBonus = 10; }
+                else if(i <= 80) { tierEmoji = '💎'; tierBonus = 20; }
+                else { tierEmoji = '👑'; tierBonus = 30; }
+
+                levels[i] = { 
+                    name: 'Level ' + i, 
+                    emoji: tierEmoji,
+                    bonus: tierBonus,
+                    requiredPoints: xp 
+                };
+            }
+            db.ref('levelConfig/levels').update(levels).then(() => {
+                alert('Successfully generated and saved 100 levels with 200 XP each!');
+                loadSettingsInputs();
+            });
+        }
+
+        function saveBoostSettings() {
+            let duration = parseInt(document.getElementById('setBoostDuration').value) || 3;
+            let cooldown = parseInt(document.getElementById('setBoostCooldown').value) || 60;
+            db.ref('speedBoostConfig').update({ duration: duration, cooldown: cooldown });
+            alert('Speed Boost settings saved!');
+        }
+
+        function saveReferralSettings() {
+            let updates = { perReferralCoins: 50 };
+            for(let i=1; i<=5; i++) {
+                let countKey = 'tier' + i;
+                updates[countKey] = {
+                    count: parseInt(document.getElementById('setRef' + i + 'Count').value) || 0,
+                    bonus: parseInt(document.getElementById('setRef' + i + 'Bonus').value) || 0
+                };
+            }
+            db.ref('referralConfig').update(updates);
+            alert('Referral Tier settings saved!');
+        }
+
+        // ================= INIT =================
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDashboardData();
+            loadOffersHistory();
         });
 
-        console.log('✅ CoinQuest App Loaded Successfully');
-        console.log('📊 User ID:', userId);
-        console.log('🎯 Monetag Ad SDK Integrated');
     </script>
 </body>
 </html>
