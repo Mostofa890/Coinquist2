@@ -64,7 +64,7 @@
         .stat-value { font-size: 16px; font-weight: 800; background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .stat-label { color: #94a3b8; font-size: 9px; margin-top: 2px; }
 
-        /* ===== AIRDROP & LIVE COUNTER (Replaces Weekly Bonus) ===== */
+        /* ===== AIRDROP & LIVE COUNTER ===== */
         .airdrop-btn { background: rgba(255,255,255,0.05); backdrop-filter: blur(8px); padding: 10px 14px; border-radius: 16px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 20px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); }
         .airdrop-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 30px rgba(0,0,0,0.3); }
         .airdrop-btn .bonus-text h4 { font-size: 14px; font-weight: 700; color: #fff; }
@@ -405,21 +405,31 @@
         .level-item .level-reward { font-size: 12px; color: #10b981; }
         .level-item .level-check { color: #10b981; font-size: 16px; }
 
-        /* ===== AIRDROP OVERLAY (Replaces Weekly Overlay) ===== */
+        /* ===== AIRDROP OVERLAY (ADVANCED) ===== */
         .airdrop-overlay .airdrop-grid { display: grid; grid-template-columns: 1fr; gap: 10px; padding: 8px 0; }
         .airdrop-overlay .info-box { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 16px; padding: 16px; border: 1px solid rgba(255,255,255,0.08); text-align: center; }
         .airdrop-overlay .info-box .big-number { font-size: 36px; font-weight: 900; color: #fbbf24; }
         .airdrop-overlay .info-box .label { color: #94a3b8; font-size: 13px; margin-top: 4px; }
+        
+        .airdrop-overlay .countdown-area { display: flex; flex-direction: column; align-items: center; margin: 15px 0; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); }
+        .airdrop-overlay .countdown-area .countdown-timer { font-size: 32px; font-weight: bold; color: #fbbf24; letter-spacing: 2px; font-variant-numeric: tabular-nums; }
+        .airdrop-overlay .countdown-area .countdown-label { font-size: 12px; color: #94a3b8; margin-bottom: 4px; }
+        
         .airdrop-overlay .claim-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; padding: 12px 24px; border: none; border-radius: 30px; font-weight: 700; font-size: 16px; cursor: pointer; margin-top: 15px; width: 100%; box-shadow: 0 4px 20px rgba(245,158,11,0.3); transition: all 0.2s; }
         .airdrop-overlay .claim-btn:hover:not(:disabled) { transform: scale(1.02); box-shadow: 0 6px 30px rgba(245,158,11,0.4); }
         .airdrop-overlay .claim-btn:disabled { background: #64748b; cursor: not-allowed; box-shadow: none; }
         
+        .airdrop-overlay .status-box { font-size: 14px; margin-top: 10px; padding: 8px; border-radius: 8px; font-weight: bold; color: #fff; }
+        .airdrop-overlay .status-box.live { background: rgba(16,185,129,0.1); color: #10b981; border: 1px solid rgba(16,185,129,0.1); }
+        .airdrop-overlay .status-box.ended { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.1); }
+
         .airdrop-list { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 12px; padding: 12px; margin-top: 12px; border: 1px solid rgba(255,255,255,0.08); max-height: 300px; overflow-y: auto; }
         .airdrop-list .list-title { font-size: 12px; color: #94a3b8; margin-bottom: 8px; text-align: center; }
         .airdrop-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px; }
         .airdrop-item:last-child { border-bottom: none; }
         .airdrop-item .name { color: #fff; font-weight: 500; }
         .airdrop-item .time { color: #94a3b8; font-size: 10px; }
+        .airdrop-item.winner { background: rgba(251,191,36,0.1); border-left: 3px solid #fbbf24; padding-left: 8px; border-radius: 4px; }
 
         /* ===== OFFLINE OVERLAY (NEW) ===== */
         .offline-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 99999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; }
@@ -490,7 +500,7 @@
         </div>
     </div>
 
-    <!-- AIRDROP OVERLAY (Replaces Weekly Overlay) -->
+    <!-- AIRDROP OVERLAY (Advanced Countdown & Winner List) -->
     <div class="overlay airdrop-overlay" id="airdropOverlay">
         <div class="overlay-header">
             <button class="back-btn" onclick="closeAirdropPage()"><i class="fas fa-arrow-left"></i> Back</button>
@@ -503,15 +513,22 @@
                     <div class="big-number" id="airdropPoolDisplay">$0.00</div>
                     <div class="label">Current Reward Pool</div>
                     
-                    <button class="claim-btn" id="airdropClaimBtn" onclick="claimAirdrop()">
+                    <!-- COUNTDOWN AREA -->
+                    <div class="countdown-area">
+                        <div class="countdown-label" id="countdownLabel">Next Drop in</div>
+                        <div class="countdown-timer" id="airdropCountdown">--:--:--</div>
+                    </div>
+
+                    <div class="status-box" id="airdropStatusBox">⏳ Waiting for next round...</div>
+                    
+                    <button class="claim-btn" id="airdropClaimBtn" onclick="claimAirdrop()" disabled>
                         🎁 Claim Your Share
                     </button>
-                    <p style="font-size:11px;color:#94a3b8;margin-top:8px;">Be the first to click and claim!</p>
                 </div>
 
                 <div class="airdrop-list">
-                    <div class="list-title">👥 Waiting List</div>
-                    <div id="airdropListContainer"><p style="color:#94a3b8;font-size:13px;text-align:center;padding:10px;">No one has claimed yet...</p></div>
+                    <div class="list-title">🏆 Winner List</div>
+                    <div id="airdropListContainer"><p style="color:#94a3b8;font-size:13px;text-align:center;padding:10px;">Waiting for the first claim...</p></div>
                 </div>
             </div>
         </div>
@@ -798,7 +815,7 @@
             isSpeedBoostActive: false,
             speedBoostCooldown: 0,
             taskLastCompleted: {},
-            // New Airdrop State
+            // Airdrop State
             airdropClaimed: false,
             airdropAmount: 0
         };
@@ -1607,9 +1624,10 @@
             });
         }
 
-        // ==================== AIRDROP SYSTEM (Replaces Weekly) ====================
+        // ==================== ADVANCED AIRDROP SYSTEM ====================
         let airdropListeners = [];
         let onlineCountRef = null;
+        let countdownInterval = null;
 
         function loadAirdropData() {
             // Listen to online user count
@@ -1620,40 +1638,124 @@
                 document.getElementById('onlineUsersDisplay').textContent = count;
             });
 
-            // Listen to Airdrop Config (Pool Amount)
+            // Listen to Airdrop Config (Pool, Time, Limits)
             airdropConfigRef.on('value', (snap) => {
-                let config = snap.val() || { min: 0.5, max: 2.0, limit: 50 };
+                let config = snap.val() || { min: 0.5, max: 2.0, poolAmount: 50.00, active: false };
                 appState.airdropConfig = config;
                 document.getElementById('airdropPoolDisplay').textContent = `$${config.poolAmount || 50.00}`;
+                updateAirdropState(config);
             });
 
-            // Listen to Airdrop Claim List
+            // Listen to Airdrop Winner List
             const airdropListRef = db.ref('airdropList').orderByChild('timestamp').limitToLast(50);
             airdropListRef.on('value', (snap) => {
                 const container = document.getElementById('airdropListContainer');
                 if (!snap.exists()) {
-                    container.innerHTML = '<p style="color:#94a3b8;font-size:13px;text-align:center;padding:10px;">No one has claimed yet...</p>';
+                    container.innerHTML = '<p style="color:#94a3b8;font-size:13px;text-align:center;padding:10px;">Waiting for the first claim...</p>';
                     return;
                 }
                 let html = '';
                 let list = [];
                 snap.forEach(child => { list.push({ id: child.key, ...child.val() }); });
-                list.reverse().forEach(item => {
+                
+                // Sort by timestamp descending (Newest first)
+                list.sort((a,b) => b.timestamp - a.timestamp);
+
+                // Highlight the first winner
+                list.forEach((item, index) => {
                     let timeAgo = Math.floor((Date.now() - item.timestamp) / 60000);
                     let timeStr = timeAgo < 1 ? 'Just now' : `${timeAgo}m ago`;
-                    html += `<div class="airdrop-item"><span class="name">${item.username || 'Anonymous'}</span><span class="time">+$${item.amount.toFixed(2)} • ${timeStr}</span></div>`;
+                    let isWinner = index === 0 ? 'winner' : '';
+                    html += `<div class="airdrop-item ${isWinner}"><span class="name">${index === 0 ? '👑 ' : ''}${item.username || 'Anonymous'}</span><span class="time">+$${item.amount.toFixed(2)} • ${timeStr}</span></div>`;
                 });
-                container.innerHTML = html || '<p style="color:#94a3b8;font-size:13px;text-align:center;padding:10px;">No claims yet</p>';
+                container.innerHTML = html || '<p style="color:#94a3b8;font-size:13px;text-align:center;padding:10px;">Waiting for the first claim...</p>';
             });
 
             // Check if current user already claimed
             db.ref('users/' + userId + '/airdropClaimed').once('value', (snap) => {
                 appState.airdropClaimed = snap.val() || false;
-                if(appState.airdropClaimed) {
-                    document.getElementById('airdropClaimBtn').disabled = true;
-                    document.getElementById('airdropClaimBtn').textContent = '✅ Already Claimed';
-                }
             });
+        }
+
+        function updateAirdropState(config) {
+            const btn = document.getElementById('airdropClaimBtn');
+            const countdownEl = document.getElementById('airdropCountdown');
+            const labelEl = document.getElementById('countdownLabel');
+            const statusBox = document.getElementById('airdropStatusBox');
+
+            // Clear any existing interval
+            if(countdownInterval) clearInterval(countdownInterval);
+
+            // If no times are set, default to waiting
+            if(!config.startTime || !config.endTime) {
+                btn.disabled = true;
+                countdownEl.textContent = '--:--:--';
+                labelEl.textContent = 'Next Drop in';
+                statusBox.textContent = '⏳ Waiting for admin setup...';
+                statusBox.className = 'status-box';
+                return;
+            }
+
+            const now = Date.now();
+            const start = config.startTime;
+            const end = config.endTime;
+
+            if(now < start) {
+                // PRE-DROP (Countdown to start)
+                labelEl.textContent = 'Next Drop in';
+                btn.disabled = true;
+                statusBox.textContent = '⏳ Countdown to start...';
+                statusBox.className = 'status-box';
+                
+                countdownInterval = setInterval(() => {
+                    const diff = start - Date.now();
+                    if(diff <= 0) {
+                        clearInterval(countdownInterval);
+                        updateAirdropState(config); // Re-run to move to active state
+                        return;
+                    }
+                    const h = Math.floor(diff / (1000 * 60 * 60));
+                    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const s = Math.floor((diff % (1000 * 60)) / 1000);
+                    countdownEl.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                }, 1000);
+
+            } else if(now >= start && now < end) {
+                // LIVE DROP (Clicking allowed)
+                labelEl.textContent = '⏳ Live Drop Ends in';
+                statusBox.textContent = '🔥 LIVE NOW! Be the first to click!';
+                statusBox.className = 'status-box live';
+                
+                // Enable button only if user hasn't claimed
+                if(!appState.airdropClaimed) {
+                    btn.disabled = false;
+                    btn.textContent = '🎁 Claim Your Share';
+                } else {
+                    btn.disabled = true;
+                    btn.textContent = '✅ Already Claimed';
+                }
+
+                countdownInterval = setInterval(() => {
+                    const diff = end - Date.now();
+                    if(diff <= 0) {
+                        clearInterval(countdownInterval);
+                        updateAirdropState(config); // Re-run to move to ended state
+                        return;
+                    }
+                    const h = Math.floor(diff / (1000 * 60 * 60));
+                    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const s = Math.floor((diff % (1000 * 60)) / 1000);
+                    countdownEl.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                }, 1000);
+
+            } else {
+                // DROP ENDED
+                labelEl.textContent = 'Drop Ended';
+                countdownEl.textContent = '00:00:00';
+                btn.disabled = true;
+                statusBox.textContent = '⛔ This round has ended.';
+                statusBox.className = 'status-box ended';
+            }
         }
 
         function openAirdropPage() {
@@ -1724,7 +1826,6 @@
             });
         }
 
-
         // ==================== OFFLINE HANDLER (NEW) ====================
         function checkConnection() {
             const offlineOverlay = document.getElementById('offlineOverlay');
@@ -1732,19 +1833,16 @@
             const bottomNav = document.querySelector('.bottom-nav');
             
             if (navigator.onLine) {
-                // Hide offline overlay
                 offlineOverlay.classList.remove('show');
                 mainContent.style.display = 'block';
                 bottomNav.style.display = 'flex';
             } else {
-                // Show offline overlay, block all interactions
                 offlineOverlay.classList.add('show');
                 mainContent.style.display = 'none';
                 bottomNav.style.display = 'none';
             }
         }
 
-        // Listen to online/offline events
         window.addEventListener('online', checkConnection);
         window.addEventListener('offline', checkConnection);
 
