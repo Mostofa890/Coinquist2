@@ -431,7 +431,7 @@
         .airdrop-item .time { color: #94a3b8; font-size: 10px; }
         .airdrop-item.winner { background: rgba(251,191,36,0.1); border-left: 3px solid #fbbf24; padding-left: 8px; border-radius: 4px; }
 
-        /* ===== OFFLINE OVERLAY (NEW) ===== */
+        /* ===== OFFLINE OVERLAY ===== */
         .offline-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 99999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; }
         .offline-overlay.show { display: flex; }
         .offline-overlay h1 { color: #ef4444; font-size: 26px; margin-bottom: 10px; }
@@ -515,7 +515,7 @@
                     
                     <!-- COUNTDOWN AREA -->
                     <div class="countdown-area">
-                        <div class="countdown-label" id="countdownLabel">Next Drop in</div>
+                        <div class="countdown-label" id="countdownLabel">Drop Timer</div>
                         <div class="countdown-timer" id="airdropCountdown">--:--:--</div>
                     </div>
 
@@ -817,7 +817,8 @@
             taskLastCompleted: {},
             // Airdrop State
             airdropClaimed: false,
-            airdropAmount: 0
+            airdropAmount: 0,
+            roundStartTime: null // New: to track 5-minute window
         };
 
         let tasks = [];
@@ -836,8 +837,8 @@
         const speedBoostConfigRef = db.ref('speedBoostConfig');
         const levelConfigRef = db.ref('levelConfig');
         const referralConfigRef = db.ref('referralConfig');
-        const airdropConfigRef = db.ref('airdropConfig'); // NEW
-        const connectedRef = db.ref('.info/connected'); // Connection status
+        const airdropConfigRef = db.ref('airdropConfig'); 
+        const connectedRef = db.ref('.info/connected'); 
 
         // ==================== PAGE NAVIGATION ====================
         function switchPage(page, event) {
@@ -1135,8 +1136,7 @@
             });
         }
 
-
-        // ==================== PROGRESS BAR ====================
+        // ==================== PROGRESS BAR (With Offline Fix) ====================
         function updateProgressUI() {
             const fill = document.getElementById('progressBarFill');
             const count = document.getElementById('progressCoinCount');
@@ -1171,6 +1171,11 @@
                 updateProgressUI();
                 return;
             }
+            // If offline, don't start
+            if (!navigator.onLine) {
+                showToast('⚠️ No internet. Mining paused.', 'error');
+                return;
+            }
             
             const btn = document.getElementById('progressStartBtn');
             btn.disabled = true;
@@ -1187,6 +1192,16 @@
                     return;
                 }
                 
+                // If user goes offline while mining, stop the interval
+                if (!navigator.onLine) {
+                    clearInterval(progressInterval);
+                    progressInterval = null;
+                    btn.disabled = false;
+                    btn.textContent = '▶ START';
+                    showToast('⚠️ Internet lost. Mining paused.', 'error');
+                    return;
+                }
+
                 appState.progressCoins -= 1;
                 appState.balance += 1;
                 userRef.update({ 
@@ -1627,10 +1642,12 @@
         // ==================== ADVANCED AIRDROP SYSTEM ====================
         let airdropListeners = [];
         let onlineCountRef = null;
-        let countdownInterval = null;
+        let airdropCountdownInterval = null;
+        let airdropVisitorsRef = null;
+        let airdropVisitorsCountRef = null;
 
         function loadAirdropData() {
-            // Listen to online user count
+            // 1. Online User Count (Global)
             onlineCountRef = db.ref('presence/onlineCount');
             onlineCountRef.on('value', (snap) => {
                 let count = snap.val() || 0;
@@ -1638,15 +1655,24 @@
                 document.getElementById('onlineUsersDisplay').textContent = count;
             });
 
-            // Listen to Airdrop Config (Pool, Time, Limits)
+            // 2. Airdrop Config
             airdropConfigRef.on('value', (snap) => {
                 let config = snap.val() || { min: 0.5, max: 2.0, poolAmount: 50.00, active: false };
                 appState.airdropConfig = config;
                 document.getElementById('airdropPoolDisplay').textContent = `$${config.poolAmount || 50.00}`;
-                updateAirdropState(config);
+                
+                // Check if there is an active round (5 min timer)
+                if (config.roundStartTime) {
+                    appState.roundStartTime = config.roundStartTime;
+                    startAirdropCountdown(config.roundStartTime, config.roundDuration || 300000); // Default 5 mins
+                } else {
+                    // Default state
+                    document.getElementById('airdropCountdown').textContent = '--:--:--';
+                    document.getElementById('airdropClaimBtn').disabled = true;
+                }
             });
 
-            // Listen to Airdrop Winner List
+            // 3. Airdrop Winner List (Last 50 claims)
             const airdropListRef = db.ref('airdropList').orderByChild('timestamp').limitToLast(50);
             airdropListRef.on('value', (snap) => {
                 const container = document.getElementById('airdropListContainer');
@@ -1677,97 +1703,76 @@
             });
         }
 
-        function updateAirdropState(config) {
+        function startAirdropCountdown(startTime, duration) {
+            if (airdropCountdownInterval) clearInterval(airdropCountdownInterval);
+            
             const btn = document.getElementById('airdropClaimBtn');
             const countdownEl = document.getElementById('airdropCountdown');
-            const labelEl = document.getElementById('countdownLabel');
-            const statusBox = document.getElementById('airdropStatusBox');
-
-            // Clear any existing interval
-            if(countdownInterval) clearInterval(countdownInterval);
-
-            // If no times are set, default to waiting
-            if(!config.startTime || !config.endTime) {
-                btn.disabled = true;
-                countdownEl.textContent = '--:--:--';
-                labelEl.textContent = 'Next Drop in';
-                statusBox.textContent = '⏳ Waiting for admin setup...';
-                statusBox.className = 'status-box';
-                return;
-            }
-
-            const now = Date.now();
-            const start = config.startTime;
-            const end = config.endTime;
-
-            if(now < start) {
-                // PRE-DROP (Countdown to start)
-                labelEl.textContent = 'Next Drop in';
-                btn.disabled = true;
-                statusBox.textContent = '⏳ Countdown to start...';
-                statusBox.className = 'status-box';
+            
+            // Calculate End Time
+            const endTime = startTime + duration;
+            
+            airdropCountdownInterval = setInterval(() => {
+                const now = Date.now();
+                const remaining = endTime - now;
                 
-                countdownInterval = setInterval(() => {
-                    const diff = start - Date.now();
-                    if(diff <= 0) {
-                        clearInterval(countdownInterval);
-                        updateAirdropState(config); // Re-run to move to active state
-                        return;
-                    }
-                    const h = Math.floor(diff / (1000 * 60 * 60));
-                    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                    const s = Math.floor((diff % (1000 * 60)) / 1000);
-                    countdownEl.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-                }, 1000);
-
-            } else if(now >= start && now < end) {
-                // LIVE DROP (Clicking allowed)
-                labelEl.textContent = '⏳ Live Drop Ends in';
-                statusBox.textContent = '🔥 LIVE NOW! Be the first to click!';
-                statusBox.className = 'status-box live';
+                if (remaining <= 0) {
+                    clearInterval(airdropCountdownInterval);
+                    countdownEl.textContent = '00:00:00';
+                    btn.disabled = true;
+                    document.getElementById('airdropStatusBox').textContent = '⛔ Round Ended.';
+                    document.getElementById('airdropStatusBox').className = 'status-box ended';
+                    return;
+                }
                 
-                // Enable button only if user hasn't claimed
-                if(!appState.airdropClaimed) {
+                const h = Math.floor((remaining / (1000 * 60 * 60)) % 24);
+                const m = Math.floor((remaining / (1000 * 60)) % 60);
+                const s = Math.floor((remaining / 1000) % 60);
+                countdownEl.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                
+                // Enable button only if not claimed and time is within 5 mins
+                if (!appState.airdropClaimed && remaining > 0) {
                     btn.disabled = false;
                     btn.textContent = '🎁 Claim Your Share';
-                } else {
+                    document.getElementById('airdropStatusBox').textContent = '🔥 Round Active! Be the first to click!';
+                    document.getElementById('airdropStatusBox').className = 'status-box live';
+                } else if (appState.airdropClaimed) {
                     btn.disabled = true;
                     btn.textContent = '✅ Already Claimed';
                 }
-
-                countdownInterval = setInterval(() => {
-                    const diff = end - Date.now();
-                    if(diff <= 0) {
-                        clearInterval(countdownInterval);
-                        updateAirdropState(config); // Re-run to move to ended state
-                        return;
-                    }
-                    const h = Math.floor(diff / (1000 * 60 * 60));
-                    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                    const s = Math.floor((diff % (1000 * 60)) / 1000);
-                    countdownEl.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-                }, 1000);
-
-            } else {
-                // DROP ENDED
-                labelEl.textContent = 'Drop Ended';
-                countdownEl.textContent = '00:00:00';
-                btn.disabled = true;
-                statusBox.textContent = '⛔ This round has ended.';
-                statusBox.className = 'status-box ended';
-            }
+            }, 100);
         }
 
         function openAirdropPage() {
             document.getElementById('airdropOverlay').classList.add('show');
             document.getElementById('mainContent').classList.add('hide');
             document.querySelector('.bottom-nav').style.display = 'none';
+            
+            // Handle Live Visitor Count for Airdrop Page
+            const visitorRef = db.ref('airdropVisitors/' + userId);
+            visitorRef.set(true);
+            visitorRef.onDisconnect().remove();
+            
+            // Listen to total visitors
+            if (!airdropVisitorsCountRef) {
+                airdropVisitorsCountRef = db.ref('airdropVisitors');
+                airdropVisitorsCountRef.on('value', (snap) => {
+                    let count = snap.exists() ? snap.numChildren() : 0;
+                    document.getElementById('onlineUsersDisplay').textContent = count; // Update Display
+                });
+            }
         }
 
         function closeAirdropPage() {
             document.getElementById('airdropOverlay').classList.remove('show');
             document.getElementById('mainContent').classList.remove('hide');
             document.querySelector('.bottom-nav').style.display = 'flex';
+            
+            // Remove the listener for visitors when leaving page (optional but good)
+            if (airdropVisitorsCountRef) {
+                airdropVisitorsCountRef.off();
+                airdropVisitorsCountRef = null;
+            }
         }
 
         function claimAirdrop() {
@@ -1779,17 +1784,14 @@
                 return;
             }
 
-            // Disable button to prevent double clicking
             btn.disabled = true;
             btn.textContent = '⏳ Processing...';
 
-            // Generate Random Amount (Min/Max from Admin Config)
+            // Generate Random Amount
             let config = appState.airdropConfig || { min: 0.5, max: 2.0 };
             let amount = Math.random() * (config.max - config.min) + config.min;
-            // Convert to Coins based on rate
             let coinsWon = Math.floor(amount * appState.conversionRate);
 
-            // Save to Airdrop List and User Profile
             const updateData = {};
             const claimData = {
                 userId: userId,
@@ -1799,12 +1801,11 @@
                 timestamp: Date.now()
             };
 
-            // Update user balance and mark as claimed
             updateData['users/' + userId + '/balance'] = firebase.database.ServerValue.increment(coinsWon);
             updateData['users/' + userId + '/airdropClaimed'] = true;
             updateData['airdropList/' + Date.now()] = claimData;
 
-            // Update local appState
+            // Reset local state
             appState.balance += coinsWon;
             appState.airdropClaimed = true;
 
@@ -1814,19 +1815,20 @@
                 showToast(`🎉 +${coinsWon} Coins from AirDrop!`);
                 updateUI();
                 updateLevelUI();
-                // Update the button to show claimed
+                // Update button state
                 btn.textContent = '✅ Already Claimed';
+                btn.disabled = true;
                 closeAirdropPage();
             }).catch(err => {
                 console.error(err);
                 showToast('Error claiming airdrop. Try again.', 'error');
                 btn.disabled = false;
                 btn.textContent = '🎁 Claim Your Share';
-                appState.airdropClaimed = false; // revert local state
+                appState.airdropClaimed = false;
             });
         }
 
-        // ==================== OFFLINE HANDLER (NEW) ====================
+        // ==================== OFFLINE HANDLER (Stops Mining) ====================
         function checkConnection() {
             const offlineOverlay = document.getElementById('offlineOverlay');
             const mainContent = document.getElementById('mainContent');
@@ -1836,10 +1838,20 @@
                 offlineOverlay.classList.remove('show');
                 mainContent.style.display = 'block';
                 bottomNav.style.display = 'flex';
+                // Resume mining if needed is handled by interval checks
             } else {
                 offlineOverlay.classList.add('show');
                 mainContent.style.display = 'none';
                 bottomNav.style.display = 'none';
+                
+                // Force stop mining
+                if (progressInterval) {
+                    clearInterval(progressInterval);
+                    progressInterval = null;
+                    document.getElementById('progressStartBtn').disabled = false;
+                    document.getElementById('progressStartBtn').textContent = '▶ START';
+                    showToast('⚠️ Internet lost. Mining paused.', 'error');
+                }
             }
         }
 
