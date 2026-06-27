@@ -1638,7 +1638,7 @@
             });
         }
 
-        // ==================== ADVANCED AIRDROP SYSTEM (FIXED TIMER) ====================
+        // ==================== ADVANCED AIRDROP SYSTEM (FIXED 5-MIN LOGIC) ====================
         let airdropListeners = [];
         let onlineCountRef = null;
         let airdropCountdownInterval = null;
@@ -1654,15 +1654,17 @@
                 document.getElementById('onlineUsersDisplay').textContent = count;
             });
 
-            // 2. Airdrop Config (Pool & Timer)
+            // 2. Airdrop Config
             airdropConfigRef.on('value', (snap) => {
                 let config = snap.val() || { min: 0.5, max: 2.0, poolAmount: 50.00, active: false };
                 appState.airdropConfig = config;
                 document.getElementById('airdropPoolDisplay').textContent = `$${config.poolAmount || 50.00}`;
                 
-                // **FIXED LOGIC:** Use Admin's "startTime" to start a 5-minute countdown
+                // **FIXED LOGIC:**
+                // If startTime exists, show countdown until it starts (Button is INACTIVE)
+                // When startTime is passed, Claim Button becomes ACTIVE and starts a 5-min timer.
                 if (config.startTime) {
-                    startAirdropCountdown(config.startTime, 300000); // 300,000 ms = 5 minutes
+                    startAirdropCountdown(config.startTime); 
                 } else {
                     // Default state if no timer set
                     document.getElementById('airdropCountdown').textContent = '--:--:--';
@@ -1702,7 +1704,7 @@
             });
         }
 
-        function startAirdropCountdown(startTime, duration) {
+        function startAirdropCountdown(startTime) {
             if (airdropCountdownInterval) clearInterval(airdropCountdownInterval);
             
             const btn = document.getElementById('airdropClaimBtn');
@@ -1710,41 +1712,55 @@
             const labelEl = document.getElementById('countdownLabel');
             const statusBox = document.getElementById('airdropStatusBox');
 
-            // Calculate End Time
+            // 5 Minutes Duration for claiming after startTime is reached
+            const duration = 5 * 60 * 1000; // 5 minutes in ms
             const endTime = startTime + duration;
             
             airdropCountdownInterval = setInterval(() => {
                 const now = Date.now();
-                const remaining = endTime - now;
                 
-                if (remaining <= 0) {
+                if (now < startTime) {
+                    // BEFORE START: Countdown to Start Time. Button is INACTIVE.
+                    const diff = startTime - now;
+                    const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                    const m = Math.floor((diff / (1000 * 60)) % 60);
+                    const s = Math.floor((diff / 1000) % 60);
+                    countdownEl.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                    labelEl.textContent = 'Starts in';
+                    btn.disabled = true; // INACTIVE
+                    statusBox.textContent = '⏳ Drop starts soon...';
+                    statusBox.className = 'status-box';
+                    
+                } else if (now >= startTime && now < endTime) {
+                    // AFTER START: Countdown 5 minutes. Button is ACTIVE.
+                    const diff = endTime - now;
+                    const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                    const m = Math.floor((diff / (1000 * 60)) % 60);
+                    const s = Math.floor((diff / 1000) % 60);
+                    countdownEl.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                    labelEl.textContent = '5-Min Claim Timer';
+                    
+                    // ACTIVATE BUTTON if not claimed
+                    if (!appState.airdropClaimed) {
+                        btn.disabled = false; // ACTIVE
+                        btn.textContent = '🎁 Claim Your Share';
+                        statusBox.textContent = '🔥 DROP STARTED! Be the first to click!';
+                        statusBox.className = 'status-box live';
+                    } else {
+                        btn.disabled = true;
+                        btn.textContent = '✅ Already Claimed';
+                        statusBox.textContent = '🎉 You already claimed this round!';
+                        statusBox.className = 'status-box';
+                    }
+
+                } else {
+                    // ROUND ENDED
                     clearInterval(airdropCountdownInterval);
                     countdownEl.textContent = '00:00:00';
-                    btn.disabled = true;
                     labelEl.textContent = 'Drop Ended';
-                    statusBox.textContent = '⛔ Round Ended.';
-                    statusBox.className = 'status-box ended';
-                    return;
-                }
-                
-                // Update Timer Display
-                const h = Math.floor((remaining / (1000 * 60 * 60)) % 24);
-                const m = Math.floor((remaining / (1000 * 60)) % 60);
-                const s = Math.floor((remaining / 1000) % 60);
-                countdownEl.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-                
-                // Update Status & Button based on remaining time
-                if (!appState.airdropClaimed && remaining > 0) {
-                    btn.disabled = false;
-                    btn.textContent = '🎁 Claim Your Share';
-                    labelEl.textContent = 'Drop Timer';
-                    statusBox.textContent = '🔥 Round Active! Be the first to click!';
-                    statusBox.className = 'status-box live';
-                } else if (appState.airdropClaimed) {
                     btn.disabled = true;
-                    btn.textContent = '✅ Already Claimed';
-                    statusBox.textContent = '🎉 You already claimed this round!';
-                    statusBox.className = 'status-box';
+                    statusBox.textContent = '⛔ This round has ended.';
+                    statusBox.className = 'status-box ended';
                 }
             }, 100);
         }
