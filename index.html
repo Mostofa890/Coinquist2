@@ -817,8 +817,7 @@
             taskLastCompleted: {},
             // Airdrop State
             airdropClaimed: false,
-            airdropAmount: 0,
-            roundStartTime: null 
+            airdropAmount: 0
         };
 
         let tasks = [];
@@ -1639,7 +1638,7 @@
             });
         }
 
-        // ==================== ADVANCED AIRDROP SYSTEM (FIXED) ====================
+        // ==================== ADVANCED AIRDROP SYSTEM (FIXED TIMER) ====================
         let airdropListeners = [];
         let onlineCountRef = null;
         let airdropCountdownInterval = null;
@@ -1661,14 +1660,14 @@
                 appState.airdropConfig = config;
                 document.getElementById('airdropPoolDisplay').textContent = `$${config.poolAmount || 50.00}`;
                 
-                // Check if there is an active round (5 min timer)
-                if (config.roundStartTime) {
-                    appState.roundStartTime = config.roundStartTime;
-                    startAirdropCountdown(config.roundStartTime, config.roundDuration || 300000); // Default 5 mins
+                // **FIXED LOGIC:** Use Admin's "startTime" to start a 5-minute countdown
+                if (config.startTime) {
+                    startAirdropCountdown(config.startTime, 300000); // 300,000 ms = 5 minutes
                 } else {
-                    // Default state
+                    // Default state if no timer set
                     document.getElementById('airdropCountdown').textContent = '--:--:--';
                     document.getElementById('airdropClaimBtn').disabled = true;
+                    document.getElementById('airdropStatusBox').textContent = '⏳ Waiting for admin to set timer...';
                 }
             });
 
