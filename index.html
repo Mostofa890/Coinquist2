@@ -242,7 +242,7 @@
         .overlay-header h2 { font-size: 18px; flex: 1; text-align: center; margin-right: 40px; color: #fff; }
         .overlay-content { padding: 14px; }
 
-        /* ===== LEVEL OVERLAY (New 5-Tier System) ===== */
+        /* ===== LEVEL OVERLAY (New 5-Tier System, Auto XP Math) ===== */
         .current-level-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 16px; padding: 16px; margin-bottom: 14px; border: 1px solid rgba(255,255,255,0.08); text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
         .current-level-card .level-emoji { font-size: 40px; }
         .current-level-card .level-number { font-size: 24px; font-weight: 900; color: #fbbf24; }
@@ -258,7 +258,7 @@
         .reward-item:last-child { border-bottom: none; }
         .reward-item .value { font-weight: 600; color: #fbbf24; }
 
-        /* Updated Level Filter Tabs with specific emojis */
+        /* Level Filter Tabs with specific emojis */
         .filter-tabs { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 4px; }
         .filter-tabs .tab { padding: 4px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #94a3b8; cursor: pointer; font-size: 11px; white-space: nowrap; transition: all 0.2s; }
         .filter-tabs .tab.active { background: linear-gradient(135deg, #8b5cf6, #3b82f6); border-color: transparent; color: #fff; box-shadow: 0 4px 16px rgba(139,92,246,0.2); }
@@ -276,7 +276,7 @@
         .level-item .level-reward { font-size: 12px; color: #10b981; }
         .level-item .level-check { color: #10b981; font-size: 16px; }
 
-        /* ===== FULL SCREEN WEBVIEW (Task Link Page) ===== */
+        /* ===== FULL SCREEN WEBVIEW ===== */
         .webview-fullscreen-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; z-index: 99999; display: none; flex-direction: column; }
         .webview-fullscreen-overlay.show { display: flex; }
         .webview-header { background: #1e293b; padding: 12px 16px; border-bottom: 2px solid #334155; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
@@ -335,7 +335,6 @@
 </head>
 <body>
 
-    <!-- OFFLINE / BANNED OVERLAYS -->
     <div class="offline-overlay" id="offlineOverlay">
         <h1>⚠️ No Internet Connection</h1>
         <p>Please check your network connection. The app will resume automatically once you are back online.</p>
@@ -358,17 +357,16 @@
                 <div class="level-emoji" id="levelCurrentEmoji">🥉</div>
                 <div class="level-number" id="levelCurrentNumber">Level 1</div>
                 <div class="level-title" id="levelCurrentTitle">Bronze</div>
-                <div class="level-points" id="levelCurrentPointsText">0 / 100 XP</div>
+                <div class="level-points" id="levelCurrentPointsText">0 / 400 XP</div>
                 <div class="level-progress"><div class="fill" id="levelProgressFill2" style="width:0%;"></div></div>
                 <div class="level-progress-text"><span id="levelProgressText2">0%</span><span id="levelNextInfo">Next Level: 2</span></div>
             </div>
             <div class="reward-section">
                 <div class="reward-title">🎁 Current Level Rewards</div>
-                <div class="reward-item"><span>🪙 Bonus Earnings</span><span class="value" id="levelBonusPercent">+2%</span></div>
+                <div class="reward-item"><span>🪙 Bonus Earnings</span><span class="value" id="levelBonusPercent">+1%</span></div>
                 <div class="reward-item"><span>📋 Exclusive Tasks</span><span class="value" id="levelExclusiveTasks">🔒 Locked</span></div>
                 <div class="reward-item"><span>🎯 Daily Bonus</span><span class="value" id="levelDailyBonus">+10 Coins</span></div>
             </div>
-            <!-- New 5-Tier Filters as requested -->
             <div class="filter-tabs">
                 <button class="tab active" data-filter="all" onclick="filterLevels('all',this)">📋 All</button>
                 <button class="tab" data-filter="bronze" onclick="filterLevels('bronze',this)">🥉 Bronze</button>
@@ -409,7 +407,7 @@
         </div>
     </div>
 
-    <!-- FULL SCREEN WEBVIEW MODAL (Updated as requested) -->
+    <!-- FULL SCREEN WEBVIEW -->
     <div class="webview-fullscreen-overlay" id="webviewFullscreenOverlay">
         <div class="webview-header">
             <div class="webview-title">🔗 Loading Page...</div>
@@ -444,7 +442,7 @@
                 <div class="usd-value" id="usdValue">≈ $0.00 USD</div>
                 <div class="total-usd-earned" id="totalUsdEarned">💵 Total USD Earned: $0.00</div>
                 
-                <!-- HOME PAGE LEVEL SECTION (UPDATED TO SHOW REAL-TIME XP & PROGRESS) -->
+                <!-- HOME PAGE LEVEL SECTION (Now auto-calculates Fixed System) -->
                 <div class="level-section" onclick="openLevelPage()">
                     <div class="level-row">
                         <span class="level-title" id="levelTitle">🥉 Bronze</span>
@@ -455,8 +453,8 @@
                         <div class="fill" id="levelProgressFill" style="width: 0%;"></div>
                     </div>
                     <div class="level-points">
-                        <span id="levelCurrentPoints">0</span>
-                        <span id="levelNextPoints">/ 100</span>
+                        <span id="levelCurrentPoints">-10000</span>
+                        <span id="levelNextPoints">/ 400</span>
                     </div>
                 </div>
                 
@@ -485,7 +483,7 @@
             <div class="arrow">➜</div>
         </div>
 
-        <!-- NEW SPECIAL OFFER BUTTON -->
+        <!-- ===== SPECIAL OFFER BUTTON ===== -->
         <div class="airdrop-btn" onclick="openSpecialOfferPage()" style="border: 2px solid #ef4444; background: rgba(239,68,68,0.1);">
             <div class="bonus-text">
                 <h4 style="color: #fca5a5;">🎁 Special Offer</h4>
@@ -521,7 +519,7 @@
             </div>
         </div>
 
-        <!-- ===== PAGE: SPECIAL OFFER (NEW PAGE) ===== -->
+        <!-- ===== PAGE: SPECIAL OFFER ===== -->
         <div class="page" id="pageSpecialOffer">
             <h2 class="page-header">🎁 User Special Offer</h2>
             <div class="special-offer-card">
@@ -682,13 +680,14 @@
             isSpeedBoostActive: false, speedBoostCooldown: 0, taskLastCompleted: {},
             airdropClaimed: false, airdropAmount: 0,
             webviewTimerId: null, webviewReward: 0, webviewTaskId: null,
-            xpPoints: 0, userTier: 'bronze' // New XP system
+            xpPoints: -10000 // NEGATIVE START as per request to trigger unlocking
         };
 
         let tasks = [], levelConfig = {}, referralConfig = {};
         let conversionTimerInterval = null, progressInterval = null, speedBoostInterval = null;
         let currentFilter = 'all', currentLevelFilter = 'all';
         const TOTAL_COINS = 1000;
+        const NEGATIVE_XP_START = -10000;
 
         const userRef = db.ref('users/' + userId);
         const tasksRef = db.ref('tasks');
@@ -696,10 +695,10 @@
         const withdrawRef = db.ref('withdrawSettings');
         const videoSettingsRef = db.ref('videoSettings');
         const speedBoostConfigRef = db.ref('speedBoostConfig');
-        const levelConfigRef = db.ref('levelConfig'); // Admin sets: { 1: { requiredXP: 100, bonus: 2 }, 2: {...} ... 100 }
+        const levelConfigRef = db.ref('levelConfig');
         const referralConfigRef = db.ref('referralConfig');
         const airdropConfigRef = db.ref('airdropConfig');
-        const specialOfferRef = db.ref('specialOffers'); // New DB path for special offers
+        const specialOfferRef = db.ref('specialOffers');
 
         // ==================== PAGE NAVIGATION ====================
         function switchPage(page, event) {
@@ -719,10 +718,8 @@
             switchPage('specialOffer', null);
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             document.querySelector('.nav-item[onclick*="home"]').classList.add('active'); 
-            
             const container = document.getElementById('specialOfferContent');
             container.innerHTML = '<div class="offer-empty">⏳ Loading your exclusive offer...</div>';
-            
             specialOfferRef.child(userId).on('value', (snap) => {
                 const offer = snap.val();
                 if (offer && !offer.claimed && offer.title) {
@@ -743,7 +740,6 @@
         function claimSpecialOffer() {
             const btn = document.getElementById('specialOfferBtn');
             if(btn) btn.disabled = true;
-            
             specialOfferRef.child(userId).once('value', (snap) => {
                 const offer = snap.val();
                 if(offer && !offer.claimed) {
@@ -752,7 +748,7 @@
                     userRef.update({ balance: appState.balance });
                     specialOfferRef.child(userId).update({ claimed: true, claimedAt: Date.now() });
                     showToast(`🎉 Congratulations! You claimed +${reward} Coins!`);
-                    openSpecialOfferPage(); // Reload
+                    openSpecialOfferPage();
                 }
             });
         }
@@ -942,7 +938,7 @@
             });
         }
 
-        // ==================== PROGRESS BAR & REAL-TIME XP SYSTEM ====================
+        // ==================== PROGRESS BAR & XP SYSTEM ====================
         function updateProgressUI() {
             const fill = document.getElementById('progressBarFill');
             const count = document.getElementById('progressCoinCount');
@@ -987,12 +983,14 @@
                     showToast('⚠️ Internet lost. Mining paused.', 'error');
                     return;
                 }
-                let bonusPercent = appState.userLevel; // Level থেকে Bonus নিচ্ছে
+                
+                // *** NEW MATH: Calculate Bonus % from the new fixed system ***
+                let bonusPercent = getLevelMiningBonus(appState.userLevel);
                 let coinsToAdd = 1 + (bonusPercent / 100);
                 
                 appState.progressCoins -= 1;
                 appState.balance += coinsToAdd;
-                appState.xpPoints = (appState.xpPoints || 0) + 1; // XP যোগ হচ্ছে রিয়েল-টাইমে
+                appState.xpPoints = (appState.xpPoints || 0) + 1; 
                 
                 userRef.update({ balance: appState.balance, progressCoins: appState.progressCoins, xpPoints: appState.xpPoints });
                 
@@ -1001,7 +999,7 @@
                 coin.style.left = (Math.random() * 80 + 10) + '%'; coin.style.top = '30%';
                 document.body.appendChild(coin); setTimeout(() => coin.remove(), 1000);
                 
-                updateProgressUI(); updateUI(); updateLevelUI(); // Level UI রিয়েল-টাইমে আপডেট হচ্ছে
+                updateProgressUI(); updateUI(); updateLevelUI();
             }, 5000);
         }
 
@@ -1100,10 +1098,12 @@
             });
         }
 
-        // ==================== DYNAMIC LEVEL SYSTEM (100 levels, 5 Tiers, XP Based, Admin Configurable) ====================
+        // ==================== FIXED 100-LEVEL SYSTEM (Auto Calculations) ====================
         function loadLevelConfig() {
             levelConfigRef.on('value', (snapshot) => {
-                if (snapshot.exists()) { levelConfig = snapshot.val(); }
+                if (snapshot.exists()) { 
+                    levelConfig = snapshot.val(); // Override from Admin panel if exists
+                }
                 updateLevelUI(); renderLevelList();
             });
         }
@@ -1119,79 +1119,125 @@
             });
         }
 
-        function getLevelData(level) {
+        // CALCULATE XP & TIER BASED ON FIXED MATH
+        function getLevelStaticData(level) {
+            // Calculate XP: Starting at 400, Doubling logic until Level 100
+            let xp = 400;
+            if(level > 1) {
+                for(let i=2; i<=level; i++) {
+                    xp = xp * 2;
+                }
+            }
+            
+            let tierName = "Bronze", tierEmoji = "🥉", bonusPercent = 1;
+            if (level >= 81) { tierName = "Diamond"; tierEmoji = "👑"; bonusPercent = 25; }
+            else if (level >= 61) { tierName = "Platinum"; tierEmoji = "💎"; bonusPercent = 15; }
+            else if (level >= 41) { tierName = "Gold"; tierEmoji = "🥇"; bonusPercent = 10; }
+            else if (level >= 21) { tierName = "Silver"; tierEmoji = "🥈"; bonusPercent = 5; }
+            
+            // Override by Admin Config if sent, otherwise use Fixed Math
             if (levelConfig && levelConfig[level]) {
                 const lvl = levelConfig[level];
-                // Tier logic (1-20 Bronze, 21-40 Silver, 41-60 Gold, 61-80 Platinum, 81-100 Diamond)
-                let tierName = "Bronze", tierEmoji = "🥉";
-                if (level >= 81) { tierName = "Diamond"; tierEmoji = "👑"; }
-                else if (level >= 61) { tierName = "Platinum"; tierEmoji = "💎"; }
-                else if (level >= 41) { tierName = "Gold"; tierEmoji = "🥇"; }
-                else if (level >= 21) { tierName = "Silver"; tierEmoji = "🥈"; }
-                
-                return { 
-                    name: tierName + ` ${level}`, 
-                    emoji: tierEmoji, 
-                    bonus: lvl.bonus || 0, 
-                    requiredXP: lvl.requiredXP || 0 
-                };
+                if (lvl.requiredXP) xp = lvl.requiredXP;
+                if (lvl.bonus) bonusPercent = lvl.bonus;
             }
-            return { name: 'Level ' + level, emoji: '🪙', bonus: 0, requiredXP: 0 };
+            
+            return { 
+                name: tierName + ` ${level}`, 
+                emoji: tierEmoji, 
+                bonus: bonusPercent, 
+                requiredXP: xp 
+            };
+        }
+
+        function getLevelMiningBonus(level) {
+            if(level >= 81) return 25;
+            if(level >= 61) return 15;
+            if(level >= 41) return 10;
+            if(level >= 21) return 5;
+            return 1;
         }
 
         function calcLevel(xp) {
             let level = 1;
-            let currentRequired = 0, nextRequired = 0;
-
-            if (levelConfig) {
-                const levelKeys = Object.keys(levelConfig).map(Number).sort((a,b) => a-b);
-                for (let i = levelKeys.length - 1; i >= 0; i--) {
-                    const lvlNum = levelKeys[i];
-                    if (xp >= (levelConfig[lvlNum].requiredXP || 0)) {
-                        level = lvlNum;
+            let currentRequired = 400;
+            let nextRequired = 800;
+            
+            if (xp >= NEGATIVE_XP_START) {
+                let netXp = xp - NEGATIVE_XP_START; // Removing Negative Buffer
+                
+                for(let i=1; i<=100; i++) {
+                    let req = 400;
+                    if(i > 1) {
+                        for(let j=2; j<=i; j++) { req = req * 2; }
+                    }
+                    if (netXp >= req) {
+                        level = i;
+                    } else {
                         break;
                     }
                 }
-                if (levelConfig[level]) currentRequired = levelConfig[level].requiredXP || 0;
-                if (levelConfig[level+1]) nextRequired = levelConfig[level+1].requiredXP || 0;
+                
+                // Calculate exact XP requirements for UI
+                let lvlData = getLevelStaticData(level);
+                currentRequired = lvlData.requiredXP;
+                
+                let nextLvlData = getLevelStaticData(level+1);
+                nextRequired = nextLvlData.requiredXP;
+                
+                let progress = 0;
+                if (nextRequired > currentRequired) {
+                    progress = ((xp - (NEGATIVE_XP_START + currentRequired)) / (nextRequired - currentRequired)) * 100;
+                    if (progress > 100) progress = 100;
+                    if (progress < 0) progress = 0;
+                }
+                let tier = getLevelStaticData(level);
+                let isMax = !(level < 100);
+                return { level, xp, currentRequired: (NEGATIVE_XP_START + currentRequired), nextRequired: (NEGATIVE_XP_START + nextRequired), progress: Math.floor(progress), isMax, tier };
+            } else {
+                // If XP is still within -10000 to 0 range
+                return { level: 0, xp: xp, currentRequired: NEGATIVE_XP_START, nextRequired: 0, progress: 0, isMax: false, tier: { name: "Unlocking", emoji: "🔒", bonus: 0 } };
             }
-            
-            let progress = 0;
-            if (nextRequired > currentRequired) {
-                progress = ((xp - currentRequired) / (nextRequired - currentRequired)) * 100;
-                if (progress > 100) progress = 100;
-                if (progress < 0) progress = 0;
-            }
-            
-            let tier = getLevelData(level);
-            let isMax = !levelConfig || !levelConfig[level+1];
-            return { level, xp, currentRequired, nextRequired, progress: Math.floor(progress), isMax, tier };
         }
 
-        // UPDATED: This function now also updates the Home page level section instantly
         function updateLevelUI() {
-            const data = calcLevel(appState.xpPoints || 0);
-            const t = data.tier;
+            const data = calcLevel(appState.xpPoints || NEGATIVE_XP_START);
+            const t = data.tier || { name: "Unlocking", emoji: "🔒", bonus: 0 };
             
             // Home Page Level Display Update
-            document.getElementById('levelTitle').textContent = `${t.emoji} ${t.name}`;
-            document.getElementById('levelNumber').textContent = `Level ${data.level}`;
-            document.getElementById('levelProgressFill').style.width = `${data.progress}%`;
-            if (data.isMax) {
-                document.getElementById('levelCurrentPoints').textContent = `${data.xp}`;
-                document.getElementById('levelNextPoints').textContent = '⭐ MAX';
+            if (data.level === 0) {
+                document.getElementById('levelTitle').textContent = `🔒 Unlocking`;
+                document.getElementById('levelNumber').textContent = `Level 0`;
+                document.getElementById('levelProgressFill').style.width = `${Math.min(100, ((appState.xpPoints - NEGATIVE_XP_START)/400)*100)}%`;
+                document.getElementById('levelCurrentPoints').textContent = appState.xpPoints;
+                document.getElementById('levelNextPoints').textContent = `/ 0`;
+                document.getElementById('userLevelBadge').textContent = `🔒 Unlocking`;
+                appState.userLevel = 0;
             } else {
-                document.getElementById('levelCurrentPoints').textContent = data.xp - data.currentRequired;
-                document.getElementById('levelNextPoints').textContent = `/ ${data.nextRequired - data.currentRequired}`;
+                document.getElementById('levelTitle').textContent = `${t.emoji} ${t.name}`;
+                document.getElementById('levelNumber').textContent = `Level ${data.level}`;
+                document.getElementById('levelProgressFill').style.width = `${data.progress}%`;
+                if (data.isMax) {
+                    document.getElementById('levelCurrentPoints').textContent = `${data.xp}`;
+                    document.getElementById('levelNextPoints').textContent = '⭐ MAX';
+                } else {
+                    document.getElementById('levelCurrentPoints').textContent = data.xp - data.currentRequired;
+                    document.getElementById('levelNextPoints').textContent = `/ ${data.nextRequired - data.currentRequired}`;
+                }
+                document.getElementById('userLevelBadge').textContent = `Level ${data.level} 👆`;
+                appState.userLevel = data.level;
             }
-            document.getElementById('userLevelBadge').textContent = `Level ${data.level} 👆`;
-            appState.userLevel = data.level;
             
             // Level Overlay Page Update
-            document.getElementById('levelCurrentEmoji').textContent = t.emoji;
-            document.getElementById('levelCurrentNumber').textContent = `Level ${data.level}`;
-            document.getElementById('levelCurrentTitle').textContent = t.name;
-            if (data.isMax) {
+            document.getElementById('levelCurrentEmoji').textContent = data.level === 0 ? '🔒' : t.emoji;
+            document.getElementById('levelCurrentNumber').textContent = data.level === 0 ? 'Level 0' : `Level ${data.level}`;
+            document.getElementById('levelCurrentTitle').textContent = data.level === 0 ? 'Unlocking...' : t.name;
+            if (data.level === 0) {
+                document.getElementById('levelCurrentPointsText').textContent = `${appState.xpPoints} / 0 XP`;
+                document.getElementById('levelProgressFill2').style.width = `${Math.min(100, ((appState.xpPoints - NEGATIVE_XP_START)/400)*100)}%`;
+                document.getElementById('levelProgressText2').textContent = `${Math.floor(Math.min(100, ((appState.xpPoints - NEGATIVE_XP_START)/400)*100))}%`;
+                document.getElementById('levelNextInfo').textContent = 'Collect XP to unlock!';
+            } else if (data.isMax) {
                 document.getElementById('levelCurrentPointsText').textContent = '🏆 MAX LEVEL!';
                 document.getElementById('levelProgressFill2').style.width = '100%';
                 document.getElementById('levelProgressText2').textContent = '100%';
@@ -1202,8 +1248,8 @@
                 document.getElementById('levelProgressText2').textContent = `${data.progress}%`;
                 document.getElementById('levelNextInfo').textContent = `Next: ${data.level + 1}`;
             }
-            document.getElementById('levelBonusPercent').textContent = `+${t.bonus}%`;
-            document.getElementById('levelDailyBonus').textContent = `${10 + t.bonus} Coins`;
+            document.getElementById('levelBonusPercent').textContent = `+${t.bonus || 0}%`;
+            document.getElementById('levelDailyBonus').textContent = `${10 + (t.bonus || 0)} Coins`;
             let isExclusive = data.level >= 10;
             document.getElementById('levelExclusiveTasks').textContent = isExclusive ? '✅ Unlocked' : '🔒 Locked';
             document.getElementById('levelExclusiveTasks').style.color = isExclusive ? '#10b981' : '#94a3b8';
@@ -1211,17 +1257,16 @@
 
         function renderLevelList() {
             const container = document.getElementById('levelList');
-            const data = calcLevel(appState.xpPoints || 0);
+            const data = calcLevel(appState.xpPoints || NEGATIVE_XP_START);
             let html = '';
-            let levelNumbers = Object.keys(levelConfig).map(Number).sort((a,b) => a-b);
             
-            for (let i of levelNumbers) {
+            for (let i = 1; i <= 100; i++) {
                 if (currentLevelFilter !== 'all') {
                     const filterMap = { 'bronze':[1,20], 'silver':[21,40], 'gold':[41,60], 'platinum':[61,80], 'diamond':[81,100] };
                     const range = filterMap[currentLevelFilter];
                     if (!range || i < range[0] || i > range[1]) continue;
                 }
-                const t = getLevelData(i);
+                const t = getLevelStaticData(i);
                 const isUnlocked = data.level >= i;
                 const isCurrent = data.level === i;
                 html += `
@@ -1735,7 +1780,7 @@
                     appState.videoWatchedCount = data.videoWatchedCount !== undefined ? data.videoWatchedCount : 0;
                     appState.speedBoostCooldown = data.speedBoostCooldown || 0; appState.taskLastCompleted = data.taskLastCompleted || {};
                     appState.airdropClaimed = data.airdropClaimed || false;
-                    appState.xpPoints = data.xpPoints || 0; // Load XP Points
+                    appState.xpPoints = data.xpPoints !== undefined ? data.xpPoints : NEGATIVE_XP_START; // Load XP Points (Default -10000)
                     
                     const username = tg.initDataUnsafe?.user?.username || 'User';
                     document.getElementById('userName').textContent = username;
@@ -1750,7 +1795,7 @@
                         balance: 0, usdBalance: 0, completedTasks: 0, referCount: 0, dailyStreak: 0, tasksCompleted: [],
                         referCode: generateReferCode(), referTiers: {}, videoWatchedToday: 0, videoLastWatchDate: null, withdrawHistory: [],
                         lastLogin: new Date().toISOString(), progressCoins: 1000, videoWatchedCount: 0, speedBoostCooldown: 0, taskLastCompleted: {},
-                        airdropClaimed: false, xpPoints: 0
+                        airdropClaimed: false, xpPoints: NEGATIVE_XP_START
                     });
                     appState.referCode = generateReferCode(); updateUI(); updateLevelUI(); startConversionTimer(); updateProgressUI();
                 }
@@ -1764,7 +1809,7 @@
             loadAirdropData(); checkBanStatus(); loadReferralData(); checkReferral();
             getUserLocation(); listenWithdrawStatus();
 
-            setTimeout(() => { if (!appState.isBanned) showToast('👋 Welcome to CoinQuest! Press START to earn!'); }, 1500);
+            setTimeout(() => { if (!appState.isBanned) showToast('👋 Welcome! Collect XP to Unlock!'); }, 1500);
         }
 
         document.addEventListener('DOMContentLoaded', initApp);
