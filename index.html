@@ -534,6 +534,22 @@
         </div>
     </div>
 
+    <!-- WEB VIEW MODAL FOR LINK TASKS (NEW) -->
+    <div class="modal" id="webviewModal">
+        <div class="modal-content" style="max-width: 450px; padding: 0; overflow: hidden;">
+            <div style="background: #1e293b; padding: 10px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center;">
+                <span style="color:#fff; font-weight:600; font-size:14px;">📄 Loading Page...</span>
+                <span id="webviewTimer" style="color:#fbbf24; font-weight:bold; font-size:14px;">30s</span>
+            </div>
+            <iframe id="webviewIframe" src="about:blank" style="width: 100%; height: 300px; border: none; background: #fff;"></iframe>
+            <div style="background: #1e293b; padding: 10px; border-top: 1px solid #334155;">
+                <button id="webviewBackBtn" onclick="closeWebview()" disabled style="background: #64748b; color:#fff; padding: 8px 20px; border: none; border-radius: 8px; width:100%; font-weight:600; cursor:not-allowed;">
+                    ⏳ Wait 30s to Claim
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- ===== MAIN CONTENT ===== -->
     <div class="container main-content" id="mainContent">
         
@@ -817,7 +833,11 @@
             taskLastCompleted: {},
             // Airdrop State
             airdropClaimed: false,
-            airdropAmount: 0
+            airdropAmount: 0,
+            // Webview Timer State
+            webviewTimerId: null,
+            webviewReward: 0,
+            webviewTaskId: null
         };
 
         let tasks = [];
@@ -1135,7 +1155,7 @@
             });
         }
 
-        // ==================== PROGRESS BAR (With Offline Fix) ====================
+        // ==================== PROGRESS BAR (Level Based XP Bonus) ====================
         function updateProgressUI() {
             const fill = document.getElementById('progressBarFill');
             const count = document.getElementById('progressCoinCount');
@@ -1201,8 +1221,12 @@
                     return;
                 }
 
+                // Calculate Level Bonus %
+                let bonusPercent = appState.userLevel;
+                let coinsToAdd = 1 + (bonusPercent / 100);
+                
                 appState.progressCoins -= 1;
-                appState.balance += 1;
+                appState.balance += coinsToAdd;
                 userRef.update({ 
                     balance: appState.balance,
                     progressCoins: appState.progressCoins
@@ -1210,7 +1234,7 @@
                 
                 let coin = document.createElement('div');
                 coin.className = 'floating-coin';
-                coin.textContent = '+1 🪙';
+                coin.textContent = `+${coinsToAdd.toFixed(2)} 🪙`;
                 coin.style.left = (Math.random() * 80 + 10) + '%';
                 coin.style.top = '30%';
                 document.body.appendChild(coin);
@@ -1571,16 +1595,18 @@
                 const isCompletedToday = appState.taskLastCompleted[task.id] === today;
                 let actionHTML = '';
                 let statusText = isCompletedToday ? '✅ Done Today' : '⏳ Incomplete';
+                
                 if (!isCompletedToday) {
                     if (task.type === 'link') {
                         let link = task.link || '#';
-                        actionHTML = `<a href="${link}" target="_blank" class="task-link" onclick="event.preventDefault(); window.open('${link}', '_blank'); setTimeout(() => completeTask('${task.id}'), 3000);">${task.actionText || 'Go →'}</a>`;
+                        actionHTML = `<button class="task-link" onclick="openWebview('${task.id}', '${link}')">🔗 Open Link</button>`;
                     } else if (task.type === 'button') {
                         actionHTML = `<button class="task-btn" onclick="completeTask('${task.id}')">${task.actionText || 'Complete'}</button>`;
                     } else if (task.type === 'video') {
                         actionHTML = `<button class="task-video-btn" onclick="watchTaskVideo('${task.id}')">📺 ${task.actionText || 'Watch Video'}</button>`;
                     }
                 }
+
                 return `
                     <div class="task-card">
                         <div class="task-header"><span class="task-title">${task.title}</span><span class="task-reward">+${task.reward} 🪙</span></div>
@@ -1638,6 +1664,81 @@
             });
         }
 
+        // ==================== WEBVIEW TASK SYSTEM ====================
+        function openWebview(taskId, url) {
+            const today = new Date().toDateString();
+            if (appState.taskLastCompleted[taskId] === today) {
+                showToast('Already completed today!', 'error');
+                return;
+            }
+
+            let task = tasks.find(t => t.id === taskId);
+            if (!task) return;
+
+            appState.webviewTaskId = taskId;
+            appState.webviewReward = task.reward;
+
+            document.getElementById('webviewIframe').src = url;
+            document.getElementById('webviewModal').classList.add('active');
+            
+            let seconds = 30;
+            const timerEl = document.getElementById('webviewTimer');
+            const backBtn = document.getElementById('webviewBackBtn');
+            
+            backBtn.disabled = true;
+            backBtn.textContent = `⏳ Wait ${seconds}s to Claim`;
+            backBtn.style.background = '#64748b';
+            backBtn.style.cursor = 'not-allowed';
+
+            if (appState.webviewTimerId) clearInterval(appState.webviewTimerId);
+
+            appState.webviewTimerId = setInterval(() => {
+                seconds--;
+                timerEl.textContent = seconds + 's';
+                backBtn.textContent = `⏳ Wait ${seconds}s to Claim`;
+                if (seconds <= 0) {
+                    clearInterval(appState.webviewTimerId);
+                    backBtn.disabled = false;
+                    backBtn.textContent = '✅ Claim Reward';
+                    backBtn.style.background = '#10b981';
+                    backBtn.style.cursor = 'pointer';
+                }
+            }, 1000);
+        }
+
+        function closeWebview() {
+            if (document.getElementById('webviewBackBtn').disabled) {
+                showToast('Please wait for 30 seconds!', 'error');
+                return;
+            }
+
+            document.getElementById('webviewModal').classList.remove('active');
+            document.getElementById('webviewIframe').src = 'about:blank';
+            if (appState.webviewTimerId) clearInterval(appState.webviewTimerId);
+
+            // Complete the task
+            if (appState.webviewTaskId) {
+                let task = tasks.find(t => t.id === appState.webviewTaskId);
+                if (task) {
+                    const today = new Date().toDateString();
+                    appState.taskLastCompleted[appState.webviewTaskId] = today;
+                    appState.balance += appState.webviewReward;
+                    appState.completedTasks++;
+                    userRef.update({ 
+                        balance: appState.balance, 
+                        completedTasks: appState.completedTasks, 
+                        taskLastCompleted: appState.taskLastCompleted 
+                    });
+                    document.getElementById('rewardText').textContent = `+${appState.webviewReward} Coins`;
+                    document.getElementById('successModal').classList.add('active');
+                    updateUI(); updateLevelUI(); renderTasks();
+                    showToast(`🎉 +${appState.webviewReward} Coins from link task!`);
+                }
+                appState.webviewTaskId = null;
+                appState.webviewReward = 0;
+            }
+        }
+
         // ==================== ADVANCED AIRDROP SYSTEM (FIXED 5-MIN LOGIC) ====================
         let airdropListeners = [];
         let onlineCountRef = null;
@@ -1660,13 +1761,9 @@
                 appState.airdropConfig = config;
                 document.getElementById('airdropPoolDisplay').textContent = `$${config.poolAmount || 50.00}`;
                 
-                // **FIXED LOGIC:**
-                // If startTime exists, show countdown until it starts (Button is INACTIVE)
-                // When startTime is passed, Claim Button becomes ACTIVE and starts a 5-min timer.
                 if (config.startTime) {
                     startAirdropCountdown(config.startTime); 
                 } else {
-                    // Default state if no timer set
                     document.getElementById('airdropCountdown').textContent = '--:--:--';
                     document.getElementById('airdropClaimBtn').disabled = true;
                     document.getElementById('airdropStatusBox').textContent = '⏳ Waiting for admin to set timer...';
@@ -1684,11 +1781,7 @@
                 let html = '';
                 let list = [];
                 snap.forEach(child => { list.push({ id: child.key, ...child.val() }); });
-                
-                // Sort by timestamp descending (Newest first)
                 list.sort((a,b) => b.timestamp - a.timestamp);
-
-                // Highlight the first winner
                 list.forEach((item, index) => {
                     let timeAgo = Math.floor((Date.now() - item.timestamp) / 60000);
                     let timeStr = timeAgo < 1 ? 'Just now' : `${timeAgo}m ago`;
@@ -1698,7 +1791,6 @@
                 container.innerHTML = html || '<p style="color:#94a3b8;font-size:13px;text-align:center;padding:10px;">Waiting for the first claim...</p>';
             });
 
-            // Check if current user already claimed
             db.ref('users/' + userId + '/airdropClaimed').once('value', (snap) => {
                 appState.airdropClaimed = snap.val() || false;
             });
@@ -1712,7 +1804,6 @@
             const labelEl = document.getElementById('countdownLabel');
             const statusBox = document.getElementById('airdropStatusBox');
 
-            // 5 Minutes Duration for claiming after startTime is reached
             const duration = 5 * 60 * 1000; // 5 minutes in ms
             const endTime = startTime + duration;
             
@@ -1720,19 +1811,17 @@
                 const now = Date.now();
                 
                 if (now < startTime) {
-                    // BEFORE START: Countdown to Start Time. Button is INACTIVE.
                     const diff = startTime - now;
                     const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
                     const m = Math.floor((diff / (1000 * 60)) % 60);
                     const s = Math.floor((diff / 1000) % 60);
                     countdownEl.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
                     labelEl.textContent = 'Starts in';
-                    btn.disabled = true; // INACTIVE
+                    btn.disabled = true;
                     statusBox.textContent = '⏳ Drop starts soon...';
                     statusBox.className = 'status-box';
                     
                 } else if (now >= startTime && now < endTime) {
-                    // AFTER START: Countdown 5 minutes. Button is ACTIVE.
                     const diff = endTime - now;
                     const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
                     const m = Math.floor((diff / (1000 * 60)) % 60);
@@ -1740,9 +1829,8 @@
                     countdownEl.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
                     labelEl.textContent = '5-Min Claim Timer';
                     
-                    // ACTIVATE BUTTON if not claimed
                     if (!appState.airdropClaimed) {
-                        btn.disabled = false; // ACTIVE
+                        btn.disabled = false;
                         btn.textContent = '🎁 Claim Your Share';
                         statusBox.textContent = '🔥 DROP STARTED! Be the first to click!';
                         statusBox.className = 'status-box live';
@@ -1754,7 +1842,6 @@
                     }
 
                 } else {
-                    // ROUND ENDED
                     clearInterval(airdropCountdownInterval);
                     countdownEl.textContent = '00:00:00';
                     labelEl.textContent = 'Drop Ended';
@@ -1770,19 +1857,17 @@
             document.getElementById('mainContent').classList.add('hide');
             document.querySelector('.bottom-nav').style.display = 'none';
             
-            // Handle Live Visitor Count for Airdrop Page
             const visitorRef = db.ref('airdropVisitors/' + userId);
             visitorRef.set(true);
             visitorRef.onDisconnect().remove();
             
-            // Listen to total visitors (for Airdrop Page)
             if (airdropVisitorsCountRef) airdropVisitorsCountRef.off();
             
             airdropVisitorsCountRef = db.ref('airdropVisitors');
             airdropVisitorsCountRef.on('value', (snap) => {
                 let count = snap.exists() ? snap.numChildren() : 0;
-                document.getElementById('onlineUsersDisplay').textContent = count; // Inside Airdrop
-                document.getElementById('onlineUsersHome').textContent = count;    // Home Page sees it as "Online Users" in button
+                document.getElementById('onlineUsersDisplay').textContent = count;
+                document.getElementById('onlineUsersHome').textContent = count;
             });
         }
 
@@ -1791,19 +1876,17 @@
             document.getElementById('mainContent').classList.remove('hide');
             document.querySelector('.bottom-nav').style.display = 'flex';
             
-            // Remove the listener for visitors when leaving page
             if (airdropVisitorsCountRef) {
                 airdropVisitorsCountRef.off();
                 airdropVisitorsCountRef = null;
                 document.getElementById('onlineUsersDisplay').textContent = '0';
-                document.getElementById('onlineUsersHome').textContent = '0'; // Reset Home View
+                document.getElementById('onlineUsersHome').textContent = '0';
             }
         }
 
         function claimAirdrop() {
             const btn = document.getElementById('airdropClaimBtn');
             
-            // Check if already claimed
             if(appState.airdropClaimed) {
                 showToast('You already claimed this round!', 'error');
                 return;
@@ -1812,7 +1895,6 @@
             btn.disabled = true;
             btn.textContent = '⏳ Processing...';
 
-            // Generate Random Amount
             let config = appState.airdropConfig || { min: 0.5, max: 2.0 };
             let amount = Math.random() * (config.max - config.min) + config.min;
             let coinsWon = Math.floor(amount * appState.conversionRate);
@@ -1830,7 +1912,6 @@
             updateData['users/' + userId + '/airdropClaimed'] = true;
             updateData['airdropList/' + Date.now()] = claimData;
 
-            // Reset local state
             appState.balance += coinsWon;
             appState.airdropClaimed = true;
 
@@ -1840,7 +1921,6 @@
                 showToast(`🎉 +${coinsWon} Coins from AirDrop!`);
                 updateUI();
                 updateLevelUI();
-                // Update button state
                 btn.textContent = '✅ Already Claimed';
                 btn.disabled = true;
                 closeAirdropPage();
@@ -1863,13 +1943,11 @@
                 offlineOverlay.classList.remove('show');
                 mainContent.style.display = 'block';
                 bottomNav.style.display = 'flex';
-                // Resume mining if needed is handled by interval checks
             } else {
                 offlineOverlay.classList.add('show');
                 mainContent.style.display = 'none';
                 bottomNav.style.display = 'none';
                 
-                // Force stop mining
                 if (progressInterval) {
                     clearInterval(progressInterval);
                     progressInterval = null;
