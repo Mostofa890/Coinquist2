@@ -443,15 +443,23 @@
                 <div class="balance-amount" id="balance">0</div>
                 <div class="usd-value" id="usdValue">≈ $0.00 USD</div>
                 <div class="total-usd-earned" id="totalUsdEarned">💵 Total USD Earned: $0.00</div>
+                
+                <!-- HOME PAGE LEVEL SECTION (UPDATED TO SHOW REAL-TIME XP & PROGRESS) -->
                 <div class="level-section" onclick="openLevelPage()">
                     <div class="level-row">
                         <span class="level-title" id="levelTitle">🥉 Bronze</span>
                         <span class="level-number" id="levelNumber">Level 1</span>
                         <span class="level-arrow">➜</span>
                     </div>
-                    <div class="level-progress"><div class="fill" id="levelProgressFill" style="width:0%;"></div></div>
-                    <div class="level-points"><span id="levelCurrentPoints">0</span><span id="levelNextPoints">/ 100</span></div>
+                    <div class="level-progress">
+                        <div class="fill" id="levelProgressFill" style="width: 0%;"></div>
+                    </div>
+                    <div class="level-points">
+                        <span id="levelCurrentPoints">0</span>
+                        <span id="levelNextPoints">/ 100</span>
+                    </div>
                 </div>
+                
                 <div class="conversion-timer">
                     <div class="label">⏰ Next Auto Conversion</div>
                     <div class="time" id="conversionCountdown">--:--:--</div>
@@ -477,7 +485,7 @@
             <div class="arrow">➜</div>
         </div>
 
-        <!-- NEW SPECIAL OFFER BUTTON (Red Circled in your screenshot, now links to New Page) -->
+        <!-- NEW SPECIAL OFFER BUTTON -->
         <div class="airdrop-btn" onclick="openSpecialOfferPage()" style="border: 2px solid #ef4444; background: rgba(239,68,68,0.1);">
             <div class="bonus-text">
                 <h4 style="color: #fca5a5;">🎁 Special Offer</h4>
@@ -706,7 +714,7 @@
             if (page === 'wallet') updateWithdrawHistory();
         }
 
-        // ==================== USER SPECIAL OFFER (User-to-User Admin System) ====================
+        // ==================== USER SPECIAL OFFER ====================
         function openSpecialOfferPage() {
             switchPage('specialOffer', null);
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
@@ -715,7 +723,6 @@
             const container = document.getElementById('specialOfferContent');
             container.innerHTML = '<div class="offer-empty">⏳ Loading your exclusive offer...</div>';
             
-            // Admins can set data at: specialOffers/{userId} = { title, description, reward, claimed: false }
             specialOfferRef.child(userId).on('value', (snap) => {
                 const offer = snap.val();
                 if (offer && !offer.claimed && offer.title) {
@@ -935,7 +942,7 @@
             });
         }
 
-        // ==================== PROGRESS BAR & XP SYSTEM ====================
+        // ==================== PROGRESS BAR & REAL-TIME XP SYSTEM ====================
         function updateProgressUI() {
             const fill = document.getElementById('progressBarFill');
             const count = document.getElementById('progressCoinCount');
@@ -980,17 +987,21 @@
                     showToast('⚠️ Internet lost. Mining paused.', 'error');
                     return;
                 }
-                let bonusPercent = appState.userLevel; // Based on XP Level
+                let bonusPercent = appState.userLevel; // Level থেকে Bonus নিচ্ছে
                 let coinsToAdd = 1 + (bonusPercent / 100);
+                
                 appState.progressCoins -= 1;
                 appState.balance += coinsToAdd;
-                appState.xpPoints = (appState.xpPoints || 0) + 1; // XP added for each progress
+                appState.xpPoints = (appState.xpPoints || 0) + 1; // XP যোগ হচ্ছে রিয়েল-টাইমে
+                
                 userRef.update({ balance: appState.balance, progressCoins: appState.progressCoins, xpPoints: appState.xpPoints });
+                
                 let coin = document.createElement('div');
                 coin.className = 'floating-coin'; coin.textContent = `+${coinsToAdd.toFixed(2)} 🪙`;
                 coin.style.left = (Math.random() * 80 + 10) + '%'; coin.style.top = '30%';
                 document.body.appendChild(coin); setTimeout(() => coin.remove(), 1000);
-                updateProgressUI(); updateUI(); updateLevelUI();
+                
+                updateProgressUI(); updateUI(); updateLevelUI(); // Level UI রিয়েল-টাইমে আপডেট হচ্ছে
             }, 5000);
         }
 
@@ -1157,9 +1168,12 @@
             return { level, xp, currentRequired, nextRequired, progress: Math.floor(progress), isMax, tier };
         }
 
+        // UPDATED: This function now also updates the Home page level section instantly
         function updateLevelUI() {
             const data = calcLevel(appState.xpPoints || 0);
             const t = data.tier;
+            
+            // Home Page Level Display Update
             document.getElementById('levelTitle').textContent = `${t.emoji} ${t.name}`;
             document.getElementById('levelNumber').textContent = `Level ${data.level}`;
             document.getElementById('levelProgressFill').style.width = `${data.progress}%`;
@@ -1172,6 +1186,8 @@
             }
             document.getElementById('userLevelBadge').textContent = `Level ${data.level} 👆`;
             appState.userLevel = data.level;
+            
+            // Level Overlay Page Update
             document.getElementById('levelCurrentEmoji').textContent = t.emoji;
             document.getElementById('levelCurrentNumber').textContent = `Level ${data.level}`;
             document.getElementById('levelCurrentTitle').textContent = t.name;
@@ -1323,7 +1339,7 @@
             });
         }
 
-        // ==================== FULL SCREEN WEBVIEW TASK (Updated as requested) ====================
+        // ==================== FULL SCREEN WEBVIEW TASK ====================
         function openFullWebview(taskId, url) {
             const today = new Date().toDateString();
             if (appState.taskLastCompleted[taskId] === today) { showToast('Already completed today!', 'error'); return; }
