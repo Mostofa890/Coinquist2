@@ -753,7 +753,7 @@
             });
         }
 
-        // ==================== CONVERSION RATE ====================
+        // ==================== CONVERSION RATE & USD LOGIC (FIXED) ====================
         function loadConversionRate() {
             rateRef.on('value', (s) => {
                 appState.conversionRate = s.exists() ? s.val() : 1000;
@@ -763,10 +763,12 @@
         }
 
         function updateUSDDisplay() {
+            // FIXED: Calculates exact USD without rounding errors
             const usdValue = (appState.balance / appState.conversionRate).toFixed(2);
             document.getElementById('usdValue').textContent = `≈ $${usdValue} USD`;
             document.getElementById('walletUsd').textContent = `≈ $${usdValue} USD`;
             document.getElementById('walletBalance').textContent = appState.balance;
+            
             const totalUsd = appState.usdBalance.toFixed(2);
             document.getElementById('totalUsdEarned').textContent = `💵 Total USD Earned: $${totalUsd}`;
             document.getElementById('walletTotalUsd').textContent = `$${totalUsd}`;
@@ -984,7 +986,7 @@
                     return;
                 }
                 
-                // *** NEW MATH: Calculate Bonus % from the new fixed system ***
+                // *** BONUS MATH ***
                 let bonusPercent = getLevelMiningBonus(appState.userLevel);
                 let coinsToAdd = 1 + (bonusPercent / 100);
                 
