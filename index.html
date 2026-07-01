@@ -12,440 +12,382 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* ===== GLOBAL ===== */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; }
-        body { background: #0f172a; color: #e2e8f0; padding-bottom: 70px; min-height: 100vh; background: radial-gradient(circle at 20% 30%, #1e293b, #0f172a); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', -apple-system, sans-serif; }
+        body { 
+            background: #0f172a; 
+            color: #e2e8f0; 
+            padding-bottom: 70px; 
+            min-height: 100vh; 
+            background: radial-gradient(circle at 20% 30%, #1e293b, #0f172a); 
+        }
         .container { max-width: 500px; margin: 0 auto; padding: 12px; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #1e293b; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 4px; }
-
-        /* ===== HEADER ===== */
-        .header { background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); padding: 12px 16px; border-radius: 20px; margin-bottom: 14px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
+        
+        /* Header */
+        .header { 
+            background: rgba(255,255,255,0.05); 
+            backdrop-filter: blur(12px); 
+            padding: 12px 16px; 
+            border-radius: 20px; 
+            margin-bottom: 14px; 
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3); 
+            border: 1px solid rgba(255,255,255,0.1); 
+        }
         .user-info { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .avatar { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #3b82f6); display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; box-shadow: 0 4px 12px rgba(139,92,246,0.3); transition: transform 0.2s; color: #fff; }
-        .avatar:hover { transform: scale(1.05); }
+        .avatar { 
+            width: 38px; height: 38px; border-radius: 50%; 
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6); 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 18px; cursor: pointer; color: #fff; 
+        }
         .user-details h3 { font-size: 14px; font-weight: 600; color: #fff; }
         .user-details .last-login { font-size: 9px; color: #94a3b8; }
-        .level-badge { display: inline-block; background: rgba(251,191,36,0.15); backdrop-filter: blur(4px); padding: 2px 10px; border-radius: 20px; font-size: 10px; cursor: pointer; border: 1px solid rgba(251,191,36,0.3); transition: all 0.2s; color: #fbbf24; }
-        .level-badge:hover { background: rgba(251,191,36,0.25); }
-
-        .balance-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(8px); padding: 12px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); }
+        .level-badge { 
+            display: inline-block; background: rgba(251,191,36,0.15); 
+            padding: 2px 10px; border-radius: 20px; font-size: 10px; 
+            cursor: pointer; border: 1px solid rgba(251,191,36,0.3); 
+            color: #fbbf24; 
+        }
+        
+        .balance-card { 
+            background: rgba(255,255,255,0.05); 
+            padding: 12px; border-radius: 16px; 
+            border: 1px solid rgba(255,255,255,0.1); 
+        }
         .balance-label { font-size: 10px; color: #94a3b8; letter-spacing: 1px; }
-        .balance-amount { font-size: 28px; font-weight: 900; background: linear-gradient(to right, #fcd34d, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 30px rgba(251,191,36,0.2); }
+        .balance-amount { 
+            font-size: 28px; font-weight: 900; 
+            background: linear-gradient(to right, #fcd34d, #fbbf24, #f59e0b); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+        }
         .usd-value { color: #10b981; font-size: 14px; font-weight: bold; }
-        .total-usd-earned { font-size: 10px; color: #94a3b8; margin-top: 2px; }
-
-        .level-section { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 6px 12px; margin-top: 6px; cursor: pointer; transition: background 0.2s; border: 1px solid rgba(255,255,255,0.05); }
-        .level-section:hover { background: rgba(255,255,255,0.1); }
-        .level-section .level-row { display: flex; justify-content: space-between; align-items: center; }
+        
+        .level-section { 
+            background: rgba(255,255,255,0.05); border-radius: 10px; 
+            padding: 6px 12px; margin-top: 6px; cursor: pointer; 
+            border: 1px solid rgba(255,255,255,0.05); 
+        }
+        .level-section .level-row { 
+            display: flex; justify-content: space-between; align-items: center; 
+        }
         .level-section .level-title { font-size: 10px; font-weight: bold; color: #94a3b8; }
         .level-section .level-number { font-size: 14px; font-weight: bold; color: #fbbf24; }
-        .level-section .level-arrow { color: #94a3b8; font-size: 12px; transition: transform 0.2s; }
-        .level-section:hover .level-arrow { transform: translateX(4px); }
-        .level-section .level-progress { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-top: 4px; overflow: hidden; }
-        .level-section .level-progress .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 4px; box-shadow: 0 0 10px rgba(251,191,36,0.3); }
-        .level-section .level-points { font-size: 9px; color: #94a3b8; margin-top: 2px; display: flex; justify-content: space-between; }
-
-        .conversion-timer { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.15); border-radius: 10px; padding: 8px; margin-top: 8px; }
+        .level-progress { 
+            width: 100%; height: 4px; background: rgba(255,255,255,0.1); 
+            border-radius: 4px; margin-top: 4px; overflow: hidden; 
+        }
+        .level-progress .fill { 
+            height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); 
+            border-radius: 4px; 
+        }
+        
+        .conversion-timer { 
+            background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.15); 
+            border-radius: 10px; padding: 8px; margin-top: 8px; 
+        }
         .conversion-timer .label { font-size: 9px; color: #94a3b8; }
         .conversion-timer .time { font-size: 14px; font-weight: bold; color: #10b981; }
-        .conversion-timer .rate-info { font-size: 9px; color: #94a3b8; margin-top: 2px; }
 
-        /* ===== HOME MENU CARDS (New Design) ===== */
-        .home-card-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+        /* Mining Circle */
+        .mining-circle-wrapper { 
+            display: flex; justify-content: center; align-items: center; margin: 10px 0; 
+        }
+        .mining-circle { 
+            position: relative; width: 220px; height: 220px; border-radius: 50%; 
+            background: conic-gradient(#fbbf24 0%, #1e293b 0%); 
+            display: flex; justify-content: center; align-items: center; 
+            box-shadow: 0 0 40px rgba(251,191,36,0.15); 
+        }
+        .mining-circle .inner-circle { 
+            width: 170px; height: 170px; border-radius: 50%; 
+            background: #0f172a; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; z-index: 2; 
+            border: 2px solid rgba(255,255,255,0.05); 
+        }
+        .mining-circle .coin-icon { font-size: 28px; margin-bottom: 4px; }
+        .mining-circle .coin-count { font-size: 24px; font-weight: 800; color: #fbbf24; }
+        .mining-circle .circle-status { font-size: 12px; color: #94a3b8; margin-top: 4px; }
         
-        /* Menu Card Base Style */
-        .home-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(8px); padding: 16px 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
-        .home-card:hover { transform: translateY(-2px); box-shadow: 0 6px 30px rgba(0,0,0,0.3); }
+        .circle-start-btn { 
+            margin-top: 16px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); 
+            color: #fff; padding: 12px 40px; border: none; border-radius: 30px; 
+            font-weight: 700; font-size: 16px; cursor: pointer; width: 100%; max-width: 300px; 
+        }
+        .circle-start-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .circle-watch-btn { 
+            margin-top: 12px; background: linear-gradient(135deg, #10b981, #059669); 
+            color: #fff; padding: 8px 30px; border: none; border-radius: 30px; 
+            font-weight: 700; font-size: 14px; cursor: pointer; width: 100%; max-width: 300px; 
+        }
+        
+        /* Speed Boost */
+        .speed-btn-container { 
+            margin-top: 10px; width: 100%; display: flex; 
+            justify-content: center; flex-direction: column; align-items: center; 
+        }
+        .speed-boost-btn { 
+            background: linear-gradient(135deg, #f97316, #f59e0b); color: #fff; 
+            padding: 8px 20px; border: none; border-radius: 30px; font-weight: 700; 
+            font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; 
+        }
+        .speed-boost-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .boost-cooldown-text { font-size: 12px; color: #94a3b8; margin-top: 6px; display: none; }
+
+        /* Pages */
+        .page { display: none; min-height: 60vh; padding-top: 8px; }
+        .page.active { display: block; }
+        .page-header { 
+            font-size: 18px; font-weight: 800; margin-bottom: 14px; 
+            padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); 
+            background: linear-gradient(135deg, #fbbf24, #f59e0b); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+        }
+
+        /* Cards */
+        .home-card-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+        .home-card { 
+            background: rgba(255,255,255,0.05); backdrop-filter: blur(8px); 
+            padding: 16px 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); 
+            display: flex; align-items: center; justify-content: space-between; 
+            cursor: pointer; transition: transform 0.2s; 
+        }
+        .home-card:hover { transform: translateY(-2px); }
         .home-card .card-left { display: flex; align-items: center; gap: 14px; }
         .home-card .card-icon { font-size: 28px; width: 40px; text-align: center; }
         .home-card .card-title { font-size: 15px; font-weight: 700; color: #fff; }
         .home-card .card-desc { font-size: 11px; color: #94a3b8; margin-top: 2px; }
-        .home-card .card-arrow { color: #94a3b8; font-size: 18px; transition: transform 0.2s; }
-        .home-card:hover .card-arrow { transform: translateX(4px); }
-
-        /* AirDrop Card Specific */
-        .card-airdrop { border: 1px solid rgba(251,191,36,0.3); background: rgba(251,191,36,0.05); }
-        .card-airdrop .card-icon { color: #fbbf24; }
-        .card-airdrop .live-users { display: flex; align-items: center; gap: 6px; margin-top: 4px; color: #10b981; font-size: 12px; font-weight: bold; }
-        .card-airdrop .live-users .dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
-
-        /* Special Offer Card Specific */
-        .card-special { border: 2px solid #ef4444; background: rgba(239,68,68,0.1); }
-        .card-special .card-title { color: #fca5a5; }
-        .card-special .card-arrow { color: #fca5a5; }
-
-        /* Earn Card Specific */
-        .card-earn { border: 1px solid rgba(16,185,129,0.3); background: rgba(16,185,129,0.05); }
-        .card-earn .card-icon { color: #10b981; }
-
-        /* ===== INTRO CARDS FOR PAGES ===== */
-        .page-intro-box { background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.15); border-radius: 14px; padding: 14px 16px; margin-bottom: 16px; }
-        .page-intro-box h4 { font-size: 15px; color: #10b981; margin-bottom: 6px; }
-        .page-intro-box p { font-size: 12px; color: #94a3b8; line-height: 1.5; }
-
-        /* ===== CIRCULAR MINING SYSTEM ===== */
-        .mining-circle-wrapper { display: flex; justify-content: center; align-items: center; margin: 10px 0; }
-        .mining-circle { position: relative; width: 220px; height: 220px; border-radius: 50%; background: conic-gradient(#fbbf24 0%, #1e293b 0%); display: flex; justify-content: center; align-items: center; box-shadow: 0 0 40px rgba(251,191,36,0.15); transition: background 0.3s ease; }
-        .mining-circle .inner-circle { width: 170px; height: 170px; border-radius: 50%; background: #0f172a; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2; border: 2px solid rgba(255,255,255,0.05); }
-        .mining-circle .inner-circle .coin-icon { font-size: 28px; margin-bottom: 4px; }
-        .mining-circle .inner-circle .coin-count { font-size: 24px; font-weight: 800; color: #fbbf24; }
-        .mining-circle .inner-circle .circle-status { font-size: 12px; color: #94a3b8; margin-top: 4px; }
         
-        .circle-start-btn { margin-top: 16px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; padding: 12px 40px; border: none; border-radius: 30px; font-weight: 700; font-size: 16px; cursor: pointer; box-shadow: 0 4px 20px rgba(59,130,246,0.3); transition: all 0.2s; width: 100%; max-width: 300px; }
-        .circle-start-btn:hover { transform: scale(1.02); box-shadow: 0 6px 30px rgba(59,130,246,0.4); }
-        .circle-start-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-        .circle-watch-btn { margin-top: 12px; background: linear-gradient(135deg, #10b981, #059669); color: #fff; padding: 8px 30px; border: none; border-radius: 30px; font-weight: 700; font-size: 14px; cursor: pointer; box-shadow: 0 4px 20px rgba(16,185,129,0.3); transition: all 0.2s; width: 100%; max-width: 300px; }
-        .circle-watch-btn:hover { transform: scale(1.02); box-shadow: 0 6px 30px rgba(16,185,129,0.4); }
-        .circle-watch-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .card-airdrop { 
+            border: 1px solid rgba(251,191,36,0.3); 
+            background: rgba(251,191,36,0.05); 
+        }
+        .card-special { 
+            border: 2px solid #ef4444; background: rgba(239,68,68,0.1); 
+        }
+        .card-earn { 
+            border: 1px solid rgba(16,185,129,0.3); 
+            background: rgba(16,185,129,0.05); 
+        }
 
-        /* ===== SPEED BOOST BUTTON ===== */
-        .speed-btn-container { margin-top: 10px; width: 100%; display: flex; justify-content: center; flex-direction: column; align-items: center; }
-        .speed-boost-btn { background: linear-gradient(135deg, #f97316, #f59e0b); color: #fff; padding: 8px 20px; border: none; border-radius: 30px; font-weight: 700; font-size: 14px; cursor: pointer; box-shadow: 0 4px 20px rgba(249,115,22,0.3); transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
-        .speed-boost-btn:hover { transform: scale(1.05); box-shadow: 0 6px 30px rgba(249,115,22,0.4); }
-        .speed-boost-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-        .speed-boost-btn i { font-size: 16px; animation: spin 2s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .boost-cooldown-text { font-size: 12px; color: #94a3b8; margin-top: 6px; display: none; }
-        .speed-spinner-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 9999; flex-direction: column; }
-        .speed-spinner-overlay.active { display: flex; }
-        .speed-spinner { width: 80px; height: 80px; border: 6px solid rgba(255,255,255,0.1); border-top: 6px solid #fbbf24; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
-        .speed-spinner-text { color: #fff; font-size: 18px; font-weight: 700; }
-        .speed-spinner-timer { color: #fbbf24; font-size: 24px; font-weight: 800; margin-top: 10px; }
-        .speed-spinner-progress { width: 200px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 10px; overflow: hidden; }
-        .speed-spinner-progress .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 10px; width: 0%; transition: width 0.1s; }
-
-        /* ===== FLOATING COIN ===== */
-        .floating-coin { position: fixed; font-size: 28px; pointer-events: none; z-index: 1000; animation: floatUp 1s ease-out forwards; text-shadow: 0 0 20px rgba(251,191,36,0.4); }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); } 100% { opacity: 0; transform: translateY(-140px) scale(0.6) rotate(20deg); } }
-
-        /* ===== PAGES ===== */
-        .page { display: none; min-height: 60vh; padding-top: 8px; }
-        .page.active { display: block; }
-        .page-header { font-size: 18px; font-weight: 800; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        /* ===== TASK PAGE FILTERS ===== */
-        .task-filters { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 4px; }
-        .task-filters .filter-btn { padding: 4px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #94a3b8; cursor: pointer; font-size: 11px; white-space: nowrap; transition: all 0.2s; }
-        .task-filters .filter-btn.active { background: linear-gradient(135deg, #8b5cf6, #3b82f6); border-color: transparent; color: #fff; box-shadow: 0 4px 16px rgba(139,92,246,0.2); }
-        .task-filters .filter-btn:hover:not(.active) { background: rgba(255,255,255,0.05); }
-
-        /* ===== EARN VIDEO CARD ===== */
-        .video-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(8px); border-radius: 16px; padding: 18px 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.08); text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
-        .video-card .video-title { font-size: 16px; font-weight: 700; color: #fff; }
-        .video-card .video-desc { font-size: 11px; color: #94a3b8; margin: 4px 0; }
-        .video-card .video-reward { font-size: 14px; color: #10b981; font-weight: bold; }
-        .video-card .video-btn { background: linear-gradient(135deg, #10b981, #059669); color: #fff; padding: 10px 28px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; font-size: 14px; margin-top: 10px; box-shadow: 0 4px 20px rgba(16,185,129,0.2); transition: all 0.2s; }
-        .video-card .video-btn:active { transform: scale(0.95); }
-        .video-card .video-btn:hover { box-shadow: 0 6px 28px rgba(16,185,129,0.3); transform: translateY(-2px); }
-        .video-card .video-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-        .video-card .video-limit { font-size: 10px; color: #94a3b8; margin-top: 6px; }
-        .video-card .video-watched { font-size: 11px; color: #10b981; margin-top: 4px; }
-
-        /* ===== TASK CARD ===== */
-        .task-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 14px; padding: 14px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.08); transition: transform 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-        .task-card:hover { transform: translateY(-2px); }
-        .task-card .task-header { display: flex; justify-content: space-between; align-items: center; }
+        /* Task Cards */
+        .task-filters { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; }
+        .task-filters .filter-btn { 
+            padding: 4px 14px; border-radius: 20px; 
+            border: 1px solid rgba(255,255,255,0.1); background: transparent; 
+            color: #94a3b8; cursor: pointer; font-size: 11px; white-space: nowrap; 
+        }
+        .task-filters .filter-btn.active { 
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6); 
+            border-color: transparent; color: #fff; 
+        }
+        
+        .task-card { 
+            background: rgba(255,255,255,0.03); border-radius: 14px; 
+            padding: 14px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.08); 
+        }
+        .task-card .task-header { 
+            display: flex; justify-content: space-between; align-items: center; 
+        }
         .task-card .task-title { font-size: 14px; font-weight: 600; color: #fff; }
         .task-card .task-reward { color: #10b981; font-weight: bold; font-size: 14px; }
         .task-card .task-desc { font-size: 11px; color: #94a3b8; margin: 4px 0; }
-        .task-card .task-btn { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; padding: 6px 20px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 12px; transition: all 0.2s; box-shadow: 0 2px 12px rgba(59,130,246,0.2); }
+        .task-card .task-btn { 
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; 
+            padding: 6px 20px; border-radius: 10px; border: none; font-weight: 700; 
+            cursor: pointer; font-size: 12px; 
+        }
         .task-card .task-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .task-card .task-btn.completed { background: #10b981; }
-        .task-card .task-link { color: #3b82f6; text-decoration: none; font-size: 11px; display: inline-block; margin-top: 4px; }
-        .task-card .task-video-btn { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; padding: 6px 20px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 12px; transition: all 0.2s; box-shadow: 0 2px 12px rgba(239,68,68,0.2); }
-        .task-card .task-video-btn:hover { transform: scale(1.05); }
-        .task-card .task-video-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .task-card .task-status { font-size: 10px; margin-top: 4px; }
 
-        /* ===== REFER ===== */
-        .refer-link-box { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 14px; padding: 14px; margin-bottom: 14px; border: 1px solid rgba(255,255,255,0.08); text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-        .refer-link-box .link { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; font-size: 12px; color: #3b82f6; word-break: break-all; margin: 8px 0; border: 1px solid rgba(255,255,255,0.05); }
-        .refer-link-box .copy-btn { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; padding: 6px 20px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 12px; transition: all 0.2s; box-shadow: 0 2px 12px rgba(59,130,246,0.2); }
-        .refer-link-box .copy-btn:hover { transform: translateY(-2px); }
-
-        .refer-code-input-box { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 14px; padding: 14px; margin-bottom: 14px; border: 1px solid rgba(255,255,255,0.08); text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-        .refer-code-input-box input { width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; font-size: 13px; color: #fff; margin-bottom: 8px; outline: none; }
-        .refer-code-input-box input:focus { border-color: #3b82f6; }
-        .refer-code-input-box button { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; padding: 6px 20px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 12px; transition: all 0.2s; box-shadow: 0 2px 12px rgba(59,130,246,0.2); }
-        .refer-code-input-box button:hover { transform: translateY(-2px); }
-        .refer-code-input-box button:disabled { opacity: 0.5; cursor: not-allowed; }
-
+        /* Refer Section */
         .refer-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
-        .refer-stats .stat { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); padding: 10px 8px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .refer-stats .stat { 
+            background: rgba(255,255,255,0.03); padding: 10px 8px; 
+            border-radius: 12px; text-align: center; 
+            border: 1px solid rgba(255,255,255,0.08); 
+        }
         .refer-stats .stat .number { font-size: 18px; font-weight: 800; color: #fbbf24; }
         .refer-stats .stat .label { font-size: 9px; color: #94a3b8; }
+        
+        .refer-link-box { 
+            background: rgba(255,255,255,0.03); border-radius: 14px; 
+            padding: 14px; margin-bottom: 14px; text-align: center; 
+            border: 1px solid rgba(255,255,255,0.08); 
+        }
+        .refer-link-box .link { 
+            background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; 
+            font-size: 12px; color: #3b82f6; word-break: break-all; margin: 8px 0; 
+        }
+        .refer-link-box .copy-btn { 
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; 
+            padding: 6px 20px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; 
+        }
 
-        .refer-tier { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 12px; padding: 10px 14px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-        .refer-tier .tier-info .tier-name { font-size: 13px; font-weight: 600; color: #fff; }
-        .refer-tier .tier-info .tier-desc { font-size: 10px; color: #94a3b8; }
-        .refer-tier .tier-status { font-size: 12px; font-weight: 700; }
-        .refer-tier .tier-status.claimed { color: #10b981; }
-        .refer-tier .tier-status.locked { color: #64748b; }
-        .refer-tier .tier-status.available { color: #fbbf24; cursor: pointer; }
+        .refer-code-input-box { 
+            background: rgba(255,255,255,0.03); border-radius: 14px; 
+            padding: 14px; margin-bottom: 14px; text-align: center; 
+            border: 1px solid rgba(255,255,255,0.08); 
+        }
+        .refer-code-input-box input { 
+            width: 100%; padding: 10px; background: rgba(255,255,255,0.05); 
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; 
+            font-size: 13px; color: #fff; margin-bottom: 8px; outline: none; 
+        }
+        .refer-code-input-box button { 
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; 
+            padding: 6px 20px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; 
+        }
 
-        .refer-progress { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 12px; padding: 12px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-        .refer-progress .progress-bar { width: 100%; height: 5px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-top: 8px; overflow: hidden; }
-        .refer-progress .progress-bar .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 4px; }
-        .refer-progress .progress-text { display: flex; justify-content: space-between; font-size: 10px; color: #94a3b8; margin-top: 4px; }
-
-        .referral-list-box { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 12px; padding: 12px; margin-top: 12px; border: 1px solid rgba(255,255,255,0.08); max-height: 180px; overflow-y: auto; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-        .referral-list-box .list-title { font-size: 12px; color: #94a3b8; margin-bottom: 8px; }
-        .referral-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .referral-item:last-child { border-bottom: none; }
-        .referral-item .name { font-size: 12px; font-weight: 500; color: #fff; }
-        .referral-item .bonus { color: #10b981; font-size: 11px; font-weight: bold; }
-        .referral-item .date { font-size: 9px; color: #94a3b8; }
-
-        /* ===== WALLET & WITHDRAW ===== */
-        .wallet-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(8px); padding: 18px 16px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
-        .wallet-card .wallet-balance { font-size: 36px; font-weight: 900; background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 30px rgba(251,191,36,0.1); }
+        /* Wallet */
+        .wallet-card { 
+            background: rgba(255,255,255,0.03); backdrop-filter: blur(8px); 
+            padding: 18px 16px; border-radius: 20px; text-align: center; 
+            border: 1px solid rgba(255,255,255,0.08); 
+        }
+        .wallet-card .wallet-balance { 
+            font-size: 36px; font-weight: 900; 
+            background: linear-gradient(135deg, #fbbf24, #f59e0b); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+        }
         .wallet-card .wallet-usd { color: #10b981; font-size: 18px; font-weight: bold; margin-top: 4px; }
-        .wallet-card .wallet-total { background: rgba(16,185,129,0.1); border-radius: 10px; padding: 8px; margin-top: 12px; border: 1px solid rgba(16,185,129,0.15); }
-        .wallet-card .wallet-total .label { font-size: 11px; color: #94a3b8; }
-        .wallet-card .wallet-total .value { font-size: 16px; font-weight: bold; color: #10b981; }
-        .wallet-card .wallet-conversion { background: rgba(59,130,246,0.1); border-radius: 10px; padding: 8px; margin-top: 10px; border: 1px solid rgba(59,130,246,0.15); }
-        .wallet-card .wallet-conversion .label { font-size: 10px; color: #94a3b8; }
-        .wallet-card .wallet-conversion .value { font-size: 13px; color: #3b82f6; font-weight: bold; }
         
-        /* WITHDRAW SECTION */
-        .withdraw-section { margin-top: 14px; padding: 12px; background: rgba(239,68,68,0.1); border-radius: 12px; border: 1px solid rgba(239,68,68,0.15); }
-        .withdraw-section .form-group { margin-bottom: 12px; text-align: left; background: transparent; padding: 0; border: none; }
-        .withdraw-section .form-group label { font-size: 12px; color: #94a3b8; margin-bottom: 4px; display: block; }
-        .withdraw-section .form-group select, .withdraw-section .form-group input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #fff; font-size: 14px; outline: none; }
-        .withdraw-section .form-group select:focus, .withdraw-section .form-group input:focus { border-color: #3b82f6; }
-        .withdraw-section .withdraw-btn { margin-top: 8px; padding: 12px 20px; background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; width: 100%; font-size: 14px; box-shadow: 0 4px 20px rgba(16,185,129,0.2); transition: all 0.2s; }
-        .withdraw-section .withdraw-btn:hover:not(:disabled) { transform: scale(1.02); }
-        .withdraw-section .withdraw-btn:disabled { background: #64748b; cursor: not-allowed; box-shadow: none; }
-        
-        .wallet-card .withdraw-history { margin-top: 12px; padding: 8px; background: rgba(255,255,255,0.03); border-radius: 10px; max-height: 150px; overflow-y: auto; text-align: left; border: 1px solid rgba(255,255,255,0.05); }
-        .wallet-card .withdraw-history .title { font-size: 9px; color: #94a3b8; margin-bottom: 4px; }
-        .withdraw-history-item { padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
-        .withdraw-history-item:last-child { border-bottom: none; }
-        .withdraw-history-item .amount { font-weight: bold; color: #fbbf24; }
-        .withdraw-history-item .status-pending { color: #f59e0b; }
-        .withdraw-history-item .status-approved { color: #10b981; }
-        .withdraw-history-item .status-cancelled { color: #ef4444; }
-        .withdraw-history-item .date { font-size: 8px; color: #94a3b8; }
+        .withdraw-section { 
+            margin-top: 14px; padding: 12px; 
+            background: rgba(239,68,68,0.1); border-radius: 12px; 
+            border: 1px solid rgba(239,68,68,0.15); 
+        }
+        .withdraw-section .form-group { margin-bottom: 12px; text-align: left; }
+        .withdraw-section .form-group label { 
+            font-size: 12px; color: #94a3b8; margin-bottom: 4px; display: block; 
+        }
+        .withdraw-section .form-group select, 
+        .withdraw-section .form-group input { 
+            width: 100%; padding: 10px; border-radius: 8px; 
+            border: 1px solid #334155; background: #1e293b; 
+            color: #fff; font-size: 14px; outline: none; 
+        }
+        .withdraw-section .withdraw-btn { 
+            margin-top: 8px; padding: 12px 20px; 
+            background: linear-gradient(135deg, #10b981, #059669); 
+            border: none; border-radius: 10px; color: #fff; font-weight: 700; 
+            cursor: pointer; width: 100%; font-size: 14px; 
+        }
+        .withdraw-section .withdraw-btn:disabled { 
+            background: #64748b; cursor: not-allowed; 
+        }
 
-        /* ===== BOTTOM NAV (UPDATED: Removed Earn, added Tasks) ===== */
-        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; background: rgba(15,23,42,0.9); backdrop-filter: blur(24px); display: flex; justify-content: space-around; padding: 8px 4px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; box-shadow: 0 -4px 20px rgba(0,0,0,0.3); }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; color: #64748b; font-size: 9px; cursor: pointer; flex: 1; transition: color 0.2s; }
+        /* Bottom Nav */
+        .bottom-nav { 
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); 
+            width: 100%; max-width: 500px; background: rgba(15,23,42,0.9); 
+            backdrop-filter: blur(24px); display: flex; justify-content: space-around; 
+            padding: 8px 4px; border-top: 1px solid rgba(255,255,255,0.05); 
+            z-index: 1000; 
+        }
+        .nav-item { 
+            display: flex; flex-direction: column; align-items: center; gap: 2px; 
+            color: #64748b; font-size: 9px; cursor: pointer; flex: 1; 
+        }
         .nav-item.active { color: #fbbf24; }
-        .nav-item i { font-size: 18px; transition: transform 0.2s; }
-        .nav-item:hover i { transform: translateY(-2px); }
-        .nav-item.active i { text-shadow: 0 0 20px rgba(251,191,36,0.1); }
+        .nav-item i { font-size: 18px; }
 
-        /* ===== TOAST & MODALS ===== */
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; }
+        /* Modal & Toast */
+        .modal { 
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); 
+            z-index: 9999; align-items: center; justify-content: center; 
+        }
         .modal.active { display: flex; }
-        .modal-content { background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); padding: 20px; border-radius: 20px; width: 90%; max-width: 320px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); }
-        .modal-content button { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; padding: 10px 28px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; margin-top: 10px; transition: transform 0.2s; }
-        .modal-content button:hover { transform: scale(1.03); }
+        .modal-content { 
+            background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); 
+            padding: 20px; border-radius: 20px; width: 90%; max-width: 320px; 
+            text-align: center; border: 1px solid rgba(255,255,255,0.08); 
+        }
+        .modal-content button { 
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; 
+            padding: 10px 28px; border-radius: 12px; border: none; 
+            font-weight: 700; cursor: pointer; margin-top: 10px; 
+        }
         .success-animation { font-size: 48px; margin-bottom: 12px; }
         .modal-content h3 { font-size: 20px; margin-bottom: 6px; color: #fff; }
         .modal-content p { color: #94a3b8; margin-bottom: 10px; }
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #10b981; color: #fff; padding: 10px 20px; border-radius: 14px; font-weight: 700; z-index: 9999; display: none; font-size: 14px; box-shadow: 0 8px 32px rgba(16,185,129,0.2); }
-        .toast.show { display: block; animation: slideDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .toast.error { background: #ef4444; box-shadow: 0 8px 32px rgba(239,68,68,0.2); }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-80px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        
+        .toast { 
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%); 
+            background: #10b981; color: #fff; padding: 10px 20px; 
+            border-radius: 14px; font-weight: 700; z-index: 9999; 
+            display: none; font-size: 14px; 
+        }
+        .toast.show { display: block; animation: slideDown 0.4s ease; }
+        .toast.error { background: #ef4444; }
+        @keyframes slideDown { 
+            from { opacity: 0; transform: translateY(-80px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
 
-        /* ===== OVERLAYS ===== */
-        .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9998; display: none; overflow-y: auto; padding-bottom: 70px; }
+        /* Floating Coin Animation */
+        .floating-coin { 
+            position: fixed; font-size: 28px; pointer-events: none; z-index: 1000; 
+            animation: floatUp 1s ease-out forwards; 
+        }
+        @keyframes floatUp { 
+            0% { opacity: 1; transform: translateY(0) scale(1); } 
+            100% { opacity: 0; transform: translateY(-140px) scale(0.6); } 
+        }
+
+        /* Webview Overlay */
+        .webview-fullscreen-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: #0f172a; z-index: 99999; display: none; flex-direction: column; 
+        }
+        .webview-fullscreen-overlay.show { display: flex; }
+        .webview-header { 
+            background: #1e293b; padding: 12px 16px; 
+            display: flex; justify-content: space-between; align-items: center; 
+        }
+        .webview-header .webview-title { color: #fff; font-weight: 700; }
+        .webview-header .webview-timer { 
+            color: #fbbf24; font-weight: bold; background: rgba(0,0,0,0.5); 
+            padding: 4px 12px; border-radius: 20px; 
+        }
+        .webview-iframe-container { flex-grow: 1; display: flex; }
+        .webview-iframe-container iframe { width: 100%; height: 100%; border: none; }
+        .webview-footer { 
+            background: #1e293b; padding: 12px 16px; 
+            display: flex; justify-content: center; 
+        }
+        .webview-footer button { 
+            background: #64748b; color: #fff; padding: 12px 24px; 
+            border: none; border-radius: 12px; width: 100%; font-weight: 700; 
+        }
+        .webview-footer button.active-btn { background: #10b981; cursor: pointer; }
+
+        /* Airdrop Overlay */
+        .overlay { 
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+            background: rgba(0,0,0,0.95); z-index: 9998; display: none; 
+            overflow-y: auto; padding-bottom: 70px; 
+        }
         .overlay.show { display: block; }
-        .overlay-header { background: rgba(15,23,42,0.9); backdrop-filter: blur(8px); padding: 12px 16px; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
-        .overlay-header .back-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 6px 14px; border-radius: 10px; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 6px; transition: background 0.2s; }
-        .overlay-header .back-btn:hover { background: rgba(255,255,255,0.2); }
-        .overlay-header h2 { font-size: 18px; flex: 1; text-align: center; margin-right: 40px; color: #fff; }
+        .overlay-header { 
+            background: rgba(15,23,42,0.9); padding: 12px 16px; 
+            position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 10px; 
+        }
+        .overlay-header .back-btn { 
+            background: rgba(255,255,255,0.1); border: none; color: #fff; 
+            padding: 6px 14px; border-radius: 10px; cursor: pointer; 
+        }
         .overlay-content { padding: 14px; }
 
-        /* ===== LEVEL OVERLAY (New 5-Tier System, Auto XP Math) ===== */
-        .current-level-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 16px; padding: 16px; margin-bottom: 14px; border: 1px solid rgba(255,255,255,0.08); text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-        .current-level-card .level-emoji { font-size: 40px; }
-        .current-level-card .level-number { font-size: 24px; font-weight: 900; color: #fbbf24; }
-        .current-level-card .level-title { font-size: 15px; color: #94a3b8; }
-        .current-level-card .level-points { font-size: 12px; color: #94a3b8; margin-top: 4px; }
-        .current-level-card .level-progress { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 6px; margin-top: 10px; overflow: hidden; }
-        .current-level-card .level-progress .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 6px; }
-        .current-level-card .level-progress-text { display: flex; justify-content: space-between; font-size: 10px; color: #94a3b8; margin-top: 4px; }
-        
-        .reward-section { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.08); }
-        .reward-section .reward-title { font-weight: bold; font-size: 14px; margin-bottom: 8px; color: #fbbf24; }
-        .reward-item { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .reward-item:last-child { border-bottom: none; }
-        .reward-item .value { font-weight: 600; color: #fbbf24; }
-
-        /* Level Filter Tabs with specific emojis */
-        .filter-tabs { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 4px; }
-        .filter-tabs .tab { padding: 4px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #94a3b8; cursor: pointer; font-size: 11px; white-space: nowrap; transition: all 0.2s; }
-        .filter-tabs .tab.active { background: linear-gradient(135deg, #8b5cf6, #3b82f6); border-color: transparent; color: #fff; box-shadow: 0 4px 16px rgba(139,92,246,0.2); }
-        .filter-tabs .tab:hover:not(.active) { background: rgba(255,255,255,0.05); }
-
-        .level-list-title { font-size: 16px; font-weight: 700; margin: 12px 0; display: flex; align-items: center; gap: 8px; color: #fff; }
-        .level-item { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 12px; padding: 10px 14px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(255,255,255,0.08); transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-        .level-item.active { border-color: #fbbf24; background: rgba(251,191,36,0.05); box-shadow: 0 0 20px rgba(251,191,36,0.05); }
-        .level-item.locked { opacity: 0.4; }
-        .level-item .level-info { display: flex; align-items: center; gap: 10px; }
-        .level-item .level-info .num { font-size: 13px; font-weight: bold; color: #94a3b8; min-width: 24px; }
-        .level-item .level-info .name { font-size: 13px; color: #fff; }
-        .level-item .level-info .emoji { font-size: 18px; }
-        .level-item .level-info .badge { font-size: 9px; padding: 2px 8px; border-radius: 20px; background: rgba(251,191,36,0.1); color: #fbbf24; }
-        .level-item .level-reward { font-size: 12px; color: #10b981; }
-        .level-item .level-check { color: #10b981; font-size: 16px; }
-
-        /* ===== FULL SCREEN WEBVIEW ===== */
-        .webview-fullscreen-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; z-index: 99999; display: none; flex-direction: column; }
-        .webview-fullscreen-overlay.show { display: flex; }
-        .webview-header { background: #1e293b; padding: 12px 16px; border-bottom: 2px solid #334155; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
-        .webview-header .webview-title { color: #fff; font-weight: 700; font-size: 16px; }
-        .webview-header .webview-timer { color: #fbbf24; font-weight: bold; font-size: 16px; background: rgba(0,0,0,0.5); padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(251,191,36,0.2); }
-        .webview-iframe-container { flex-grow: 1; width: 100%; height: 100%; border: none; margin: 0; padding: 0; display: flex; }
-        .webview-iframe-container iframe { width: 100%; height: 100%; border: none; background: #fff; }
-        .webview-footer { background: #1e293b; padding: 12px 16px; border-top: 2px solid #334155; flex-shrink: 0; display: flex; justify-content: center; }
-        .webview-footer button { background: #64748b; color: #fff; padding: 12px 24px; border: none; border-radius: 12px; width: 100%; font-weight: 700; font-size: 16px; cursor: not-allowed; transition: 0.2s; }
-        .webview-footer button.active-btn { background: #10b981; cursor: pointer; box-shadow: 0 4px 12px rgba(16,185,129,0.2); }
-        .webview-footer button.active-btn:hover { transform: scale(1.02); }
-
-        /* ===== AIRDROP OVERLAY ===== */
-        .airdrop-overlay .airdrop-grid { display: grid; grid-template-columns: 1fr; gap: 10px; padding: 8px 0; }
-        .airdrop-overlay .info-box { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 16px; padding: 16px; border: 1px solid rgba(255,255,255,0.08); text-align: center; }
-        .airdrop-overlay .info-box .big-number { font-size: 36px; font-weight: 900; color: #fbbf24; }
-        .airdrop-overlay .info-box .label { color: #94a3b8; font-size: 13px; margin-top: 4px; }
-        .airdrop-overlay .countdown-area { display: flex; flex-direction: column; align-items: center; margin: 15px 0; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); }
-        .airdrop-overlay .countdown-area .countdown-timer { font-size: 32px; font-weight: bold; color: #fbbf24; letter-spacing: 2px; font-variant-numeric: tabular-nums; }
-        .airdrop-overlay .countdown-area .countdown-label { font-size: 12px; color: #94a3b8; margin-bottom: 4px; }
-        .airdrop-overlay .claim-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; padding: 12px 24px; border: none; border-radius: 30px; font-weight: 700; font-size: 16px; cursor: pointer; margin-top: 15px; width: 100%; box-shadow: 0 4px 20px rgba(245,158,11,0.3); transition: all 0.2s; }
-        .airdrop-overlay .claim-btn:hover:not(:disabled) { transform: scale(1.02); box-shadow: 0 6px 30px rgba(245,158,11,0.4); }
-        .airdrop-overlay .claim-btn:disabled { background: #64748b; cursor: not-allowed; box-shadow: none; }
-        .airdrop-overlay .status-box { font-size: 14px; margin-top: 10px; padding: 8px; border-radius: 8px; font-weight: bold; color: #fff; }
-        .airdrop-overlay .status-box.live { background: rgba(16,185,129,0.1); color: #10b981; border: 1px solid rgba(16,185,129,0.1); }
-        .airdrop-overlay .status-box.ended { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.1); }
-        .airdrop-list { background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); border-radius: 12px; padding: 12px; margin-top: 12px; border: 1px solid rgba(255,255,255,0.08); max-height: 300px; overflow-y: auto; }
-        .airdrop-list .list-title { font-size: 12px; color: #94a3b8; margin-bottom: 8px; text-align: center; }
-        .airdrop-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px; }
-        .airdrop-item:last-child { border-bottom: none; }
-        .airdrop-item .name { color: #fff; font-weight: 500; }
-        .airdrop-item .time { color: #94a3b8; font-size: 10px; }
-        .airdrop-item.winner { background: rgba(251,191,36,0.1); border-left: 3px solid #fbbf24; padding-left: 8px; border-radius: 4px; }
-
-        /* ===== SPECIAL OFFER PAGE ===== */
-        .special-offer-card { background: linear-gradient(135deg, rgba(251,191,36,0.1), rgba(245,158,11,0.05)); backdrop-filter: blur(8px); border-radius: 24px; padding: 24px; border: 2px solid rgba(251,191,36,0.3); text-align: center; margin-top: 10px; box-shadow: 0 10px 40px rgba(251,191,36,0.1); }
-        .special-offer-card .offer-title { font-size: 28px; font-weight: 900; color: #fbbf24; margin-bottom: 10px; }
-        .special-offer-card .offer-desc { font-size: 16px; color: #e2e8f0; margin-bottom: 20px; line-height: 1.5; }
-        .special-offer-card .offer-reward { font-size: 22px; font-weight: bold; color: #10b981; background: rgba(16,185,129,0.1); padding: 10px; border-radius: 12px; display: inline-block; margin-bottom: 20px; border: 1px solid rgba(16,185,129,0.2); }
-        .special-offer-card .offer-claim-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; padding: 14px 40px; border: none; border-radius: 30px; font-weight: 700; font-size: 18px; cursor: pointer; box-shadow: 0 4px 20px rgba(245,158,11,0.3); transition: all 0.2s; }
-        .special-offer-card .offer-claim-btn:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 6px 30px rgba(245,158,11,0.4); }
-        .special-offer-card .offer-claim-btn:disabled { background: #64748b; cursor: not-allowed; box-shadow: none; }
-        .special-offer-card .offer-empty { color: #94a3b8; font-size: 16px; padding: 20px 0; }
-
-        /* ===== OFFLINE/BANNED OVERLAY ===== */
-        .offline-overlay, .banned-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 99999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; }
-        .offline-overlay.show, .banned-overlay.show { display: flex; }
-        .offline-overlay h1, .banned-overlay h1 { color: #ef4444; font-size: 26px; margin-bottom: 10px; }
-        .offline-overlay p, .banned-overlay p { color: #94a3b8; max-width: 380px; line-height: 1.6; }
-        .banned-overlay .ban-reason { background: rgba(255,255,255,0.05); padding: 14px; border-radius: 12px; margin-top: 12px; max-width: 380px; color: #fbbf24; border: 1px solid rgba(239,68,68,0.15); }
-
         .hidden { display: none !important; }
-        .loading { text-align: center; padding: 24px; color: #94a3b8; }
-        .loading-spinner { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #3b82f6; border-radius: 50%; width: 32px; height: 32px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
     </style>
 </head>
 <body>
 
-    <div class="offline-overlay" id="offlineOverlay">
-        <h1>⚠️ No Internet Connection</h1>
-        <p>Please check your network connection. The app will resume automatically once you are back online.</p>
-    </div>
-    <div class="banned-overlay" id="bannedOverlay">
-        <h1>🚫 Account Banned</h1>
-        <p>Your account has been suspended by the administrator.</p>
-        <div class="ban-reason" id="banReason">Reason: Violation of terms</div>
-        <p style="margin-top:12px;font-size:12px;color:#64748b;">Contact support if you think this is a mistake.</p>
-    </div>
-
-    <!-- LEVEL OVERLAY -->
-    <div class="overlay" id="levelOverlay">
-        <div class="overlay-header">
-            <button class="back-btn" onclick="closeLevelPage()"><i class="fas fa-arrow-left"></i> Back</button>
-            <h2>🏆 Level System</h2>
-        </div>
-        <div class="overlay-content">
-            <div class="current-level-card">
-                <div class="level-emoji" id="levelCurrentEmoji">🔒</div>
-                <div class="level-number" id="levelCurrentNumber">Level 0</div>
-                <div class="level-title" id="levelCurrentTitle">Unlocking...</div>
-                <div class="level-points" id="levelCurrentPointsText">-1000 / 0 XP</div>
-                <div class="level-progress"><div class="fill" id="levelProgressFill2" style="width:0%;"></div></div>
-                <div class="level-progress-text"><span id="levelProgressText2">0%</span><span id="levelNextInfo">Collect XP to unlock!</span></div>
-            </div>
-            <div class="reward-section">
-                <div class="reward-title">🎁 Current Level Rewards</div>
-                <div class="reward-item"><span>🪙 Bonus Earnings</span><span class="value" id="levelBonusPercent">+0%</span></div>
-                <div class="reward-item"><span>📋 Exclusive Tasks</span><span class="value" id="levelExclusiveTasks">🔒 Locked</span></div>
-                <div class="reward-item"><span>🎯 Daily Bonus</span><span class="value" id="levelDailyBonus">+10 Coins</span></div>
-            </div>
-            <div class="filter-tabs">
-                <button class="tab active" data-filter="all" onclick="filterLevels('all',this)">📋 All</button>
-                <button class="tab" data-filter="bronze" onclick="filterLevels('bronze',this)">🥉 Bronze</button>
-                <button class="tab" data-filter="silver" onclick="filterLevels('silver',this)">🥈 Silver</button>
-                <button class="tab" data-filter="gold" onclick="filterLevels('gold',this)">🥇 Gold</button>
-                <button class="tab" data-filter="platinum" onclick="filterLevels('platinum',this)">💎 Platinum</button>
-                <button class="tab" data-filter="diamond" onclick="filterLevels('diamond',this)">👑 Diamond</button>
-            </div>
-            <div class="level-list-title">📊 All Levels <span>100 Levels</span></div>
-            <div class="level-list" id="levelList"><div class="loading"><div class="loading-spinner"></div><p>Loading...</p></div></div>
-        </div>
-    </div>
-
-    <!-- AIRDROP OVERLAY -->
-    <div class="overlay airdrop-overlay" id="airdropOverlay">
-        <div class="overlay-header">
-            <button class="back-btn" onclick="closeAirdropPage()"><i class="fas fa-arrow-left"></i> Back</button>
-            <h2>📢 Live AirDrop</h2>
-        </div>
-        <div class="overlay-content">
-            <div class="airdrop-grid">
-                <div class="info-box">
-                    <div class="live-users"><span class="dot"></span> <span id="onlineUsersDisplay">0</span> Users Online</div>
-                    <div class="big-number" id="airdropPoolDisplay">$0.00</div>
-                    <div class="label">Current Reward Pool</div>
-                    <div class="countdown-area">
-                        <div class="countdown-label" id="countdownLabel">Drop Timer</div>
-                        <div class="countdown-timer" id="airdropCountdown">--:--:--</div>
-                    </div>
-                    <div class="status-box" id="airdropStatusBox">⏳ Waiting for next round...</div>
-                    <button class="claim-btn" id="airdropClaimBtn" onclick="claimAirdrop()" disabled>🎁 Claim Your Share</button>
-                </div>
-                <div class="airdrop-list">
-                    <div class="list-title">🏆 Winner List</div>
-                    <div id="airdropListContainer"><p style="color:#94a3b8;font-size:13px;text-align:center;padding:10px;">Waiting for the first claim...</p></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- FULL SCREEN WEBVIEW -->
-    <div class="webview-fullscreen-overlay" id="webviewFullscreenOverlay">
-        <div class="webview-header">
-            <div class="webview-title">🔗 Loading Page...</div>
-            <div class="webview-timer" id="webviewFullTimer">30s</div>
-        </div>
-        <div class="webview-iframe-container">
-            <iframe id="webviewFullIframe" src="about:blank"></iframe>
-        </div>
-        <div class="webview-footer">
-            <button id="webviewFullClaimBtn" onclick="closeFullWebview()" disabled>
-                ⏳ Wait 30s to Claim Reward
-            </button>
-        </div>
-    </div>
-
-    <!-- ===== MAIN CONTENT ===== -->
+    <!-- Main Container -->
     <div class="container main-content" id="mainContent">
         
-        <!-- ===== HEADER ===== -->
+        <!-- Header -->
         <div class="header">
             <div class="user-info">
                 <div class="avatar" onclick="openLevelPage()">👤</div>
@@ -459,9 +401,9 @@
                 <div class="balance-label">💰 Coins Balance</div>
                 <div class="balance-amount" id="balance">0</div>
                 <div class="usd-value" id="usdValue">≈ $0.00 USD</div>
-                <div class="total-usd-earned" id="totalUsdEarned">💵 Total USD Earned: $0.00</div>
+                <div class="total-usd-earned" id="totalUsdEarned" style="font-size:10px;color:#94a3b8;margin-top:2px;">💵 Total USD Earned: $0.00</div>
                 
-                <!-- HOME PAGE LEVEL SECTION -->
+                <!-- Level Section -->
                 <div class="level-section" onclick="openLevelPage()">
                     <div class="level-row">
                         <span class="level-title" id="levelTitle">🔒 Unlocking</span>
@@ -471,7 +413,7 @@
                     <div class="level-progress">
                         <div class="fill" id="levelProgressFill" style="width: 0%;"></div>
                     </div>
-                    <div class="level-points">
+                    <div class="level-points" style="font-size:9px;color:#94a3b8;display:flex;justify-content:space-between;">
                         <span id="levelCurrentPoints">-1000</span>
                         <span id="levelNextPoints">/ 0</span>
                     </div>
@@ -480,29 +422,24 @@
                 <div class="conversion-timer">
                     <div class="label">⏰ Next Auto Conversion</div>
                     <div class="time" id="conversionCountdown">--:--:--</div>
-                    <div class="rate-info" id="rateInfo">Rate: 1 USD = 1000 Coins</div>
+                    <div class="rate-info" id="rateInfo" style="font-size:9px;color:#94a3b8;">Rate: 1 USD = 1000 Coins</div>
                 </div>
             </div>
         </div>
 
-        <!-- ===== HOME PAGE NEW CARDS (Stats Removed, 3 New Cards) ===== -->
+        <!-- Home Cards -->
         <div class="home-card-grid">
-            
-            <!-- 1. Live AirDrop Card (Big Card like Special Offer) -->
             <div class="home-card card-airdrop" onclick="openAirdropPage()">
                 <div class="card-left">
                     <span class="card-icon">📢</span>
                     <div>
                         <div class="card-title">Live AirDrop</div>
                         <div class="card-desc">Be the first to claim free crypto!</div>
-                        <div class="live-users"><span class="dot"></span> <span id="onlineUsersHome">0</span> Users Online</div>
                     </div>
                 </div>
                 <div class="card-arrow">➜</div>
             </div>
-
-            <!-- 2. Special Offer Card -->
-            <div class="home-card card-special" onclick="openSpecialOfferPage()">
+            <div class="home-card card-special" onclick="switchPage('specialOffer')">
                 <div class="card-left">
                     <span class="card-icon">🎁</span>
                     <div>
@@ -512,91 +449,47 @@
                 </div>
                 <div class="card-arrow">➜</div>
             </div>
-            
         </div>
 
-        <!-- ===== PAGE: HOME (CIRCULAR MINING) ===== -->
+        <!-- Pages -->
         <div class="page active" id="pageHome">
-            <div class="tap-section-enhanced">
-                <div class="mining-circle-wrapper">
-                    <div class="mining-circle" id="miningCircle">
-                        <div class="inner-circle">
-                            <span class="coin-icon">🪙</span>
-                            <span class="coin-count" id="progressCoinCount">1000</span>
-                            <div class="circle-status" id="progressStatus">Ready to start!</div>
-                        </div>
+            <div class="mining-circle-wrapper">
+                <div class="mining-circle" id="miningCircle">
+                    <div class="inner-circle">
+                        <span class="coin-icon">🪙</span>
+                        <span class="coin-count" id="progressCoinCount">1000</span>
+                        <div class="circle-status" id="progressStatus">Ready to start!</div>
                     </div>
                 </div>
-                
-                <button class="circle-start-btn" id="progressStartBtn" onclick="startProgress()">▶ START</button>
-                <button class="circle-watch-btn hidden" id="progressWatchBtn" onclick="startVideoProgress()">📺 Watch Ads to Refill (0/5)</button>
-                <div class="progress-percent" id="progressPercent" style="margin-top:8px; font-weight:bold; color:#fbbf24;">100%</div>
-                
-                <div class="speed-btn-container">
-                    <button class="speed-boost-btn" id="speedBoostBtn" onclick="activateSpeedBoost()">
-                        <i class="fas fa-rocket"></i> Speed Boost <span class="boost-timer" id="boostTimer"></span>
-                    </button>
-                    <div class="boost-cooldown-text" id="boostCooldownText">⏳ Wait <span id="boostCountdownDisplay">00:00</span> to reuse</div>
-                </div>
+            </div>
+            <button class="circle-start-btn" id="progressStartBtn" onclick="startProgress()">▶ START</button>
+            <button class="circle-watch-btn hidden" id="progressWatchBtn" onclick="startVideoProgress()">📺 Watch Ads to Refill (0/5)</button>
+            
+            <div class="speed-btn-container">
+                <button class="speed-boost-btn" id="speedBoostBtn" onclick="activateSpeedBoost()">
+                    <i class="fas fa-rocket"></i> Speed Boost
+                </button>
+                <div class="boost-cooldown-text" id="boostCooldownText">⏳ Wait 00:00 to reuse</div>
             </div>
         </div>
 
-        <!-- ===== PAGE: SPECIAL OFFER ===== -->
-        <div class="page" id="pageSpecialOffer">
-            <h2 class="page-header">🎁 User Special Offer</h2>
-            <div class="page-intro-box">
-                <h4>How it works?</h4>
-                <p>Admins send exclusive offers to specific users. If you have an active offer, claim it immediately to get free bonus coins!</p>
-            </div>
-            <div class="special-offer-card">
-                <div id="specialOfferContent">
-                    <div class="offer-empty">⏳ Checking for your exclusive offer...</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ===== PAGE: EARN ===== -->
-        <div class="page" id="pageEarn">
-            <h2 class="page-header">📺 Earn Coins</h2>
-            <div class="page-intro-box">
-                <h4>How it works?</h4>
-                <p>Watch short videos to earn coins. You can earn up to <strong>5 videos per day</strong> for <strong>+10 Coins each</strong>! Keep watching to fill your mining progress.</p>
-            </div>
-            <div class="video-card">
-                <div class="video-title">Watch Video & Earn</div>
-                <div class="video-desc">Watch short videos to earn coins!</div>
-                <div class="video-reward" id="videoReward">+10 Coins per video</div>
-                <div class="video-limit" id="videoLimit">Today: 0 / 5 videos</div>
-                <button class="video-btn" id="videoBtn" onclick="watchVideo()">▶ Watch Video</button>
-                <div class="video-watched" id="videoWatched"></div>
-            </div>
-        </div>
-
-        <!-- ===== PAGE: TASKS ===== -->
         <div class="page" id="pageTasks">
             <h2 class="page-header">📋 Tasks</h2>
             <div class="task-filters">
-                <button class="filter-btn active" data-filter="all" onclick="filterTasks('all', this)">📋 All</button>
-                <button class="filter-btn" data-filter="link" onclick="filterTasks('link', this)">🔗 Link</button>
-                <button class="filter-btn" data-filter="button" onclick="filterTasks('button', this)">🟦 Button</button>
-                <button class="filter-btn" data-filter="video" onclick="filterTasks('video', this)">📺 Video</button>
+                <button class="filter-btn active" onclick="filterTasks('all', this)">📋 All</button>
+                <button class="filter-btn" onclick="filterTasks('link', this)">🔗 Link</button>
+                <button class="filter-btn" onclick="filterTasks('button', this)">🟦 Button</button>
+                <button class="filter-btn" onclick="filterTasks('video', this)">📺 Video</button>
             </div>
-            <div class="tasks-section" id="tasksContainer">
-                <div class="no-tasks">No tasks available. Check back later!</div>
-            </div>
+            <div id="tasksContainer"><p style="color:#94a3b8;">No tasks available.</p></div>
         </div>
 
-        <!-- ===== PAGE: REFER ===== -->
         <div class="page" id="pageRefer">
             <h2 class="page-header">👥 Refer & Earn</h2>
-            <div class="page-intro-box">
-                <h4>How it works?</h4>
-                <p>Invite your friends to CoinQuest using your referral link! You will earn <strong>+50 Coins</strong> per referral. Reach referral milestones to unlock <strong>massive Tier Bonuses</strong> (up to 1000 Coins)!</p>
-            </div>
             <div class="refer-link-box">
                 <p style="font-size:13px;color:#94a3b8;">Your Referral Link</p>
                 <div class="link" id="referLinkHome">Loading...</div>
-                <button class="copy-btn" onclick="copyReferLinkHome()"><i class="fas fa-copy"></i> Copy Link</button>
+                <button class="copy-btn" onclick="copyReferLink()"><i class="fas fa-copy"></i> Copy Link</button>
             </div>
             
             <div class="refer-code-input-box">
@@ -606,108 +499,134 @@
             </div>
 
             <div class="refer-stats">
-                <div class="stat"><div class="number" id="referTotalHome">0</div><div class="label">Total Referrals</div></div>
-                <div class="stat"><div class="number" id="referEarnedHome">0</div><div class="label">Coins Earned</div></div>
-                <div class="stat"><div class="number" id="referBonusHome">0</div><div class="label">Bonus Ready</div></div>
-            </div>
-
-            <div class="refer-progress">
-                <p style="font-size:13px;color:#94a3b8;">📊 Referral Progress</p>
-                <div class="progress-bar"><div class="fill" id="referProgressFillHome" style="width:0%;"></div></div>
-                <div class="progress-text"><span id="referProgressTextHome">0 / 10</span><span>Next Bonus: 10 Referrals</span></div>
+                <div class="stat"><div class="number" id="referTotal">0</div><div class="label">Total Referrals</div></div>
+                <div class="stat"><div class="number" id="referEarned">0</div><div class="label">Coins Earned</div></div>
+                <div class="stat"><div class="number" id="referBonus">0</div><div class="label">Bonus Ready</div></div>
             </div>
 
             <div style="margin-top:12px;">
                 <h4 style="font-size:14px;margin-bottom:8px;">🎁 Tier Bonuses</h4>
-                <div id="referTierListHome"></div>
-            </div>
-
-            <div class="referral-list-box">
-                <div class="list-title">📋 Referral History</div>
-                <div id="referralListHome"><p style="color:#94a3b8;font-size:13px;text-align:center;padding:10px;">No referrals yet</p></div>
+                <div id="referTierList"></div>
             </div>
         </div>
 
-        <!-- ===== PAGE: WALLET ===== -->
         <div class="page" id="pageWallet">
             <h2 class="page-header">💰 Wallet</h2>
-            <div class="page-intro-box">
-                <h4>How it works?</h4>
-                <p>Your coins will automatically convert to USD every 24 hours. Withdraw your balance via <strong>Nagad</strong> or <strong>Rocket</strong> (min $10.00 USD).</p>
-            </div>
             <div class="wallet-card">
                 <p style="color:#94a3b8;font-size:13px;">Coins Balance</p>
                 <div class="wallet-balance" id="walletBalance">0</div>
                 <div class="wallet-usd" id="walletUsd">≈ $0.00 USD</div>
                 
-                <div class="wallet-total">
-                    <div class="label">💵 Total USD Earned</div>
-                    <div class="value" id="walletTotalUsd">$0.00</div>
+                <div style="background:rgba(16,185,129,0.1);border-radius:10px;padding:8px;margin-top:12px;">
+                    <div style="font-size:11px;color:#94a3b8;">💵 Total USD Earned</div>
+                    <div style="font-size:16px;font-weight:bold;color:#10b981;" id="walletTotalUsd">$0.00</div>
                 </div>
                 
-                <div class="wallet-conversion">
-                    <div class="label">⏰ Next Auto Conversion</div>
-                    <div class="value" id="walletNextConversion">--:--:--</div>
+                <div style="background:rgba(59,130,246,0.1);border-radius:10px;padding:8px;margin-top:10px;">
+                    <div style="font-size:10px;color:#94a3b8;">⏰ Next Conversion</div>
+                    <div style="font-size:13px;color:#3b82f6;font-weight:bold;" id="walletNextConversion">--:--:--</div>
                 </div>
                 
+                <!-- Withdraw Section - Always visible -->
                 <div class="withdraw-section">
-                    <p style="font-size:12px;font-weight:bold;color:#fbbf24;" id="withdrawInfo">Min: $10.00 USD</p>
+                    <p style="font-size:12px;font-weight:bold;color:#fbbf24;margin-bottom:8px;" id="withdrawInfo">Min: $10.00 USD</p>
                     <div class="form-group">
-                        <label>Select Withdraw Method</label>
+                        <label>Select Method</label>
                         <select id="withdrawMethod">
                             <option value="Nagad">Nagad</option>
                             <option value="Rocket">Rocket</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Account / Mobile Number</label>
+                        <label>Account Number</label>
                         <input type="text" id="withdrawAccount" placeholder="Enter your number...">
                     </div>
-                    <p style="font-size:11px;color:#94a3b8; margin-bottom:8px;" id="withdrawStatus">You have: $0.00 USD</p>
+                    <p style="font-size:11px;color:#94a3b8;margin-bottom:8px;" id="withdrawStatus">You have: $0.00 USD</p>
                     <button class="withdraw-btn" id="withdrawBtn" onclick="withdraw()">Withdraw Now</button>
                 </div>
-                
-                <div class="withdraw-history">
-                    <div class="title">📜 Withdraw History</div>
-                    <div id="withdrawHistory" style="font-size:11px;color:#94a3b8;"></div>
+            </div>
+        </div>
+
+        <div class="page" id="pageSpecialOffer">
+            <h2 class="page-header">🎁 Special Offer</h2>
+            <div style="background:linear-gradient(135deg,rgba(251,191,36,0.1),rgba(245,158,11,0.05));border-radius:24px;padding:24px;border:2px solid rgba(251,191,36,0.3);text-align:center;">
+                <div id="specialOfferContent">
+                    <p style="color:#94a3b8;">⏳ Checking for your exclusive offer...</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ===== BOTTOM NAV (UPDATED: Removed Earn, added Tasks) ===== -->
+    <!-- Bottom Nav -->
     <div class="bottom-nav">
-        <div class="nav-item active" onclick="switchPage('home', event)"><i class="fas fa-home"></i><span>Home</span></div>
-        <div class="nav-item" onclick="switchPage('tasks', event)"><i class="fas fa-tasks"></i><span>Tasks</span></div>
-        <div class="nav-item" onclick="switchPage('refer', event)"><i class="fas fa-users"></i><span>Refer</span></div>
-        <div class="nav-item" onclick="switchPage('wallet', event)"><i class="fas fa-wallet"></i><span>Wallet</span></div>
+        <div class="nav-item active" onclick="switchPage('home', this)"><i class="fas fa-home"></i><span>Home</span></div>
+        <div class="nav-item" onclick="switchPage('tasks', this)"><i class="fas fa-tasks"></i><span>Tasks</span></div>
+        <div class="nav-item" onclick="switchPage('refer', this)"><i class="fas fa-users"></i><span>Refer</span></div>
+        <div class="nav-item" onclick="switchPage('wallet', this)"><i class="fas fa-wallet"></i><span>Wallet</span></div>
     </div>
 
-    <!-- ===== MODALS ===== -->
-    <div class="modal" id="successModal"><div class="modal-content"><div class="success-animation">🎉</div><h3>Task Completed!</h3><p id="rewardText">+50 Coins</p><button onclick="closeModal('successModal')">Awesome!</button></div></div>
-    <div class="modal" id="conversionModal"><div class="modal-content"><div class="success-animation">💰</div><h3>Coins Converted!</h3><p id="conversionText">Coins → USD</p><button onclick="closeModal('conversionModal')">Awesome!</button></div></div>
-    <div class="modal" id="airdropModal"><div class="modal-content"><div class="success-animation">💰</div><h3>AirDrop Claimed!</h3><p id="airdropRewardText">You won +$0.00!</p><button onclick="closeModal('airdropModal')">Awesome!</button></div></div>
-    <div class="modal" id="withdrawModal"><div class="modal-content"><div class="success-animation">💳</div><h3 id="withdrawModalTitle">Withdrawal</h3><p id="withdrawModalText">Processing...</p><button onclick="closeModal('withdrawModal')">OK</button></div></div>
-    <div class="modal" id="videoModal"><div class="modal-content"><div class="success-animation">📺</div><h3>Video Watched!</h3><p id="videoRewardText">You earned +10 Coins</p><button onclick="closeModal('videoModal')">Awesome!</button></div></div>
+    <!-- Modals -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <div class="success-animation">🎉</div>
+            <h3>Task Completed!</h3>
+            <p id="rewardText">+50 Coins</p>
+            <button onclick="closeModal('successModal')">Awesome!</button>
+        </div>
+    </div>
+    <div class="modal" id="conversionModal">
+        <div class="modal-content">
+            <div class="success-animation">💰</div>
+            <h3>Coins Converted!</h3>
+            <p id="conversionText">Coins → USD</p>
+            <button onclick="closeModal('conversionModal')">Awesome!</button>
+        </div>
+    </div>
+    <div class="modal" id="withdrawModal">
+        <div class="modal-content">
+            <div class="success-animation">💳</div>
+            <h3 id="withdrawModalTitle">Withdrawal</h3>
+            <p id="withdrawModalText">Processing...</p>
+            <button onclick="closeModal('withdrawModal')">OK</button>
+        </div>
+    </div>
+
+    <!-- Airdrop Overlay -->
+    <div class="overlay" id="airdropOverlay">
+        <div class="overlay-header">
+            <button class="back-btn" onclick="closeAirdropPage()"><i class="fas fa-arrow-left"></i> Back</button>
+            <h2>📢 Live AirDrop</h2>
+        </div>
+        <div class="overlay-content">
+            <div style="background:rgba(255,255,255,0.03);border-radius:16px;padding:16px;text-align:center;margin-bottom:12px;">
+                <div style="font-size:36px;font-weight:900;color:#fbbf24;" id="airdropPoolDisplay">$0.00</div>
+                <div style="color:#94a3b8;font-size:13px;">Current Reward Pool</div>
+                <div style="margin:15px 0;">
+                    <div style="font-size:32px;font-weight:bold;color:#fbbf24;" id="airdropCountdown">--:--:--</div>
+                </div>
+                <button style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:12px 24px;border:none;border-radius:30px;font-weight:700;font-size:16px;cursor:pointer;width:100%;" id="airdropClaimBtn" onclick="claimAirdrop()" disabled>🎁 Claim Your Share</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Webview Overlay -->
+    <div class="webview-fullscreen-overlay" id="webviewFullscreenOverlay">
+        <div class="webview-header">
+            <div class="webview-title">🔗 Loading...</div>
+            <div class="webview-timer" id="webviewFullTimer">30s</div>
+        </div>
+        <div class="webview-iframe-container">
+            <iframe id="webviewFullIframe" src="about:blank"></iframe>
+        </div>
+        <div class="webview-footer">
+            <button id="webviewFullClaimBtn" onclick="closeFullWebview()" disabled>⏳ Wait 30s</button>
+        </div>
+    </div>
 
     <div class="toast" id="toast"></div>
-    <div class="speed-spinner-overlay" id="speedSpinnerOverlay">
-        <div class="speed-spinner"></div>
-        <div class="speed-spinner-text">⏳ Speed Boost Active!</div>
-        <div class="speed-spinner-timer" id="speedTimerDisplay">3s</div>
-        <div class="speed-spinner-progress"><div class="fill" id="speedProgressFill" style="width: 0%;"></div></div>
-    </div>
 
     <script>
-        // ==================== MONETAG ====================
-        function showRewardedAd(callback) {
-            show_11197472().then(() => { if (callback) callback(); }).catch(() => { if (callback) callback(); });
-        }
-        function showRewardedPopup(callback) {
-            show_11197472('pop').then(() => { if (callback) callback(); }).catch(() => { if (callback) callback(); });
-        }
-
-        // ==================== FIREBASE ====================
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyAqCNHhu9oaBDea85tAH-iHucHczZnR7nY",
             authDomain: "tolaka-exc-reverb-b1afd.firebaseapp.com",
@@ -719,140 +638,106 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        
         let tg = window.Telegram.WebApp;
         tg.expand();
         let userId = 'default_user';
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) { userId = tg.initDataUnsafe.user.id.toString(); }
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            userId = tg.initDataUnsafe.user.id.toString();
+        }
 
-        // ==================== STATE ====================
+        // App State
         let appState = {
-            balance: 0, usdBalance: 0, completedTasks: 0, referralCount: 0,
-            dailyStreak: 0, userLevel: 0, tasksCompleted: [],
-            lastConversion: null, conversionRate: 1000, minWithdraw: 10,
-            isBanned: false, banReason: '', withdrawHistory: [],
-            lastLogin: null, referCode: '', referEarned: 0, referTiers: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
-            videoWatchedToday: 0, videoLastWatchDate: null, videoReward: 10, videoDailyLimit: 5, videoRefillThreshold: 5,
-            referrals: [], weekStart: null, progressCoins: 1000, videoWatchedCount: 0,
-            isSpeedBoostActive: false, speedBoostCooldown: 0, taskLastCompleted: {},
-            airdropClaimed: false, airdropAmount: 0,
-            webviewTimerId: null, webviewReward: 0, webviewTaskId: null,
-            xpPoints: -1000, withdrawMethods: ['Nagad', 'Rocket']
+            balance: 0,
+            usdBalance: 0,
+            completedTasks: 0,
+            referralCount: 0,
+            userLevel: 0,
+            tasksCompleted: [],
+            lastConversion: null,
+            conversionRate: 1000,
+            minWithdraw: 10,
+            isBanned: false,
+            banReason: '',
+            withdrawHistory: [],
+            lastLogin: null,
+            referCode: '',
+            referEarned: 0,
+            referTiers: {},
+            referrals: [],
+            progressCoins: 1000,
+            videoWatchedCount: 0,
+            isSpeedBoostActive: false,
+            speedBoostCooldown: 0,
+            taskLastCompleted: {},
+            airdropClaimed: false,
+            xpPoints: -1000,
+            withdrawMethods: ['Nagad', 'Rocket'],
+            videoWatchedToday: 0,
+            videoLastWatchDate: null,
+            videoReward: 10,
+            videoDailyLimit: 5
         };
 
-        let tasks = [], levelConfig = {}, referralConfig = {};
-        let conversionTimerInterval = null, progressInterval = null, speedBoostInterval = null;
-        let currentFilter = 'all', currentLevelFilter = 'all';
+        let tasks = [];
+        let conversionTimerInterval = null;
+        let progressInterval = null;
+        let currentFilter = 'all';
+
+        const userRef = db.ref('users/' + userId);
         const TOTAL_COINS = 1000;
         const NEGATIVE_XP_START = -1000;
 
-        const userRef = db.ref('users/' + userId);
-        const tasksRef = db.ref('tasks');
-        const rateRef = db.ref('conversionRate');
-        const withdrawRef = db.ref('withdrawSettings');
-        const videoSettingsRef = db.ref('videoSettings');
-        const speedBoostConfigRef = db.ref('speedBoostConfig');
-        const levelConfigRef = db.ref('levelConfig');
-        const referralConfigRef = db.ref('referralConfig');
-        const airdropConfigRef = db.ref('airdropConfig');
-        const specialOfferRef = db.ref('specialOffers');
+        // ==================== MONETAG ADS ====================
+        function showRewardedAd(callback) {
+            if (typeof show_11197472 === 'function') {
+                show_11197472().then(() => { if (callback) callback(); })
+                    .catch(() => { if (callback) callback(); });
+            } else {
+                if (callback) callback();
+            }
+        }
 
         // ==================== PAGE NAVIGATION ====================
-        function switchPage(page, event) {
-            // Remove active class from all nav items
+        function switchPage(page, el) {
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            // If event exists (clicked from bottom nav), set it to active. Otherwise, default to Home.
-            if (event && event.currentTarget) {
-                event.currentTarget.classList.add('active');
-            } else {
-                document.querySelector('.nav-item[onclick*="home"]').classList.add('active');
-            }
+            if (el) el.classList.add('active');
             
-            // Hide all pages
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            
-            // If page is 'airdrop', we need to show the overlay instead of a standard page
-            if (page === 'airdrop') {
-                openAirdropPage();
-                return;
-            }
-            
-            // Show the requested page
             const targetPage = document.getElementById('page' + page.charAt(0).toUpperCase() + page.slice(1));
             if (targetPage) targetPage.classList.add('active');
             
-            // Update specific page contents
             if (page === 'tasks') renderTasks();
-            if (page === 'refer') { updateReferUI(); loadReferralList(); }
-            if (page === 'earn') updateVideoUI();
-            if (page === 'wallet') updateWithdrawHistory();
-            if (page === 'specialOffer') openSpecialOfferPage();
-            if (page === 'home') updateProgressUI();
+            if (page === 'refer') updateReferUI();
+            if (page === 'wallet') updateWithdrawUI();
+            if (page === 'specialOffer') loadSpecialOffer();
         }
 
-        // ==================== USER SPECIAL OFFER ====================
-        function openSpecialOfferPage() {
-            // Switch to the special offer page logic without using switchPage to avoid overlay conflicts
-            document.getElementById('pageSpecialOffer').classList.add('active');
-            document.getElementById('pageHome').classList.remove('active');
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            document.querySelector('.nav-item[onclick*="home"]').classList.add('active'); 
+        // ==================== FIXED CONVERSION TIMER ====================
+        function startConversionTimer() {
+            if (conversionTimerInterval) clearInterval(conversionTimerInterval);
             
-            const container = document.getElementById('specialOfferContent');
-            container.innerHTML = '<div class="offer-empty">⏳ Loading your exclusive offer...</div>';
-            specialOfferRef.child(userId).on('value', (snap) => {
-                const offer = snap.val();
-                if (offer && !offer.claimed && offer.title) {
-                    container.innerHTML = `
-                        <div class="offer-title">🎁 ${offer.title}</div>
-                        <div class="offer-desc">${offer.description || 'Get this special reward exclusively for you!'}</div>
-                        <div class="offer-reward">💰 +${offer.reward} Coins</div>
-                        <button class="offer-claim-btn" onclick="claimSpecialOffer()" id="specialOfferBtn">Claim Reward</button>
-                    `;
-                } else if (offer && offer.claimed) {
-                    container.innerHTML = `<div class="offer-empty">✅ You have already claimed this special offer!</div>`;
-                } else {
-                    container.innerHTML = `<div class="offer-empty">🤷 No special offers available for you right now. Check back later!</div>`;
+            function updateTimer() {
+                const now = Date.now();
+                const lastConversion = appState.lastConversion || now;
+                const nextConversion = lastConversion + (24 * 60 * 60 * 1000);
+                const remaining = Math.max(0, nextConversion - now);
+                
+                const h = Math.floor(remaining / (60 * 60 * 1000));
+                const m = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+                const s = Math.floor((remaining % (60 * 1000)) / 1000);
+                
+                const timeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                document.getElementById('conversionCountdown').textContent = timeStr;
+                document.getElementById('walletNextConversion').textContent = timeStr;
+                
+                if (remaining <= 0) {
+                    performConversion();
                 }
-            });
-        }
-
-        function claimSpecialOffer() {
-            const btn = document.getElementById('specialOfferBtn');
-            if(btn) btn.disabled = true;
-            specialOfferRef.child(userId).once('value', (snap) => {
-                const offer = snap.val();
-                if(offer && !offer.claimed) {
-                    const reward = offer.reward || 0;
-                    appState.balance += reward;
-                    userRef.update({ balance: appState.balance });
-                    specialOfferRef.child(userId).update({ claimed: true, claimedAt: Date.now() });
-                    showToast(`🎉 Congratulations! You claimed +${reward} Coins!`);
-                    openSpecialOfferPage();
-                }
-            });
-        }
-
-        // ==================== CONVERSION RATE & USD LOGIC ====================
-        function loadConversionRate() {
-            rateRef.on('value', (s) => {
-                appState.conversionRate = s.exists() ? s.val() : 1000;
-                if (!s.exists()) rateRef.set(1000);
-                updateUSDDisplay();
-            });
-        }
-
-        function updateUSDDisplay() {
-            const usdValue = (appState.balance / appState.conversionRate).toFixed(2);
-            document.getElementById('usdValue').textContent = `≈ $${usdValue} USD`;
-            document.getElementById('walletUsd').textContent = `≈ $${usdValue} USD`;
-            document.getElementById('walletBalance').textContent = appState.balance;
+            }
             
-            const totalUsd = appState.usdBalance.toFixed(2);
-            document.getElementById('totalUsdEarned').textContent = `💵 Total USD Earned: $${totalUsd}`;
-            document.getElementById('walletTotalUsd').textContent = `$${totalUsd}`;
-            document.getElementById('rateInfo').textContent = `Rate: 1 USD = ${appState.conversionRate} Coins`;
-            updateWithdrawUI();
-            updateWithdrawHistory();
+            updateTimer();
+            conversionTimerInterval = setInterval(updateTimer, 1000);
         }
 
         function performConversion() {
@@ -862,8 +747,13 @@
                 const coins = appState.balance;
                 appState.balance = 0;
                 appState.lastConversion = Date.now();
-                userRef.update({ balance: 0, usdBalance: appState.usdBalance, lastConversion: appState.lastConversion });
-                document.getElementById('conversionText').textContent = `${coins.toLocaleString()} Coins → $${earned.toFixed(2)} USD`;
+                userRef.update({ 
+                    balance: 0, 
+                    usdBalance: appState.usdBalance, 
+                    lastConversion: appState.lastConversion 
+                });
+                document.getElementById('conversionText').textContent = 
+                    `${coins.toLocaleString()} Coins → $${earned.toFixed(2)} USD`;
                 document.getElementById('conversionModal').classList.add('active');
                 updateUI();
                 showToast(`💰 Converted ${coins} Coins to $${earned.toFixed(2)} USD!`);
@@ -871,67 +761,56 @@
                 appState.lastConversion = Date.now();
                 userRef.update({ lastConversion: appState.lastConversion });
             }
-            if (conversionTimerInterval) { clearInterval(conversionTimerInterval); conversionTimerInterval = null; }
+            if (conversionTimerInterval) {
+                clearInterval(conversionTimerInterval);
+            }
             startConversionTimer();
         }
 
-        function startConversionTimer() {
-            if (conversionTimerInterval) clearInterval(conversionTimerInterval);
-            let now = Date.now();
-            if (!appState.lastConversion) { appState.lastConversion = now; userRef.update({ lastConversion: now }); }
-            let next = appState.lastConversion + (24 * 60 * 60 * 1000);
-            let rem = next - now;
-            if (rem <= 0) { performConversion(); return; }
-            conversionTimerInterval = setInterval(() => {
-                let r = next - Date.now();
-                if (r <= 0) { clearInterval(conversionTimerInterval); conversionTimerInterval = null; performConversion(); return; }
-                let h = Math.floor(r / (60*60*1000)), m = Math.floor((r % (60*60*1000)) / (60*1000)), s = Math.floor((r % (60*1000)) / 1000);
-                document.getElementById('conversionCountdown').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-                document.getElementById('walletNextConversion').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-            }, 1000);
-            let h = Math.floor(rem / (60*60*1000)), m = Math.floor((rem % (60*60*1000)) / (60*1000)), s = Math.floor((rem % (60*1000)) / 1000);
-            document.getElementById('conversionCountdown').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-            document.getElementById('walletNextConversion').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-        }
-
-        // ==================== WITHDRAW ====================
-        function loadWithdrawSettings() {
-            withdrawRef.on('value', (s) => {
-                if (s.exists()) { 
-                    let d = s.val(); 
-                    appState.minWithdraw = d.minAmount || 10; 
-                    if(d.methods) appState.withdrawMethods = d.methods;
-                }
-                updateWithdrawUI();
-            });
-        }
-
+        // ==================== WITHDRAW SYSTEM ====================
         function updateWithdrawUI() {
-            let bal = appState.usdBalance || 0, min = appState.minWithdraw || 10;
+            const bal = appState.usdBalance || 0;
+            const min = appState.minWithdraw || 10;
+            
             document.getElementById('withdrawInfo').textContent = `Min: $${min.toFixed(2)} USD`;
             document.getElementById('withdrawStatus').textContent = `You have: $${bal.toFixed(2)} USD`;
             
-            // Update dropdown methods
+            // Update methods dropdown
             const methodSelect = document.getElementById('withdrawMethod');
             methodSelect.innerHTML = '';
-            appState.withdrawMethods.forEach(m => {
+            (appState.withdrawMethods || ['Nagad', 'Rocket']).forEach(m => {
                 methodSelect.innerHTML += `<option value="${m}">${m}</option>`;
             });
 
-            let btn = document.getElementById('withdrawBtn');
-            if (bal >= min) { btn.disabled = false; btn.textContent = 'Withdraw Now'; } 
-            else { btn.disabled = true; btn.textContent = `Need $${(min - bal).toFixed(2)} more`; }
+            const btn = document.getElementById('withdrawBtn');
+            if (bal >= min) {
+                btn.disabled = false;
+                btn.textContent = 'Withdraw Now';
+            } else {
+                btn.disabled = true;
+                btn.textContent = `Need $${(min - bal).toFixed(2)} more`;
+            }
         }
 
         function withdraw() {
-            let bal = appState.usdBalance || 0, min = appState.minWithdraw || 10;
-            if (bal < min) { showToast(`Minimum $${min} USD required!`, 'error'); return; }
+            const bal = appState.usdBalance || 0;
+            const min = appState.minWithdraw || 10;
             
-            let method = document.getElementById('withdrawMethod').value;
-            let account = document.getElementById('withdrawAccount').value.trim();
-            if(!account) { showToast('Please enter your account number!', 'error'); return; }
+            if (bal < min) { 
+                showToast(`Minimum $${min} USD required!`, 'error'); 
+                return; 
+            }
+            
+            const method = document.getElementById('withdrawMethod').value;
+            const account = document.getElementById('withdrawAccount').value.trim();
+            
+            if (!account) { 
+                showToast('Please enter your account number!', 'error'); 
+                return; 
+            }
 
-            let amount = bal, id = Date.now().toString();
+            const amount = bal;
+            const id = Date.now().toString();
             const withdrawData = { 
                 userId: userId, 
                 username: tg.initDataUnsafe?.user?.username || 'User', 
@@ -941,136 +820,73 @@
                 status: 'pending', 
                 requestedAt: new Date().toISOString() 
             };
+            
             db.ref('withdrawRequests/' + id).set(withdrawData);
             appState.usdBalance = 0;
+            
             if (!appState.withdrawHistory) appState.withdrawHistory = [];
-            appState.withdrawHistory.push({ id: id, amount: amount, method: method, account: account, status: 'pending', date: new Date().toISOString() });
+            appState.withdrawHistory.push({ 
+                id: id, amount: amount, method: method, 
+                account: account, status: 'pending', 
+                date: new Date().toISOString() 
+            });
+            
             userRef.update({ usdBalance: 0, withdrawHistory: appState.withdrawHistory });
+            
             document.getElementById('withdrawModalTitle').textContent = '💰 Request Sent!';
-            document.getElementById('withdrawModalText').textContent = `$${amount.toFixed(2)} pending approval via ${method}.`;
+            document.getElementById('withdrawModalText').textContent = 
+                `$${amount.toFixed(2)} pending approval via ${method}.`;
             document.getElementById('withdrawModal').classList.add('active');
             document.getElementById('withdrawAccount').value = '';
-            updateUI(); updateUSDDisplay(); updateWithdrawHistory();
+            
+            updateUI();
+            updateWithdrawUI();
             showToast(`$${amount.toFixed(2)} sent for approval via ${method}!`);
         }
 
-        function updateWithdrawHistory() {
-            const container = document.getElementById('withdrawHistory');
-            if (!appState.withdrawHistory || appState.withdrawHistory.length === 0) {
-                container.innerHTML = '<span style="color:#94a3b8;font-size:10px;">No withdrawals yet</span>';
-                return;
-            }
-            const statusLabels = { pending: '⏳ Pending', approved: '✅ Approved', cancelled: '❌ Cancelled', processing: '🔄 Processing' };
-            container.innerHTML = appState.withdrawHistory.slice(-10).reverse().map(w => `
-                <div class="withdraw-history-item">
-                    <div>
-                        <span class="amount">$${w.amount.toFixed(2)}</span>
-                        <div style="font-size:9px;color:#94a3b8;">${w.method || 'N/A'} - ${w.account || ''}</div>
-                        ${w.status === 'cancelled' ? `<div style="font-size:10px;color:#ef4444;">⚠️ ${w.cancelReason||''}</div>` : ''}
-                    </div>
-                    <div style="text-align:right;">
-                        <span class="status-${w.status}" style="font-size:10px;font-weight:bold;">${statusLabels[w.status] || w.status}</span>
-                        <div class="date">${new Date(w.date).toLocaleDateString()}</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
+        // Listen for withdrawal status changes
         function listenWithdrawStatus() {
-            db.ref('withdrawRequests').orderByChild('userId').equalTo(userId).on('child_changed', (snapshot) => {
-                const data = snapshot.val();
-                if (data && data.userId === userId && appState.withdrawHistory) {
-                    const existingIndex = appState.withdrawHistory.findIndex(h => h.id === snapshot.key);
-                    if (existingIndex !== -1) {
-                        appState.withdrawHistory[existingIndex].status = data.status;
-                        if (data.cancelReason) appState.withdrawHistory[existingIndex].cancelReason = data.cancelReason;
-                        if (data.status === 'cancelled' && data.amount) {
-                            appState.usdBalance = (appState.usdBalance || 0) + data.amount;
-                            userRef.update({ usdBalance: appState.usdBalance });
-                            showToast(`⚠️ Withdrawal cancelled: ${data.cancelReason || 'No reason'}`, 'error');
-                        }
-                        userRef.update({ withdrawHistory: appState.withdrawHistory });
-                        updateUI(); updateUSDDisplay(); updateWithdrawHistory();
-                    }
-                }
-            });
-        }
-
-        // ==================== VIDEO SETTINGS ====================
-        function loadVideoSettings() {
-            videoSettingsRef.on('value', (snapshot) => {
-                if (snapshot.exists()) {
+            db.ref('withdrawRequests')
+                .orderByChild('userId')
+                .equalTo(userId)
+                .on('child_changed', (snapshot) => {
                     const data = snapshot.val();
-                    appState.videoReward = data.reward || 10;
-                    appState.videoDailyLimit = data.dailyLimit || 5;
-                    appState.videoRefillThreshold = data.refillThreshold || 5;
-                }
-                updateVideoUI();
-            });
-        }
-
-        function updateVideoUI() {
-            const today = new Date().toDateString();
-            const isToday = appState.videoLastWatchDate === today;
-            const watched = isToday ? (appState.videoWatchedToday || 0) : 0;
-            const limit = appState.videoDailyLimit || 5;
-            const remaining = limit - watched;
-            document.getElementById('videoReward').textContent = `+${appState.videoReward || 10} Coins per video`;
-            document.getElementById('videoLimit').textContent = `Today: ${watched} / ${limit} videos`;
-            const btn = document.getElementById('videoBtn');
-            if (remaining <= 0) { btn.disabled = true; btn.textContent = '✅ Daily Limit Reached'; document.getElementById('videoWatched').textContent = '🎉 All videos watched today!'; } 
-            else { btn.disabled = false; btn.textContent = '▶ Watch Video'; document.getElementById('videoWatched').textContent = `${remaining} videos left today`; }
-        }
-
-        function watchVideo() {
-            const today = new Date().toDateString();
-            const isToday = appState.videoLastWatchDate === today;
-            const watched = isToday ? (appState.videoWatchedToday || 0) : 0;
-            const limit = appState.videoDailyLimit || 5;
-            if (watched >= limit) { showToast('Daily limit reached!', 'error'); return; }
-            showRewardedAd(function() {
-                const btn = document.getElementById('videoBtn');
-                btn.disabled = true; btn.textContent = '⏳ Please wait...';
-                let seconds = 15;
-                const timerInterval = setInterval(() => {
-                    seconds--; btn.textContent = `⏳ ${seconds}s`;
-                    if (seconds <= 0) {
-                        clearInterval(timerInterval);
-                        btn.textContent = '▶ Watch Video'; btn.disabled = false;
-                        appState.videoWatchedToday = watched + 1;
-                        appState.videoLastWatchDate = today;
-                        const reward = appState.videoReward || 10;
-                        appState.balance += reward;
-                        userRef.update({ balance: appState.balance, videoWatchedToday: appState.videoWatchedToday, videoLastWatchDate: appState.videoLastWatchDate });
-                        document.getElementById('videoRewardText').textContent = `You earned +${reward} Coins! 📺`;
-                        document.getElementById('videoModal').classList.add('active');
-                        updateUI(); updateLevelUI(); updateVideoUI();
-                        showToast(`+${reward} Coins for watching video! 🎉`);
+                    if (data && appState.withdrawHistory) {
+                        const idx = appState.withdrawHistory.findIndex(h => h.id === snapshot.key);
+                        if (idx !== -1) {
+                            appState.withdrawHistory[idx].status = data.status;
+                            if (data.cancelReason) {
+                                appState.withdrawHistory[idx].cancelReason = data.cancelReason;
+                            }
+                            if (data.status === 'cancelled' && data.amount) {
+                                appState.usdBalance = (appState.usdBalance || 0) + data.amount;
+                                userRef.update({ usdBalance: appState.usdBalance });
+                                showToast(`⚠️ Withdrawal cancelled: ${data.cancelReason || 'No reason'}`, 'error');
+                            }
+                            userRef.update({ withdrawHistory: appState.withdrawHistory });
+                            updateUI();
+                            updateWithdrawUI();
+                        }
                     }
-                }, 1000);
-            });
+                });
         }
 
-        // ==================== CIRCULAR MINING SYSTEM ====================
+        // ==================== MINING SYSTEM ====================
         function updateProgressUI() {
             const circle = document.getElementById('miningCircle');
             const count = document.getElementById('progressCoinCount');
-            const percent = document.getElementById('progressPercent');
             const status = document.getElementById('progressStatus');
             
-            let pct = (appState.progressCoins / TOTAL_COINS * 100);
-            // Update Circle Conic Gradient
+            const pct = (appState.progressCoins / TOTAL_COINS * 100);
             circle.style.background = `conic-gradient(#fbbf24 ${pct}%, #1e293b ${pct}%)`;
-            
             count.textContent = appState.progressCoins;
-            percent.textContent = Math.round(pct) + '%';
             
             if (appState.progressCoins === 0) {
-                status.textContent = '🎯 Empty! Watch video ads to refill.';
+                status.textContent = '🎯 Empty! Watch ads to refill.';
                 document.getElementById('progressWatchBtn').classList.remove('hidden');
                 document.getElementById('progressStartBtn').classList.add('hidden');
             } else if (appState.progressCoins === TOTAL_COINS) {
-                status.textContent = '✅ Full! Press START to mine.';
+                status.textContent = '✅ Full! Press START.';
                 document.getElementById('progressWatchBtn').classList.add('hidden');
                 document.getElementById('progressStartBtn').classList.remove('hidden');
                 document.getElementById('progressStartBtn').disabled = false;
@@ -1084,68 +900,93 @@
 
         function startProgress() {
             if (progressInterval) return;
-            if (appState.progressCoins <= 0) { showToast('❌ No coins left! Watch videos first.', 'error'); updateProgressUI(); return; }
-            if (!navigator.onLine) { showToast('⚠️ No internet. Mining paused.', 'error'); return; }
+            if (appState.progressCoins <= 0) { 
+                showToast('❌ No coins left! Watch videos first.', 'error'); 
+                return; 
+            }
+            
             const btn = document.getElementById('progressStartBtn');
-            btn.disabled = true; btn.textContent = '⏳ Mining...';
+            btn.disabled = true;
+            btn.textContent = '⏳ Mining...';
+            
             progressInterval = setInterval(() => {
                 if (appState.progressCoins <= 0) {
-                    clearInterval(progressInterval); progressInterval = null;
-                    btn.disabled = false; btn.textContent = '▶ START';
-                    updateProgressUI(); showToast('🎉 All coins earned! Watch videos to refill.');
-                    return;
-                }
-                if (!navigator.onLine) {
-                    clearInterval(progressInterval); progressInterval = null;
-                    btn.disabled = false; btn.textContent = '▶ START';
-                    showToast('⚠️ Internet lost. Mining paused.', 'error');
+                    clearInterval(progressInterval);
+                    progressInterval = null;
+                    btn.disabled = false;
+                    btn.textContent = '▶ START';
+                    updateProgressUI();
+                    showToast('🎉 All coins earned! Watch videos to refill.');
                     return;
                 }
                 
-                let bonusPercent = getLevelMiningBonus(appState.userLevel);
+                let bonusPercent = 0;
+                if (appState.userLevel >= 81) bonusPercent = 25;
+                else if (appState.userLevel >= 61) bonusPercent = 15;
+                else if (appState.userLevel >= 41) bonusPercent = 10;
+                else if (appState.userLevel >= 21) bonusPercent = 5;
+                else if (appState.userLevel >= 1) bonusPercent = 1;
+                
                 let coinsToAdd = 1 + (bonusPercent / 100);
                 
                 appState.progressCoins -= 1;
                 appState.balance += coinsToAdd;
-                appState.xpPoints = (appState.xpPoints || NEGATIVE_XP_START) + 1; 
+                appState.xpPoints = (appState.xpPoints || NEGATIVE_XP_START) + 1;
                 
-                userRef.update({ balance: appState.balance, progressCoins: appState.progressCoins, xpPoints: appState.xpPoints });
+                userRef.update({ 
+                    balance: appState.balance, 
+                    progressCoins: appState.progressCoins, 
+                    xpPoints: appState.xpPoints 
+                });
                 
-                // Floating Coin Animation
-                let coin = document.createElement('div');
-                coin.className = 'floating-coin'; coin.textContent = `+${coinsToAdd.toFixed(2)} 🪙`;
-                coin.style.left = (Math.random() * 80 + 10) + '%'; coin.style.top = '30%';
-                document.body.appendChild(coin); setTimeout(() => coin.remove(), 1000);
+                // Floating coin animation
+                const coin = document.createElement('div');
+                coin.className = 'floating-coin';
+                coin.textContent = `+${coinsToAdd.toFixed(2)} 🪙`;
+                coin.style.left = (Math.random() * 80 + 10) + '%';
+                coin.style.top = '30%';
+                document.body.appendChild(coin);
+                setTimeout(() => coin.remove(), 1000);
                 
-                updateProgressUI(); updateUI(); updateLevelUI();
+                updateProgressUI();
+                updateUI();
             }, 5000);
         }
 
         function startVideoProgress() {
             const btn = document.getElementById('progressWatchBtn');
-            const threshold = appState.videoRefillThreshold || 5; 
+            const threshold = 5;
+            
             if (appState.videoWatchedCount >= threshold) {
-                showToast(`✅ All ${threshold} videos watched! Refilling coins...`, 'success');
-                appState.progressCoins = TOTAL_COINS; appState.videoWatchedCount = 0;
-                userRef.update({ progressCoins: appState.progressCoins, videoWatchedCount: 0 });
-                updateProgressUI(); showToast('🪙 1000 coins refilled! Press START to earn again.');
+                appState.progressCoins = TOTAL_COINS;
+                appState.videoWatchedCount = 0;
+                userRef.update({ progressCoins: TOTAL_COINS, videoWatchedCount: 0 });
+                updateProgressUI();
+                showToast('🪙 1000 coins refilled! Press START.');
                 return;
             }
-            btn.disabled = true; btn.textContent = '⏳ Watching...';
+            
+            btn.disabled = true;
+            btn.textContent = '⏳ Watching...';
+            
             showRewardedAd(function() {
                 let seconds = 15;
-                const timerInterval = setInterval(() => {
-                    seconds--; btn.textContent = `⏳ ${seconds}s`;
+                const timer = setInterval(() => {
+                    seconds--;
+                    btn.textContent = `⏳ ${seconds}s`;
                     if (seconds <= 0) {
-                        clearInterval(timerInterval); btn.disabled = false;
+                        clearInterval(timer);
+                        btn.disabled = false;
                         appState.videoWatchedCount++;
                         userRef.update({ videoWatchedCount: appState.videoWatchedCount });
-                        btn.textContent = `📺 Watch Ads to Refill (${appState.videoWatchedCount}/${threshold})`;
-                        showToast(`📺 Ad ${appState.videoWatchedCount}/${threshold} watched!`);
+                        btn.textContent = `📺 Watch Ads (${appState.videoWatchedCount}/${threshold})`;
+                        
                         if (appState.videoWatchedCount >= threshold) {
-                            appState.progressCoins = TOTAL_COINS; appState.videoWatchedCount = 0;
-                            userRef.update({ progressCoins: appState.progressCoins, videoWatchedCount: 0 });
-                            updateProgressUI(); showToast(`🪙 ${TOTAL_COINS} coins refilled! Press START to earn again.`);
+                            appState.progressCoins = TOTAL_COINS;
+                            appState.videoWatchedCount = 0;
+                            userRef.update({ progressCoins: TOTAL_COINS, videoWatchedCount: 0 });
+                            updateProgressUI();
+                            showToast('🪙 1000 coins refilled! Press START.');
                         }
                     }
                 }, 1000);
@@ -1153,281 +994,93 @@
         }
 
         // ==================== SPEED BOOST ====================
-        function updateSpeedBoostUI() {
-            const btn = document.getElementById('speedBoostBtn');
-            const timerSpan = document.getElementById('boostTimer');
-            const cooldownTextDiv = document.getElementById('boostCooldownText');
-            const countdownSpan = document.getElementById('boostCountdownDisplay');
-            if (appState.speedBoostCooldown > 0) {
-                const now = Date.now();
-                const timeLeft = Math.ceil((appState.speedBoostCooldown - now) / 1000);
-                if (timeLeft > 0) {
-                    btn.style.display = 'none'; cooldownTextDiv.style.display = 'block';
-                    const minutes = Math.floor(timeLeft / 60); const seconds = timeLeft % 60;
-                    countdownSpan.textContent = `${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
-                } else { btn.style.display = 'flex'; cooldownTextDiv.style.display = 'none'; timerSpan.textContent = ''; appState.speedBoostCooldown = 0; userRef.update({ speedBoostCooldown: 0 }); }
-            } else { btn.style.display = 'flex'; cooldownTextDiv.style.display = 'none'; timerSpan.textContent = ''; }
-        }
-
-        setInterval(() => { if(appState.speedBoostCooldown > 0) updateSpeedBoostUI(); }, 1000);
-
         function activateSpeedBoost() {
-            const now = Date.now();
-            if (appState.speedBoostCooldown > 0) { updateSpeedBoostUI(); return; }
-            if (appState.isSpeedBoostActive) { showToast('⏳ Speed Boost already active!', 'error'); return; }
-            showRewardedPopup(function() {
-                appState.isSpeedBoostActive = true;
-                document.getElementById('speedBoostBtn').disabled = true;
-                document.getElementById('speedBoostBtn').innerHTML = '<i class="fas fa-rocket"></i> Boost Active!';
-                const overlay = document.getElementById('speedSpinnerOverlay');
-                overlay.classList.add('active');
-                let timeLeft = 3, progress = 0;
-                const speedTimerDisplay = document.getElementById('speedTimerDisplay');
-                const speedProgressFill = document.getElementById('speedProgressFill');
-                const speedUpdateInterval = setInterval(() => {
-                    timeLeft -= 0.1; progress = ((3 - timeLeft) / 3) * 100;
-                    speedTimerDisplay.textContent = timeLeft.toFixed(1) + 's';
-                    speedProgressFill.style.width = progress + '%';
-                    if (timeLeft <= 0) {
-                        clearInterval(speedUpdateInterval); appState.isSpeedBoostActive = false;
-                        overlay.classList.remove('active');
-                        document.getElementById('speedBoostBtn').disabled = false;
-                        document.getElementById('speedBoostBtn').innerHTML = '<i class="fas fa-rocket"></i> Speed Boost <span class="boost-timer"></span>';
-                        speedBoostConfigRef.once('value', snap => {
-                            let config = snap.val(); let cd = (config && config.cooldown) ? config.cooldown : 60;
-                            appState.speedBoostCooldown = Date.now() + (cd * 60 * 1000);
-                            userRef.update({ speedBoostCooldown: appState.speedBoostCooldown });
-                            updateSpeedBoostUI(); showToast(`🚀 Speed Boost ended! Cooldown: ${cd} minute(s).`);
-                        });
-                    }
-                }, 100);
+            if (appState.speedBoostCooldown > Date.now()) {
+                showToast('Speed Boost on cooldown!', 'error');
+                return;
+            }
+            
+            showRewardedAd(function() {
+                const btn = document.getElementById('speedBoostBtn');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-rocket"></i> Boost Active!';
+                
                 let coinsAdded = 0;
-                speedBoostInterval = setInterval(() => {
+                const boostInterval = setInterval(() => {
                     if (appState.progressCoins > 0 && coinsAdded < 60) {
-                        appState.progressCoins -= 1; appState.balance += 1; appState.xpPoints += 2; coinsAdded++;
-                        userRef.update({ balance: appState.balance, progressCoins: appState.progressCoins, xpPoints: appState.xpPoints });
-                        updateProgressUI(); updateUI(); updateLevelUI();
-                        let coin = document.createElement('div');
-                        coin.className = 'floating-coin'; coin.textContent = '+1 🪙';
-                        coin.style.left = (Math.random() * 80 + 10) + '%'; coin.style.top = '30%';
-                        document.body.appendChild(coin); setTimeout(() => coin.remove(), 1000);
-                    } else { clearInterval(speedBoostInterval); if (appState.progressCoins <= 0) showToast('⛔ No coins left! Boost stopped.'); }
+                        appState.progressCoins -= 1;
+                        appState.balance += 1;
+                        appState.xpPoints += 2;
+                        coinsAdded++;
+                        userRef.update({ 
+                            balance: appState.balance, 
+                            progressCoins: appState.progressCoins, 
+                            xpPoints: appState.xpPoints 
+                        });
+                        updateProgressUI();
+                        updateUI();
+                    } else {
+                        clearInterval(boostInterval);
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-rocket"></i> Speed Boost';
+                        
+                        // Set cooldown
+                        appState.speedBoostCooldown = Date.now() + (60 * 60 * 1000);
+                        userRef.update({ speedBoostCooldown: appState.speedBoostCooldown });
+                        showToast('🚀 Speed Boost ended! Cooldown: 60 minutes.');
+                    }
                 }, 50);
             });
         }
 
-        // ==================== LEVEL SYSTEM ====================
-        function loadLevelConfig() {
-            levelConfigRef.on('value', (snapshot) => {
-                if (snapshot.exists()) { levelConfig = snapshot.val(); }
-                updateLevelUI(); renderLevelList();
-            });
-        }
-
-        function loadReferralConfig() {
-            referralConfigRef.on('value', (snapshot) => {
-                if (snapshot.exists()) { referralConfig = snapshot.val(); } 
-                else {
-                    referralConfig = { perReferralCoins: 50, tier1: { count: 10, bonus: 50 }, tier2: { count: 25, bonus: 150 }, tier3: { count: 50, bonus: 300 }, tier4: { count: 100, bonus: 500 }, tier5: { count: 200, bonus: 1000 } };
-                    referralConfigRef.set(referralConfig);
-                }
-                updateReferUI();
-            });
-        }
-
-        function getLevelStaticData(level) {
-            let xp = 0;
-            if(level > 1) {
-                xp = 400;
-                for(let i=3; i<=level; i++) { xp = xp * 2; }
-            }
-            
-            let tierName = "Bronze", tierEmoji = "🥉", bonusPercent = 1;
-            if (level >= 81) { tierName = "Diamond"; tierEmoji = "👑"; bonusPercent = 25; }
-            else if (level >= 61) { tierName = "Platinum"; tierEmoji = "💎"; bonusPercent = 15; }
-            else if (level >= 41) { tierName = "Gold"; tierEmoji = "🥇"; bonusPercent = 10; }
-            else if (level >= 21) { tierName = "Silver"; tierEmoji = "🥈"; bonusPercent = 5; }
-            
-            if (levelConfig && levelConfig[level]) {
-                const lvl = levelConfig[level];
-                if (lvl.requiredXP !== undefined) xp = lvl.requiredXP;
-                if (lvl.bonus !== undefined) bonusPercent = lvl.bonus;
-            }
-            
-            return { name: tierName + ` ${level}`, emoji: tierEmoji, bonus: bonusPercent, requiredXP: xp };
-        }
-
-        function getLevelMiningBonus(level) {
-            if(level >= 81) return 25;
-            if(level >= 61) return 15;
-            if(level >= 41) return 10;
-            if(level >= 21) return 5;
-            if(level >= 1) return 1;
-            return 0;
-        }
-
-        function calcLevel(xp) {
-            let level = 0;
-            let currentRequired = NEGATIVE_XP_START;
-            let nextRequired = 0;
-            
-            if (xp >= 0) {
-                level = 1;
-                let netXp = xp;
-                for(let i=2; i<=100; i++) {
-                    let req = 400;
-                    for(let j=3; j<=i; j++) { req = req * 2; }
-                    if (netXp >= req) { level = i; } else { break; }
-                }
-                let lvlData = getLevelStaticData(level);
-                currentRequired = lvlData.requiredXP;
-                let nextLvlData = getLevelStaticData(level+1);
-                nextRequired = nextLvlData.requiredXP;
-                let progress = 0;
-                if (nextRequired > currentRequired) {
-                    progress = ((xp - currentRequired) / (nextRequired - currentRequired)) * 100;
-                    if (progress > 100) progress = 100;
-                    if (progress < 0) progress = 0;
-                }
-                let tier = getLevelStaticData(level);
-                let isMax = !(level < 100);
-                return { level, xp, currentRequired: currentRequired, nextRequired: nextRequired, progress: Math.floor(progress), isMax, tier };
-            } else {
-                let progress = ((xp - NEGATIVE_XP_START) / (0 - NEGATIVE_XP_START)) * 100;
-                return { level: 0, xp: xp, currentRequired: NEGATIVE_XP_START, nextRequired: 0, progress: Math.min(100, Math.floor(progress)), isMax: false, tier: { name: "Unlocking", emoji: "🔒", bonus: 0 } };
-            }
-        }
-
-        function updateLevelUI() {
-            const data = calcLevel(appState.xpPoints || NEGATIVE_XP_START);
-            const t = data.tier || { name: "Unlocking", emoji: "🔒", bonus: 0 };
-            
-            if (data.level === 0) {
-                document.getElementById('levelTitle').textContent = `🔒 Unlocking`;
-                document.getElementById('levelNumber').textContent = `Level 0`;
-                document.getElementById('levelProgressFill').style.width = `${Math.max(0, Math.min(100, ((appState.xpPoints - NEGATIVE_XP_START)/(0 - NEGATIVE_XP_START))*100))}%`;
-                document.getElementById('levelCurrentPoints').textContent = appState.xpPoints;
-                document.getElementById('levelNextPoints').textContent = `/ 0`;
-                document.getElementById('userLevelBadge').textContent = `🔒 Unlocking`;
-                appState.userLevel = 0;
-            } else {
-                document.getElementById('levelTitle').textContent = `${t.emoji} ${t.name}`;
-                document.getElementById('levelNumber').textContent = `Level ${data.level}`;
-                document.getElementById('levelProgressFill').style.width = `${data.progress}%`;
-                if (data.isMax) {
-                    document.getElementById('levelCurrentPoints').textContent = `${data.xp}`;
-                    document.getElementById('levelNextPoints').textContent = '⭐ MAX';
-                } else {
-                    document.getElementById('levelCurrentPoints').textContent = data.xp - data.currentRequired;
-                    document.getElementById('levelNextPoints').textContent = `/ ${data.nextRequired - data.currentRequired}`;
-                }
-                document.getElementById('userLevelBadge').textContent = `Level ${data.level} 👆`;
-                appState.userLevel = data.level;
-            }
-            
-            document.getElementById('levelCurrentEmoji').textContent = data.level === 0 ? '🔒' : t.emoji;
-            document.getElementById('levelCurrentNumber').textContent = data.level === 0 ? 'Level 0' : `Level ${data.level}`;
-            document.getElementById('levelCurrentTitle').textContent = data.level === 0 ? 'Unlocking...' : t.name;
-            if (data.level === 0) {
-                document.getElementById('levelCurrentPointsText').textContent = `${appState.xpPoints} / 0 XP`;
-                document.getElementById('levelProgressFill2').style.width = `${Math.max(0, Math.min(100, ((appState.xpPoints - NEGATIVE_XP_START)/(0 - NEGATIVE_XP_START))*100))}%`;
-                document.getElementById('levelProgressText2').textContent = `${Math.floor(Math.max(0, Math.min(100, ((appState.xpPoints - NEGATIVE_XP_START)/(0 - NEGATIVE_XP_START))*100)))}%`;
-                document.getElementById('levelNextInfo').textContent = 'Collect XP to unlock!';
-                document.getElementById('levelBonusPercent').textContent = `+0%`;
-                document.getElementById('levelDailyBonus').textContent = `+10 Coins`;
-            } else if (data.isMax) {
-                document.getElementById('levelCurrentPointsText').textContent = '🏆 MAX LEVEL!';
-                document.getElementById('levelProgressFill2').style.width = '100%';
-                document.getElementById('levelProgressText2').textContent = '100%';
-                document.getElementById('levelNextInfo').textContent = '⭐ MAX';
-                document.getElementById('levelBonusPercent').textContent = `+${t.bonus}%`;
-                document.getElementById('levelDailyBonus').textContent = `${10 + (t.bonus)} Coins`;
-            } else {
-                document.getElementById('levelCurrentPointsText').textContent = `${data.xp - data.currentRequired} / ${data.nextRequired - data.currentRequired} XP`;
-                document.getElementById('levelProgressFill2').style.width = `${data.progress}%`;
-                document.getElementById('levelProgressText2').textContent = `${data.progress}%`;
-                document.getElementById('levelNextInfo').textContent = `Next: ${data.level + 1}`;
-                document.getElementById('levelBonusPercent').textContent = `+${t.bonus}%`;
-                document.getElementById('levelDailyBonus').textContent = `${10 + (t.bonus)} Coins`;
-            }
-            let isExclusive = data.level >= 10;
-            document.getElementById('levelExclusiveTasks').textContent = isExclusive ? '✅ Unlocked' : '🔒 Locked';
-            document.getElementById('levelExclusiveTasks').style.color = isExclusive ? '#10b981' : '#94a3b8';
-        }
-
-        function renderLevelList() {
-            const container = document.getElementById('levelList');
-            const data = calcLevel(appState.xpPoints || NEGATIVE_XP_START);
-            let html = '';
-            for (let i = 1; i <= 100; i++) {
-                if (currentLevelFilter !== 'all') {
-                    const filterMap = { 'bronze':[1,20], 'silver':[21,40], 'gold':[41,60], 'platinum':[61,80], 'diamond':[81,100] };
-                    const range = filterMap[currentLevelFilter];
-                    if (!range || i < range[0] || i > range[1]) continue;
-                }
-                const t = getLevelStaticData(i);
-                const isUnlocked = data.level >= i;
-                const isCurrent = data.level === i;
-                html += `
-                    <div class="level-item ${isCurrent ? 'active' : ''} ${!isUnlocked ? 'locked' : ''}">
-                        <div class="level-info"><span class="num">${i}</span><span class="emoji">${t.emoji}</span><span class="name">${t.name}</span>${isCurrent ? '<span class="badge">👈 Current</span>' : ''}${!isUnlocked ? '<span class="badge" style="background:rgba(239,68,68,0.1);color:#ef4444;">🔒</span>' : ''}</div>
-                        <div class="level-reward">+${t.bonus}%</div>
-                        ${isCurrent ? '<div class="level-check">✅</div>' : ''}
-                    </div>
-                `;
-            }
-            container.innerHTML = html || '<div class="loading"><p>No levels found</p></div>';
-        }
-
-        function filterLevels(filter, btn) {
-            currentLevelFilter = filter;
-            document.querySelectorAll('.filter-tabs .tab').forEach(t => t.classList.remove('active'));
-            if (btn) btn.classList.add('active');
-            renderLevelList();
-        }
-
-        function openLevelPage() {
-            document.getElementById('levelOverlay').classList.add('show');
-            document.getElementById('mainContent').classList.add('hide');
-            document.querySelector('.bottom-nav').style.display = 'none';
-            renderLevelList();
-        }
-        function closeLevelPage() {
-            document.getElementById('levelOverlay').classList.remove('show');
-            document.getElementById('mainContent').classList.remove('hide');
-            document.querySelector('.bottom-nav').style.display = 'flex';
-        }
-
-        // ==================== DYNAMIC TASKS ====================
+        // ==================== TASKS ====================
         function loadTasksFromDB() {
-            tasksRef.on('value', (snapshot) => {
-                if (snapshot.exists()) { const data = snapshot.val(); tasks = Object.keys(data).map(key => ({ id: key, ...data[key] })); renderTasks(); } 
-                else { tasks = []; renderTasks(); }
+            db.ref('tasks').on('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    tasks = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                } else {
+                    tasks = [];
+                }
+                renderTasks();
             });
         }
 
         function renderTasks() {
             const container = document.getElementById('tasksContainer');
-            const filteredTasks = currentFilter === 'all' ? tasks : tasks.filter(task => task.type === currentFilter);
+            const filteredTasks = currentFilter === 'all' ? tasks : tasks.filter(t => t.type === currentFilter);
+            
             if (!filteredTasks || filteredTasks.length === 0) {
-                container.innerHTML = '<div class="no-tasks">📭 No tasks available. Check back later!</div>';
+                container.innerHTML = '<p style="color:#94a3b8;text-align:center;">📭 No tasks available.</p>';
                 return;
             }
+            
             container.innerHTML = filteredTasks.map(task => {
                 const today = new Date().toDateString();
-                const isCompletedToday = appState.taskLastCompleted[task.id] === today;
+                const isCompleted = appState.taskLastCompleted[task.id] === today;
+                
                 let actionHTML = '';
-                let statusText = isCompletedToday ? '✅ Done Today' : '⏳ Incomplete';
-                if (!isCompletedToday) {
-                    if (task.type === 'link') { actionHTML = `<button class="task-link" onclick="openFullWebview('${task.id}', '${task.link || '#'}')">🔗 Open Link</button>`; }
-                    else if (task.type === 'button') { actionHTML = `<button class="task-btn" onclick="completeTask('${task.id}')">${task.actionText || 'Complete'}</button>`; }
-                    else if (task.type === 'video') { actionHTML = `<button class="task-video-btn" onclick="watchTaskVideo('${task.id}')">📺 ${task.actionText || 'Watch Video'}</button>`; }
+                if (!isCompleted) {
+                    if (task.type === 'link') {
+                        actionHTML = `<button class="task-btn" onclick="openFullWebview('${task.id}', '${task.link || '#'}')">🔗 Open Link</button>`;
+                    } else if (task.type === 'button') {
+                        actionHTML = `<button class="task-btn" onclick="completeTask('${task.id}')">${task.actionText || 'Complete'}</button>`;
+                    } else if (task.type === 'video') {
+                        actionHTML = `<button class="task-btn" onclick="watchTaskVideo('${task.id}')">📺 Watch Video</button>`;
+                    }
                 }
+                
                 return `
                     <div class="task-card">
-                        <div class="task-header"><span class="task-title">${task.title}</span><span class="task-reward">+${task.reward} 🪙</span></div>
+                        <div class="task-header">
+                            <span class="task-title">${task.title}</span>
+                            <span class="task-reward">+${task.reward} 🪙</span>
+                        </div>
                         <div class="task-desc">${task.description || ''}</div>
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">${actionHTML}<span class="task-status">${statusText}</span></div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
+                            ${actionHTML}
+                            <span style="font-size:10px;color:${isCompleted ? '#10b981' : '#94a3b8'};">${isCompleted ? '✅ Done' : '⏳ Pending'}</span>
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -1442,270 +1095,519 @@
 
         function completeTask(taskId) {
             const today = new Date().toDateString();
-            if (appState.taskLastCompleted[taskId] === today) { showToast('Already completed today!', 'error'); return; }
-            let task = tasks.find(t => t.id === taskId);
+            if (appState.taskLastCompleted[taskId] === today) { 
+                showToast('Already completed today!', 'error'); 
+                return; 
+            }
+            
+            const task = tasks.find(t => t.id === taskId);
             if (!task) return;
+            
             appState.taskLastCompleted[taskId] = today;
             appState.balance += task.reward;
             appState.completedTasks++;
             appState.xpPoints = (appState.xpPoints || NEGATIVE_XP_START) + (task.reward * 2);
-            userRef.update({ balance: appState.balance, completedTasks: appState.completedTasks, taskLastCompleted: appState.taskLastCompleted, xpPoints: appState.xpPoints });
+            
+            userRef.update({ 
+                balance: appState.balance, 
+                completedTasks: appState.completedTasks, 
+                taskLastCompleted: appState.taskLastCompleted, 
+                xpPoints: appState.xpPoints 
+            });
+            
             document.getElementById('rewardText').textContent = `+${task.reward} Coins`;
             document.getElementById('successModal').classList.add('active');
-            updateUI(); updateLevelUI(); renderTasks();
-            showToast(`🎉 +${task.reward} Coins & XP for completing task!`);
+            updateUI();
+            renderTasks();
+            showToast(`🎉 +${task.reward} Coins!`);
         }
 
         function watchTaskVideo(taskId) {
             const today = new Date().toDateString();
-            if (appState.taskLastCompleted[taskId] === today) { showToast('Already completed today!', 'error'); return; }
-            let task = tasks.find(t => t.id === taskId);
+            if (appState.taskLastCompleted[taskId] === today) { 
+                showToast('Already completed today!', 'error'); 
+                return; 
+            }
+            
+            const task = tasks.find(t => t.id === taskId);
             if (!task) return;
+            
             showRewardedAd(function() {
                 appState.taskLastCompleted[taskId] = today;
                 appState.balance += task.reward;
                 appState.completedTasks++;
                 appState.xpPoints = (appState.xpPoints || NEGATIVE_XP_START) + (task.reward * 2);
-                userRef.update({ balance: appState.balance, completedTasks: appState.completedTasks, taskLastCompleted: appState.taskLastCompleted, xpPoints: appState.xpPoints });
+                
+                userRef.update({ 
+                    balance: appState.balance, 
+                    completedTasks: appState.completedTasks, 
+                    taskLastCompleted: appState.taskLastCompleted, 
+                    xpPoints: appState.xpPoints 
+                });
+                
                 document.getElementById('rewardText').textContent = `+${task.reward} Coins`;
                 document.getElementById('successModal').classList.add('active');
-                updateUI(); updateLevelUI(); renderTasks();
-                showToast(`🎉 +${task.reward} Coins & XP for watching video!`);
+                updateUI();
+                renderTasks();
+                showToast(`🎉 +${task.reward} Coins from video!`);
             });
         }
 
-        // ==================== FULL SCREEN WEBVIEW TASK ====================
+        // ==================== WEBVIEW SYSTEM ====================
         function openFullWebview(taskId, url) {
             const today = new Date().toDateString();
-            if (appState.taskLastCompleted[taskId] === today) { showToast('Already completed today!', 'error'); return; }
-            let task = tasks.find(t => t.id === taskId);
-            if (!task) return;
-            
-            appState.webviewTaskId = taskId;
-            appState.webviewReward = task.reward;
+            if (appState.taskLastCompleted[taskId] === today) { 
+                showToast('Already completed today!', 'error'); 
+                return; 
+            }
             
             document.getElementById('webviewFullIframe').src = url;
             document.getElementById('webviewFullscreenOverlay').classList.add('show');
-            document.getElementById('mainContent').style.display = 'none';
-            document.querySelector('.bottom-nav').style.display = 'none';
             
             let seconds = 30;
             const timerEl = document.getElementById('webviewFullTimer');
-            const backBtn = document.getElementById('webviewFullClaimBtn');
+            const claimBtn = document.getElementById('webviewFullClaimBtn');
             
-            backBtn.disabled = true;
-            backBtn.textContent = `⏳ Wait ${seconds}s to Claim Reward`;
-            backBtn.className = '';
-            timerEl.textContent = seconds + 's';
-
-            if (appState.webviewTimerId) clearInterval(appState.webviewTimerId);
-
-            appState.webviewTimerId = setInterval(() => {
+            claimBtn.disabled = true;
+            claimBtn.textContent = '⏳ Wait 30s';
+            claimBtn.className = '';
+            timerEl.textContent = '30s';
+            
+            const timer = setInterval(() => {
                 seconds--;
                 timerEl.textContent = seconds + 's';
-                backBtn.textContent = `⏳ Wait ${seconds}s to Claim Reward`;
+                claimBtn.textContent = `⏳ Wait ${seconds}s`;
+                
                 if (seconds <= 0) {
-                    clearInterval(appState.webviewTimerId);
-                    appState.webviewTimerId = null;
-                    backBtn.disabled = false;
-                    backBtn.textContent = '✅ Claim Reward';
-                    backBtn.className = 'active-btn';
+                    clearInterval(timer);
+                    claimBtn.disabled = false;
+                    claimBtn.textContent = '✅ Claim Reward';
+                    claimBtn.className = 'active-btn';
+                    claimBtn.setAttribute('data-taskid', taskId);
                 }
             }, 1000);
         }
 
         function closeFullWebview() {
-            const btn = document.getElementById('webviewFullClaimBtn');
-            if (btn.disabled) { showToast('Please wait for 30 seconds!', 'error'); return; }
-
-            if (appState.webviewTimerId) {
-                clearInterval(appState.webviewTimerId);
-                appState.webviewTimerId = null;
+            const claimBtn = document.getElementById('webviewFullClaimBtn');
+            const taskId = claimBtn.getAttribute('data-taskid');
+            
+            if (claimBtn.disabled) {
+                showToast('Please wait for 30 seconds!', 'error');
+                return;
             }
-
+            
             document.getElementById('webviewFullscreenOverlay').classList.remove('show');
             document.getElementById('webviewFullIframe').src = 'about:blank';
-            document.getElementById('mainContent').style.display = 'block';
-            document.querySelector('.bottom-nav').style.display = 'flex';
-
-            if (appState.webviewTaskId) {
-                let task = tasks.find(t => t.id === appState.webviewTaskId);
+            
+            if (taskId) {
+                const task = tasks.find(t => t.id === taskId);
                 if (task) {
                     const today = new Date().toDateString();
-                    appState.taskLastCompleted[appState.webviewTaskId] = today;
-                    appState.balance += appState.webviewReward;
+                    appState.taskLastCompleted[taskId] = today;
+                    appState.balance += task.reward;
                     appState.completedTasks++;
-                    appState.xpPoints = (appState.xpPoints || NEGATIVE_XP_START) + (appState.webviewReward * 2);
-                    userRef.update({ balance: appState.balance, completedTasks: appState.completedTasks, taskLastCompleted: appState.taskLastCompleted, xpPoints: appState.xpPoints });
-                    document.getElementById('rewardText').textContent = `+${appState.webviewReward} Coins`;
+                    appState.xpPoints = (appState.xpPoints || NEGATIVE_XP_START) + (task.reward * 2);
+                    
+                    userRef.update({ 
+                        balance: appState.balance, 
+                        completedTasks: appState.completedTasks, 
+                        taskLastCompleted: appState.taskLastCompleted, 
+                        xpPoints: appState.xpPoints 
+                    });
+                    
+                    document.getElementById('rewardText').textContent = `+${task.reward} Coins`;
                     document.getElementById('successModal').classList.add('active');
-                    updateUI(); updateLevelUI(); renderTasks();
-                    showToast(`🎉 +${appState.webviewReward} Coins & XP from link task!`);
+                    updateUI();
+                    renderTasks();
+                    showToast(`🎉 +${task.reward} Coins from link task!`);
                 }
-                appState.webviewTaskId = null;
-                appState.webviewReward = 0;
+                claimBtn.removeAttribute('data-taskid');
             }
         }
-
-        // ==================== AIRDROP ====================
-        let airdropCountdownInterval = null, airdropVisitorsCountRef = null;
-
-        function loadAirdropData() {
-            db.ref('presence/onlineCount').on('value', (snap) => { let count = snap.val() || 0; document.getElementById('onlineUsersHome').textContent = count; document.getElementById('onlineUsersDisplay').textContent = count; });
-            airdropConfigRef.on('value', (snap) => {
-                let config = snap.val() || { min: 0.5, max: 2.0, poolAmount: 50.00, active: false };
-                appState.airdropConfig = config;
-                document.getElementById('airdropPoolDisplay').textContent = `$${config.poolAmount || 50.00}`;
-                if (config.startTime) { startAirdropCountdown(config.startTime); } 
-                else { document.getElementById('airdropCountdown').textContent = '--:--:--'; document.getElementById('airdropClaimBtn').disabled = true; document.getElementById('airdropStatusBox').textContent = '⏳ Waiting for admin to set timer...'; }
-            });
-            const airdropListRef = db.ref('airdropList').orderByChild('timestamp').limitToLast(50);
-            airdropListRef.on('value', (snap) => {
-                const container = document.getElementById('airdropListContainer');
-                if (!snap.exists()) { container.innerHTML = '<p style="color:#94a3b8;font-size:13px;text-align:center;padding:10px;">Waiting for the first claim...</p>'; return; }
-                let html = ''; let list = [];
-                snap.forEach(child => { list.push({ id: child.key, ...child.val() }); });
-                list.sort((a,b) => b.timestamp - a.timestamp);
-                list.forEach((item, index) => {
-                    let timeAgo = Math.floor((Date.now() - item.timestamp) / 60000);
-                    let timeStr = timeAgo < 1 ? 'Just now' : `${timeAgo}m ago`;
-                    html += `<div class="airdrop-item ${index === 0 ? 'winner' : ''}"><span class="name">${index === 0 ? '👑 ' : ''}${item.username || 'Anonymous'}</span><span class="time">+$${item.amount.toFixed(2)} • ${timeStr}</span></div>`;
-                });
-                container.innerHTML = html || '<p style="color:#94a3b8;font-size:13px;text-align:center;padding:10px;">Waiting for the first claim...</p>';
-            });
-            db.ref('users/' + userId + '/airdropClaimed').once('value', (snap) => { appState.airdropClaimed = snap.val() || false; });
-        }
-
-        function startAirdropCountdown(startTime) {
-            if (airdropCountdownInterval) clearInterval(airdropCountdownInterval);
-            const btn = document.getElementById('airdropClaimBtn'); const countdownEl = document.getElementById('airdropCountdown');
-            const labelEl = document.getElementById('countdownLabel'); const statusBox = document.getElementById('airdropStatusBox');
-            const duration = 5 * 60 * 1000; const endTime = startTime + duration;
-            airdropCountdownInterval = setInterval(() => {
-                const now = Date.now();
-                if (now < startTime) {
-                    const diff = startTime - now; const h = Math.floor((diff / (1000 * 60 * 60)) % 24); const m = Math.floor((diff / (1000 * 60)) % 60); const s = Math.floor((diff / 1000) % 60);
-                    countdownEl.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-                    labelEl.textContent = 'Starts in'; btn.disabled = true; statusBox.textContent = '⏳ Drop starts soon...'; statusBox.className = 'status-box';
-                } else if (now >= startTime && now < endTime) {
-                    const diff = endTime - now; const h = Math.floor((diff / (1000 * 60 * 60)) % 24); const m = Math.floor((diff / (1000 * 60)) % 60); const s = Math.floor((diff / 1000) % 60);
-                    countdownEl.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-                    labelEl.textContent = '5-Min Claim Timer';
-                    if (!appState.airdropClaimed) { btn.disabled = false; btn.textContent = '🎁 Claim Your Share'; statusBox.textContent = '🔥 DROP STARTED!'; statusBox.className = 'status-box live'; } 
-                    else { btn.disabled = true; btn.textContent = '✅ Already Claimed'; statusBox.textContent = '🎉 You already claimed this round!'; statusBox.className = 'status-box'; }
-                } else { clearInterval(airdropCountdownInterval); countdownEl.textContent = '00:00:00'; labelEl.textContent = 'Drop Ended'; btn.disabled = true; statusBox.textContent = '⛔ This round has ended.'; statusBox.className = 'status-box ended'; }
-            }, 100);
-        }
-
-        function openAirdropPage() {
-            document.getElementById('airdropOverlay').classList.add('show');
-            document.getElementById('mainContent').classList.add('hide');
-            document.querySelector('.bottom-nav').style.display = 'none';
-            const visitorRef = db.ref('airdropVisitors/' + userId);
-            visitorRef.set(true); visitorRef.onDisconnect().remove();
-            if (airdropVisitorsCountRef) airdropVisitorsCountRef.off();
-            airdropVisitorsCountRef = db.ref('airdropVisitors');
-            airdropVisitorsCountRef.on('value', (snap) => { let count = snap.exists() ? snap.numChildren() : 0; document.getElementById('onlineUsersDisplay').textContent = count; document.getElementById('onlineUsersHome').textContent = count; });
-        }
-
-        function closeAirdropPage() {
-            document.getElementById('airdropOverlay').classList.remove('show');
-            document.getElementById('mainContent').classList.remove('hide');
-            document.querySelector('.bottom-nav').style.display = 'flex';
-            if (airdropVisitorsCountRef) { airdropVisitorsCountRef.off(); airdropVisitorsCountRef = null; document.getElementById('onlineUsersDisplay').textContent = '0'; document.getElementById('onlineUsersHome').textContent = '0'; }
-        }
-
-        function claimAirdrop() {
-            const btn = document.getElementById('airdropClaimBtn');
-            if(appState.airdropClaimed) { showToast('You already claimed this round!', 'error'); return; }
-            btn.disabled = true; btn.textContent = '⏳ Processing...';
-            let config = appState.airdropConfig || { min: 0.5, max: 2.0 };
-            let amount = Math.random() * (config.max - config.min) + config.min;
-            let coinsWon = Math.floor(amount * appState.conversionRate);
-            const updateData = {};
-            const claimData = { userId: userId, username: tg.initDataUnsafe?.user?.username || 'User', amount: amount, coins: coinsWon, timestamp: Date.now() };
-            updateData['users/' + userId + '/balance'] = firebase.database.ServerValue.increment(coinsWon);
-            updateData['users/' + userId + '/airdropClaimed'] = true;
-            updateData['airdropList/' + Date.now()] = claimData;
-            appState.balance += coinsWon; appState.airdropClaimed = true;
-            db.ref().update(updateData).then(() => {
-                document.getElementById('airdropRewardText').textContent = `You won +$${amount.toFixed(2)} (${coinsWon} Coins)!`;
-                document.getElementById('airdropModal').classList.add('active');
-                showToast(`🎉 +${coinsWon} Coins from AirDrop!`);
-                updateUI(); updateLevelUI(); btn.textContent = '✅ Already Claimed'; btn.disabled = true; closeAirdropPage();
-            }).catch(err => { console.error(err); showToast('Error claiming airdrop. Try again.', 'error'); btn.disabled = false; btn.textContent = '🎁 Claim Your Share'; appState.airdropClaimed = false; });
-        }
-
-        // ==================== OFFLINE HANDLER ====================
-        function checkConnection() {
-            const offlineOverlay = document.getElementById('offlineOverlay');
-            const mainContent = document.getElementById('mainContent');
-            const bottomNav = document.querySelector('.bottom-nav');
-            if (navigator.onLine) { offlineOverlay.classList.remove('show'); mainContent.style.display = 'block'; bottomNav.style.display = 'flex'; } 
-            else {
-                offlineOverlay.classList.add('show'); mainContent.style.display = 'none'; bottomNav.style.display = 'none';
-                if (progressInterval) { clearInterval(progressInterval); progressInterval = null; document.getElementById('progressStartBtn').disabled = false; document.getElementById('progressStartBtn').textContent = '▶ START'; showToast('⚠️ Internet lost. Mining paused.', 'error'); }
-            }
-        }
-        window.addEventListener('online', checkConnection);
-        window.addEventListener('offline', checkConnection);
 
         // ==================== REFERRAL SYSTEM ====================
         function updateReferUI() {
             const total = appState.referralCount || 0;
-            const perReferralCoins = referralConfig.perReferralCoins || 50;
-            const earned = total * perReferralCoins;
-            document.getElementById('referTotalHome').textContent = total;
-            document.getElementById('referEarnedHome').textContent = earned;
-            document.getElementById('referBonusHome').textContent = Math.floor(total / 10) * 50;
-            const progress = Math.min((total / 10) * 100, 100);
-            document.getElementById('referProgressFillHome').style.width = progress + '%';
-            document.getElementById('referProgressTextHome').textContent = `${total} / 10`;
+            const perReferral = 50;
+            
+            document.getElementById('referTotal').textContent = total;
+            document.getElementById('referEarned').textContent = total * perReferral;
+            document.getElementById('referBonus').textContent = Math.floor(total / 10) * 50;
+            
             renderTiers();
         }
 
         function renderTiers() {
             const total = appState.referralCount || 0;
             const tiers = [
-                { level: 1, count: referralConfig.tier1?.count || 10, bonus: referralConfig.tier1?.bonus || 50, name: '🥉 Bronze Referrer' },
-                { level: 2, count: referralConfig.tier2?.count || 25, bonus: referralConfig.tier2?.bonus || 150, name: '🥈 Silver Referrer' },
-                { level: 3, count: referralConfig.tier3?.count || 50, bonus: referralConfig.tier3?.bonus || 300, name: '🥇 Gold Referrer' },
-                { level: 4, count: referralConfig.tier4?.count || 100, bonus: referralConfig.tier4?.bonus || 500, name: '💎 Platinum Referrer' },
-                { level: 5, count: referralConfig.tier5?.count || 200, bonus: referralConfig.tier5?.bonus || 1000, name: '👑 Diamond Referrer' }
+                { level: 1, count: 10, bonus: 50, name: '🥉 Bronze' },
+                { level: 2, count: 25, bonus: 150, name: '🥈 Silver' },
+                { level: 3, count: 50, bonus: 300, name: '🥇 Gold' },
+                { level: 4, count: 100, bonus: 500, name: '💎 Platinum' },
+                { level: 5, count: 200, bonus: 1000, name: '👑 Diamond' }
             ];
+            
             let html = '';
             tiers.forEach(tier => {
                 const isClaimed = appState.referTiers && appState.referTiers[tier.level] === 1;
                 const isAvailable = total >= tier.count && !isClaimed;
-                const status = isClaimed ? '✅ Claimed' : (isAvailable ? '🎁 Claim Now' : `🔒 ${tier.count} needed`);
-                const cls = isClaimed ? 'claimed' : (isAvailable ? 'available' : 'locked');
-                html += `<div class="refer-tier"><div class="tier-info"><span class="tier-name">${tier.name}</span><span class="tier-desc">${tier.count} referrals • +${tier.bonus} Coins</span></div><span class="tier-status ${cls}" ${isAvailable ? `onclick="claimTier(${tier.level},${tier.bonus})"` : ''}>${status}</span></div>`;
+                const status = isClaimed ? '✅ Claimed' : (isAvailable ? '🎁 Claim' : `🔒 ${tier.count} needed`);
+                
+                html += `
+                    <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+                        <div>
+                            <div style="font-size:13px;font-weight:600;">${tier.name}</div>
+                            <div style="font-size:10px;color:#94a3b8;">${tier.count} referrals • +${tier.bonus} Coins</div>
+                        </div>
+                        <span style="font-size:12px;font-weight:700;color:${isAvailable ? '#fbbf24' : '#64748b'};cursor:${isAvailable ? 'pointer' : 'default'};" 
+                            ${isAvailable ? `onclick="claimTier(${tier.level},${tier.bonus})"` : ''}>${status}</span>
+                    </div>
+                `;
             });
-            document.getElementById('referTierListHome').innerHTML = html;
+            document.getElementById('referTierList').innerHTML = html;
         }
 
         function claimTier(level, bonus) {
-            const total = appState.referralCount || 0;
-            if (total < 10) { showToast('Not enough referrals!','error'); return; }
-            if (appState.referTiers && appState.referTiers[level] === 1) { showToast('Already claimed!','error'); return; }
+            if (appState.referTiers && appState.referTiers[level] === 1) {
+                showToast('Already claimed!', 'error');
+                return;
+            }
+            
             appState.balance += bonus;
             appState.xpPoints = (appState.xpPoints || NEGATIVE_XP_START) + (bonus * 2);
             if (!appState.referTiers) appState.referTiers = {};
             appState.referTiers[level] = 1;
-            userRef.update({ balance: appState.balance, xpPoints: appState.xpPoints, referTiers: appState.referTiers });
-            updateUI(); updateReferUI(); updateLevelUI();
-            showToast(`🎁 +${bonus} Coins & XP from referral tier!`);
+            
+            userRef.update({ 
+                balance: appState.balance, 
+                xpPoints: appState.xpPoints, 
+                referTiers: appState.referTiers 
+            });
+            
+            updateUI();
+            updateReferUI();
+            showToast(`🎁 +${bonus} Coins from referral tier!`);
         }
 
         function generateReferCode() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let code = '';
-            for (let i = 0; i < 8; i++) { code += chars.charAt(Math.floor(Math.random() * chars.length)); }
+            for (let i = 0; i < 8; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
             return code;
         }
 
-        function checkReferral() {
-            let startParam = tg.initDataUnsafe?.start_param || new URLSearchParams(window.location.search).get('start') || '';
+        function submitReferCode() {
+            const code = document.getElementById('referCodeInput').value.trim();
+            if (!code) { showToast('Please enter a code!', 'error'); return; }
+            
+            const btn = document.getElementById('referCodeSubmitBtn');
+            
+            userRef.once('value', snap => {
+                const data = snap.val() || {};
+                if (data.referCodeSubmitted) {
+                    showToast('You already submitted a code!', 'error');
+                    return;
+                }
+                
+                db.ref('users').orderByChild('referCode').equalTo(code).once('value', snapshot => {
+                    if (snapshot.exists()) {
+                        snapshot.forEach(child => {
+                            const referrerId = child.key;
+                            if (referrerId === userId) {
+                                showToast('Cannot use your own code!', 'error');
+                                return;
+                            }
+                            
+                            const newUserData = {
+                                referredBy: referrerId,
+                                referredAt: Date.now(),
+                                username: tg.initDataUnsafe?.user?.username || 'User',
+                                bonus: 50,
+                                userId: userId
+                            };
+                            
+                            db.ref('referrals/' + userId).set(newUserData).then(() => {
+                                db.ref('users/' + referrerId).transaction(current => {
+                                    if (current === null) return { referCount: 1, referrals: [newUserData] };
+                                    return { 
+                                        ...current, 
+                                        referCount: (current.referCount || 0) + 1, 
+                                        referrals: (current.referrals || []).concat([newUserData]) 
+                                    };
+                                });
+                                
+                                userRef.update({ 
+                                    balance: (appState.balance || 0) + 50, 
+                                    xpPoints: (appState.xpPoints || NEGATIVE_XP_START) + 100, 
+                                    referCodeSubmitted: true 
+                                });
+                                
+                                appState.balance += 50;
+                                appState.xpPoints += 100;
+                                btn.disabled = true;
+                                btn.textContent = '✅ Submitted';
+                                document.getElementById('referCodeInput').disabled = true;
+                                updateUI();
+                                showToast('🎉 Code accepted! +50 Coins!');
+                            });
+                        });
+                    } else {
+                        showToast('Invalid referral code!', 'error');
+                    }
+                });
+            });
+        }
+
+        function copyReferLink() {
+            const link = document.getElementById('referLinkHome').textContent;
+            navigator.clipboard.writeText(link).then(() => showToast('📋 Copied!'))
+                .catch(() => showToast('Copy manually', 'error'));
+        }
+
+        // ==================== AIRDROP SYSTEM ====================
+        function loadAirdropConfig() {
+            db.ref('airdropConfig').on('value', snap => {
+                const config = snap.val() || {};
+                document.getElementById('airdropPoolDisplay').textContent = `$${(config.poolAmount || 50).toFixed(2)}`;
+                
+                if (config.startTime) {
+                    startAirdropCountdown(config.startTime);
+                }
+            });
+        }
+
+        function startAirdropCountdown(startTime) {
+            const duration = 5 * 60 * 1000;
+            const endTime = startTime + duration;
+            
+            const interval = setInterval(() => {
+                const now = Date.now();
+                const remaining = Math.max(0, endTime - now);
+                
+                const h = Math.floor(remaining / (60 * 60 * 1000));
+                const m = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+                const s = Math.floor((remaining % (60 * 1000)) / 1000);
+                
+                document.getElementById('airdropCountdown').textContent = 
+                    `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                
+                const btn = document.getElementById('airdropClaimBtn');
+                if (remaining > 0 && !appState.airdropClaimed) {
+                    btn.disabled = false;
+                    btn.textContent = '🎁 Claim Your Share';
+                } else {
+                    btn.disabled = true;
+                    btn.textContent = appState.airdropClaimed ? '✅ Claimed' : '⛔ Ended';
+                }
+                
+                if (remaining <= 0) clearInterval(interval);
+            }, 100);
+        }
+
+        function openAirdropPage() {
+            document.getElementById('airdropOverlay').classList.add('show');
+        }
+
+        function closeAirdropPage() {
+            document.getElementById('airdropOverlay').classList.remove('show');
+        }
+
+        function claimAirdrop() {
+            if (appState.airdropClaimed) {
+                showToast('Already claimed!', 'error');
+                return;
+            }
+            
+            const btn = document.getElementById('airdropClaimBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Processing...';
+            
+            const amount = Math.random() * 1.5 + 0.5; // $0.50 - $2.00
+            const coinsWon = Math.floor(amount * appState.conversionRate);
+            
+            appState.balance += coinsWon;
+            appState.airdropClaimed = true;
+            
+            const claimData = {
+                userId: userId,
+                username: tg.initDataUnsafe?.user?.username || 'User',
+                amount: amount,
+                coins: coinsWon,
+                timestamp: Date.now()
+            };
+            
+            db.ref('airdropList/' + Date.now()).set(claimData);
+            userRef.update({ 
+                balance: appState.balance, 
+                airdropClaimed: true 
+            });
+            
+            showToast(`🎉 +${coinsWon} Coins from AirDrop!`);
+            updateUI();
+            btn.textContent = '✅ Claimed';
+        }
+
+        // ==================== SPECIAL OFFER ====================
+        function loadSpecialOffer() {
+            const container = document.getElementById('specialOfferContent');
+            container.innerHTML = '<p style="color:#94a3b8;">⏳ Checking for offers...</p>';
+            
+            db.ref('specialOffers/' + userId).on('value', snap => {
+                const offer = snap.val();
+                if (offer && !offer.claimed && offer.title) {
+                    container.innerHTML = `
+                        <div style="font-size:28px;font-weight:900;color:#fbbf24;">🎁 ${offer.title}</div>
+                        <div style="font-size:16px;color:#e2e8f0;margin:10px 0;">${offer.description || ''}</div>
+                        <div style="font-size:22px;font-weight:bold;color:#10b981;background:rgba(16,185,129,0.1);padding:10px;border-radius:12px;display:inline-block;margin:10px 0;">💰 +${offer.reward} Coins</div>
+                        <br>
+                        <button style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:14px 40px;border:none;border-radius:30px;font-weight:700;font-size:18px;cursor:pointer;" onclick="claimSpecialOffer()">Claim Reward</button>
+                    `;
+                } else if (offer && offer.claimed) {
+                    container.innerHTML = '<p style="color:#94a3b8;">✅ You already claimed this offer!</p>';
+                } else {
+                    container.innerHTML = '<p style="color:#94a3b8;">🤷 No special offers available right now.</p>';
+                }
+            });
+        }
+
+        function claimSpecialOffer() {
+            db.ref('specialOffers/' + userId).once('value', snap => {
+                const offer = snap.val();
+                if (offer && !offer.claimed) {
+                    appState.balance += offer.reward;
+                    userRef.update({ balance: appState.balance });
+                    db.ref('specialOffers/' + userId).update({ claimed: true, claimedAt: Date.now() });
+                    showToast(`🎉 +${offer.reward} Coins from special offer!`);
+                    loadSpecialOffer();
+                    updateUI();
+                }
+            });
+        }
+
+        // ==================== UI HELPERS ====================
+        function updateUI() {
+            document.getElementById('balance').textContent = appState.balance.toLocaleString();
+            document.getElementById('walletBalance').textContent = appState.balance;
+            
+            const usdValue = (appState.balance / appState.conversionRate).toFixed(2);
+            document.getElementById('usdValue').textContent = `≈ $${usdValue} USD`;
+            document.getElementById('walletUsd').textContent = `≈ $${usdValue} USD`;
+            
+            document.getElementById('totalUsdEarned').textContent = 
+                `💵 Total USD Earned: $${appState.usdBalance.toFixed(2)}`;
+            document.getElementById('walletTotalUsd').textContent = `$${appState.usdBalance.toFixed(2)}`;
+            document.getElementById('rateInfo').textContent = 
+                `Rate: 1 USD = ${appState.conversionRate} Coins`;
+            
+            updateWithdrawUI();
+            updateProgressUI();
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show';
+            if (type === 'error') toast.classList.add('error');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        // ==================== INIT ====================
+        function initApp() {
+            userRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    appState.balance = data.balance || 0;
+                    appState.usdBalance = data.usdBalance || 0;
+                    appState.completedTasks = data.completedTasks || 0;
+                    appState.referralCount = data.referCount || 0;
+                    appState.lastConversion = data.lastConversion || null;
+                    appState.referCode = data.referCode || '';
+                    appState.referTiers = data.referTiers || {};
+                    appState.referrals = data.referrals || [];
+                    appState.progressCoins = data.progressCoins !== undefined ? data.progressCoins : 1000;
+                    appState.videoWatchedCount = data.videoWatchedCount || 0;
+                    appState.speedBoostCooldown = data.speedBoostCooldown || 0;
+                    appState.taskLastCompleted = data.taskLastCompleted || {};
+                    appState.airdropClaimed = data.airdropClaimed || false;
+                    appState.xpPoints = data.xpPoints !== undefined ? data.xpPoints : NEGATIVE_XP_START;
+                    appState.videoWatchedToday = data.videoWatchedToday || 0;
+                    appState.videoLastWatchDate = data.videoLastWatchDate || null;
+                    appState.withdrawHistory = data.withdrawHistory || [];
+                    appState.lastLogin = data.lastLogin || null;
+                    
+                    const username = tg.initDataUnsafe?.user?.username || 'User';
+                    document.getElementById('userName').textContent = username;
+                    if (appState.lastLogin) {
+                        document.getElementById('lastLoginDisplay').textContent = 
+                            `📅 Last Login: ${new Date(appState.lastLogin).toLocaleString()}`;
+                    }
+                    
+                    updateUI();
+                    
+                    if (!appState.lastConversion) {
+                        appState.lastConversion = Date.now();
+                        userRef.update({ lastConversion: Date.now() });
+                    }
+                    startConversionTimer();
+                } else {
+                    userRef.set({
+                        balance: 0, usdBalance: 0, completedTasks: 0, referCount: 0,
+                        referCode: generateReferCode(), referTiers: {},
+                        videoWatchedToday: 0, videoLastWatchDate: null, withdrawHistory: [],
+                        lastLogin: new Date().toISOString(), progressCoins: 1000,
+                        videoWatchedCount: 0, speedBoostCooldown: 0, taskLastCompleted: {},
+                        airdropClaimed: false, xpPoints: NEGATIVE_XP_START,
+                        lastConversion: Date.now()
+                    });
+                    appState.referCode = generateReferCode();
+                    appState.lastConversion = Date.now();
+                    updateUI();
+                    startConversionTimer();
+                }
+                
+                const botUsername = 'CoinQuist_bot';
+                const link = `https://t.me/${botUsername}?start=ref_${appState.referCode}`;
+                document.getElementById('referLinkHome').textContent = link;
+            });
+
+            // Load configs
+            db.ref('conversionRate').on('value', s => {
+                appState.conversionRate = s.exists() ? s.val() : 1000;
+                updateUI();
+            });
+            
+            db.ref('withdrawSettings').on('value', s => {
+                if (s.exists()) {
+                    const d = s.val();
+                    appState.minWithdraw = d.minAmount || 10;
+                    if (d.methods) appState.withdrawMethods = d.methods;
+                }
+                updateWithdrawUI();
+            });
+            
+            db.ref('videoSettings').on('value', s => {
+                if (s.exists()) {
+                    const d = s.val();
+                    appState.videoReward = d.reward || 10;
+                    appState.videoDailyLimit = d.dailyLimit || 5;
+                }
+            });
+
+            loadTasksFromDB();
+            loadAirdropConfig();
+            listenWithdrawStatus();
+            
+            // Check for referral
+            const startParam = tg.initDataUnsafe?.start_param || 
+                new URLSearchParams(window.location.search).get('start') || '';
             if (startParam && startParam.startsWith('ref_')) {
                 const refCode = startParam.replace('ref_', '');
                 db.ref('users').orderByChild('referCode').equalTo(refCode).once('value', snapshot => {
@@ -1715,19 +1617,23 @@
                             if (referrerId !== userId) {
                                 db.ref('referrals/' + userId).once('value', s => {
                                     if (!s.exists()) {
-                                        const perReferralCoins = referralConfig.perReferralCoins || 50;
-                                        const newUserData = { referredBy: referrerId, referredAt: Date.now(), username: tg.initDataUnsafe?.user?.username || 'User', bonus: perReferralCoins, userId: userId };
+                                        const newUserData = {
+                                            referredBy: referrerId,
+                                            referredAt: Date.now(),
+                                            username: tg.initDataUnsafe?.user?.username || 'User',
+                                            bonus: 50,
+                                            userId: userId
+                                        };
                                         db.ref('referrals/' + userId).set(newUserData).then(() => {
                                             db.ref('users/' + referrerId).transaction(current => {
                                                 if (current === null) return { referCount: 1, referrals: [newUserData] };
                                                 return { ...current, referCount: (current.referCount || 0) + 1, referrals: (current.referrals || []).concat([newUserData]) };
-                                            }).then(() => {
-                                                userRef.update({ balance: (appState.balance || 0) + perReferralCoins, xpPoints: (appState.xpPoints || NEGATIVE_XP_START) + (perReferralCoins * 2) });
-                                                appState.balance = (appState.balance || 0) + perReferralCoins;
-                                                appState.xpPoints = (appState.xpPoints || NEGATIVE_XP_START) + (perReferralCoins * 2);
-                                                updateUI(); updateLevelUI(); updateReferUI();
-                                                showToast(`🎉 You got +${perReferralCoins} Coins & XP from referral!`);
                                             });
+                                            appState.balance += 50;
+                                            appState.xpPoints += 100;
+                                            userRef.update({ balance: appState.balance, xpPoints: appState.xpPoints });
+                                            updateUI();
+                                            showToast('🎉 +50 Coins from referral!');
                                         });
                                     }
                                 });
@@ -1738,196 +1644,7 @@
             }
         }
 
-        function submitReferCode() {
-            const codeInput = document.getElementById('referCodeInput');
-            const code = codeInput.value.trim();
-            const submitBtn = document.getElementById('referCodeSubmitBtn');
-            if (!code) { showToast('Please enter a referral code!', 'error'); return; }
-            userRef.once('value', snap => {
-                const data = snap.val() || {};
-                if (data.referCodeSubmitted) { showToast('You have already submitted a referral code!', 'error'); return; }
-                db.ref('users').orderByChild('referCode').equalTo(code).once('value', snapshot => {
-                    if (snapshot.exists()) {
-                        snapshot.forEach(child => {
-                            const referrerId = child.key;
-                            if (referrerId === userId) { showToast('You cannot use your own code!', 'error'); return; }
-                            const perReferralCoins = referralConfig.perReferralCoins || 50;
-                            const newUserData = { referredBy: referrerId, referredAt: Date.now(), username: tg.initDataUnsafe?.user?.username || 'User', bonus: perReferralCoins, userId: userId };
-                            db.ref('referrals/' + userId).set(newUserData).then(() => {
-                                db.ref('users/' + referrerId).transaction(current => {
-                                    if (current === null) return { referCount: 1, referrals: [newUserData] };
-                                    return { ...current, referCount: (current.referCount || 0) + 1, referrals: (current.referrals || []).concat([newUserData]) };
-                                }).then(() => {
-                                    userRef.update({ balance: (appState.balance || 0) + perReferralCoins, xpPoints: (appState.xpPoints || NEGATIVE_XP_START) + (perReferralCoins * 2), referCodeSubmitted: true });
-                                    appState.balance = (appState.balance || 0) + perReferralCoins;
-                                    appState.xpPoints = (appState.xpPoints || NEGATIVE_XP_START) + (perReferralCoins * 2);
-                                    submitBtn.disabled = true; submitBtn.textContent = '✅ Submitted'; codeInput.disabled = true;
-                                    updateUI(); updateLevelUI(); updateReferUI();
-                                    showToast(`🎉 Code accepted! +${perReferralCoins} Coins & XP from referral!`);
-                                });
-                            });
-                        });
-                    } else { showToast('Invalid referral code!', 'error'); }
-                });
-            });
-        }
-
-        function loadReferralData() {
-            db.ref('users/' + userId + '/referCode').once('value', s => {
-                if (!s.exists()) { const code = generateReferCode(); userRef.update({ referCode: code }); appState.referCode = code; }
-                else { appState.referCode = s.val(); }
-                updateReferUI();
-            });
-            db.ref('users/' + userId + '/referrals').on('value', snapshot => {
-                let count = 0, earn = 0, refs = [];
-                if (snapshot.exists()) { snapshot.forEach(child => { const val = child.val(); count++; earn += (val.bonus || 0); refs.push({ id: child.key, ...val }); }); }
-                appState.referralCount = count; appState.referEarned = earn; appState.referrals = refs;
-                updateReferUI(); loadReferralList();
-            });
-            db.ref('referrals/' + userId).once('value', s => {
-                if (s.exists() && s.val().referredBy && !s.val().bonusClaimed) {
-                    const perReferralCoins = referralConfig.perReferralCoins || 50;
-                    appState.balance = (appState.balance || 0) + perReferralCoins;
-                    appState.xpPoints = (appState.xpPoints || NEGATIVE_XP_START) + (perReferralCoins * 2);
-                    db.ref('referrals/' + userId).update({ bonusClaimed: true });
-                    userRef.update({ balance: appState.balance, xpPoints: appState.xpPoints });
-                    updateUI(); showToast(`🎉 Welcome! +${perReferralCoins} Coins & XP from referral!`);
-                }
-            });
-        }
-
-        function loadReferralList() {
-            const container = document.getElementById('referralListHome');
-            const refs = appState.referrals || [];
-            if (refs.length === 0) { container.innerHTML = '<p style="color:#94a3b8;font-size:13px;text-align:center;padding:10px;">No referrals yet</p>'; return; }
-            const html = refs.slice(-20).reverse().map(ref => `
-                <div class="referral-item">
-                    <span class="name">${ref.username || 'User'}</span>
-                    <span class="bonus">+${ref.bonus || 0} 🪙</span>
-                    <span class="date">${new Date(ref.referredAt || ref.date || Date.now()).toLocaleDateString()}</span>
-                </div>
-            `).join('');
-            container.innerHTML = html;
-        }
-
-        function copyReferLinkHome() {
-            const link = document.getElementById('referLinkHome').textContent;
-            navigator.clipboard.writeText(link).then(() => showToast('📋 Copied!')).catch(() => showToast('📋 Copy manually','error'));
-        }
-
-        // ==================== BAN CHECK ====================
-        function checkBanStatus() {
-            userRef.child('banned').on('value', snapshot => {
-                const isBanned = snapshot.val() === true;
-                if (isBanned) {
-                    appState.isBanned = true;
-                    document.getElementById('bannedOverlay').classList.add('show');
-                    document.getElementById('mainContent').style.display = 'none';
-                    document.querySelector('.bottom-nav').style.display = 'none';
-                    userRef.child('banReason').once('value', s => { document.getElementById('banReason').textContent = `Reason: ${s.val() || 'Violation of terms'}`; });
-                } else { appState.isBanned = false; document.getElementById('bannedOverlay').classList.remove('show'); document.getElementById('mainContent').style.display = 'block'; document.querySelector('.bottom-nav').style.display = 'flex'; }
-            });
-        }
-
-        // ==================== GEOLOCATION ====================
-        let userIP = 'Unknown', userCountry = 'Unknown';
-        function getUserLocation() {
-            fetch('https://ipapi.co/json/').then(res => res.json()).then(data => {
-                userIP = data.ip || 'Unknown'; userCountry = data.country_name || 'Unknown';
-                userRef.update({ ip: userIP, country: userCountry, lastLogin: new Date().toISOString() });
-            }).catch(() => {
-                fetch('https://api.ipify.org?format=json').then(res => res.json()).then(data => {
-                    userIP = data.ip || 'Unknown'; userRef.update({ ip: userIP, lastLogin: new Date().toISOString() });
-                }).catch(() => {});
-            });
-        }
-
-        // ==================== UI UPDATE ====================
-        function updateUI() {
-            document.getElementById('balance').textContent = appState.balance.toLocaleString();
-            document.getElementById('completedTasks').textContent = appState.completedTasks || 0;
-            document.getElementById('referralCount').textContent = appState.referralCount || 0;
-            document.getElementById('dailyStreak').textContent = appState.dailyStreak || 0;
-            document.getElementById('walletBalance').textContent = appState.balance;
-            updateUSDDisplay(); updateLevelUI(); updateWithdrawUI(); updateVideoUI(); updateProgressUI(); updateSpeedBoostUI();
-        }
-
-        // ==================== TOAST ====================
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            toast.textContent = message; toast.className = 'toast show';
-            if (type === 'error') toast.classList.add('error');
-            clearTimeout(toast._timeout);
-            toast._timeout = setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-
-        // ==================== INIT ====================
-        function initApp() {
-            checkConnection();
-            userRef.on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    appState.balance = data.balance || 0; appState.usdBalance = data.usdBalance || 0;
-                    appState.completedTasks = data.completedTasks || 0; appState.referralCount = data.referCount || 0;
-                    appState.dailyStreak = data.dailyStreak || 0; appState.tasksCompleted = data.tasksCompleted || [];
-                    appState.lastConversion = data.lastConversion || null; appState.weekStart = data.weekStart || null;
-                    appState.referCode = data.referCode || ''; appState.referEarned = data.referEarned || 0;
-                    appState.referTiers = data.referTiers || {}; appState.referrals = data.referrals || [];
-                    appState.videoWatchedToday = data.videoWatchedToday || 0; appState.videoLastWatchDate = data.videoLastWatchDate || null;
-                    appState.withdrawHistory = data.withdrawHistory || []; appState.lastLogin = data.lastLogin || null;
-                    appState.progressCoins = data.progressCoins !== undefined ? data.progressCoins : 1000;
-                    appState.videoWatchedCount = data.videoWatchedCount !== undefined ? data.videoWatchedCount : 0;
-                    appState.speedBoostCooldown = data.speedBoostCooldown || 0; appState.taskLastCompleted = data.taskLastCompleted || {};
-                    appState.airdropClaimed = data.airdropClaimed || false;
-                    appState.xpPoints = data.xpPoints !== undefined ? data.xpPoints : NEGATIVE_XP_START; 
-                    
-                    const username = tg.initDataUnsafe?.user?.username || 'User';
-                    document.getElementById('userName').textContent = username;
-                    if (appState.lastLogin) document.getElementById('lastLoginDisplay').textContent = `📅 Last Login: ${new Date(appState.lastLogin).toLocaleString()}`;
-                    
-                    updateUI(); updateLevelUI(); updateVideoUI(); updateReferUI(); updateWithdrawHistory(); updateProgressUI(); updateSpeedBoostUI();
-                    
-                    if (appState.lastConversion) { startConversionTimer(); } 
-                    else { appState.lastConversion = Date.now(); userRef.update({ lastConversion: Date.now() }); startConversionTimer(); }
-                } else {
-                    userRef.set({
-                        balance: 0, usdBalance: 0, completedTasks: 0, referCount: 0, dailyStreak: 0, tasksCompleted: [],
-                        referCode: generateReferCode(), referTiers: {}, videoWatchedToday: 0, videoLastWatchDate: null, withdrawHistory: [],
-                        lastLogin: new Date().toISOString(), progressCoins: 1000, videoWatchedCount: 0, speedBoostCooldown: 0, taskLastCompleted: {},
-                        airdropClaimed: false, xpPoints: NEGATIVE_XP_START
-                    });
-                    appState.referCode = generateReferCode(); updateUI(); updateLevelUI(); startConversionTimer(); updateProgressUI();
-                }
-                const botUsername = 'CoinQuist_bot';
-                const link = `https://t.me/${botUsername}?start=ref_${appState.referCode}`;
-                document.getElementById('referLinkHome').textContent = link;
-            });
-
-            loadConversionRate(); loadTasksFromDB(); loadVideoSettings();
-            loadWithdrawSettings(); loadLevelConfig(); loadReferralConfig();
-            loadAirdropData(); checkBanStatus(); loadReferralData(); checkReferral();
-            getUserLocation(); listenWithdrawStatus();
-
-            setTimeout(() => { if (!appState.isBanned) showToast('👋 Welcome! Collect 1000 XP to Unlock!'); }, 1500);
-        }
-
         document.addEventListener('DOMContentLoaded', initApp);
-        show_11197472({ type: 'inApp', inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false } });
-        document.addEventListener('visibilitychange', () => { if (!document.hidden) { updateUI(); updateProgressUI(); updateSpeedBoostUI(); } });
-        document.addEventListener('dblclick', (e) => e.preventDefault());
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
-        });
-        window.addEventListener('error', (e) => { console.error('❌ Global error:', e.message); });
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                if (document.getElementById('levelOverlay').classList.contains('show')) closeLevelPage();
-                else if (document.getElementById('airdropOverlay').classList.contains('show')) closeAirdropPage();
-                else if (document.getElementById('webviewFullscreenOverlay').classList.contains('show')) closeFullWebview();
-            }
-        });
     </script>
 </body>
 </html>
