@@ -14,7 +14,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', -apple-system, sans-serif; }
         body { 
-            background: #0f172a; color: #e2e8f0; padding-bottom: 70px; min-height: 100vh; 
+            background: #0f172a; color: #e2e8f0; padding-bottom: 80px; min-height: 100vh; 
             background: radial-gradient(circle at 20% 30%, #1e293b, #0f172a); 
         }
         .container { max-width: 500px; margin: 0 auto; padding: 12px; }
@@ -22,206 +22,207 @@
         /* Header */
         .header { 
             background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); 
-            padding: 12px 16px; border-radius: 20px; margin-bottom: 14px; 
+            padding: 14px 18px; border-radius: 20px; margin-bottom: 16px; 
             box-shadow: 0 8px 32px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); 
         }
-        .user-info { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .user-info { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
         .avatar { 
-            width: 38px; height: 38px; border-radius: 50%; 
+            width: 42px; height: 42px; border-radius: 50%; 
             background: linear-gradient(135deg, #8b5cf6, #3b82f6); 
             display: flex; align-items: center; justify-content: center; 
-            font-size: 18px; cursor: pointer; color: #fff; 
+            font-size: 20px; cursor: pointer; color: #fff; 
+            box-shadow: 0 4px 15px rgba(139,92,246,0.3);
         }
-        .user-details h3 { font-size: 14px; font-weight: 600; color: #fff; }
-        .user-details .last-login { font-size: 9px; color: #94a3b8; }
+        .user-details h3 { font-size: 15px; font-weight: 600; color: #fff; }
+        .user-details .last-login { font-size: 10px; color: #94a3b8; }
         .level-badge { 
-            display: inline-block; background: rgba(251,191,36,0.15); padding: 2px 10px; 
-            border-radius: 20px; font-size: 10px; cursor: pointer; 
+            display: inline-block; background: rgba(251,191,36,0.15); padding: 3px 12px; 
+            border-radius: 20px; font-size: 11px; cursor: pointer; 
             border: 1px solid rgba(251,191,36,0.3); color: #fbbf24; 
+            transition: all 0.3s ease;
         }
+        .level-badge:hover { background: rgba(251,191,36,0.25); transform: scale(1.05); }
         
         .balance-card { 
-            background: rgba(255,255,255,0.05); padding: 12px; border-radius: 16px; 
+            background: rgba(255,255,255,0.05); padding: 14px; border-radius: 16px; 
             border: 1px solid rgba(255,255,255,0.1); 
         }
-        .balance-label { font-size: 10px; color: #94a3b8; letter-spacing: 1px; }
+        .balance-label { font-size: 11px; color: #94a3b8; letter-spacing: 1px; }
         .balance-amount { 
-            font-size: 28px; font-weight: 900; 
+            font-size: 32px; font-weight: 900; 
             background: linear-gradient(to right, #fcd34d, #fbbf24, #f59e0b); 
             -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
         }
-        .usd-value { color: #10b981; font-size: 14px; font-weight: bold; }
+        .usd-value { color: #10b981; font-size: 15px; font-weight: bold; }
         
         .level-section { 
-            background: rgba(255,255,255,0.05); border-radius: 10px; padding: 8px 12px; 
-            margin-top: 6px; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); 
+            background: rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 14px; 
+            margin-top: 8px; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); 
+            transition: all 0.3s ease;
         }
+        .level-section:hover { background: rgba(255,255,255,0.08); }
         .level-section .level-row { 
             display: flex; justify-content: space-between; align-items: center; 
         }
+        .level-section .level-title { font-size: 11px; font-weight: bold; color: #94a3b8; }
+        .level-section .level-number { font-size: 15px; font-weight: bold; color: #fbbf24; }
         .level-progress { 
             width: 100%; height: 5px; background: rgba(255,255,255,0.1); 
-            border-radius: 5px; margin-top: 5px; overflow: hidden; 
+            border-radius: 5px; margin-top: 6px; overflow: hidden; 
         }
         .level-progress .fill { 
             height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); 
-            border-radius: 5px; transition: width 0.3s ease;
+            border-radius: 5px; transition: width 0.5s ease;
         }
         
         .conversion-timer { 
             background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.15); 
-            border-radius: 10px; padding: 8px; margin-top: 8px; 
+            border-radius: 12px; padding: 10px; margin-top: 10px; 
         }
-        .conversion-timer .label { font-size: 9px; color: #94a3b8; }
-        .conversion-timer .time { font-size: 14px; font-weight: bold; color: #10b981; }
+        .conversion-timer .label { font-size: 10px; color: #94a3b8; }
+        .conversion-timer .time { font-size: 16px; font-weight: bold; color: #10b981; }
 
-        /* Mining Circle with Start Button Inside */
+        /* ===== MINING CIRCLE - START BUTTON OVERLAY ===== */
         .mining-circle-wrapper { 
-            display: flex; justify-content: center; align-items: center; margin: 20px 0; 
-            position: relative;
+            display: flex; justify-content: center; align-items: center; 
+            margin: 15px 0; position: relative;
         }
         .mining-circle { 
-            position: relative; width: 240px; height: 240px; border-radius: 50%; 
-            background: conic-gradient(#fbbf24 0%, #1e293b 0%); 
+            position: relative; width: 250px; height: 250px; border-radius: 50%; 
+            background: conic-gradient(#fbbf24 100%, #1e293b 100%); 
             display: flex; justify-content: center; align-items: center; 
-            box-shadow: 0 0 40px rgba(251,191,36,0.15); 
+            box-shadow: 0 0 50px rgba(251,191,36,0.2); 
             transition: background 0.5s ease;
+            cursor: pointer;
         }
-        .mining-circle .inner-circle { 
-            width: 180px; height: 180px; border-radius: 50%; 
-            background: #0f172a; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; z-index: 2; 
-            border: 2px solid rgba(255,255,255,0.05); 
+        .mining-circle.mining-active {
+            box-shadow: 0 0 60px rgba(251,191,36,0.4);
+            animation: miningPulse 2s infinite;
         }
-        .mining-circle .coin-icon { font-size: 30px; margin-bottom: 5px; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-        .mining-circle .coin-count { font-size: 28px; font-weight: 900; color: #fbbf24; }
-        .mining-circle .circle-status { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+        @keyframes miningPulse {
+            0%, 100% { box-shadow: 0 0 40px rgba(251,191,36,0.2); }
+            50% { box-shadow: 0 0 70px rgba(251,191,36,0.5); }
+        }
         
-        /* Start Button Inside Circle */
-        .circle-start-btn { 
+        /* START Button - Full Circle Overlay */
+        .circle-start-overlay {
             position: absolute;
+            top: 0; left: 0;
             width: 100%; height: 100%;
             border-radius: 50%;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            z-index: 10;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: all 0.3s ease;
+            z-index: 10;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            border: 3px solid rgba(251,191,36,0.4);
         }
-        .circle-start-btn:hover {
-            box-shadow: 0 0 30px rgba(251,191,36,0.3);
+        .circle-start-overlay:hover {
+            background: rgba(0,0,0,0.5);
+            border-color: rgba(251,191,36,0.7);
+            box-shadow: 0 0 40px rgba(251,191,36,0.3);
         }
-        .circle-start-btn:active {
-            transform: scale(0.97);
+        .circle-start-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.95);
         }
-        .circle-start-btn .start-text {
-            position: absolute;
-            bottom: -50px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            color: #fff;
-            padding: 8px 24px;
-            border-radius: 20px;
-            font-weight: 700;
-            font-size: 14px;
-            white-space: nowrap;
-            box-shadow: 0 4px 15px rgba(59,130,246,0.3);
-            transition: all 0.3s ease;
+        .circle-start-overlay .start-icon {
+            font-size: 48px;
+            margin-bottom: 8px;
+            animation: bounceIcon 1.5s infinite;
         }
-        .circle-start-btn:disabled .start-text {
-            opacity: 0.5;
-            background: #64748b;
+        @keyframes bounceIcon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
-        .circle-start-btn.mining .start-text {
-            background: #f59e0b;
-            animation: pulse 2s infinite;
+        .circle-start-overlay .start-text {
+            font-size: 20px;
+            font-weight: 900;
+            color: #fbbf24;
+            text-shadow: 0 0 20px rgba(251,191,36,0.5);
+            letter-spacing: 2px;
+            text-align: center;
+            line-height: 1.3;
+        }
+        .circle-start-overlay .start-subtext {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 4px;
         }
         
-        .circle-watch-btn { 
-            margin-top: 15px; background: linear-gradient(135deg, #10b981, #059669); 
-            color: #fff; padding: 10px 24px; border: none; border-radius: 25px; 
-            font-weight: 700; font-size: 14px; cursor: pointer; width: 100%; max-width: 300px; 
-            transition: all 0.3s ease;
+        /* Inner Circle Content */
+        .mining-circle .inner-circle { 
+            width: 170px; height: 170px; border-radius: 50%; 
+            background: #0f172a; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; z-index: 5; 
+            border: 2px solid rgba(255,255,255,0.08); 
         }
-        .circle-watch-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(16,185,129,0.3); }
+        .mining-circle .coin-icon { 
+            font-size: 32px; margin-bottom: 5px; 
+            animation: coinSpin 3s linear infinite;
+        }
+        @keyframes coinSpin {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
+        }
+        .mining-circle .coin-count { 
+            font-size: 30px; font-weight: 900; color: #fbbf24; 
+        }
+        .mining-circle .circle-status { 
+            font-size: 10px; color: #94a3b8; margin-top: 4px; 
+        }
+        .mining-circle .circle-progress-text {
+            font-size: 11px; color: #94a3b8; margin-top: 2px;
+        }
+        
+        /* Watch Ads Button */
+        .circle-watch-btn { 
+            margin-top: 12px; 
+            background: linear-gradient(135deg, #10b981, #059669); 
+            color: #fff; padding: 10px 20px; border: none; border-radius: 25px; 
+            font-weight: 700; font-size: 13px; cursor: pointer; 
+            width: 100%; max-width: 280px; 
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(16,185,129,0.3);
+        }
+        .circle-watch-btn:hover { transform: translateY(-2px); }
         .circle-watch-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* Speed Boost with Real-time Countdown */
+        /* Speed Boost */
         .speed-btn-container { 
-            margin-top: 15px; width: 100%; display: flex; 
+            margin-top: 12px; width: 100%; display: flex; 
             justify-content: center; flex-direction: column; align-items: center; 
         }
         .speed-boost-btn { 
             background: linear-gradient(135deg, #f97316, #f59e0b); color: #fff; 
-            padding: 10px 24px; border: none; border-radius: 25px; font-weight: 700; 
-            font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px;
+            padding: 10px 20px; border: none; border-radius: 25px; font-weight: 700; 
+            font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px;
             transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(249,115,22,0.3);
         }
-        .speed-boost-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(249,115,22,0.4); }
+        .speed-boost-btn:hover { transform: translateY(-2px); }
         .speed-boost-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .speed-boost-btn i { animation: spin 2s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
         
-        /* Countdown Display */
         .boost-countdown-box {
             display: none;
             background: rgba(249,115,22,0.15);
             border: 2px solid rgba(249,115,22,0.3);
             border-radius: 15px;
-            padding: 12px 20px;
+            padding: 14px 20px;
             text-align: center;
-            animation: fadeIn 0.3s ease;
+            width: 100%;
+            max-width: 280px;
         }
-        .boost-countdown-box.show {
-            display: block;
-        }
+        .boost-countdown-box.show { display: block; }
         .boost-countdown-box .countdown-label {
-            font-size: 11px;
-            color: #f97316;
-            margin-bottom: 4px;
+            font-size: 12px; color: #f97316; margin-bottom: 4px;
         }
         .boost-countdown-box .countdown-time {
-            font-size: 28px;
-            font-weight: 900;
-            color: #f97316;
-            letter-spacing: 2px;
-        }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Speed Boost Overlay */
-        .speed-spinner-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.9); backdrop-filter: blur(10px);
-            z-index: 9999; display: none; align-items: center; justify-content: center;
-            flex-direction: column;
-        }
-        .speed-spinner-overlay.active { display: flex; }
-        .speed-spinner {
-            width: 80px; height: 80px;
-            border: 6px solid rgba(255,255,255,0.1);
-            border-top: 6px solid #fbbf24;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-        .speed-spinner-text {
-            color: #fff; font-size: 20px; font-weight: 700; margin-bottom: 10px;
-        }
-        .speed-spinner-timer {
-            color: #fbbf24; font-size: 36px; font-weight: 900; margin-bottom: 15px;
-        }
-        .speed-spinner-progress {
-            width: 250px; height: 8px; background: rgba(255,255,255,0.1);
-            border-radius: 10px; overflow: hidden;
-        }
-        .speed-spinner-progress .fill {
-            height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            border-radius: 10px; width: 0%; transition: width 0.1s linear;
+            font-size: 32px; font-weight: 900; color: #f97316;
         }
 
         /* Pages */
@@ -240,7 +241,6 @@
             padding: 5px 14px; border-radius: 20px; 
             border: 1px solid rgba(255,255,255,0.1); background: transparent; 
             color: #94a3b8; cursor: pointer; font-size: 11px; white-space: nowrap; 
-            transition: all 0.3s ease;
         }
         .task-filters .filter-btn.active { 
             background: linear-gradient(135deg, #8b5cf6, #3b82f6); 
@@ -250,67 +250,130 @@
         .task-card { 
             background: rgba(255,255,255,0.03); border-radius: 14px; 
             padding: 14px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.08);
-            transition: transform 0.2s ease;
+            transition: transform 0.2s;
         }
         .task-card:hover { transform: translateY(-2px); }
-        .task-card .task-header { 
-            display: flex; justify-content: space-between; align-items: center; 
-        }
+        .task-card .task-header { display: flex; justify-content: space-between; align-items: center; }
         .task-card .task-title { font-size: 14px; font-weight: 600; color: #fff; }
         .task-card .task-reward { color: #10b981; font-weight: bold; font-size: 14px; }
-        .task-card .task-desc { font-size: 11px; color: #94a3b8; margin: 4px 0; }
         .task-card .task-btn { 
             background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; 
-            padding: 6px 20px; border-radius: 10px; border: none; font-weight: 700; 
-            cursor: pointer; font-size: 12px; transition: all 0.3s ease;
+            padding: 6px 18px; border-radius: 10px; border: none; font-weight: 700; 
+            cursor: pointer; font-size: 12px;
         }
-        .task-card .task-btn:hover { transform: scale(1.05); }
         .task-card .task-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* Refer Section */
-        .refer-stats { 
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; 
+        /* Level Page */
+        .level-overlay-content {
+            padding: 15px;
         }
-        .refer-stats .stat { 
-            background: rgba(255,255,255,0.03); padding: 12px 8px; 
-            border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.08); 
+        .current-level-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 2px solid rgba(251,191,36,0.2);
         }
-        .refer-stats .stat .number { font-size: 20px; font-weight: 900; color: #fbbf24; }
-        .refer-stats .stat .label { font-size: 10px; color: #94a3b8; }
+        .current-level-card .level-emoji {
+            font-size: 60px;
+            margin-bottom: 8px;
+        }
+        .current-level-card .level-number {
+            font-size: 28px;
+            font-weight: 900;
+            color: #fbbf24;
+        }
+        .current-level-card .level-name {
+            font-size: 16px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+        .current-level-card .level-bonus {
+            display: inline-block;
+            background: rgba(16,185,129,0.15);
+            color: #10b981;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            margin-top: 6px;
+        }
         
-        .refer-link-box { 
-            background: rgba(255,255,255,0.03); border-radius: 14px; 
-            padding: 14px; margin-bottom: 14px; text-align: center; 
-            border: 1px solid rgba(255,255,255,0.08); 
+        .level-filters {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            padding-bottom: 5px;
         }
-        .refer-link-box .link { 
-            background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; 
-            font-size: 12px; color: #3b82f6; word-break: break-all; margin: 8px 0; 
-        }
-        .refer-link-box .copy-btn { 
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; 
-            padding: 8px 20px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; 
+        .level-filters .lvl-filter-btn {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: transparent;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 11px;
+            white-space: nowrap;
             transition: all 0.3s ease;
         }
-        .refer-link-box .copy-btn:hover { transform: translateY(-2px); }
-
-        .refer-code-input-box { 
-            background: rgba(255,255,255,0.03); border-radius: 14px; 
-            padding: 14px; margin-bottom: 14px; text-align: center; 
-            border: 1px solid rgba(255,255,255,0.08); 
+        .level-filters .lvl-filter-btn.active {
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            border-color: transparent;
+            color: #fff;
         }
-        .refer-code-input-box input { 
-            width: 100%; padding: 10px; background: rgba(255,255,255,0.05); 
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; 
-            font-size: 13px; color: #fff; margin-bottom: 8px; outline: none; 
+        
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
         }
-        .refer-code-input-box button { 
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; 
-            padding: 8px 20px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; 
+        .level-card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.08);
             transition: all 0.3s ease;
+            cursor: pointer;
         }
-        .refer-code-input-box button:hover { transform: translateY(-2px); }
-        .refer-code-input-box button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .level-card.current {
+            border: 2px solid #fbbf24;
+            background: rgba(251,191,36,0.08);
+            box-shadow: 0 0 20px rgba(251,191,36,0.1);
+        }
+        .level-card.unlocked {
+            border-color: rgba(16,185,129,0.3);
+        }
+        .level-card.locked {
+            opacity: 0.4;
+        }
+        .level-card .lvl-num {
+            font-size: 18px;
+            font-weight: 900;
+            color: #fbbf24;
+        }
+        .level-card .lvl-name {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+        .level-card .lvl-bonus {
+            font-size: 12px;
+            color: #10b981;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+        .level-card .lvl-status {
+            font-size: 10px;
+            margin-top: 3px;
+            color: #94a3b8;
+        }
+        .level-card.current .lvl-status {
+            color: #fbbf24;
+            font-weight: bold;
+        }
 
         /* Wallet */
         .wallet-card { 
@@ -323,7 +386,6 @@
             background: linear-gradient(135deg, #fbbf24, #f59e0b); 
             -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
         }
-        .wallet-card .wallet-usd { color: #10b981; font-size: 20px; font-weight: bold; margin-top: 4px; }
         
         .withdraw-section { 
             margin-top: 15px; padding: 15px; 
@@ -331,25 +393,18 @@
             border: 1px solid rgba(239,68,68,0.15); text-align: left;
         }
         .withdraw-section .form-group { margin-bottom: 12px; }
-        .withdraw-section .form-group label { 
-            font-size: 12px; color: #94a3b8; margin-bottom: 5px; display: block; 
-        }
+        .withdraw-section .form-group label { font-size: 12px; color: #94a3b8; margin-bottom: 5px; display: block; }
         .withdraw-section .form-group select, 
         .withdraw-section .form-group input { 
             width: 100%; padding: 10px; border-radius: 8px; 
             border: 1px solid #334155; background: #1e293b; 
             color: #fff; font-size: 14px; outline: none; 
         }
-        .withdraw-section .form-group select:focus,
-        .withdraw-section .form-group input:focus { border-color: #fbbf24; }
         .withdraw-section .withdraw-btn { 
             margin-top: 8px; padding: 12px 20px; 
             background: linear-gradient(135deg, #10b981, #059669); 
             border: none; border-radius: 10px; color: #fff; font-weight: 700; 
-            cursor: pointer; width: 100%; font-size: 15px; transition: all 0.3s ease;
-        }
-        .withdraw-section .withdraw-btn:hover:not(:disabled) { 
-            transform: translateY(-2px); box-shadow: 0 4px 15px rgba(16,185,129,0.3); 
+            cursor: pointer; width: 100%; font-size: 15px;
         }
         .withdraw-section .withdraw-btn:disabled { background: #64748b; cursor: not-allowed; }
 
@@ -359,17 +414,14 @@
             width: 100%; max-width: 500px; background: rgba(15,23,42,0.95); 
             backdrop-filter: blur(24px); display: flex; justify-content: space-around; 
             padding: 10px 4px; border-top: 1px solid rgba(255,255,255,0.05); 
-            z-index: 1000; box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+            z-index: 1000; 
         }
         .nav-item { 
             display: flex; flex-direction: column; align-items: center; gap: 3px; 
             color: #64748b; font-size: 10px; cursor: pointer; flex: 1; 
-            transition: color 0.3s ease;
         }
         .nav-item.active { color: #fbbf24; }
-        .nav-item i { font-size: 20px; transition: transform 0.3s ease; }
-        .nav-item:hover i { transform: translateY(-3px); }
-        .nav-item.active i { text-shadow: 0 0 15px rgba(251,191,36,0.3); }
+        .nav-item i { font-size: 20px; }
 
         /* Modal & Toast */
         .modal { 
@@ -379,50 +431,25 @@
         }
         .modal.active { display: flex; }
         .modal-content { 
-            background: rgba(30,41,59,0.95); backdrop-filter: blur(12px); 
-            padding: 25px; border-radius: 20px; width: 90%; max-width: 350px; 
-            text-align: center; border: 1px solid rgba(255,255,255,0.1); 
-            animation: modalSlideIn 0.3s ease;
-        }
-        @keyframes modalSlideIn { 
-            from { opacity: 0; transform: scale(0.9) translateY(20px); } 
-            to { opacity: 1; transform: scale(1) translateY(0); } 
+            background: rgba(30,41,59,0.95); padding: 25px; border-radius: 20px; 
+            width: 90%; max-width: 350px; text-align: center; 
+            border: 1px solid rgba(255,255,255,0.1); 
         }
         .modal-content button { 
             background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; 
             padding: 12px 30px; border-radius: 12px; border: none; 
             font-weight: 700; cursor: pointer; margin-top: 15px; 
-            transition: transform 0.2s ease;
         }
-        .modal-content button:hover { transform: scale(1.05); }
         .success-animation { font-size: 50px; margin-bottom: 12px; }
-        .modal-content h3 { font-size: 22px; margin-bottom: 8px; color: #fff; }
-        .modal-content p { color: #94a3b8; margin-bottom: 10px; }
         
         .toast { 
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%); 
             background: #10b981; color: #fff; padding: 12px 24px; 
             border-radius: 14px; font-weight: 700; z-index: 99999; 
-            display: none; font-size: 14px; box-shadow: 0 8px 30px rgba(16,185,129,0.3);
-            animation: slideDown 0.4s ease;
+            display: none; font-size: 14px; 
         }
         .toast.show { display: block; }
-        .toast.error { background: #ef4444; box-shadow: 0 8px 30px rgba(239,68,68,0.3); }
-        @keyframes slideDown { 
-            from { opacity: 0; transform: translateY(-80px) translateX(-50%); } 
-            to { opacity: 1; transform: translateY(0) translateX(-50%); } 
-        }
-
-        /* Floating Coin */
-        .floating-coin { 
-            position: fixed; font-size: 30px; pointer-events: none; z-index: 1000; 
-            animation: floatUp 1s ease-out forwards; 
-            text-shadow: 0 0 20px rgba(251,191,36,0.5);
-        }
-        @keyframes floatUp { 
-            0% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); } 
-            100% { opacity: 0; transform: translateY(-150px) scale(0.5) rotate(30deg); } 
-        }
+        .toast.error { background: #ef4444; }
 
         /* Overlays */
         .overlay { 
@@ -434,49 +461,61 @@
         .overlay-header { 
             background: rgba(15,23,42,0.95); padding: 15px 20px; 
             position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 10px; 
-            backdrop-filter: blur(8px);
         }
         .overlay-header .back-btn { 
             background: rgba(255,255,255,0.1); border: none; color: #fff; 
-            padding: 8px 16px; border-radius: 10px; cursor: pointer; font-size: 13px;
-            transition: background 0.3s ease;
+            padding: 8px 16px; border-radius: 10px; cursor: pointer; 
         }
-        .overlay-header .back-btn:hover { background: rgba(255,255,255,0.2); }
         .overlay-content { padding: 15px; }
 
-        /* Webview */
-        .webview-fullscreen-overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #0f172a; z-index: 99999; display: none; flex-direction: column; 
+        /* Floating Coin */
+        .floating-coin { 
+            position: fixed; font-size: 30px; pointer-events: none; z-index: 1000; 
+            animation: floatUp 1s ease-out forwards; 
         }
-        .webview-fullscreen-overlay.show { display: flex; }
-        .webview-header { 
-            background: #1e293b; padding: 15px 20px; 
-            display: flex; justify-content: space-between; align-items: center; 
+        @keyframes floatUp { 
+            0% { opacity: 1; transform: translateY(0) scale(1); } 
+            100% { opacity: 0; transform: translateY(-150px) scale(0.5); } 
         }
-        .webview-header .webview-timer { 
-            color: #fbbf24; font-weight: bold; background: rgba(0,0,0,0.5); 
-            padding: 6px 14px; border-radius: 20px; font-size: 16px;
-        }
-        .webview-iframe-container { flex-grow: 1; display: flex; }
-        .webview-iframe-container iframe { width: 100%; height: 100%; border: none; }
-        .webview-footer { 
-            background: #1e293b; padding: 15px 20px; display: flex; justify-content: center; 
-        }
-        .webview-footer button { 
-            background: #64748b; color: #fff; padding: 14px 24px; 
-            border: none; border-radius: 12px; width: 100%; font-weight: 700; font-size: 16px;
-            transition: all 0.3s ease;
-        }
-        .webview-footer button.active-btn { 
-            background: linear-gradient(135deg, #10b981, #059669); cursor: pointer; 
-        }
-        .webview-footer button.active-btn:hover { transform: scale(1.02); }
 
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
+
+    <!-- Level Overlay -->
+    <div class="overlay" id="levelOverlay">
+        <div class="overlay-header">
+            <button class="back-btn" onclick="closeLevelPage()"><i class="fas fa-arrow-left"></i> Back</button>
+            <h2 style="color:#fff;flex:1;text-align:center;">🏆 Level System</h2>
+        </div>
+        <div class="level-overlay-content">
+            <div class="current-level-card">
+                <div class="level-emoji" id="lvlEmoji">🔒</div>
+                <div class="level-number" id="lvlNumber">Level 0</div>
+                <div class="level-name" id="lvlName">Unlocking...</div>
+                <div style="margin-top:8px;">
+                    <span style="font-size:13px;color:#94a3b8;">XP: </span>
+                    <span style="font-size:16px;font-weight:bold;color:#fff;" id="lvlXP">-1000 / 0</span>
+                </div>
+                <div class="level-progress" style="margin-top:10px;">
+                    <div class="fill" id="lvlProgressFill" style="width:0%;"></div>
+                </div>
+                <div class="level-bonus" id="lvlBonus">Mining Bonus: +0%</div>
+            </div>
+            
+            <div class="level-filters">
+                <button class="lvl-filter-btn active" onclick="filterLevels('all', this)">📋 All (100)</button>
+                <button class="lvl-filter-btn" onclick="filterLevels('bronze', this)">🥉 Bronze (1-20)</button>
+                <button class="lvl-filter-btn" onclick="filterLevels('silver', this)">🥈 Silver (21-40)</button>
+                <button class="lvl-filter-btn" onclick="filterLevels('gold', this)">🥇 Gold (41-60)</button>
+                <button class="lvl-filter-btn" onclick="filterLevels('platinum', this)">💎 Platinum (61-80)</button>
+                <button class="lvl-filter-btn" onclick="filterLevels('diamond', this)">👑 Diamond (81-100)</button>
+            </div>
+            
+            <div class="level-grid" id="levelGrid"></div>
+        </div>
+    </div>
 
     <!-- Main Container -->
     <div class="container main-content" id="mainContent">
@@ -484,79 +523,58 @@
         <!-- Header -->
         <div class="header">
             <div class="user-info">
-                <div class="avatar" onclick="openLevelPage()">👤</div>
+                <div class="avatar">👤</div>
                 <div class="user-details">
                     <h3 id="userName">User</h3>
                     <div class="last-login" id="lastLoginDisplay">📅 Last Login: --</div>
-                    <span class="level-badge" onclick="openLevelPage()" id="userLevelBadge">🔒 Level 0</span>
+                    <span class="level-badge" onclick="openLevelPage()" id="userLevelBadge">🔒 Unlocking</span>
                 </div>
             </div>
             <div class="balance-card">
                 <div class="balance-label">💰 Coins Balance</div>
                 <div class="balance-amount" id="balance">0</div>
                 <div class="usd-value" id="usdValue">≈ $0.00 USD</div>
-                <div class="total-usd-earned" id="totalUsdEarned" style="font-size:10px;color:#94a3b8;margin-top:2px;">💵 Total USD Earned: $0.00</div>
+                <div id="totalUsdEarned" style="font-size:10px;color:#94a3b8;margin-top:2px;">💵 Total USD: $0.00</div>
                 
-                <!-- Level Section -->
                 <div class="level-section" onclick="openLevelPage()">
                     <div class="level-row">
-                        <span class="level-title" id="levelTitle">🔒 Bronze 1</span>
-                        <span class="level-number" id="levelNumber">Level 1</span>
-                        <span class="level-arrow">➜</span>
+                        <span class="level-title" id="levelTitle">🔒 Unlocking</span>
+                        <span class="level-number" id="levelNumber">Level 0</span>
                     </div>
                     <div class="level-progress">
                         <div class="fill" id="levelProgressFill" style="width: 0%;"></div>
                     </div>
-                    <div class="level-points" style="font-size:9px;color:#94a3b8;display:flex;justify-content:space-between;margin-top:3px;">
-                        <span id="levelCurrentPoints">0 XP</span>
-                        <span id="levelNextPoints">/ 400 XP</span>
+                    <div style="font-size:9px;color:#94a3b8;display:flex;justify-content:space-between;margin-top:3px;">
+                        <span id="levelCurrentPoints">-1000 XP</span>
+                        <span id="levelNextPoints">/ 0 XP</span>
                     </div>
                 </div>
                 
                 <div class="conversion-timer">
                     <div class="label">⏰ Next Auto Conversion</div>
                     <div class="time" id="conversionCountdown">--:--:--</div>
-                    <div class="rate-info" id="rateInfo" style="font-size:9px;color:#94a3b8;">Rate: 1 USD = 1000 Coins</div>
+                    <div id="rateInfo" style="font-size:9px;color:#94a3b8;">Rate: 1 USD = 1000 Coins</div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Home Cards -->
-        <div class="home-card-grid" style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px;">
-            <div style="background:rgba(255,255,255,0.05);border-radius:16px;padding:16px 20px;border:1px solid rgba(251,191,36,0.3);display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="openAirdropPage()">
-                <div style="display:flex;align-items:center;gap:14px;">
-                    <span style="font-size:28px;">📢</span>
-                    <div>
-                        <div style="font-size:15px;font-weight:700;color:#fff;">Live AirDrop</div>
-                        <div style="font-size:11px;color:#94a3b8;">Claim free crypto rewards!</div>
-                    </div>
-                </div>
-                <span style="color:#94a3b8;">➜</span>
-            </div>
-            <div style="background:rgba(255,255,255,0.05);border-radius:16px;padding:16px 20px;border:2px solid #ef4444;display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="switchPage('specialOffer')">
-                <div style="display:flex;align-items:center;gap:14px;">
-                    <span style="font-size:28px;">🎁</span>
-                    <div>
-                        <div style="font-size:15px;font-weight:700;color:#fca5a5;">Special Offer</div>
-                        <div style="font-size:11px;color:#94a3b8;">Exclusive deal for you!</div>
-                    </div>
-                </div>
-                <span style="color:#fca5a5;">➜</span>
             </div>
         </div>
 
         <!-- Pages -->
         <div class="page active" id="pageHome">
+            <!-- Mining Circle with START Overlay -->
             <div class="mining-circle-wrapper">
                 <div class="mining-circle" id="miningCircle">
-                    <!-- Start Button INSIDE the circle -->
-                    <button class="circle-start-btn" id="progressStartBtn" onclick="startProgress()">
-                        <span class="start-text" id="startBtnText">▶ START MINING</span>
-                    </button>
+                    <!-- START Button Overlay - covers entire circle -->
+                    <div class="circle-start-overlay" id="circleStartOverlay" onclick="startMining()">
+                        <div class="start-icon">⚡</div>
+                        <div class="start-text">START<br>MINING</div>
+                        <div class="start-subtext">Tap to earn coins</div>
+                    </div>
+                    <!-- Inner circle content -->
                     <div class="inner-circle">
                         <span class="coin-icon">🪙</span>
                         <span class="coin-count" id="progressCoinCount">1000</span>
-                        <div class="circle-status" id="progressStatus">Tap to start</div>
+                        <div class="circle-status" id="progressStatus">Ready</div>
+                        <div class="circle-progress-text" id="progressPercent">100%</div>
                     </div>
                 </div>
             </div>
@@ -567,96 +585,83 @@
                 </button>
             </div>
             
-            <!-- Speed Boost Section -->
+            <!-- Speed Boost -->
             <div class="speed-btn-container">
                 <button class="speed-boost-btn" id="speedBoostBtn" onclick="activateSpeedBoost()">
                     <i class="fas fa-rocket"></i> Speed Boost
                 </button>
                 <div class="boost-countdown-box" id="boostCountdownBox">
-                    <div class="countdown-label">⏳ Speed Boost Cooldown</div>
+                    <div class="countdown-label">⏳ Cooldown</div>
                     <div class="countdown-time" id="boostCountdownTime">00:00</div>
                 </div>
             </div>
         </div>
 
         <div class="page" id="pageTasks">
-            <h2 class="page-header">📋 Complete Tasks</h2>
+            <h2 class="page-header">📋 Tasks</h2>
             <div class="task-filters">
-                <button class="filter-btn active" onclick="filterTasks('all', this)">📋 All</button>
+                <button class="filter-btn active" onclick="filterTasks('all', this)">All</button>
                 <button class="filter-btn" onclick="filterTasks('link', this)">🔗 Link</button>
                 <button class="filter-btn" onclick="filterTasks('button', this)">🟦 Button</button>
                 <button class="filter-btn" onclick="filterTasks('video', this)">📺 Video</button>
             </div>
-            <div id="tasksContainer"><p style="color:#94a3b8;text-align:center;">Loading tasks...</p></div>
+            <div id="tasksContainer"></div>
         </div>
 
         <div class="page" id="pageRefer">
             <h2 class="page-header">👥 Refer & Earn</h2>
-            <div class="refer-link-box">
+            <div style="background:rgba(255,255,255,0.03);border-radius:14px;padding:14px;margin-bottom:14px;text-align:center;">
                 <p style="font-size:13px;color:#94a3b8;">Your Referral Link</p>
-                <div class="link" id="referLinkHome">Loading...</div>
-                <button class="copy-btn" onclick="copyReferLink()"><i class="fas fa-copy"></i> Copy Link</button>
+                <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:10px;font-size:12px;color:#3b82f6;word-break:break-all;margin:8px 0;" id="referLinkHome">Loading...</div>
+                <button style="background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;padding:8px 20px;border-radius:10px;border:none;font-weight:700;cursor:pointer;" onclick="copyReferLink()">📋 Copy Link</button>
             </div>
             
-            <div class="refer-code-input-box">
-                <p style="font-size:13px;color:#94a3b8;margin-bottom:8px;">📝 Enter Referral Code</p>
-                <input type="text" id="referCodeInput" placeholder="Enter code here...">
-                <button id="referCodeSubmitBtn" onclick="submitReferCode()">Submit Code</button>
+            <div style="background:rgba(255,255,255,0.03);border-radius:14px;padding:14px;margin-bottom:14px;text-align:center;">
+                <input type="text" id="referCodeInput" placeholder="Enter referral code..." style="width:100%;padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;margin-bottom:8px;outline:none;">
+                <button id="referCodeSubmitBtn" onclick="submitReferCode()" style="background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;padding:8px 20px;border-radius:10px;border:none;font-weight:700;cursor:pointer;">Submit Code</button>
             </div>
 
-            <div class="refer-stats">
-                <div class="stat"><div class="number" id="referTotal">0</div><div class="label">Referrals</div></div>
-                <div class="stat"><div class="number" id="referEarned">0</div><div class="label">Coins</div></div>
-                <div class="stat"><div class="number" id="referBonus">0</div><div class="label">Bonus</div></div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
+                <div style="background:rgba(255,255,255,0.03);padding:12px;border-radius:12px;text-align:center;">
+                    <div style="font-size:20px;font-weight:900;color:#fbbf24;" id="referTotal">0</div>
+                    <div style="font-size:10px;color:#94a3b8;">Referrals</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.03);padding:12px;border-radius:12px;text-align:center;">
+                    <div style="font-size:20px;font-weight:900;color:#fbbf24;" id="referEarned">0</div>
+                    <div style="font-size:10px;color:#94a3b8;">Coins</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.03);padding:12px;border-radius:12px;text-align:center;">
+                    <div style="font-size:20px;font-weight:900;color:#fbbf24;" id="referBonus">0</div>
+                    <div style="font-size:10px;color:#94a3b8;">Bonus</div>
+                </div>
             </div>
-
-            <div style="margin-top:15px;">
-                <h4 style="font-size:15px;margin-bottom:10px;">🎁 Tier Bonuses</h4>
-                <div id="referTierList"></div>
-            </div>
+            <div id="referTierList"></div>
         </div>
 
         <div class="page" id="pageWallet">
-            <h2 class="page-header">💰 My Wallet</h2>
+            <h2 class="page-header">💰 Wallet</h2>
             <div class="wallet-card">
-                <p style="color:#94a3b8;font-size:13px;">Coins Balance</p>
+                <p style="color:#94a3b8;">Coins Balance</p>
                 <div class="wallet-balance" id="walletBalance">0</div>
-                <div class="wallet-usd" id="walletUsd">≈ $0.00 USD</div>
+                <div style="color:#10b981;font-size:18px;font-weight:bold;" id="walletUsd">≈ $0.00</div>
                 
                 <div style="background:rgba(16,185,129,0.1);border-radius:10px;padding:10px;margin-top:15px;">
-                    <div style="font-size:11px;color:#94a3b8;">💵 Total USD Earned</div>
+                    <div style="font-size:11px;color:#94a3b8;">💵 Total USD</div>
                     <div style="font-size:18px;font-weight:bold;color:#10b981;" id="walletTotalUsd">$0.00</div>
                 </div>
                 
-                <div style="background:rgba(59,130,246,0.1);border-radius:10px;padding:10px;margin-top:10px;">
-                    <div style="font-size:10px;color:#94a3b8;">⏰ Next Conversion</div>
-                    <div style="font-size:14px;color:#3b82f6;font-weight:bold;" id="walletNextConversion">--:--:--</div>
-                </div>
-                
                 <div class="withdraw-section">
-                    <p style="font-size:13px;font-weight:bold;color:#fbbf24;margin-bottom:10px;" id="withdrawInfo">Min: $10.00 USD</p>
+                    <p style="font-weight:bold;color:#fbbf24;margin-bottom:8px;" id="withdrawInfo">Min: $10.00</p>
                     <div class="form-group">
-                        <label>Select Withdrawal Method</label>
-                        <select id="withdrawMethod">
-                            <option value="Nagad">Nagad</option>
-                            <option value="Rocket">Rocket</option>
-                        </select>
+                        <label>Method</label>
+                        <select id="withdrawMethod"></select>
                     </div>
                     <div class="form-group">
-                        <label>Account / Mobile Number</label>
-                        <input type="text" id="withdrawAccount" placeholder="Enter your number...">
+                        <label>Account Number</label>
+                        <input type="text" id="withdrawAccount" placeholder="Enter number...">
                     </div>
-                    <p style="font-size:12px;color:#94a3b8;margin-bottom:10px;" id="withdrawStatus">You have: $0.00 USD</p>
+                    <p style="font-size:11px;color:#94a3b8;" id="withdrawStatus">You have: $0.00</p>
                     <button class="withdraw-btn" id="withdrawBtn" onclick="withdraw()">Withdraw Now</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="page" id="pageSpecialOffer">
-            <h2 class="page-header">🎁 Special Offer</h2>
-            <div style="background:linear-gradient(135deg,rgba(251,191,36,0.1),rgba(245,158,11,0.05));border-radius:24px;padding:24px;border:2px solid rgba(251,191,36,0.3);text-align:center;">
-                <div id="specialOfferContent">
-                    <p style="color:#94a3b8;">⏳ Checking for exclusive offers...</p>
                 </div>
             </div>
         </div>
@@ -671,75 +676,14 @@
     </div>
 
     <!-- Modals -->
-    <div class="modal" id="successModal">
-        <div class="modal-content">
-            <div class="success-animation">🎉</div>
-            <h3>Completed!</h3>
-            <p id="rewardText">+50 Coins</p>
-            <button onclick="closeModal('successModal')">Awesome!</button>
-        </div>
-    </div>
-    <div class="modal" id="conversionModal">
-        <div class="modal-content">
-            <div class="success-animation">💰</div>
-            <h3>Coins Converted!</h3>
-            <p id="conversionText">Coins → USD</p>
-            <button onclick="closeModal('conversionModal')">OK</button>
-        </div>
-    </div>
-    <div class="modal" id="withdrawModal">
-        <div class="modal-content">
-            <div class="success-animation">💳</div>
-            <h3 id="withdrawModalTitle">Withdrawal</h3>
-            <p id="withdrawModalText">Processing...</p>
-            <button onclick="closeModal('withdrawModal')">OK</button>
-        </div>
-    </div>
-
-    <!-- Airdrop Overlay -->
-    <div class="overlay" id="airdropOverlay">
-        <div class="overlay-header">
-            <button class="back-btn" onclick="closeAirdropPage()"><i class="fas fa-arrow-left"></i> Back</button>
-            <h2 style="color:#fff;">📢 Live AirDrop</h2>
-        </div>
-        <div class="overlay-content">
-            <div style="background:rgba(255,255,255,0.03);border-radius:16px;padding:20px;text-align:center;">
-                <div style="font-size:40px;font-weight:900;color:#fbbf24;" id="airdropPoolDisplay">$50.00</div>
-                <div style="color:#94a3b8;margin-top:4px;">Current Pool</div>
-                <div style="font-size:36px;font-weight:bold;color:#fbbf24;margin:15px 0;" id="airdropCountdown">--:--:--</div>
-                <button style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:14px 24px;border:none;border-radius:30px;font-weight:700;font-size:16px;cursor:pointer;width:100%;" id="airdropClaimBtn" onclick="claimAirdrop()" disabled>🎁 Claim Your Share</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Webview Overlay -->
-    <div class="webview-fullscreen-overlay" id="webviewFullscreenOverlay">
-        <div class="webview-header">
-            <div style="color:#fff;font-weight:700;">🔗 Task Page</div>
-            <div class="webview-timer" id="webviewFullTimer">30s</div>
-        </div>
-        <div class="webview-iframe-container">
-            <iframe id="webviewFullIframe" src="about:blank"></iframe>
-        </div>
-        <div class="webview-footer">
-            <button id="webviewFullClaimBtn" onclick="closeFullWebview()" disabled>⏳ Wait 30s to Claim</button>
-        </div>
-    </div>
-
-    <!-- Speed Boost Overlay -->
-    <div class="speed-spinner-overlay" id="speedSpinnerOverlay">
-        <div class="speed-spinner"></div>
-        <div class="speed-spinner-text">⚡ Speed Boost Active!</div>
-        <div class="speed-spinner-timer" id="speedTimerDisplay">3.0s</div>
-        <div class="speed-spinner-progress">
-            <div class="fill" id="speedProgressFill" style="width:0%;"></div>
-        </div>
-    </div>
+    <div class="modal" id="successModal"><div class="modal-content"><div class="success-animation">🎉</div><h3>Completed!</h3><p id="rewardText">+50 Coins</p><button onclick="closeModal('successModal')">OK</button></div></div>
+    <div class="modal" id="conversionModal"><div class="modal-content"><div class="success-animation">💰</div><h3>Converted!</h3><p id="conversionText"></p><button onclick="closeModal('conversionModal')">OK</button></div></div>
+    <div class="modal" id="withdrawModal"><div class="modal-content"><div class="success-animation">💳</div><h3 id="withdrawModalTitle"></h3><p id="withdrawModalText"></p><button onclick="closeModal('withdrawModal')">OK</button></div></div>
 
     <div class="toast" id="toast"></div>
 
     <script>
-        // ==================== FIREBASE CONFIG ====================
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyAqCNHhu9oaBDea85tAH-iHucHczZnR7nY",
             authDomain: "tolaka-exc-reverb-b1afd.firebaseapp.com",
@@ -751,13 +695,10 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        
         let tg = window.Telegram.WebApp;
         tg.expand();
         let userId = 'default_user';
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            userId = tg.initDataUnsafe.user.id.toString();
-        }
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) userId = tg.initDataUnsafe.user.id.toString();
 
         // ==================== APP STATE ====================
         let appState = {
@@ -768,276 +709,248 @@
             progressCoins: 1000, videoWatchedCount: 0,
             isSpeedBoostActive: false, speedBoostCooldown: 0,
             taskLastCompleted: {}, airdropClaimed: false,
-            xpPoints: 0, withdrawMethods: ['Nagad', 'Rocket'],
-            videoWatchedToday: 0, videoLastWatchDate: null,
-            videoReward: 10, videoDailyLimit: 5
+            xpPoints: -1000, withdrawMethods: ['Nagad', 'Rocket'],
+            videoWatchedToday: 0, videoLastWatchDate: null
         };
 
         let tasks = [];
         let conversionTimerInterval = null;
-        let progressInterval = null;
-        let speedBoostInterval = null;
-        let speedBoostCountdownInterval = null;
+        let miningInterval = null;
+        let boostCountdownInterval = null;
         let currentFilter = 'all';
+        let currentLevelFilter = 'all';
 
         const userRef = db.ref('users/' + userId);
         const TOTAL_COINS = 1000;
+        const NEGATIVE_XP = -1000;
 
-        // ==================== MONETAG ADS ====================
-        function showRewardedAd(callback) {
-            if (typeof show_11197472 === 'function') {
-                show_11197472().then(() => { if (callback) callback(); })
-                    .catch(() => { if (callback) callback(); });
-            } else {
-                if (callback) callback();
+        // ==================== LEVEL SYSTEM (100 LEVELS, 5 TIERS) ====================
+        function getLevelConfig(level) {
+            let tierName, tierEmoji, bonusPercent, xpRequired;
+            
+            if (level === 0) {
+                return { tierName: 'Unlocking', tierEmoji: '🔒', bonusPercent: 0, xpRequired: 0 };
+            } else if (level >= 1 && level <= 20) {
+                tierName = 'Bronze'; tierEmoji = '🥉';
+                bonusPercent = level === 1 ? 1 : (level <= 5 ? 2 : (level <= 10 ? 3 : (level <= 15 ? 4 : 5)));
+            } else if (level >= 21 && level <= 40) {
+                tierName = 'Silver'; tierEmoji = '🥈';
+                bonusPercent = level <= 25 ? 7 : (level <= 30 ? 10 : (level <= 35 ? 12 : 15));
+            } else if (level >= 41 && level <= 60) {
+                tierName = 'Gold'; tierEmoji = '🥇';
+                bonusPercent = level <= 45 ? 17 : (level <= 50 ? 20 : (level <= 55 ? 22 : 25));
+            } else if (level >= 61 && level <= 80) {
+                tierName = 'Platinum'; tierEmoji = '💎';
+                bonusPercent = level <= 65 ? 27 : (level <= 70 ? 30 : (level <= 75 ? 35 : 40));
+            } else if (level >= 81 && level <= 100) {
+                tierName = 'Diamond'; tierEmoji = '👑';
+                bonusPercent = level <= 85 ? 42 : (level <= 90 ? 45 : (level <= 95 ? 48 : 50));
             }
+            
+            // XP calculation: each level needs more XP
+            if (level === 1) xpRequired = 0; // After negative XP is filled
+            else xpRequired = level * 100; // Simple scaling
+            
+            return { tierName, tierEmoji, bonusPercent, xpRequired };
         }
 
-        // ==================== PAGE NAVIGATION ====================
-        function switchPage(page, el) {
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            if (el) el.classList.add('active');
+        function calculateLevel(xpPoints) {
+            let xp = xpPoints || NEGATIVE_XP;
             
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            const targetPage = document.getElementById('page' + page.charAt(0).toUpperCase() + page.slice(1));
-            if (targetPage) targetPage.classList.add('active');
+            // If still in negative, level 0
+            if (xp < 0) {
+                let progressPercent = Math.floor(((NEGATIVE_XP - Math.abs(xp)) / Math.abs(NEGATIVE_XP)) * 100);
+                return {
+                    level: 0, xp: xp, xpForLevel: 0, xpNeeded: NEGATIVE_XP,
+                    progress: Math.max(0, progressPercent),
+                    tierName: 'Unlocking', tierEmoji: '🔒', bonusPercent: 0,
+                    isMaxLevel: false
+                };
+            }
             
-            if (page === 'tasks') renderTasks();
-            if (page === 'refer') updateReferUI();
-            if (page === 'wallet') updateWithdrawUI();
-            if (page === 'specialOffer') loadSpecialOffer();
-        }
-
-        // ==================== LEVEL SYSTEM (FIXED) ====================
-        function calculateLevel(xp) {
-            if (xp < 0) xp = 0;
+            // Level calculation after reaching 0 XP
             let level = 1;
-            let xpForNext = 400;
-            let totalXpNeeded = 0;
+            let xpForNextLevel = 100; // XP needed for level 2
+            let totalXpForCurrentLevel = 0;
             
-            while (xp >= totalXpNeeded + xpForNext && level < 100) {
-                totalXpNeeded += xpForNext;
+            while (xp >= totalXpForCurrentLevel + xpForNextLevel && level < 100) {
+                totalXpForCurrentLevel += xpForNextLevel;
                 level++;
-                xpForNext = level === 2 ? 400 : xpForNext * 2;
+                xpForNextLevel = (level) * 100;
             }
             
-            let xpIntoCurrentLevel = xp - totalXpNeeded;
-            let progress = Math.min(100, Math.floor((xpIntoCurrentLevel / xpForNext) * 100));
+            let xpIntoLevel = xp - totalXpForCurrentLevel;
+            let progress = Math.min(100, Math.floor((xpIntoLevel / xpForNextLevel) * 100));
             
-            let tierName, tierEmoji, bonusPercent;
-            if (level >= 81) { tierName = "Diamond"; tierEmoji = "👑"; bonusPercent = 25; }
-            else if (level >= 61) { tierName = "Platinum"; tierEmoji = "💎"; bonusPercent = 15; }
-            else if (level >= 41) { tierName = "Gold"; tierEmoji = "🥇"; bonusPercent = 10; }
-            else if (level >= 21) { tierName = "Silver"; tierEmoji = "🥈"; bonusPercent = 5; }
-            else { tierName = "Bronze"; tierEmoji = "🥉"; bonusPercent = 1; }
+            let config = getLevelConfig(level);
             
             return {
-                level, xpIntoCurrentLevel, xpForNext, progress,
-                tierName, tierEmoji, bonusPercent,
-                totalXpNeeded, isMaxLevel: level >= 100
+                level, xp, xpForLevel: xpForNextLevel, xpNeeded: totalXpForCurrentLevel,
+                progress, ...config,
+                isMaxLevel: level >= 100
             };
         }
 
         function updateLevelUI() {
-            const levelData = calculateLevel(appState.xpPoints || 0);
-            appState.userLevel = levelData.level;
+            const lvlData = calculateLevel(appState.xpPoints);
+            appState.userLevel = lvlData.level;
             
-            // Update header level section
-            document.getElementById('levelTitle').textContent = `${levelData.tierEmoji} ${levelData.tierName}`;
-            document.getElementById('levelNumber').textContent = `Level ${levelData.level}`;
-            document.getElementById('levelProgressFill').style.width = levelData.progress + '%';
-            document.getElementById('levelCurrentPoints').textContent = `${levelData.xpIntoCurrentLevel} XP`;
-            document.getElementById('levelNextPoints').textContent = levelData.isMaxLevel ? '⭐ MAX' : `/ ${levelData.xpForNext} XP`;
-            document.getElementById('userLevelBadge').textContent = `${levelData.tierEmoji} Level ${levelData.level}`;
-        }
-
-        // ==================== CONVERSION TIMER ====================
-        function startConversionTimer() {
-            if (conversionTimerInterval) clearInterval(conversionTimerInterval);
-            
-            function updateTimer() {
-                const now = Date.now();
-                const lastConversion = appState.lastConversion || now;
-                const nextConversion = lastConversion + (24 * 60 * 60 * 1000);
-                const remaining = Math.max(0, nextConversion - now);
-                
-                const h = Math.floor(remaining / (60 * 60 * 1000));
-                const m = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
-                const s = Math.floor((remaining % (60 * 1000)) / 1000);
-                
-                const timeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-                document.getElementById('conversionCountdown').textContent = timeStr;
-                document.getElementById('walletNextConversion').textContent = timeStr;
-                
-                if (remaining <= 0) performConversion();
-            }
-            
-            updateTimer();
-            conversionTimerInterval = setInterval(updateTimer, 1000);
-        }
-
-        function performConversion() {
-            if (appState.balance > 0) {
-                const earned = appState.balance / appState.conversionRate;
-                appState.usdBalance += earned;
-                const coins = appState.balance;
-                appState.balance = 0;
-                appState.lastConversion = Date.now();
-                userRef.update({ balance: 0, usdBalance: appState.usdBalance, lastConversion: appState.lastConversion });
-                document.getElementById('conversionText').textContent = `${coins.toLocaleString()} Coins → $${earned.toFixed(2)} USD`;
-                document.getElementById('conversionModal').classList.add('active');
-                updateUI();
-                showToast(`💰 Converted ${coins} Coins to $${earned.toFixed(2)} USD!`);
+            // Home page level section
+            if (lvlData.level === 0) {
+                document.getElementById('levelTitle').textContent = '🔒 Unlocking';
+                document.getElementById('levelNumber').textContent = 'Level 0';
+                document.getElementById('levelProgressFill').style.width = lvlData.progress + '%';
+                document.getElementById('levelCurrentPoints').textContent = `${lvlData.xp} XP`;
+                document.getElementById('levelNextPoints').textContent = '/ 0 XP';
+                document.getElementById('userLevelBadge').textContent = '🔒 Unlocking';
             } else {
-                appState.lastConversion = Date.now();
-                userRef.update({ lastConversion: appState.lastConversion });
-            }
-            if (conversionTimerInterval) clearInterval(conversionTimerInterval);
-            startConversionTimer();
-        }
-
-        // ==================== WITHDRAW SYSTEM ====================
-        function updateWithdrawUI() {
-            const bal = appState.usdBalance || 0;
-            const min = appState.minWithdraw || 10;
-            
-            document.getElementById('withdrawInfo').textContent = `Min: $${min.toFixed(2)} USD`;
-            document.getElementById('withdrawStatus').textContent = `You have: $${bal.toFixed(2)} USD`;
-            
-            const methodSelect = document.getElementById('withdrawMethod');
-            methodSelect.innerHTML = '';
-            (appState.withdrawMethods || ['Nagad', 'Rocket']).forEach(m => {
-                methodSelect.innerHTML += `<option value="${m}">${m}</option>`;
-            });
-
-            const btn = document.getElementById('withdrawBtn');
-            if (bal >= min) {
-                btn.disabled = false;
-                btn.textContent = 'Withdraw Now';
-            } else {
-                btn.disabled = true;
-                btn.textContent = `Need $${(min - bal).toFixed(2)} more`;
+                document.getElementById('levelTitle').textContent = `${lvlData.tierEmoji} ${lvlData.tierName}`;
+                document.getElementById('levelNumber').textContent = `Level ${lvlData.level}`;
+                document.getElementById('levelProgressFill').style.width = lvlData.progress + '%';
+                document.getElementById('levelCurrentPoints').textContent = `${lvlData.xp} XP`;
+                document.getElementById('levelNextPoints').textContent = lvlData.isMaxLevel ? '⭐ MAX' : `/ ${lvlData.xpForLevel} XP needed`;
+                document.getElementById('userLevelBadge').textContent = `${lvlData.tierEmoji} Lv.${lvlData.level}`;
             }
         }
 
-        function withdraw() {
-            const bal = appState.usdBalance || 0;
-            const min = appState.minWithdraw || 10;
-            
-            if (bal < min) { showToast(`Minimum $${min} USD required!`, 'error'); return; }
-            
-            const method = document.getElementById('withdrawMethod').value;
-            const account = document.getElementById('withdrawAccount').value.trim();
-            
-            if (!account) { showToast('Please enter your account number!', 'error'); return; }
-
-            const id = Date.now().toString();
-            const withdrawData = {
-                userId: userId,
-                username: tg.initDataUnsafe?.user?.username || 'User',
-                amount: bal, method: method, account: account,
-                status: 'pending', requestedAt: new Date().toISOString()
-            };
-            
-            db.ref('withdrawRequests/' + id).set(withdrawData);
-            appState.usdBalance = 0;
-            
-            if (!appState.withdrawHistory) appState.withdrawHistory = [];
-            appState.withdrawHistory.push({
-                id, amount: bal, method, account,
-                status: 'pending', date: new Date().toISOString()
-            });
-            
-            userRef.update({ usdBalance: 0, withdrawHistory: appState.withdrawHistory });
-            
-            document.getElementById('withdrawModalTitle').textContent = '💰 Request Sent!';
-            document.getElementById('withdrawModalText').textContent = `$${bal.toFixed(2)} pending via ${method}.`;
-            document.getElementById('withdrawModal').classList.add('active');
-            document.getElementById('withdrawAccount').value = '';
-            
-            updateUI(); updateWithdrawUI();
-            showToast(`$${bal.toFixed(2)} withdrawal requested!`);
+        function openLevelPage() {
+            document.getElementById('levelOverlay').classList.add('show');
+            updateLevelPageUI();
+            renderLevelGrid();
         }
 
-        function listenWithdrawStatus() {
-            db.ref('withdrawRequests').orderByChild('userId').equalTo(userId)
-                .on('child_changed', (snapshot) => {
-                    const data = snapshot.val();
-                    if (data && appState.withdrawHistory) {
-                        const idx = appState.withdrawHistory.findIndex(h => h.id === snapshot.key);
-                        if (idx !== -1) {
-                            appState.withdrawHistory[idx].status = data.status;
-                            if (data.cancelReason) appState.withdrawHistory[idx].cancelReason = data.cancelReason;
-                            if (data.status === 'cancelled' && data.amount) {
-                                appState.usdBalance = (appState.usdBalance || 0) + data.amount;
-                                userRef.update({ usdBalance: appState.usdBalance });
-                                showToast(`⚠️ Cancelled: ${data.cancelReason || 'No reason'}`, 'error');
-                            }
-                            userRef.update({ withdrawHistory: appState.withdrawHistory });
-                            updateUI(); updateWithdrawUI();
-                        }
-                    }
-                });
+        function closeLevelPage() {
+            document.getElementById('levelOverlay').classList.remove('show');
         }
 
-        // ==================== MINING SYSTEM (START BUTTON INSIDE CIRCLE) ====================
+        function updateLevelPageUI() {
+            const lvlData = calculateLevel(appState.xpPoints);
+            
+            document.getElementById('lvlEmoji').textContent = lvlData.tierEmoji;
+            document.getElementById('lvlNumber').textContent = lvlData.level === 0 ? 'Level 0' : `Level ${lvlData.level}`;
+            document.getElementById('lvlName').textContent = lvlData.tierName;
+            document.getElementById('lvlXP').textContent = lvlData.level === 0 ? 
+                `${lvlData.xp} / 0 XP` : 
+                `${lvlData.xp} XP (${lvlData.progress}%)`;
+            document.getElementById('lvlProgressFill').style.width = lvlData.progress + '%';
+            document.getElementById('lvlBonus').textContent = `Mining Bonus: +${lvlData.bonusPercent}%`;
+        }
+
+        function renderLevelGrid() {
+            const grid = document.getElementById('levelGrid');
+            const currentLvl = calculateLevel(appState.xpPoints);
+            let html = '';
+            
+            for (let i = 0; i <= 100; i++) {
+                // Filter based on selected tier
+                if (currentLevelFilter !== 'all') {
+                    const ranges = {
+                        'bronze': [1, 20], 'silver': [21, 40], 'gold': [41, 60],
+                        'platinum': [61, 80], 'diamond': [81, 100]
+                    };
+                    const range = ranges[currentLevelFilter];
+                    if (i > 0 && (i < range[0] || i > range[1])) continue;
+                    if (i === 0 && currentLevelFilter !== 'bronze') continue;
+                }
+                
+                let config, isUnlocked, isCurrent;
+                if (i === 0) {
+                    config = { tierName: 'Unlocking', tierEmoji: '🔒', bonusPercent: 0 };
+                    isCurrent = currentLvl.level === 0;
+                    isUnlocked = currentLvl.level >= 0;
+                } else {
+                    config = getLevelConfig(i);
+                    isCurrent = currentLvl.level === i;
+                    isUnlocked = currentLvl.level >= i;
+                }
+                
+                const statusClass = isCurrent ? 'current' : (isUnlocked ? 'unlocked' : 'locked');
+                
+                html += `
+                    <div class="level-card ${statusClass}">
+                        <div class="lvl-num">${config.tierEmoji} ${i}</div>
+                        <div class="lvl-name">${config.tierName}</div>
+                        <div class="lvl-bonus">+${config.bonusPercent}% Bonus</div>
+                        <div class="lvl-status">
+                            ${isCurrent ? '👈 Current' : (isUnlocked ? '✅ Unlocked' : '🔒 Locked')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            grid.innerHTML = html;
+        }
+
+        function filterLevels(filter, btn) {
+            currentLevelFilter = filter;
+            document.querySelectorAll('.lvl-filter-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderLevelGrid();
+        }
+
+        // ==================== MINING SYSTEM ====================
         function updateProgressUI() {
             const circle = document.getElementById('miningCircle');
             const count = document.getElementById('progressCoinCount');
             const status = document.getElementById('progressStatus');
-            const startBtn = document.getElementById('progressStartBtn');
-            const startBtnText = document.getElementById('startBtnText');
+            const percentEl = document.getElementById('progressPercent');
+            const overlay = document.getElementById('circleStartOverlay');
+            const watchBtn = document.getElementById('progressWatchBtn');
             
             const pct = (appState.progressCoins / TOTAL_COINS * 100);
             circle.style.background = `conic-gradient(#fbbf24 ${pct}%, #1e293b ${pct}%)`;
             count.textContent = appState.progressCoins;
+            percentEl.textContent = Math.round(pct) + '%';
             
             if (appState.progressCoins === 0) {
                 status.textContent = '🎯 Empty! Watch ads';
-                document.getElementById('progressWatchBtn').classList.remove('hidden');
-                startBtn.disabled = true;
-                startBtnText.textContent = '🔄 REFILL';
-                startBtn.classList.remove('mining');
-            } else if (progressInterval) {
+                watchBtn.classList.remove('hidden');
+                overlay.classList.remove('hidden');
+                overlay.querySelector('.start-text').textContent = 'REFILL';
+                overlay.querySelector('.start-icon').textContent = '📺';
+                overlay.querySelector('.start-subtext').textContent = 'Watch ads to refill';
+                circle.classList.remove('mining-active');
+            } else if (miningInterval) {
                 status.textContent = '⚡ Mining...';
-                document.getElementById('progressWatchBtn').classList.add('hidden');
-                startBtn.disabled = true;
-                startBtnText.textContent = '⏳ MINING...';
-                startBtn.classList.add('mining');
+                watchBtn.classList.add('hidden');
+                overlay.classList.add('hidden');
+                circle.classList.add('mining-active');
             } else {
-                status.textContent = '✅ Ready! Tap to start';
-                document.getElementById('progressWatchBtn').classList.add('hidden');
-                startBtn.disabled = false;
-                startBtnText.textContent = '▶ START MINING';
-                startBtn.classList.remove('mining');
+                status.textContent = 'Ready to mine';
+                watchBtn.classList.add('hidden');
+                overlay.classList.remove('hidden');
+                overlay.querySelector('.start-text').textContent = 'START\nMINING';
+                overlay.querySelector('.start-icon').textContent = '⚡';
+                overlay.querySelector('.start-subtext').textContent = 'Tap to earn coins';
+                circle.classList.remove('mining-active');
             }
         }
 
-        function startProgress() {
-            if (progressInterval) return;
+        function startMining() {
+            if (miningInterval) return;
             if (appState.progressCoins <= 0) {
-                showToast('❌ No coins left! Watch ads first.', 'error');
+                showToast('❌ No coins left! Watch ads to refill.', 'error');
+                startVideoProgress();
                 return;
             }
             
-            progressInterval = setInterval(() => {
+            // Hide overlay, start mining
+            document.getElementById('circleStartOverlay').classList.add('hidden');
+            
+            miningInterval = setInterval(() => {
                 if (appState.progressCoins <= 0) {
-                    clearInterval(progressInterval);
-                    progressInterval = null;
-                    updateProgressUI();
-                    showToast('🎉 All coins earned!');
+                    stopMining();
+                    showToast('🎉 All coins earned! Watch ads to refill.');
                     return;
                 }
                 
-                let bonusPercent = 0;
-                const levelData = calculateLevel(appState.xpPoints || 0);
-                bonusPercent = levelData.bonusPercent;
-                
-                let coinsToAdd = 1 + (bonusPercent / 100);
+                const lvlData = calculateLevel(appState.xpPoints);
+                const bonusPercent = lvlData.bonusPercent;
+                const coinsToAdd = 1 + (bonusPercent / 100);
                 
                 appState.progressCoins -= 1;
                 appState.balance += coinsToAdd;
-                appState.xpPoints = (appState.xpPoints || 0) + 1;
+                appState.xpPoints += 1;
                 
                 userRef.update({
                     balance: appState.balance,
@@ -1050,7 +963,7 @@
                 coin.className = 'floating-coin';
                 coin.textContent = `+${coinsToAdd.toFixed(2)} 🪙`;
                 coin.style.left = (Math.random() * 80 + 10) + '%';
-                coin.style.top = '40%';
+                coin.style.top = '35%';
                 document.body.appendChild(coin);
                 setTimeout(() => coin.remove(), 1000);
                 
@@ -1060,7 +973,15 @@
             }, 5000);
             
             updateProgressUI();
-            showToast('⛏️ Mining started!');
+            showToast('⛏️ Mining started! +' + (1 + (calculateLevel(appState.xpPoints).bonusPercent / 100)).toFixed(2) + ' coins/5s');
+        }
+
+        function stopMining() {
+            if (miningInterval) {
+                clearInterval(miningInterval);
+                miningInterval = null;
+            }
+            updateProgressUI();
         }
 
         function startVideoProgress() {
@@ -1072,71 +993,73 @@
                 appState.videoWatchedCount = 0;
                 userRef.update({ progressCoins: TOTAL_COINS, videoWatchedCount: 0 });
                 updateProgressUI();
-                showToast('🪙 1000 coins refilled!');
+                showToast('🪙 Coins refilled! Tap START to mine.');
                 return;
             }
             
             btn.disabled = true;
             btn.textContent = '⏳ Watching...';
             
-            showRewardedAd(function() {
-                let seconds = 15;
-                const timer = setInterval(() => {
-                    seconds--;
-                    btn.textContent = `⏳ ${seconds}s`;
-                    if (seconds <= 0) {
-                        clearInterval(timer);
-                        btn.disabled = false;
-                        appState.videoWatchedCount++;
-                        userRef.update({ videoWatchedCount: appState.videoWatchedCount });
-                        btn.textContent = `📺 Watch Ads (${appState.videoWatchedCount}/${threshold})`;
-                        
-                        if (appState.videoWatchedCount >= threshold) {
-                            appState.progressCoins = TOTAL_COINS;
-                            appState.videoWatchedCount = 0;
-                            userRef.update({ progressCoins: TOTAL_COINS, videoWatchedCount: 0 });
-                            updateProgressUI();
-                            showToast('🪙 1000 coins refilled!');
-                        }
-                    }
-                }, 1000);
-            });
+            if (typeof show_11197472 === 'function') {
+                show_11197472().then(() => completeVideoWatch(btn, threshold))
+                    .catch(() => completeVideoWatch(btn, threshold));
+            } else {
+                setTimeout(() => completeVideoWatch(btn, threshold), 1000);
+            }
         }
 
-        // ==================== SPEED BOOST (REAL-TIME COUNTDOWN) ====================
+        function completeVideoWatch(btn, threshold) {
+            let seconds = 10;
+            const timer = setInterval(() => {
+                seconds--;
+                btn.textContent = `⏳ ${seconds}s`;
+                if (seconds <= 0) {
+                    clearInterval(timer);
+                    btn.disabled = false;
+                    appState.videoWatchedCount++;
+                    userRef.update({ videoWatchedCount: appState.videoWatchedCount });
+                    btn.textContent = `📺 Watch Ads (${appState.videoWatchedCount}/${threshold})`;
+                    
+                    if (appState.videoWatchedCount >= threshold) {
+                        appState.progressCoins = TOTAL_COINS;
+                        appState.videoWatchedCount = 0;
+                        userRef.update({ progressCoins: TOTAL_COINS, videoWatchedCount: 0 });
+                        updateProgressUI();
+                        showToast('🪙 1000 coins refilled!');
+                    }
+                }
+            }, 1000);
+        }
+
+        // ==================== SPEED BOOST ====================
         function updateSpeedBoostUI() {
             const boostBtn = document.getElementById('speedBoostBtn');
             const countdownBox = document.getElementById('boostCountdownBox');
-            const countdownTime = document.getElementById('boostCountdownTime');
             
             if (appState.speedBoostCooldown > Date.now()) {
-                // On cooldown - hide button, show countdown
                 boostBtn.style.display = 'none';
                 countdownBox.classList.add('show');
-                
                 updateBoostCountdown();
-                if (speedBoostCountdownInterval) clearInterval(speedBoostCountdownInterval);
-                speedBoostCountdownInterval = setInterval(updateBoostCountdown, 1000);
+                if (boostCountdownInterval) clearInterval(boostCountdownInterval);
+                boostCountdownInterval = setInterval(updateBoostCountdown, 1000);
             } else {
-                // Not on cooldown - show button, hide countdown
                 boostBtn.style.display = 'flex';
                 countdownBox.classList.remove('show');
-                if (speedBoostCountdownInterval) {
-                    clearInterval(speedBoostCountdownInterval);
-                    speedBoostCountdownInterval = null;
+                if (boostCountdownInterval) {
+                    clearInterval(boostCountdownInterval);
+                    boostCountdownInterval = null;
                 }
             }
         }
 
         function updateBoostCountdown() {
             const remaining = Math.max(0, Math.ceil((appState.speedBoostCooldown - Date.now()) / 1000));
-            const minutes = Math.floor(remaining / 60);
-            const seconds = remaining % 60;
+            const m = Math.floor(remaining / 60);
+            const s = remaining % 60;
             document.getElementById('boostCountdownTime').textContent = 
-                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
             
             if (remaining <= 0) {
-                // Countdown finished, show button again
                 appState.speedBoostCooldown = 0;
                 userRef.update({ speedBoostCooldown: 0 });
                 updateSpeedBoostUI();
@@ -1145,123 +1068,88 @@
 
         function activateSpeedBoost() {
             if (appState.speedBoostCooldown > Date.now()) {
-                showToast('Speed Boost on cooldown!', 'error');
-                return;
-            }
-            if (appState.isSpeedBoostActive) {
-                showToast('Speed Boost already active!', 'error');
+                showToast('⏳ On cooldown!', 'error');
                 return;
             }
             
-            showRewardedAd(function() {
-                appState.isSpeedBoostActive = true;
+            if (typeof show_11197472 === 'function') {
+                show_11197472().then(() => executeSpeedBoost())
+                    .catch(() => executeSpeedBoost());
+            } else {
+                executeSpeedBoost();
+            }
+        }
+
+        function executeSpeedBoost() {
+            // Fast mining for 3 seconds
+            const boostDuration = 3000;
+            const startTime = Date.now();
+            
+            const boostMining = setInterval(() => {
+                if (Date.now() - startTime >= boostDuration || appState.progressCoins <= 0) {
+                    clearInterval(boostMining);
+                    appState.speedBoostCooldown = Date.now() + (60 * 60 * 1000);
+                    userRef.update({ speedBoostCooldown: appState.speedBoostCooldown });
+                    updateSpeedBoostUI();
+                    showToast('🚀 Boost ended! 60 min cooldown.');
+                    return;
+                }
                 
-                // Show boost overlay
-                const overlay = document.getElementById('speedSpinnerOverlay');
-                overlay.classList.add('active');
+                appState.progressCoins -= 1;
+                appState.balance += 2;
+                appState.xpPoints += 3;
                 
-                let timeLeft = 3.0;
-                const speedTimerDisplay = document.getElementById('speedTimerDisplay');
-                const speedProgressFill = document.getElementById('speedProgressFill');
+                userRef.update({
+                    balance: appState.balance,
+                    progressCoins: appState.progressCoins,
+                    xpPoints: appState.xpPoints
+                });
                 
-                const speedUpdateInterval = setInterval(() => {
-                    timeLeft -= 0.1;
-                    const progress = ((3 - timeLeft) / 3) * 100;
-                    speedTimerDisplay.textContent = timeLeft.toFixed(1) + 's';
-                    speedProgressFill.style.width = progress + '%';
-                    
-                    if (timeLeft <= 0) {
-                        clearInterval(speedUpdateInterval);
-                        appState.isSpeedBoostActive = false;
-                        overlay.classList.remove('active');
-                        
-                        // Set 60 minute cooldown
-                        appState.speedBoostCooldown = Date.now() + (60 * 60 * 1000);
-                        userRef.update({ speedBoostCooldown: appState.speedBoostCooldown });
-                        updateSpeedBoostUI();
-                        showToast('🚀 Speed Boost ended! Cooldown: 60 min.');
-                    }
-                }, 100);
+                updateProgressUI();
+                updateUI();
+                updateLevelUI();
                 
-                // Fast mining during boost
-                let coinsAdded = 0;
-                speedBoostInterval = setInterval(() => {
-                    if (appState.progressCoins > 0 && coinsAdded < 60) {
-                        appState.progressCoins -= 1;
-                        appState.balance += 1;
-                        appState.xpPoints += 2;
-                        coinsAdded++;
-                        userRef.update({
-                            balance: appState.balance,
-                            progressCoins: appState.progressCoins,
-                            xpPoints: appState.xpPoints
-                        });
-                        updateProgressUI();
-                        updateUI();
-                        updateLevelUI();
-                        
-                        const coin = document.createElement('div');
-                        coin.className = 'floating-coin';
-                        coin.textContent = '+1 🪙';
-                        coin.style.left = (Math.random() * 80 + 10) + '%';
-                        coin.style.top = '40%';
-                        document.body.appendChild(coin);
-                        setTimeout(() => coin.remove(), 1000);
-                    } else {
-                        clearInterval(speedBoostInterval);
-                        if (appState.progressCoins <= 0) showToast('⛔ No coins left!');
-                    }
-                }, 50);
-            });
+                const coin = document.createElement('div');
+                coin.className = 'floating-coin';
+                coin.textContent = '+2 🪙';
+                coin.style.left = (Math.random() * 80 + 10) + '%';
+                coin.style.top = '35%';
+                document.body.appendChild(coin);
+                setTimeout(() => coin.remove(), 800);
+            }, 100);
+            
+            showToast('⚡ Speed Boost activated! 3s of 2x mining!');
         }
 
         // ==================== TASKS ====================
         function loadTasksFromDB() {
             db.ref('tasks').on('value', (snapshot) => {
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    tasks = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-                } else {
-                    tasks = [];
-                }
+                tasks = snapshot.exists() ? Object.keys(snapshot.val()).map(k => ({ id: k, ...snapshot.val()[k] })) : [];
                 renderTasks();
             });
         }
 
         function renderTasks() {
             const container = document.getElementById('tasksContainer');
-            const filteredTasks = currentFilter === 'all' ? tasks : tasks.filter(t => t.type === currentFilter);
+            const filtered = currentFilter === 'all' ? tasks : tasks.filter(t => t.type === currentFilter);
             
-            if (!filteredTasks || filteredTasks.length === 0) {
-                container.innerHTML = '<p style="color:#94a3b8;text-align:center;">📭 No tasks available.</p>';
+            if (!filtered.length) {
+                container.innerHTML = '<p style="color:#94a3b8;text-align:center;">📭 No tasks</p>';
                 return;
             }
             
-            container.innerHTML = filteredTasks.map(task => {
-                const today = new Date().toDateString();
-                const isCompleted = appState.taskLastCompleted[task.id] === today;
-                
-                let actionHTML = '';
-                if (!isCompleted) {
-                    if (task.type === 'link') {
-                        actionHTML = `<button class="task-btn" onclick="openFullWebview('${task.id}', '${task.link || '#'}')">🔗 Open</button>`;
-                    } else if (task.type === 'button') {
-                        actionHTML = `<button class="task-btn" onclick="completeTask('${task.id}')">${task.actionText || 'Complete'}</button>`;
-                    } else if (task.type === 'video') {
-                        actionHTML = `<button class="task-btn" onclick="watchTaskVideo('${task.id}')">📺 Watch</button>`;
-                    }
-                }
-                
+            container.innerHTML = filtered.map(task => {
+                const done = appState.taskLastCompleted[task.id] === new Date().toDateString();
                 return `
                     <div class="task-card">
                         <div class="task-header">
                             <span class="task-title">${task.title}</span>
                             <span class="task-reward">+${task.reward} 🪙</span>
                         </div>
-                        <div class="task-desc">${task.description || ''}</div>
+                        <div style="font-size:11px;color:#94a3b8;margin:4px 0;">${task.description || ''}</div>
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
-                            ${actionHTML}
-                            <span style="font-size:10px;color:${isCompleted ? '#10b981' : '#94a3b8'};">${isCompleted ? '✅ Done' : '⏳ Pending'}</span>
+                            ${done ? '<span style="color:#10b981;">✅ Done</span>' : 
+                                `<button class="task-btn" onclick="completeTask('${task.id}', ${task.reward})">${task.actionText || 'Complete'}</button>`}
                         </div>
                     </div>
                 `;
@@ -1275,20 +1163,16 @@
             renderTasks();
         }
 
-        function completeTask(taskId) {
-            const today = new Date().toDateString();
-            if (appState.taskLastCompleted[taskId] === today) {
-                showToast('Already completed today!', 'error');
+        function completeTask(taskId, reward) {
+            if (appState.taskLastCompleted[taskId] === new Date().toDateString()) {
+                showToast('Already done today!', 'error');
                 return;
             }
             
-            const task = tasks.find(t => t.id === taskId);
-            if (!task) return;
-            
-            appState.taskLastCompleted[taskId] = today;
-            appState.balance += task.reward;
+            appState.taskLastCompleted[taskId] = new Date().toDateString();
+            appState.balance += reward;
             appState.completedTasks++;
-            appState.xpPoints = (appState.xpPoints || 0) + (task.reward * 2);
+            appState.xpPoints += reward * 2;
             
             userRef.update({
                 balance: appState.balance,
@@ -1297,495 +1181,315 @@
                 xpPoints: appState.xpPoints
             });
             
-            document.getElementById('rewardText').textContent = `+${task.reward} Coins`;
+            document.getElementById('rewardText').textContent = `+${reward} Coins`;
             document.getElementById('successModal').classList.add('active');
             updateUI();
             updateLevelUI();
             renderTasks();
-            showToast(`🎉 +${task.reward} Coins!`);
-        }
-
-        function watchTaskVideo(taskId) {
-            const today = new Date().toDateString();
-            if (appState.taskLastCompleted[taskId] === today) {
-                showToast('Already completed today!', 'error');
-                return;
-            }
-            
-            const task = tasks.find(t => t.id === taskId);
-            if (!task) return;
-            
-            showRewardedAd(function() {
-                appState.taskLastCompleted[taskId] = today;
-                appState.balance += task.reward;
-                appState.completedTasks++;
-                appState.xpPoints = (appState.xpPoints || 0) + (task.reward * 2);
-                
-                userRef.update({
-                    balance: appState.balance,
-                    completedTasks: appState.completedTasks,
-                    taskLastCompleted: appState.taskLastCompleted,
-                    xpPoints: appState.xpPoints
-                });
-                
-                document.getElementById('rewardText').textContent = `+${task.reward} Coins`;
-                document.getElementById('successModal').classList.add('active');
-                updateUI();
-                updateLevelUI();
-                renderTasks();
-                showToast(`🎉 +${task.reward} Coins!`);
-            });
-        }
-
-        // ==================== WEBVIEW ====================
-        function openFullWebview(taskId, url) {
-            const today = new Date().toDateString();
-            if (appState.taskLastCompleted[taskId] === today) {
-                showToast('Already completed today!', 'error');
-                return;
-            }
-            
-            document.getElementById('webviewFullIframe').src = url;
-            document.getElementById('webviewFullscreenOverlay').classList.add('show');
-            
-            let seconds = 30;
-            const timerEl = document.getElementById('webviewFullTimer');
-            const claimBtn = document.getElementById('webviewFullClaimBtn');
-            
-            claimBtn.disabled = true;
-            claimBtn.textContent = '⏳ Wait 30s';
-            claimBtn.className = '';
-            timerEl.textContent = '30s';
-            claimBtn.setAttribute('data-taskid', taskId);
-            
-            const timer = setInterval(() => {
-                seconds--;
-                timerEl.textContent = seconds + 's';
-                claimBtn.textContent = `⏳ Wait ${seconds}s`;
-                
-                if (seconds <= 0) {
-                    clearInterval(timer);
-                    claimBtn.disabled = false;
-                    claimBtn.textContent = '✅ Claim Reward';
-                    claimBtn.className = 'active-btn';
-                }
-            }, 1000);
-        }
-
-        function closeFullWebview() {
-            const claimBtn = document.getElementById('webviewFullClaimBtn');
-            const taskId = claimBtn.getAttribute('data-taskid');
-            
-            if (claimBtn.disabled) {
-                showToast('Please wait 30 seconds!', 'error');
-                return;
-            }
-            
-            document.getElementById('webviewFullscreenOverlay').classList.remove('show');
-            document.getElementById('webviewFullIframe').src = 'about:blank';
-            
-            if (taskId) {
-                const task = tasks.find(t => t.id === taskId);
-                if (task) completeTask(taskId);
-                claimBtn.removeAttribute('data-taskid');
-            }
+            showToast(`🎉 +${reward} Coins!`);
         }
 
         // ==================== REFERRAL ====================
         function updateReferUI() {
             const total = appState.referralCount || 0;
-            const perReferral = 50;
-            
             document.getElementById('referTotal').textContent = total;
-            document.getElementById('referEarned').textContent = total * perReferral;
+            document.getElementById('referEarned').textContent = total * 50;
             document.getElementById('referBonus').textContent = Math.floor(total / 10) * 50;
             
             const tiers = [
-                { level: 1, count: 10, bonus: 50, name: '🥉 Bronze' },
-                { level: 2, count: 25, bonus: 150, name: '🥈 Silver' },
-                { level: 3, count: 50, bonus: 300, name: '🥇 Gold' },
-                { level: 4, count: 100, bonus: 500, name: '💎 Platinum' },
-                { level: 5, count: 200, bonus: 1000, name: '👑 Diamond' }
+                { lvl: 1, count: 10, bonus: 50, name: '🥉 Bronze' },
+                { lvl: 2, count: 25, bonus: 150, name: '🥈 Silver' },
+                { lvl: 3, count: 50, bonus: 300, name: '🥇 Gold' },
+                { lvl: 4, count: 100, bonus: 500, name: '💎 Platinum' },
+                { lvl: 5, count: 200, bonus: 1000, name: '👑 Diamond' }
             ];
             
-            let html = '';
-            tiers.forEach(tier => {
-                const isClaimed = appState.referTiers && appState.referTiers[tier.level] === 1;
-                const isAvailable = total >= tier.count && !isClaimed;
-                const status = isClaimed ? '✅ Claimed' : (isAvailable ? '🎁 Claim' : `🔒 ${tier.count}`);
-                
-                html += `
+            document.getElementById('referTierList').innerHTML = tiers.map(t => {
+                const claimed = appState.referTiers && appState.referTiers[t.lvl] === 1;
+                const available = total >= t.count && !claimed;
+                return `
                     <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
                         <div>
-                            <div style="font-size:13px;font-weight:600;">${tier.name}</div>
-                            <div style="font-size:10px;color:#94a3b8;">${tier.count} refs • +${tier.bonus} 🪙</div>
+                            <div style="font-size:13px;font-weight:600;">${t.name}</div>
+                            <div style="font-size:10px;color:#94a3b8;">${t.count} refs • +${t.bonus} 🪙</div>
                         </div>
-                        <span style="font-size:12px;font-weight:700;color:${isAvailable ? '#fbbf24' : '#64748b'};cursor:${isAvailable ? 'pointer' : 'default'};" 
-                            ${isAvailable ? `onclick="claimTier(${tier.level},${tier.bonus})"` : ''}>${status}</span>
+                        <span style="font-size:12px;font-weight:700;color:${available ? '#fbbf24' : '#64748b'};cursor:${available ? 'pointer' : 'default'};" 
+                            ${available ? `onclick="claimTier(${t.lvl},${t.bonus})"` : ''}>${claimed ? '✅' : available ? '🎁' : '🔒'}</span>
                     </div>
                 `;
-            });
-            document.getElementById('referTierList').innerHTML = html;
+            }).join('');
         }
 
         function claimTier(level, bonus) {
-            if (appState.referTiers && appState.referTiers[level] === 1) {
-                showToast('Already claimed!', 'error');
-                return;
-            }
-            
+            if (appState.referTiers && appState.referTiers[level] === 1) return;
             appState.balance += bonus;
-            appState.xpPoints = (appState.xpPoints || 0) + (bonus * 2);
+            appState.xpPoints += bonus * 2;
             if (!appState.referTiers) appState.referTiers = {};
             appState.referTiers[level] = 1;
-            
             userRef.update({ balance: appState.balance, xpPoints: appState.xpPoints, referTiers: appState.referTiers });
             updateUI();
             updateLevelUI();
             updateReferUI();
-            showToast(`🎁 +${bonus} Coins from tier bonus!`);
+            showToast(`🎁 +${bonus} Coins!`);
         }
 
         function generateReferCode() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let code = '';
-            for (let i = 0; i < 8; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
-            return code;
+            return Array(8).fill(0).map(() => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random() * 36)]).join('');
         }
 
         function submitReferCode() {
             const code = document.getElementById('referCodeInput').value.trim();
-            if (!code) { showToast('Please enter a code!', 'error'); return; }
-            
-            const btn = document.getElementById('referCodeSubmitBtn');
+            if (!code) { showToast('Enter code!', 'error'); return; }
             
             userRef.once('value', snap => {
-                const data = snap.val() || {};
-                if (data.referCodeSubmitted) {
-                    showToast('Already submitted a code!', 'error');
-                    return;
-                }
+                if ((snap.val() || {}).referCodeSubmitted) { showToast('Already submitted!', 'error'); return; }
                 
                 db.ref('users').orderByChild('referCode').equalTo(code).once('value', snapshot => {
-                    if (snapshot.exists()) {
-                        snapshot.forEach(child => {
-                            const referrerId = child.key;
-                            if (referrerId === userId) { showToast('Cannot use your own code!', 'error'); return; }
-                            
-                            const newUserData = {
-                                referredBy: referrerId, referredAt: Date.now(),
-                                username: tg.initDataUnsafe?.user?.username || 'User',
-                                bonus: 50, userId: userId
-                            };
-                            
-                            db.ref('referrals/' + userId).set(newUserData).then(() => {
-                                db.ref('users/' + referrerId).transaction(current => {
-                                    if (current === null) return { referCount: 1, referrals: [newUserData] };
-                                    return { ...current, referCount: (current.referCount || 0) + 1, referrals: (current.referrals || []).concat([newUserData]) };
-                                });
-                                
-                                userRef.update({
-                                    balance: (appState.balance || 0) + 50,
-                                    xpPoints: (appState.xpPoints || 0) + 100,
-                                    referCodeSubmitted: true
-                                });
-                                
-                                appState.balance += 50;
-                                appState.xpPoints += 100;
-                                btn.disabled = true;
-                                btn.textContent = '✅ Submitted';
-                                document.getElementById('referCodeInput').disabled = true;
-                                updateUI();
-                                updateLevelUI();
-                                showToast('🎉 Code accepted! +50 Coins!');
-                            });
+                    if (!snapshot.exists()) { showToast('Invalid code!', 'error'); return; }
+                    
+                    snapshot.forEach(child => {
+                        if (child.key === userId) { showToast('Own code!', 'error'); return; }
+                        
+                        db.ref('referrals/' + userId).set({
+                            referredBy: child.key, referredAt: Date.now(),
+                            username: tg.initDataUnsafe?.user?.username || 'User', bonus: 50, userId
+                        }).then(() => {
+                            db.ref('users/' + child.key).transaction(c => ({
+                                ...(c || {}), referCount: (c?.referCount || 0) + 1,
+                                referrals: (c?.referrals || []).concat([{ userId, bonus: 50 }])
+                            }));
+                            appState.balance += 50;
+                            appState.xpPoints += 100;
+                            userRef.update({ balance: appState.balance, xpPoints: appState.xpPoints, referCodeSubmitted: true });
+                            document.getElementById('referCodeSubmitBtn').disabled = true;
+                            document.getElementById('referCodeInput').disabled = true;
+                            updateUI();
+                            updateLevelUI();
+                            showToast('🎉 +50 Coins!');
                         });
-                    } else {
-                        showToast('Invalid referral code!', 'error');
-                    }
+                    });
                 });
             });
         }
 
         function copyReferLink() {
-            const link = document.getElementById('referLinkHome').textContent;
-            navigator.clipboard.writeText(link).then(() => showToast('📋 Copied!'))
+            navigator.clipboard.writeText(document.getElementById('referLinkHome').textContent)
+                .then(() => showToast('📋 Copied!'))
                 .catch(() => showToast('Copy manually', 'error'));
         }
 
-        // ==================== AIRDROP ====================
-        function loadAirdropConfig() {
-            db.ref('airdropConfig').on('value', snap => {
-                const config = snap.val() || {};
-                document.getElementById('airdropPoolDisplay').textContent = `$${(config.poolAmount || 50).toFixed(2)}`;
-                if (config.startTime) startAirdropCountdown(config.startTime);
+        // ==================== WITHDRAW ====================
+        function updateWithdrawUI() {
+            const bal = appState.usdBalance || 0;
+            const min = appState.minWithdraw || 10;
+            document.getElementById('withdrawInfo').textContent = `Min: $${min.toFixed(2)}`;
+            document.getElementById('withdrawStatus').textContent = `You have: $${bal.toFixed(2)}`;
+            
+            const sel = document.getElementById('withdrawMethod');
+            sel.innerHTML = '';
+            (appState.withdrawMethods || ['Nagad', 'Rocket']).forEach(m => {
+                sel.innerHTML += `<option value="${m}">${m}</option>`;
             });
+            
+            const btn = document.getElementById('withdrawBtn');
+            btn.disabled = bal < min;
+            btn.textContent = bal < min ? `Need $${(min - bal).toFixed(2)} more` : 'Withdraw Now';
         }
 
-        function startAirdropCountdown(startTime) {
-            const duration = 5 * 60 * 1000;
-            const endTime = startTime + duration;
+        function withdraw() {
+            const bal = appState.usdBalance || 0;
+            if (bal < (appState.minWithdraw || 10)) { showToast('Insufficient!', 'error'); return; }
             
-            const interval = setInterval(() => {
-                const now = Date.now();
-                const remaining = Math.max(0, endTime - now);
-                
-                const h = Math.floor(remaining / (60 * 60 * 1000));
-                const m = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
-                const s = Math.floor((remaining % (60 * 1000)) / 1000);
-                
-                document.getElementById('airdropCountdown').textContent = 
-                    `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-                
-                const btn = document.getElementById('airdropClaimBtn');
-                if (remaining > 0 && !appState.airdropClaimed) {
-                    btn.disabled = false;
-                    btn.textContent = '🎁 Claim Your Share';
-                } else {
-                    btn.disabled = true;
-                    btn.textContent = appState.airdropClaimed ? '✅ Claimed' : '⛔ Ended';
-                }
-                
-                if (remaining <= 0) clearInterval(interval);
-            }, 100);
-        }
-
-        function openAirdropPage() {
-            document.getElementById('airdropOverlay').classList.add('show');
-        }
-
-        function closeAirdropPage() {
-            document.getElementById('airdropOverlay').classList.remove('show');
-        }
-
-        function claimAirdrop() {
-            if (appState.airdropClaimed) { showToast('Already claimed!', 'error'); return; }
+            const method = document.getElementById('withdrawMethod').value;
+            const account = document.getElementById('withdrawAccount').value.trim();
+            if (!account) { showToast('Enter account!', 'error'); return; }
             
-            const btn = document.getElementById('airdropClaimBtn');
-            btn.disabled = true;
-            btn.textContent = '⏳ Processing...';
-            
-            const amount = Math.random() * 1.5 + 0.5;
-            const coinsWon = Math.floor(amount * appState.conversionRate);
-            
-            appState.balance += coinsWon;
-            appState.airdropClaimed = true;
-            
-            db.ref('airdropList/' + Date.now()).set({
+            const id = Date.now().toString();
+            db.ref('withdrawRequests/' + id).set({
                 userId, username: tg.initDataUnsafe?.user?.username || 'User',
-                amount, coins: coinsWon, timestamp: Date.now()
+                amount: bal, method, account, status: 'pending', requestedAt: new Date().toISOString()
             });
-            userRef.update({ balance: appState.balance, airdropClaimed: true });
             
+            appState.usdBalance = 0;
+            appState.withdrawHistory = [...(appState.withdrawHistory || []), { id, amount: bal, method, account, status: 'pending', date: new Date().toISOString() }];
+            userRef.update({ usdBalance: 0, withdrawHistory: appState.withdrawHistory });
+            
+            document.getElementById('withdrawModalTitle').textContent = 'Request Sent!';
+            document.getElementById('withdrawModalText').textContent = `$${bal.toFixed(2)} via ${method}`;
+            document.getElementById('withdrawModal').classList.add('active');
+            document.getElementById('withdrawAccount').value = '';
             updateUI();
-            updateLevelUI();
-            showToast(`🎉 +${coinsWon} Coins from AirDrop!`);
-            btn.textContent = '✅ Claimed';
+            updateWithdrawUI();
+            showToast(`$${bal.toFixed(2)} requested!`);
         }
 
-        // ==================== SPECIAL OFFER ====================
-        function loadSpecialOffer() {
-            const container = document.getElementById('specialOfferContent');
-            container.innerHTML = '<p style="color:#94a3b8;">⏳ Checking...</p>';
-            
-            db.ref('specialOffers/' + userId).on('value', snap => {
-                const offer = snap.val();
-                if (offer && !offer.claimed && offer.title) {
-                    container.innerHTML = `
-                        <div style="font-size:30px;font-weight:900;color:#fbbf24;">🎁 ${offer.title}</div>
-                        <div style="font-size:16px;color:#e2e8f0;margin:12px 0;">${offer.description || ''}</div>
-                        <div style="font-size:24px;font-weight:bold;color:#10b981;background:rgba(16,185,129,0.1);padding:12px;border-radius:12px;display:inline-block;margin:10px 0;">💰 +${offer.reward} Coins</div>
-                        <br>
-                        <button style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:14px 40px;border:none;border-radius:30px;font-weight:700;font-size:18px;cursor:pointer;margin-top:15px;" onclick="claimSpecialOffer()">Claim Reward</button>
-                    `;
-                } else if (offer && offer.claimed) {
-                    container.innerHTML = '<p style="color:#94a3b8;">✅ Already claimed!</p>';
-                } else {
-                    container.innerHTML = '<p style="color:#94a3b8;">🤷 No offers available.</p>';
+        // ==================== CONVERSION ====================
+        function startConversionTimer() {
+            if (conversionTimerInterval) clearInterval(conversionTimerInterval);
+            const update = () => {
+                const now = Date.now();
+                const next = (appState.lastConversion || now) + 86400000;
+                const rem = Math.max(0, next - now);
+                const h = Math.floor(rem / 3600000), m = Math.floor((rem % 3600000) / 60000), s = Math.floor((rem % 60000) / 1000);
+                document.getElementById('conversionCountdown').textContent = 
+                    `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+                if (rem <= 0) {
+                    clearInterval(conversionTimerInterval);
+                    if (appState.balance > 0) {
+                        const earned = appState.balance / appState.conversionRate;
+                        appState.usdBalance += earned;
+                        appState.balance = 0;
+                        appState.lastConversion = Date.now();
+                        userRef.update({ balance: 0, usdBalance: appState.usdBalance, lastConversion: appState.lastConversion });
+                        document.getElementById('conversionText').textContent = `→ $${earned.toFixed(2)} USD`;
+                        document.getElementById('conversionModal').classList.add('active');
+                        updateUI();
+                    }
+                    startConversionTimer();
                 }
-            });
-        }
-
-        function claimSpecialOffer() {
-            db.ref('specialOffers/' + userId).once('value', snap => {
-                const offer = snap.val();
-                if (offer && !offer.claimed) {
-                    appState.balance += offer.reward;
-                    userRef.update({ balance: appState.balance });
-                    db.ref('specialOffers/' + userId).update({ claimed: true, claimedAt: Date.now() });
-                    updateUI();
-                    updateLevelUI();
-                    showToast(`🎉 +${offer.reward} Coins from special offer!`);
-                    loadSpecialOffer();
-                }
-            });
+            };
+            update();
+            conversionTimerInterval = setInterval(update, 1000);
         }
 
         // ==================== UI HELPERS ====================
         function updateUI() {
             document.getElementById('balance').textContent = appState.balance.toLocaleString();
             document.getElementById('walletBalance').textContent = appState.balance;
-            
-            const usdValue = (appState.balance / appState.conversionRate).toFixed(2);
-            document.getElementById('usdValue').textContent = `≈ $${usdValue} USD`;
-            document.getElementById('walletUsd').textContent = `≈ $${usdValue} USD`;
-            
-            document.getElementById('totalUsdEarned').textContent = `💵 Total USD Earned: $${appState.usdBalance.toFixed(2)}`;
+            const usd = (appState.balance / appState.conversionRate).toFixed(2);
+            document.getElementById('usdValue').textContent = `≈ $${usd} USD`;
+            document.getElementById('walletUsd').textContent = `≈ $${usd}`;
+            document.getElementById('totalUsdEarned').textContent = `💵 Total USD: $${appState.usdBalance.toFixed(2)}`;
             document.getElementById('walletTotalUsd').textContent = `$${appState.usdBalance.toFixed(2)}`;
             document.getElementById('rateInfo').textContent = `Rate: 1 USD = ${appState.conversionRate} Coins`;
-            
             updateWithdrawUI();
             updateSpeedBoostUI();
         }
 
-        function showToast(message, type = 'success') {
+        function switchPage(page, el) {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            if (el) el.classList.add('active');
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const target = document.getElementById('page' + page.charAt(0).toUpperCase() + page.slice(1));
+            if (target) target.classList.add('active');
+            if (page === 'tasks') renderTasks();
+            if (page === 'refer') updateReferUI();
+            if (page === 'wallet') updateWithdrawUI();
+        }
+
+        function showToast(msg, type = 'success') {
             const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.className = 'toast show';
-            if (type === 'error') toast.classList.add('error');
-            clearTimeout(toast._timeout);
-            toast._timeout = setTimeout(() => toast.classList.remove('show'), 3000);
+            toast.textContent = msg;
+            toast.className = 'toast show' + (type === 'error' ? ' error' : '');
+            clearTimeout(toast._t);
+            toast._t = setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('active');
-        }
-
-        function openLevelPage() {
-            showToast('🔜 Level system coming soon!', 'success');
-        }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
         // ==================== INIT ====================
         function initApp() {
-            userRef.on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    appState.balance = data.balance || 0;
-                    appState.usdBalance = data.usdBalance || 0;
-                    appState.completedTasks = data.completedTasks || 0;
-                    appState.referralCount = data.referCount || 0;
-                    appState.lastConversion = data.lastConversion || null;
-                    appState.referCode = data.referCode || '';
-                    appState.referTiers = data.referTiers || {};
-                    appState.referrals = data.referrals || [];
-                    appState.progressCoins = data.progressCoins !== undefined ? data.progressCoins : 1000;
-                    appState.videoWatchedCount = data.videoWatchedCount || 0;
-                    appState.speedBoostCooldown = data.speedBoostCooldown || 0;
-                    appState.taskLastCompleted = data.taskLastCompleted || {};
-                    appState.airdropClaimed = data.airdropClaimed || false;
-                    appState.xpPoints = data.xpPoints || 0;
-                    appState.videoWatchedToday = data.videoWatchedToday || 0;
-                    appState.videoLastWatchDate = data.videoLastWatchDate || null;
-                    appState.withdrawHistory = data.withdrawHistory || [];
-                    appState.lastLogin = data.lastLogin || null;
-                    
-                    const username = tg.initDataUnsafe?.user?.username || 'User';
-                    document.getElementById('userName').textContent = username;
-                    if (appState.lastLogin) {
-                        document.getElementById('lastLoginDisplay').textContent = 
-                            `📅 Last Login: ${new Date(appState.lastLogin).toLocaleString()}`;
-                    }
-                    
-                    updateUI();
-                    updateLevelUI();
-                    updateProgressUI();
-                    updateSpeedBoostUI();
-                    
-                    if (!appState.lastConversion) {
-                        appState.lastConversion = Date.now();
-                        userRef.update({ lastConversion: Date.now() });
-                    }
-                    startConversionTimer();
-                } else {
-                    userRef.set({
-                        balance: 0, usdBalance: 0, completedTasks: 0, referCount: 0,
-                        referCode: generateReferCode(), referTiers: {},
-                        videoWatchedToday: 0, videoLastWatchDate: null, withdrawHistory: [],
-                        lastLogin: new Date().toISOString(), progressCoins: 1000,
-                        videoWatchedCount: 0, speedBoostCooldown: 0, taskLastCompleted: {},
-                        airdropClaimed: false, xpPoints: 0, lastConversion: Date.now()
-                    });
-                    appState.referCode = generateReferCode();
-                    appState.lastConversion = Date.now();
-                    updateUI();
-                    updateLevelUI();
-                    updateProgressUI();
-                    updateSpeedBoostUI();
-                    startConversionTimer();
+            userRef.on('value', snap => {
+                const d = snap.val() || {};
+                appState.balance = d.balance || 0;
+                appState.usdBalance = d.usdBalance || 0;
+                appState.completedTasks = d.completedTasks || 0;
+                appState.referralCount = d.referCount || 0;
+                appState.lastConversion = d.lastConversion || Date.now();
+                appState.referCode = d.referCode || generateReferCode();
+                appState.referTiers = d.referTiers || {};
+                appState.progressCoins = d.progressCoins !== undefined ? d.progressCoins : TOTAL_COINS;
+                appState.videoWatchedCount = d.videoWatchedCount || 0;
+                appState.speedBoostCooldown = d.speedBoostCooldown || 0;
+                appState.taskLastCompleted = d.taskLastCompleted || {};
+                appState.xpPoints = d.xpPoints !== undefined ? d.xpPoints : NEGATIVE_XP;
+                appState.withdrawHistory = d.withdrawHistory || [];
+                appState.lastLogin = d.lastLogin || null;
+                
+                document.getElementById('userName').textContent = tg.initDataUnsafe?.user?.username || 'User';
+                if (appState.lastLogin) {
+                    document.getElementById('lastLoginDisplay').textContent = `📅 Last: ${new Date(appState.lastLogin).toLocaleString()}`;
                 }
                 
-                const botUsername = 'CoinQuist_bot';
+                if (!d.balance && !d.xpPoints) {
+                    userRef.update({
+                        balance: 0, usdBalance: 0, referCode: appState.referCode,
+                        progressCoins: TOTAL_COINS, xpPoints: NEGATIVE_XP,
+                        lastConversion: Date.now(), lastLogin: new Date().toISOString()
+                    });
+                }
+                
+                updateUI();
+                updateLevelUI();
+                updateProgressUI();
+                updateSpeedBoostUI();
+                startConversionTimer();
+                
                 document.getElementById('referLinkHome').textContent = 
-                    `https://t.me/${botUsername}?start=ref_${appState.referCode}`;
+                    `https://t.me/CoinQuist_bot?start=ref_${appState.referCode}`;
             });
 
-            // Load configs
             db.ref('conversionRate').on('value', s => {
-                appState.conversionRate = s.exists() ? s.val() : 1000;
+                appState.conversionRate = s.val() || 1000;
                 updateUI();
             });
             
             db.ref('withdrawSettings').on('value', s => {
                 if (s.exists()) {
-                    const d = s.val();
-                    appState.minWithdraw = d.minAmount || 10;
-                    if (d.methods) appState.withdrawMethods = d.methods;
+                    appState.minWithdraw = s.val().minAmount || 10;
+                    appState.withdrawMethods = s.val().methods || ['Nagad', 'Rocket'];
                 }
                 updateWithdrawUI();
             });
+
+            loadTasksFromDB();
             
-            db.ref('videoSettings').on('value', s => {
-                if (s.exists()) {
-                    const d = s.val();
-                    appState.videoReward = d.reward || 10;
-                    appState.videoDailyLimit = d.dailyLimit || 5;
+            db.ref('withdrawRequests').orderByChild('userId').equalTo(userId).on('child_changed', snap => {
+                const data = snap.val();
+                if (data && appState.withdrawHistory) {
+                    const idx = appState.withdrawHistory.findIndex(h => h.id === snap.key);
+                    if (idx !== -1) {
+                        appState.withdrawHistory[idx].status = data.status;
+                        if (data.status === 'cancelled') {
+                            appState.usdBalance += data.amount || 0;
+                            userRef.update({ usdBalance: appState.usdBalance });
+                        }
+                        userRef.update({ withdrawHistory: appState.withdrawHistory });
+                        updateUI();
+                    }
                 }
             });
 
-            loadTasksFromDB();
-            loadAirdropConfig();
-            listenWithdrawStatus();
-            
             // Check referral
-            const startParam = tg.initDataUnsafe?.start_param || 
-                new URLSearchParams(window.location.search).get('start') || '';
-            if (startParam && startParam.startsWith('ref_')) {
-                const refCode = startParam.replace('ref_', '');
-                db.ref('users').orderByChild('referCode').equalTo(refCode).once('value', snapshot => {
-                    if (snapshot.exists()) {
-                        snapshot.forEach(child => {
-                            const referrerId = child.key;
-                            if (referrerId !== userId) {
-                                db.ref('referrals/' + userId).once('value', s => {
-                                    if (!s.exists()) {
-                                        const newUserData = {
-                                            referredBy: referrerId, referredAt: Date.now(),
-                                            username: tg.initDataUnsafe?.user?.username || 'User',
-                                            bonus: 50, userId: userId
-                                        };
-                                        db.ref('referrals/' + userId).set(newUserData).then(() => {
-                                            db.ref('users/' + referrerId).transaction(current => {
-                                                if (current === null) return { referCount: 1, referrals: [newUserData] };
-                                                return { ...current, referCount: (current.referCount || 0) + 1, referrals: (current.referrals || []).concat([newUserData]) };
-                                            });
-                                            appState.balance += 50;
-                                            appState.xpPoints += 100;
-                                            userRef.update({ balance: appState.balance, xpPoints: appState.xpPoints });
-                                            updateUI();
-                                            updateLevelUI();
-                                            showToast('🎉 +50 Coins from referral!');
-                                        });
-                                    }
-                                });
-                            }
-                        });
-                    }
+            const ref = tg.initDataUnsafe?.start_param || new URLSearchParams(location.search).get('start') || '';
+            if (ref.startsWith('ref_')) {
+                const code = ref.replace('ref_', '');
+                db.ref('users').orderByChild('referCode').equalTo(code).once('value', snap => {
+                    if (snap.exists()) snap.forEach(c => {
+                        if (c.key !== userId) {
+                            db.ref('referrals/' + userId).once('value', s => {
+                                if (!s.exists()) {
+                                    db.ref('referrals/' + userId).set({
+                                        referredBy: c.key, referredAt: Date.now(),
+                                        username: tg.initDataUnsafe?.user?.username || 'User', bonus: 50, userId
+                                    }).then(() => {
+                                        db.ref('users/' + c.key).transaction(cur => ({
+                                            ...(cur || {}), referCount: (cur?.referCount || 0) + 1
+                                        }));
+                                        appState.balance += 50;
+                                        appState.xpPoints += 100;
+                                        userRef.update({ balance: appState.balance, xpPoints: appState.xpPoints });
+                                        updateUI();
+                                        updateLevelUI();
+                                    });
+                                }
+                            });
+                        }
+                    });
                 });
             }
-            
-            setTimeout(() => {
-                if (!appState.isBanned) showToast('👋 Welcome! Tap START to begin mining!');
-            }, 1500);
+
+            setTimeout(() => showToast('👋 Welcome! Tap START to mine!'), 1500);
         }
 
         document.addEventListener('DOMContentLoaded', initApp);
