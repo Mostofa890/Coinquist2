@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>CoinQuest - Tap & Earn</title>
     
+    <!-- Monetag SDK -->
     <script src='//libtl.com/sdk.js' data-zone='11197472' data-sdk='show_11197472'></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
@@ -78,7 +79,7 @@
         .conversion-timer .label { font-size: 10px; color: #94a3b8; }
         .conversion-timer .time { font-size: 16px; font-weight: bold; color: #10b981; }
 
-        /* ===== FAB BUTTON ===== */
+        /* FAB Button */
         .fab-container {
             position: fixed;
             bottom: 90px;
@@ -163,7 +164,7 @@
             color: #fff;
         }
 
-        /* ===== MINING CIRCLE ===== */
+        /* Mining Circle */
         .mining-circle-wrapper { 
             display: flex; justify-content: center; align-items: center; 
             margin: 15px 0; position: relative;
@@ -335,7 +336,7 @@
         }
         .airdrop-claim-btn:disabled { background: #64748b; cursor: not-allowed; }
 
-        /* Special Offer Overlay */
+        /* Special Offer */
         .special-offer-content { padding: 15px; }
         .send-offer-card {
             background: rgba(255,255,255,0.05); border-radius: 20px;
@@ -354,12 +355,6 @@
             background: linear-gradient(135deg, rgba(251,191,36,0.1), rgba(245,158,11,0.05));
             border-radius: 20px; padding: 20px; text-align: center;
             border: 2px solid rgba(251,191,36,0.3);
-        }
-        .received-offer-card .offer-title { font-size: 22px; font-weight: 900; color: #fbbf24; }
-        .received-offer-card .offer-reward {
-            font-size: 20px; color: #10b981; font-weight: bold;
-            background: rgba(16,185,129,0.1); padding: 10px; border-radius: 12px;
-            display: inline-block; margin: 10px 0;
         }
 
         /* Wallet */
@@ -548,7 +543,6 @@
             <h2 style="color:#fff;flex:1;text-align:center;">🎁 Special Offers</h2>
         </div>
         <div class="special-offer-content">
-            <!-- Send Offer to User -->
             <div class="send-offer-card">
                 <h4 style="color:#fff;margin-bottom:12px;">📤 Send Special Offer</h4>
                 <input type="text" id="sendOfferUserId" placeholder="Enter User ID...">
@@ -557,8 +551,6 @@
                 <input type="number" id="sendOfferReward" placeholder="Reward Coins" value="100">
                 <button onclick="sendSpecialOffer()">🚀 Send Offer</button>
             </div>
-            
-            <!-- Received Offers -->
             <h4 style="color:#fff;margin-bottom:12px;">📥 Your Offers</h4>
             <div id="receivedOffersContainer">
                 <p style="color:#94a3b8;text-align:center;">Checking for offers...</p>
@@ -729,7 +721,7 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // Firebase Config
+        // ==================== FIREBASE CONFIG ====================
         const firebaseConfig = {
             apiKey: "AIzaSyAqCNHhu9oaBDea85tAH-iHucHczZnR7nY",
             authDomain: "tolaka-exc-reverb-b1afd.firebaseapp.com",
@@ -745,6 +737,41 @@
         tg.expand();
         let userId = 'default_user';
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) userId = tg.initDataUnsafe.user.id.toString();
+
+        // ==================== MONETAG AD SETUP ====================
+        // In-App Interstitial Configuration
+        // Automatically show 2 ads within 6 minutes (0.1 hours)
+        // with 30-second interval between them
+        // and 5-second delay before first ad
+        // Session saved between page navigations (everyPage: false)
+        if (typeof show_11197472 === 'function') {
+            show_11197472({
+                type: 'inApp',
+                inAppSettings: {
+                    frequency: 2,
+                    capping: 0.1,
+                    interval: 30,
+                    timeout: 5,
+                    everyPage: false
+                }
+            });
+        }
+
+        // Rewarded Ad Helper Function
+        function showRewardedAd(callback) {
+            if (typeof show_11197472 === 'function') {
+                show_11197472('pop')
+                    .then(() => { if (callback) callback(); })
+                    .catch(() => { 
+                        // Even if ad fails, still give reward
+                        if (callback) callback(); 
+                    });
+            } else {
+                // Fallback if SDK not loaded
+                console.log('Ad SDK not available, giving reward directly');
+                if (callback) callback();
+            }
+        }
 
         // ==================== APP STATE ====================
         let appState = {
@@ -787,7 +814,6 @@
             }
         }
 
-        // Close FAB when clicking outside
         document.addEventListener('click', function(e) {
             const fab = document.querySelector('.fab-container');
             if (!fab.contains(e.target)) {
@@ -984,28 +1010,31 @@
             btn.disabled = true;
             btn.textContent = '⏳ Processing...';
             
-            const amount = Math.random() * 1.5 + 0.5;
-            const coinsWon = Math.floor(amount * appState.conversionRate);
-            
-            appState.balance += coinsWon;
-            appState.airdropClaimed = true;
-            appState.xpPoints += coinsWon;
-            
-            db.ref('airdropList/' + Date.now()).set({
-                userId, username: tg.initDataUnsafe?.user?.username || 'User',
-                amount, coins: coinsWon, timestamp: Date.now()
+            // Watch rewarded ad before claiming
+            showRewardedAd(function() {
+                const amount = Math.random() * 1.5 + 0.5;
+                const coinsWon = Math.floor(amount * appState.conversionRate);
+                
+                appState.balance += coinsWon;
+                appState.airdropClaimed = true;
+                appState.xpPoints += coinsWon;
+                
+                db.ref('airdropList/' + Date.now()).set({
+                    userId, username: tg.initDataUnsafe?.user?.username || 'User',
+                    amount, coins: coinsWon, timestamp: Date.now()
+                });
+                userRef.update({ balance: appState.balance, airdropClaimed: true, xpPoints: appState.xpPoints });
+                
+                document.getElementById('airdropModalText').textContent = `You won +${coinsWon} Coins ($${amount.toFixed(2)})!`;
+                document.getElementById('airdropModal').classList.add('active');
+                updateUI();
+                updateLevelUI();
+                showToast(`🎉 +${coinsWon} Coins from AirDrop!`);
+                btn.textContent = '✅ Claimed';
             });
-            userRef.update({ balance: appState.balance, airdropClaimed: true, xpPoints: appState.xpPoints });
-            
-            document.getElementById('airdropModalText').textContent = `You won +${coinsWon} Coins ($${amount.toFixed(2)})!`;
-            document.getElementById('airdropModal').classList.add('active');
-            updateUI();
-            updateLevelUI();
-            showToast(`🎉 +${coinsWon} Coins from AirDrop!`);
-            btn.textContent = '✅ Claimed';
         }
 
-        // ==================== SPECIAL OFFER SYSTEM (User-to-User) ====================
+        // ==================== SPECIAL OFFER SYSTEM ====================
         function openSpecialOfferPage() {
             document.getElementById('specialOfferOverlay').classList.add('show');
             document.getElementById('fabOptions').classList.remove('show');
@@ -1026,7 +1055,6 @@
             if (!title) { showToast('Enter title!', 'error'); return; }
             if (reward > appState.balance) { showToast('Insufficient coins!', 'error'); return; }
             
-            // Deduct coins from sender
             appState.balance -= reward;
             
             const offerData = {
@@ -1062,7 +1090,7 @@
                 if (offer.claimed) {
                     container.innerHTML = `
                         <div class="received-offer-card">
-                            <div class="offer-title">✅ ${offer.title}</div>
+                            <div style="font-size:22px;font-weight:900;color:#fbbf24;">✅ ${offer.title}</div>
                             <p style="color:#94a3b8;">From: ${offer.fromUsername || 'Unknown'}</p>
                             <p style="color:#10b981;">Already claimed!</p>
                         </div>
@@ -1070,10 +1098,10 @@
                 } else {
                     container.innerHTML = `
                         <div class="received-offer-card">
-                            <div class="offer-title">🎁 ${offer.title}</div>
+                            <div style="font-size:22px;font-weight:900;color:#fbbf24;">🎁 ${offer.title}</div>
                             <p style="color:#94a3b8;margin:8px 0;">${offer.description || ''}</p>
                             <p style="color:#94a3b8;font-size:12px;">From: ${offer.fromUsername || 'Unknown'}</p>
-                            <div class="offer-reward">💰 +${offer.reward} Coins</div>
+                            <div style="font-size:20px;color:#10b981;font-weight:bold;background:rgba(16,185,129,0.1);padding:10px;border-radius:12px;display:inline-block;margin:10px 0;">💰 +${offer.reward} Coins</div>
                             <br>
                             <button style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:12px 30px;border:none;border-radius:25px;font-weight:700;font-size:16px;cursor:pointer;margin-top:10px;" onclick="claimReceivedOffer()">Claim Reward</button>
                         </div>
@@ -1174,7 +1202,7 @@
             }, 5000);
             
             updateProgressUI();
-            showToast('⛏️ Mining started! +' + (1 + (calculateLevel(appState.xpPoints).bonusPercent / 100)).toFixed(2) + ' coins/5s');
+            showToast('⛏️ Mining started!');
         }
 
         function stopMining() {
@@ -1196,36 +1224,30 @@
             }
             
             btn.disabled = true;
-            btn.textContent = '⏳ Watching...';
+            btn.textContent = '⏳ Watching Ad...';
             
-            if (typeof show_11197472 === 'function') {
-                show_11197472().then(() => completeVideoWatch(btn, threshold)).catch(() => completeVideoWatch(btn, threshold));
-            } else {
-                setTimeout(() => completeVideoWatch(btn, threshold), 1000);
-            }
-        }
-
-        function completeVideoWatch(btn, threshold) {
-            let seconds = 10;
-            const timer = setInterval(() => {
-                seconds--;
-                btn.textContent = `⏳ ${seconds}s`;
-                if (seconds <= 0) {
-                    clearInterval(timer);
-                    btn.disabled = false;
-                    appState.videoWatchedCount++;
-                    userRef.update({ videoWatchedCount: appState.videoWatchedCount });
-                    btn.textContent = `📺 Watch Ads (${appState.videoWatchedCount}/${threshold})`;
-                    
-                    if (appState.videoWatchedCount >= threshold) {
-                        appState.progressCoins = TOTAL_COINS;
-                        appState.videoWatchedCount = 0;
-                        userRef.update({ progressCoins: TOTAL_COINS, videoWatchedCount: 0 });
-                        updateProgressUI();
-                        showToast('🪙 1000 coins refilled!');
+            showRewardedAd(function() {
+                let seconds = 10;
+                const timer = setInterval(() => {
+                    seconds--;
+                    btn.textContent = `⏳ ${seconds}s`;
+                    if (seconds <= 0) {
+                        clearInterval(timer);
+                        btn.disabled = false;
+                        appState.videoWatchedCount++;
+                        userRef.update({ videoWatchedCount: appState.videoWatchedCount });
+                        btn.textContent = `📺 Watch Ads (${appState.videoWatchedCount}/${threshold})`;
+                        
+                        if (appState.videoWatchedCount >= threshold) {
+                            appState.progressCoins = TOTAL_COINS;
+                            appState.videoWatchedCount = 0;
+                            userRef.update({ progressCoins: TOTAL_COINS, videoWatchedCount: 0 });
+                            updateProgressUI();
+                            showToast('🪙 1000 coins refilled!');
+                        }
                     }
-                }
-            }, 1000);
+                }, 1000);
+            });
         }
 
         // ==================== SPEED BOOST ====================
@@ -1261,43 +1283,37 @@
         function activateSpeedBoost() {
             if (appState.speedBoostCooldown > Date.now()) { showToast('⏳ On cooldown!', 'error'); return; }
             
-            if (typeof show_11197472 === 'function') {
-                show_11197472().then(() => executeSpeedBoost()).catch(() => executeSpeedBoost());
-            } else {
-                executeSpeedBoost();
-            }
-        }
-
-        function executeSpeedBoost() {
-            const boostDuration = 3000, startTime = Date.now();
-            
-            const boostMining = setInterval(() => {
-                if (Date.now() - startTime >= boostDuration || appState.progressCoins <= 0) {
-                    clearInterval(boostMining);
-                    appState.speedBoostCooldown = Date.now() + (60 * 60 * 1000);
-                    userRef.update({ speedBoostCooldown: appState.speedBoostCooldown });
-                    updateSpeedBoostUI();
-                    showToast('🚀 Boost ended! 60 min cooldown.');
-                    return;
-                }
+            showRewardedAd(function() {
+                const boostDuration = 3000, startTime = Date.now();
                 
-                appState.progressCoins -= 1;
-                appState.balance += 2;
-                appState.xpPoints += 3;
+                const boostMining = setInterval(() => {
+                    if (Date.now() - startTime >= boostDuration || appState.progressCoins <= 0) {
+                        clearInterval(boostMining);
+                        appState.speedBoostCooldown = Date.now() + (60 * 60 * 1000);
+                        userRef.update({ speedBoostCooldown: appState.speedBoostCooldown });
+                        updateSpeedBoostUI();
+                        showToast('🚀 Boost ended! 60 min cooldown.');
+                        return;
+                    }
+                    
+                    appState.progressCoins -= 1;
+                    appState.balance += 2;
+                    appState.xpPoints += 3;
+                    
+                    userRef.update({ balance: appState.balance, progressCoins: appState.progressCoins, xpPoints: appState.xpPoints });
+                    updateProgressUI(); updateUI(); updateLevelUI();
+                    
+                    const coin = document.createElement('div');
+                    coin.className = 'floating-coin';
+                    coin.textContent = '+2 🪙';
+                    coin.style.left = (Math.random() * 80 + 10) + '%';
+                    coin.style.top = '35%';
+                    document.body.appendChild(coin);
+                    setTimeout(() => coin.remove(), 800);
+                }, 100);
                 
-                userRef.update({ balance: appState.balance, progressCoins: appState.progressCoins, xpPoints: appState.xpPoints });
-                updateProgressUI(); updateUI(); updateLevelUI();
-                
-                const coin = document.createElement('div');
-                coin.className = 'floating-coin';
-                coin.textContent = '+2 🪙';
-                coin.style.left = (Math.random() * 80 + 10) + '%';
-                coin.style.top = '35%';
-                document.body.appendChild(coin);
-                setTimeout(() => coin.remove(), 800);
-            }, 100);
-            
-            showToast('⚡ Speed Boost activated! 3s of 2x mining!');
+                showToast('⚡ Speed Boost activated! 3s of 2x mining!');
+            });
         }
 
         // ==================== TASKS ====================
@@ -1336,17 +1352,19 @@
         function completeTask(taskId, reward) {
             if (appState.taskLastCompleted[taskId] === new Date().toDateString()) { showToast('Already done today!', 'error'); return; }
             
-            appState.taskLastCompleted[taskId] = new Date().toDateString();
-            appState.balance += reward;
-            appState.completedTasks++;
-            appState.xpPoints += reward * 2;
-            
-            userRef.update({ balance: appState.balance, completedTasks: appState.completedTasks, taskLastCompleted: appState.taskLastCompleted, xpPoints: appState.xpPoints });
-            
-            document.getElementById('rewardText').textContent = `+${reward} Coins`;
-            document.getElementById('successModal').classList.add('active');
-            updateUI(); updateLevelUI(); renderTasks();
-            showToast(`🎉 +${reward} Coins!`);
+            showRewardedAd(function() {
+                appState.taskLastCompleted[taskId] = new Date().toDateString();
+                appState.balance += reward;
+                appState.completedTasks++;
+                appState.xpPoints += reward * 2;
+                
+                userRef.update({ balance: appState.balance, completedTasks: appState.completedTasks, taskLastCompleted: appState.taskLastCompleted, xpPoints: appState.xpPoints });
+                
+                document.getElementById('rewardText').textContent = `+${reward} Coins`;
+                document.getElementById('successModal').classList.add('active');
+                updateUI(); updateLevelUI(); renderTasks();
+                showToast(`🎉 +${reward} Coins!`);
+            });
         }
 
         // ==================== REFERRAL ====================
