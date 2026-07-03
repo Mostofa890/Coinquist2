@@ -2,410 +2,308 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>CoinQuest - Tap & Earn</title>
-    
-    <script src='//libtl.com/sdk.js' data-zone='11197472' data-sdk='show_11197472'></script>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoinQuest - Admin Panel</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', -apple-system, sans-serif; }
-        body { background: #0f172a; color: #e2e8f0; padding-bottom: 80px; min-height: 100vh; background: radial-gradient(circle at 20% 30%, #1e293b, #0f172a); }
-        .container { max-width: 500px; margin: 0 auto; padding: 12px; }
-        
-        .header { background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); padding: 14px 18px; border-radius: 20px; margin-bottom: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
-        .user-info { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-        .avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #3b82f6); display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; color: #fff; box-shadow: 0 4px 15px rgba(139,92,246,0.3); }
-        .user-details h3 { font-size: 15px; font-weight: 600; color: #fff; }
-        .user-details .last-login { font-size: 10px; color: #94a3b8; }
-        .level-badge { display: inline-block; background: rgba(251,191,36,0.15); padding: 3px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; border: 1px solid rgba(251,191,36,0.3); color: #fbbf24; transition: all 0.3s ease; }
-        .level-badge:hover { background: rgba(251,191,36,0.25); transform: scale(1.05); }
-        
-        .balance-card { background: rgba(255,255,255,0.05); padding: 14px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); }
-        .balance-label { font-size: 11px; color: #94a3b8; letter-spacing: 1px; }
-        .balance-amount { font-size: 32px; font-weight: 900; background: linear-gradient(to right, #fcd34d, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .usd-value { color: #10b981; font-size: 15px; font-weight: bold; }
-        
-        .level-section { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 14px; margin-top: 8px; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease; }
-        .level-section:hover { background: rgba(255,255,255,0.08); }
-        .level-section .level-row { display: flex; justify-content: space-between; align-items: center; }
-        .level-progress { width: 100%; height: 5px; background: rgba(255,255,255,0.1); border-radius: 5px; margin-top: 6px; overflow: hidden; }
-        .level-progress .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 5px; transition: width 0.5s ease; }
-        
-        .conversion-timer { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.15); border-radius: 12px; padding: 10px; margin-top: 10px; }
-        .conversion-timer .label { font-size: 10px; color: #94a3b8; }
-        .conversion-timer .time { font-size: 16px; font-weight: bold; color: #10b981; }
-
-        .fab-container { position: fixed; bottom: 90px; right: 20px; z-index: 999; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
-        .fab-main { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border: none; color: #000; font-size: 24px; cursor: pointer; box-shadow: 0 4px 20px rgba(251,191,36,0.4); display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 2; }
-        .fab-main:hover { transform: scale(1.1); }
-        .fab-main.active { transform: rotate(45deg); background: #ef4444; color: #fff; }
-        .fab-options { display: flex; flex-direction: column; gap: 10px; opacity: 0; pointer-events: none; transform: translateY(20px); transition: all 0.3s ease; }
-        .fab-options.show { opacity: 1; pointer-events: all; transform: translateY(0); }
-        .fab-option { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        .fab-option-label { background: rgba(0,0,0,0.8); color: #fff; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; white-space: nowrap; }
-        .fab-option-btn { width: 48px; height: 48px; border-radius: 50%; border: none; font-size: 20px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; }
-        .fab-airdrop { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; }
-
-        .mining-circle-wrapper { display: flex; justify-content: center; align-items: center; margin: 15px 0; position: relative; }
-        .mining-circle { position: relative; width: 250px; height: 250px; border-radius: 50%; background: conic-gradient(#fbbf24 100%, #1e293b 100%); display: flex; justify-content: center; align-items: center; box-shadow: 0 0 50px rgba(251,191,36,0.2); transition: background 0.5s ease; cursor: pointer; }
-        .mining-circle.mining-active { box-shadow: 0 0 60px rgba(251,191,36,0.4); animation: miningPulse 2s infinite; }
-        @keyframes miningPulse { 0%, 100% { box-shadow: 0 0 40px rgba(251,191,36,0.2); } 50% { box-shadow: 0 0 70px rgba(251,191,36,0.5); } }
-        
-        .circle-start-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; cursor: pointer; transition: all 0.4s ease; border: 3px solid rgba(251,191,36,0.4); }
-        .circle-start-overlay:hover { background: rgba(0,0,0,0.5); border-color: rgba(251,191,36,0.7); box-shadow: 0 0 40px rgba(251,191,36,0.3); }
-        .circle-start-overlay.hidden { opacity: 0; pointer-events: none; transform: scale(0.95); }
-        .circle-start-overlay .start-icon { font-size: 48px; margin-bottom: 8px; animation: bounceIcon 1.5s infinite; }
-        @keyframes bounceIcon { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        .circle-start-overlay .start-text { font-size: 20px; font-weight: 900; color: #fbbf24; text-shadow: 0 0 20px rgba(251,191,36,0.5); letter-spacing: 2px; text-align: center; line-height: 1.3; }
-        .circle-start-overlay .start-subtext { font-size: 11px; color: #94a3b8; margin-top: 4px; }
-        
-        .mining-circle .inner-circle { width: 170px; height: 170px; border-radius: 50%; background: #0f172a; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 5; border: 2px solid rgba(255,255,255,0.08); }
-        .mining-circle .coin-icon { font-size: 32px; margin-bottom: 5px; animation: coinSpin 3s linear infinite; }
-        @keyframes coinSpin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
-        .mining-circle .coin-count { font-size: 30px; font-weight: 900; color: #fbbf24; }
-        .mining-circle .circle-status { font-size: 10px; color: #94a3b8; margin-top: 4px; }
-        .mining-circle .circle-progress-text { font-size: 11px; color: #94a3b8; margin-top: 2px; }
-        
-        .circle-watch-btn { margin-top: 12px; background: linear-gradient(135deg, #10b981, #059669); color: #fff; padding: 10px 20px; border: none; border-radius: 25px; font-weight: 700; font-size: 13px; cursor: pointer; width: 100%; max-width: 280px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(16,185,129,0.3); }
-
-        .speed-btn-container { margin-top: 12px; width: 100%; display: flex; justify-content: center; flex-direction: column; align-items: center; }
-        .speed-boost-btn { background: linear-gradient(135deg, #f97316, #f59e0b); color: #fff; padding: 10px 20px; border: none; border-radius: 25px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(249,115,22,0.3); }
-        .boost-countdown-box { display: none; background: rgba(249,115,22,0.15); border: 2px solid rgba(249,115,22,0.3); border-radius: 15px; padding: 14px 20px; text-align: center; width: 100%; max-width: 280px; }
-        .boost-countdown-box.show { display: block; }
-        .boost-countdown-box .countdown-label { font-size: 12px; color: #f97316; margin-bottom: 4px; }
-        .boost-countdown-box .countdown-time { font-size: 32px; font-weight: 900; color: #f97316; }
-
-        .page { display: none; min-height: 60vh; padding-top: 8px; }
-        .page.active { display: block; }
-        .page-header { font-size: 20px; font-weight: 800; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        .task-filters { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; }
-        .task-filters .filter-btn { padding: 5px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #94a3b8; cursor: pointer; font-size: 11px; white-space: nowrap; }
-        .task-filters .filter-btn.active { background: linear-gradient(135deg, #8b5cf6, #3b82f6); border-color: transparent; color: #fff; }
-        .task-card { background: rgba(255,255,255,0.03); border-radius: 14px; padding: 14px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.08); }
-        .task-card .task-header { display: flex; justify-content: space-between; align-items: center; }
-        .task-card .task-title { font-size: 14px; font-weight: 600; color: #fff; }
-        .task-card .task-reward { color: #10b981; font-weight: bold; font-size: 14px; }
-        .task-card .task-btn { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; padding: 6px 18px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 12px; }
-
-        .wallet-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(8px); padding: 20px 16px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.08); }
-        .wallet-card .wallet-balance { font-size: 36px; font-weight: 900; background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
-        .withdraw-section { margin-top: 15px; padding: 15px; background: rgba(239,68,68,0.08); border-radius: 14px; border: 1px solid rgba(239,68,68,0.15); text-align: left; }
-        .withdraw-section .form-group { margin-bottom: 12px; }
-        .withdraw-section .form-group label { font-size: 12px; color: #94a3b8; margin-bottom: 5px; display: block; }
-        .withdraw-section .form-group select, .withdraw-section .form-group input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #fff; font-size: 14px; outline: none; }
-        .withdraw-section .withdraw-btn { margin-top: 8px; padding: 12px 20px; background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; width: 100%; font-size: 15px; }
-        .withdraw-section .withdraw-btn:disabled { background: #64748b; cursor: not-allowed; }
-
-        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; background: rgba(15,23,42,0.95); backdrop-filter: blur(24px); display: flex; justify-content: space-around; padding: 10px 4px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; color: #64748b; font-size: 10px; cursor: pointer; flex: 1; }
-        .nav-item.active { color: #fbbf24; }
-        .nav-item i { font-size: 20px; }
-
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; }
-        .modal.active { display: flex; }
-        .modal-content { background: rgba(30,41,59,0.95); padding: 25px; border-radius: 20px; width: 90%; max-width: 350px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
-        .modal-content button { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; padding: 12px 30px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; margin-top: 15px; }
-        
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #10b981; color: #fff; padding: 12px 24px; border-radius: 14px; font-weight: 700; z-index: 99999; display: none; font-size: 14px; }
-        .toast.show { display: block; animation: slideDown 0.4s ease; }
-        .toast.error { background: #ef4444; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-80px) translateX(-50%); } to { opacity: 1; transform: translateY(0) translateX(-50%); } }
-
-        .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9998; display: none; overflow-y: auto; padding-bottom: 70px; }
-        .overlay.show { display: block; }
-        .overlay-header { background: rgba(15,23,42,0.95); padding: 15px 20px; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 10px; }
-        .overlay-header .back-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 8px 16px; border-radius: 10px; cursor: pointer; }
-
-        .level-overlay-content { padding: 15px; }
-        .current-level-card { background: rgba(255,255,255,0.05); border-radius: 20px; padding: 20px; text-align: center; margin-bottom: 20px; border: 2px solid rgba(251,191,36,0.2); }
-        .current-level-card .level-emoji { font-size: 60px; margin-bottom: 8px; }
-        .current-level-card .level-number { font-size: 28px; font-weight: 900; color: #fbbf24; }
-        .current-level-card .level-name { font-size: 16px; color: #94a3b8; margin-bottom: 8px; }
-        .current-level-card .level-bonus { display: inline-block; background: rgba(16,185,129,0.15); color: #10b981; padding: 4px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; margin-top: 6px; }
-        .level-filters { display: flex; gap: 6px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
-        .level-filters .lvl-filter-btn { padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #94a3b8; cursor: pointer; font-size: 11px; white-space: nowrap; }
-        .level-filters .lvl-filter-btn.active { background: linear-gradient(135deg, #8b5cf6, #3b82f6); border-color: transparent; color: #fff; }
-        .level-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-        .level-card { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.08); transition: all 0.3s ease; cursor: pointer; }
-        .level-card.current { border: 2px solid #fbbf24; background: rgba(251,191,36,0.08); }
-        .level-card.unlocked { border-color: rgba(16,185,129,0.3); }
-        .level-card.locked { opacity: 0.4; }
-
-        .history-card { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 12px; margin-top: 12px; max-height: 250px; overflow-y: auto; }
-        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px; }
-
-        .floating-coin { position: fixed; font-size: 30px; pointer-events: none; z-index: 1000; animation: floatUp 1s ease-out forwards; }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-150px) scale(0.5); } }
-        .hidden { display: none !important; }
-
-        /* Ban Overlay */
-        .banned-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 99999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; }
-        .banned-overlay.show { display: flex; }
-        .banned-overlay h1 { color: #ef4444; font-size: 28px; margin-bottom: 12px; }
-        .banned-overlay p { color: #94a3b8; max-width: 350px; line-height: 1.6; margin-bottom: 8px; }
-        .banned-overlay .ban-reason { background: rgba(255,255,255,0.05); padding: 14px; border-radius: 12px; margin: 10px 0; max-width: 350px; color: #fbbf24; border: 1px solid rgba(239,68,68,0.15); }
-        .banned-overlay .appeal-btn { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; padding: 12px 24px; border: none; border-radius: 25px; font-weight: 700; cursor: pointer; margin-top: 12px; font-size: 14px; }
-        .banned-overlay .appeal-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #0f172a; color: #e2e8f0; display: flex; min-height: 100vh; }
+        .sidebar { width: 280px; background: #1e293b; padding: 20px; position: fixed; height: 100vh; overflow-y: auto; border-right: 1px solid #334155; z-index: 100; }
+        .sidebar h2 { color: #fbbf24; margin-bottom: 30px; font-size: 22px; text-align: center; padding-bottom: 15px; border-bottom: 1px solid #334155; }
+        .sidebar .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px; cursor: pointer; margin-bottom: 4px; transition: 0.3s; color: #94a3b8; font-size: 14px; }
+        .sidebar .nav-item:hover, .sidebar .nav-item.active { background: rgba(251,191,36,0.1); color: #fbbf24; }
+        .main-content { margin-left: 280px; flex: 1; padding: 24px; }
+        .page { display: none; } .page.active { display: block; }
+        .page-header { font-size: 26px; font-weight: 800; margin-bottom: 24px; color: #fbbf24; display: flex; align-items: center; gap: 12px; }
+        .live-indicator { width: 12px; height: 12px; background: #10b981; border-radius: 50%; animation: livePulse 1.5s infinite; display: inline-block; }
+        @keyframes livePulse { 0%,100%{opacity:1;box-shadow:0 0 10px #10b981}50%{opacity:0.3} }
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); }
+        .stat-card .value { font-size: 28px; font-weight: 900; color: #fbbf24; }
+        .stat-card .label { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+        .card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .card h3 { margin-bottom: 16px; color: #fff; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 5px; font-weight: 600; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; background: #1e293b; border: 1px solid #334155; border-radius: 8px; color: #fff; font-size: 13px; outline: none; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #fbbf24; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+        .btn { padding: 10px 20px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; font-size: 13px; transition: 0.3s; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-primary { background: #fbbf24; color: #000; } .btn-danger { background: #ef4444; color: #fff; }
+        .btn-success { background: #10b981; color: #fff; } .btn-info { background: #3b82f6; color: #fff; }
+        .btn-warning { background: #f59e0b; color: #000; }
+        .btn-sm { padding: 6px 12px; font-size: 11px; border-radius: 6px; }
+        .btn:hover { transform: translateY(-2px); opacity: 0.9; }
+        .table-container { overflow-x: auto; max-height: 600px; overflow-y: auto; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #334155; }
+        th { color: #94a3b8; font-weight: 600; position: sticky; top: 0; background: #1e293b; z-index: 10; }
+        tr:hover { background: rgba(255,255,255,0.03); }
+        tr.banned-row { background: rgba(239,68,68,0.08); }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; display: inline-block; }
+        .badge-success { background: rgba(16,185,129,0.2); color: #10b981; }
+        .badge-warning { background: rgba(251,191,36,0.2); color: #fbbf24; }
+        .badge-danger { background: rgba(239,68,68,0.2); color: #ef4444; }
+        .badge-info { background: rgba(59,130,246,0.2); color: #3b82f6; }
+        .badge-mining { background: rgba(16,185,129,0.2); color: #10b981; animation: miningBadge 2s infinite; }
+        .badge-new { background: rgba(239,68,68,0.3); color: #fff; animation: pulse 1.5s infinite; }
+        @keyframes miningBadge { 0%,100%{opacity:1}50%{opacity:0.5} }
+        @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.6} }
+        .search-box { display: flex; gap: 10px; margin-bottom: 16px; }
+        .search-box input { flex: 1; padding: 10px 14px; background: #1e293b; border: 1px solid #334155; border-radius: 8px; color: #fff; font-size: 13px; outline: none; }
+        .search-box input:focus { border-color: #fbbf24; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 9999; display: none; align-items: center; justify-content: center; }
+        .modal-overlay.show { display: flex; }
+        .modal-box { background: #1e293b; padding: 24px; border-radius: 16px; width: 90%; max-width: 500px; border: 1px solid #334155; max-height: 80vh; overflow-y: auto; }
+        .modal-box h3 { color: #fbbf24; margin-bottom: 16px; }
+        .modal-buttons { display: flex; gap: 10px; margin-top: 16px; }
+        .toast { position: fixed; top: 20px; right: 20px; padding: 14px 24px; border-radius: 12px; color: #fff; font-weight: 600; z-index: 99999; display: none; box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+        .toast.show { display: block; animation: slideIn 0.3s ease; }
+        .toast.success { background: #10b981; } .toast.error { background: #ef4444; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .login-container { max-width: 420px; margin: 100px auto; padding: 40px; background: rgba(255,255,255,0.05); border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+        .login-container h2 { color: #fbbf24; margin-bottom: 24px; font-size: 28px; }
+        .mining-user-card { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 14px; border: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .mining-user-card.active-mining { border-color: #10b981; background: rgba(16,185,129,0.05); box-shadow: 0 0 15px rgba(16,185,129,0.1); }
+        .level-filter-tabs { display: flex; gap: 6px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
+        .level-filter-tabs button { padding: 5px 12px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #94a3b8; cursor: pointer; font-size: 11px; white-space: nowrap; }
+        .level-filter-tabs button.active { background: #fbbf24; color: #000; border-color: #fbbf24; }
+        .appeal-card { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); border-radius: 12px; padding: 14px; margin-bottom: 10px; }
+        .live-watchers { color: #10b981; font-weight: bold; font-size: 14px; display: flex; align-items: center; gap: 6px; }
+        .live-dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: livePulse 1.5s infinite; }
     </style>
 </head>
 <body>
-
-    <!-- Banned Overlay -->
-    <div class="banned-overlay" id="bannedOverlay">
-        <h1>🚫 Account Banned</h1>
-        <p>Your account has been suspended by the administrator.</p>
-        <div class="ban-reason" id="banReason">Reason: Violation of terms</div>
-        <p style="font-size:11px;color:#64748b;">You can submit an appeal to request unban.</p>
-        <button class="appeal-btn" id="appealBtn" onclick="submitBanAppeal()">📩 Submit Appeal</button>
-        <p id="appealStatus" style="font-size:11px;color:#10b981;margin-top:8px;display:none;"></p>
-    </div>
-
-    <!-- Level Overlay -->
-    <div class="overlay" id="levelOverlay">
-        <div class="overlay-header"><button class="back-btn" onclick="closeLevelPage()"><i class="fas fa-arrow-left"></i> Back</button><h2 style="color:#fff;flex:1;text-align:center;">🏆 Level System</h2></div>
-        <div class="level-overlay-content">
-            <div class="current-level-card"><div class="level-emoji" id="lvlEmoji">🔒</div><div class="level-number" id="lvlNumber">Level 0</div><div class="level-name" id="lvlName">Unlocking...</div><div style="margin-top:8px;"><span style="font-size:13px;color:#94a3b8;">XP: </span><span style="font-size:16px;font-weight:bold;color:#fff;" id="lvlXP">-1000 / 0</span></div><div class="level-progress" style="margin-top:10px;"><div class="fill" id="lvlProgressFill" style="width:0%;"></div></div><div class="level-bonus" id="lvlBonus">Mining Bonus: +0%</div></div>
-            <div class="level-filters"><button class="lvl-filter-btn active" onclick="filterLevels('all', this)">📋 All</button><button class="lvl-filter-btn" onclick="filterLevels('bronze', this)">🥉 Bronze</button><button class="lvl-filter-btn" onclick="filterLevels('silver', this)">🥈 Silver</button><button class="lvl-filter-btn" onclick="filterLevels('gold', this)">🥇 Gold</button><button class="lvl-filter-btn" onclick="filterLevels('platinum', this)">💎 Platinum</button><button class="lvl-filter-btn" onclick="filterLevels('diamond', this)">👑 Diamond</button></div>
-            <div class="level-grid" id="levelGrid"></div>
+    <!-- Login Page -->
+    <div id="loginPage" style="display:flex;align-items:center;justify-content:center;min-height:100vh;">
+        <div class="login-container">
+            <h2>🔐 CoinQuest Admin</h2>
+            <div class="form-group"><input type="text" id="adminUser" placeholder="Username"></div>
+            <div class="form-group"><input type="password" id="adminPass" placeholder="Password"></div>
+            <button class="btn btn-primary" onclick="adminLogin()" style="width:100%;padding:12px;">🚀 Login</button>
+            <p id="loginError" style="color:#ef4444;margin-top:12px;display:none;"></p>
+            <p style="color:#94a3b8;font-size:11px;margin-top:15px;">Default: admin / coinquest2024</p>
         </div>
     </div>
 
-    <!-- Airdrop Overlay -->
-    <div class="overlay" id="airdropOverlay">
-        <div class="overlay-header"><button class="back-btn" onclick="closeAirdropPage()"><i class="fas fa-arrow-left"></i> Back</button><h2 style="color:#fff;flex:1;text-align:center;">📢 Live AirDrop</h2></div>
-        <div style="padding:15px;"><div style="background:rgba(255,255,255,0.05);border-radius:20px;padding:25px;text-align:center;border:2px solid rgba(251,191,36,0.3);"><div style="font-size:14px;color:#94a3b8;">Current Pool</div><div style="font-size:42px;font-weight:900;color:#fbbf24;" id="airdropPoolDisplay">$50.00</div><div style="font-size:36px;font-weight:bold;color:#fbbf24;margin:15px 0;" id="airdropCountdown">--:--:--</div><button style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:14px 30px;border:none;border-radius:30px;font-weight:700;font-size:16px;cursor:pointer;width:100%;" id="airdropClaimBtn" onclick="claimAirdrop()" disabled>🎁 Claim Your Share</button></div></div>
-    </div>
+    <!-- Admin Panel -->
+    <div id="adminPanel" style="display:none;">
+        <div class="sidebar">
+            <h2>🪙 CoinQuest</h2>
+            <div class="nav-item active" onclick="switchPage('dashboard',this)"><i class="fas fa-chart-pie"></i> Dashboard</div>
+            <div class="nav-item" onclick="switchPage('users',this)"><i class="fas fa-users"></i> Users</div>
+            <div class="nav-item" onclick="switchPage('mining',this)"><i class="fas fa-microchip"></i> Mining Monitor</div>
+            <div class="nav-item" onclick="switchPage('withdrawals',this)"><i class="fas fa-money-bill-wave"></i> Withdrawals</div>
+            <div class="nav-item" onclick="switchPage('banAppeals',this)"><i class="fas fa-gavel"></i> Ban Appeals <span id="appealBadge" class="badge badge-new" style="display:none;">0</span></div>
+            <div class="nav-item" onclick="switchPage('referral',this)"><i class="fas fa-link"></i> Referral System</div>
+            <div class="nav-item" onclick="switchPage('tasks',this)"><i class="fas fa-tasks"></i> Tasks</div>
+            <div class="nav-item" onclick="switchPage('airdrop',this)"><i class="fas fa-parachute-box"></i> Airdrop</div>
+            <div class="nav-item" onclick="switchPage('levels',this)"><i class="fas fa-trophy"></i> Levels (0-100)</div>
+            <div class="nav-item" onclick="switchPage('settings',this)"><i class="fas fa-cog"></i> Settings</div>
+            <div class="nav-item" onclick="adminLogout()" style="color:#ef4444;margin-top:20px;"><i class="fas fa-sign-out-alt"></i> Logout</div>
+        </div>
 
-    <!-- Main Container -->
-    <div class="container main-content" id="mainContent">
-        <div class="header">
-            <div class="user-info"><div class="avatar">👤</div><div class="user-details"><h3 id="userName">User</h3><div class="last-login" id="lastLoginDisplay">📅 Last Login: --</div><span class="level-badge" onclick="openLevelPage()" id="userLevelBadge">🔒 Unlocking</span></div></div>
-            <div class="balance-card">
-                <div class="balance-label">💰 Coins Balance</div><div class="balance-amount" id="balance">0</div><div class="usd-value" id="usdValue">≈ $0.00 USD</div><div id="totalUsdEarned" style="font-size:10px;color:#94a3b8;margin-top:2px;">💵 Total USD: $0.00</div>
-                <div class="level-section" onclick="openLevelPage()"><div class="level-row"><span class="level-title" id="levelTitle">🔒 Unlocking</span><span class="level-number" id="levelNumber">Level 0</span></div><div class="level-progress"><div class="fill" id="levelProgressFill" style="width:0%;"></div></div><div style="font-size:9px;color:#94a3b8;display:flex;justify-content:space-between;margin-top:3px;"><span id="levelCurrentPoints">-1000 XP</span><span id="levelNextPoints">/ 0 XP</span></div></div>
-                <div class="conversion-timer"><div class="label">⏰ Next Auto Conversion</div><div class="time" id="conversionCountdown">--:--:--</div><div id="rateInfo" style="font-size:9px;color:#94a3b8;">Rate: 1 USD = 1000 Coins</div></div>
+        <div class="main-content">
+            <!-- Dashboard -->
+            <div class="page active" id="pageDashboard">
+                <div class="page-header"><span class="live-indicator"></span> Live Dashboard</div>
+                <div class="stat-grid">
+                    <div class="stat-card"><div class="label">👥 Total Users</div><div class="value" id="dashUsers">-</div></div>
+                    <div class="stat-card"><div class="label">⛏️ Active Mining</div><div class="value" id="dashMining" style="color:#10b981;">-</div></div>
+                    <div class="stat-card"><div class="label">💰 Total Coins</div><div class="value" id="dashCoins">-</div></div>
+                    <div class="stat-card"><div class="label">💵 Total USD</div><div class="value" id="dashUSD" style="color:#10b981;">-</div></div>
+                    <div class="stat-card"><div class="label">🚫 Banned</div><div class="value" id="dashBanned" style="color:#ef4444;">-</div></div>
+                    <div class="stat-card"><div class="label">📩 Appeals</div><div class="value" id="dashAppeals" style="color:#f59e0b;">-</div></div>
+                </div>
+            </div>
+
+            <!-- Users -->
+            <div class="page" id="pageUsers">
+                <div class="page-header">👥 User Management</div>
+                <div class="search-box"><input type="text" id="userSearch" placeholder="🔍 Search..." onkeyup="searchUsers()"><button class="btn btn-primary" onclick="loadUsers()">🔄</button></div>
+                <div class="card"><h3>All Users</h3><div class="table-container" id="usersTable"></div></div>
+            </div>
+
+            <!-- Mining Monitor -->
+            <div class="page" id="pageMining"><div class="page-header"><span class="live-indicator"></span> Live Mining</div><div class="card"><div id="miningMonitorGrid"></div></div></div>
+
+            <!-- Withdrawals -->
+            <div class="page" id="pageWithdrawals"><div class="page-header">💳 Withdrawals</div><div class="card"><div class="table-container" id="withdrawalsTable"></div></div></div>
+
+            <!-- Ban Appeals -->
+            <div class="page" id="pageBanAppeals"><div class="page-header">⚖️ Ban Appeals</div><div class="card"><h3>📩 Pending Appeals</h3><div id="banAppealsContainer"></div></div><div class="card"><h3>🚫 Banned Users</h3><div class="table-container" id="bannedUsersTable"></div></div></div>
+
+            <!-- Referral System -->
+            <div class="page" id="pageReferral">
+                <div class="page-header">👥 Referral System</div>
+                <div class="card"><h3>🔗 Referral Configuration</h3>
+                    <div class="form-row"><div class="form-group"><label>Coins per Referral</label><input type="number" id="refPerReferral" value="50"></div><div class="form-group"><label>XP per Referral</label><input type="number" id="refXpPerReferral" value="100"></div></div>
+                    <h4 style="color:#fbbf24;margin:15px 0 10px 0;">🎁 Tier Bonuses</h4>
+                    <div class="form-row"><div class="form-group"><label>T1 Count</label><input type="number" id="refT1Count" value="10"></div><div class="form-group"><label>T1 Bonus</label><input type="number" id="refT1Bonus" value="50"></div></div>
+                    <div class="form-row"><div class="form-group"><label>T2 Count</label><input type="number" id="refT2Count" value="25"></div><div class="form-group"><label>T2 Bonus</label><input type="number" id="refT2Bonus" value="150"></div></div>
+                    <div class="form-row"><div class="form-group"><label>T3 Count</label><input type="number" id="refT3Count" value="50"></div><div class="form-group"><label>T3 Bonus</label><input type="number" id="refT3Bonus" value="300"></div></div>
+                    <div class="form-row"><div class="form-group"><label>T4 Count</label><input type="number" id="refT4Count" value="100"></div><div class="form-group"><label>T4 Bonus</label><input type="number" id="refT4Bonus" value="500"></div></div>
+                    <div class="form-row"><div class="form-group"><label>T5 Count</label><input type="number" id="refT5Count" value="200"></div><div class="form-group"><label>T5 Bonus</label><input type="number" id="refT5Bonus" value="1000"></div></div>
+                    <button class="btn btn-primary" onclick="saveReferralConfig()">💾 Save Config</button>
+                </div>
+                <div class="card"><h3>📊 Referral Stats</h3><div class="table-container" id="referralStatsTable"></div></div>
+            </div>
+
+            <!-- Tasks (Link & Video only, Button REMOVED) -->
+            <div class="page" id="pageTasks">
+                <div class="page-header">📋 Task Management</div>
+                <div class="card"><h3 id="taskFormTitle">➕ Add Task</h3><input type="hidden" id="editingTaskId" value="">
+                    <div class="form-group"><input type="text" id="taskTitle" placeholder="Task Title"></div>
+                    <div class="form-group"><input type="text" id="taskDesc" placeholder="Description"></div>
+                    <div class="form-row">
+                        <div class="form-group"><input type="number" id="taskReward" value="50" placeholder="Reward Coins"></div>
+                        <div class="form-group"><select id="taskType"><option value="link">🔗 Link</option><option value="video">📺 Video</option></select></div>
+                    </div>
+                    <div class="form-group"><input type="text" id="taskLink" placeholder="URL (for link tasks)"></div>
+                    <div style="display:flex;gap:10px;">
+                        <button class="btn btn-primary" onclick="saveTask()">💾 Save Task</button>
+                        <button class="btn btn-info" onclick="clearTaskForm()">🔄 Clear</button>
+                    </div>
+                </div>
+                <div class="card"><h3>📊 Task History</h3><div class="table-container"><table><thead><tr><th>Title</th><th>Type</th><th>Reward</th><th>Created</th><th>Actions</th></tr></thead><tbody id="tasksTableBody"></tbody></table></div></div>
+            </div>
+
+            <!-- Airdrop (Start Time, End Time, Live Watchers) -->
+            <div class="page" id="pageAirdrop">
+                <div class="page-header">🎯 Airdrop Management</div>
+                <div class="card">
+                    <h3>Configure Airdrop</h3>
+                    <div class="form-row"><div class="form-group"><label>Pool Amount ($)</label><input type="number" id="airdropPool" value="50" step="0.01"></div><div class="form-group"><label>Min Reward ($)</label><input type="number" id="airdropMin" value="0.5" step="0.01"></div></div>
+                    <div class="form-row"><div class="form-group"><label>Max Reward ($)</label><input type="number" id="airdropMax" value="2" step="0.01"></div><div class="form-group"><label>Duration (min)</label><input type="number" id="airdropDuration" value="5"></div></div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Start Time</label><input type="datetime-local" id="airdropStartTime"></div>
+                        <div class="form-group"><label>End Time</label><input type="datetime-local" id="airdropEndTime"></div>
+                    </div>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                        <button class="btn btn-primary" onclick="saveAirdrop()">💾 Save</button>
+                        <button class="btn btn-success" onclick="startAirdropNow()">🚀 Start Now</button>
+                        <button class="btn btn-warning" onclick="resetAirdropClaims()">🔄 Reset Claims</button>
+                        <span class="live-watchers" id="airdropLiveWatchers"><span class="live-dot"></span> <span id="liveCount">0</span> Live</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Levels (FULL History with Edit/Delete) -->
+            <div class="page" id="pageLevels">
+                <div class="page-header">🏆 Level Configuration (0-100)</div>
+                <div class="card"><h3 id="levelFormTitle">➕ Add Level</h3><input type="hidden" id="editingLevelKey" value="">
+                    <div class="form-row"><div class="form-group"><label>Level (0-100)</label><input type="number" id="levelNum" min="0" max="100" value="0"></div><div class="form-group"><label>Tier</label><select id="levelTier"><option value="unlocking">🔒 Unlocking</option><option value="bronze">🥉 Bronze</option><option value="silver">🥈 Silver</option><option value="gold">🥇 Gold</option><option value="platinum">💎 Platinum</option><option value="diamond">👑 Diamond</option></select></div></div>
+                    <div class="form-row"><div class="form-group"><label>Required XP</label><input type="number" id="levelXp" value="-1000"></div><div class="form-group"><label>Mining Bonus %</label><input type="number" id="levelBonus" value="0"></div></div>
+                    <div style="display:flex;gap:10px;"><button class="btn btn-primary" onclick="saveLevel()">💾 Save</button><button class="btn btn-info" onclick="clearLevelForm()">🔄 Clear</button><button class="btn btn-warning" onclick="bulkLevels()">⚡ Bulk 101</button></div>
+                </div>
+                <div class="card">
+                    <h3>📊 Level History (All 101 Levels)</h3>
+                    <div class="level-filter-tabs"><button class="active" onclick="filterLevelTable('all',this)">All</button><button onclick="filterLevelTable('unlocking',this)">🔒 Unlocking</button><button onclick="filterLevelTable('bronze',this)">🥉 Bronze</button><button onclick="filterLevelTable('silver',this)">🥈 Silver</button><button onclick="filterLevelTable('gold',this)">🥇 Gold</button><button onclick="filterLevelTable('platinum',this)">💎 Platinum</button><button onclick="filterLevelTable('diamond',this)">👑 Diamond</button></div>
+                    <div style="margin-bottom:10px;font-size:12px;color:#94a3b8;">Total: <b id="totalLevelsCount" style="color:#fbbf24;">0</b> | Updated: <b id="lastLevelUpdate" style="color:#10b981;">-</b></div>
+                    <div class="table-container"><table><thead><tr><th>Level</th><th>Tier</th><th>XP</th><th>Bonus</th><th>Updated</th><th>Actions</th></tr></thead><tbody id="levelsTableBody"></tbody></table></div>
+                </div>
+            </div>
+
+            <!-- Settings -->
+            <div class="page" id="pageSettings"><div class="page-header">⚙️ Settings</div>
+                <div class="card"><h3>💰 Conversion</h3><div class="form-group"><input type="number" id="conversionRate" value="1000"></div><button class="btn btn-primary" onclick="saveConv()">💾 Save</button></div>
+                <div class="card"><h3>💳 Withdraw</h3><div class="form-row"><div class="form-group"><label>Min ($)</label><input type="number" id="minWithdraw" value="10"></div><div class="form-group"><label>Methods</label><input type="text" id="withdrawMethods" value="Nagad,Rocket,bKash"></div></div><button class="btn btn-primary" onclick="saveWithdrawSet()">💾 Save</button></div>
+                <div class="card"><h3>📺 Video</h3><div class="form-row"><div class="form-group"><label>Reward</label><input type="number" id="videoReward" value="10"></div><div class="form-group"><label>Limit</label><input type="number" id="videoDailyLimit" value="5"></div></div><button class="btn btn-primary" onclick="saveVideoSet()">💾 Save</button></div>
+                <div class="card"><h3>🔐 Admin</h3><div class="form-row"><div class="form-group"><input type="text" id="newAdminUser" placeholder="Username"></div><div class="form-group"><input type="password" id="newAdminPass" placeholder="Password"></div></div><button class="btn btn-warning" onclick="changeAdminCreds()">🔐 Update</button></div>
             </div>
         </div>
-
-        <div class="page active" id="pageHome">
-            <div class="mining-circle-wrapper"><div class="mining-circle" id="miningCircle"><div class="circle-start-overlay" id="circleStartOverlay" onclick="startMining()"><div class="start-icon">⚡</div><div class="start-text">START<br>MINING</div><div class="start-subtext">Tap to earn coins</div></div><div class="inner-circle"><span class="coin-icon">🪙</span><span class="coin-count" id="progressCoinCount">1000</span><div class="circle-status" id="progressStatus">Ready</div><div class="circle-progress-text" id="progressPercent">100%</div></div></div></div>
-            <div style="display:flex;justify-content:center;"><button class="circle-watch-btn hidden" id="progressWatchBtn" onclick="startVideoProgress()">📺 Watch Ads to Refill (0/5)</button></div>
-            <div class="speed-btn-container"><button class="speed-boost-btn" id="speedBoostBtn" onclick="activateSpeedBoost()"><i class="fas fa-rocket"></i> Speed Boost</button><div class="boost-countdown-box" id="boostCountdownBox"><div class="countdown-label">⏳ Cooldown</div><div class="countdown-time" id="boostCountdownTime">00:00</div></div></div>
-        </div>
-
-        <div class="page" id="pageTasks"><h2 class="page-header">📋 Tasks</h2><div class="task-filters"><button class="filter-btn active" onclick="filterTasks('all', this)">All</button><button class="filter-btn" onclick="filterTasks('link', this)">🔗 Link</button><button class="filter-btn" onclick="filterTasks('button', this)">🟦 Button</button><button class="filter-btn" onclick="filterTasks('video', this)">📺 Video</button></div><div id="tasksContainer"></div></div>
-
-        <div class="page" id="pageRefer"><h2 class="page-header">👥 Refer & Earn</h2>
-            <div style="background:rgba(255,255,255,0.03);border-radius:14px;padding:14px;margin-bottom:14px;text-align:center;"><p style="font-size:13px;color:#94a3b8;">Your Referral Link</p><div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:10px;font-size:12px;color:#3b82f6;word-break:break-all;margin:8px 0;" id="referLinkHome">Loading...</div><button style="background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;padding:8px 20px;border-radius:10px;border:none;font-weight:700;cursor:pointer;" onclick="copyReferLink()">📋 Copy</button></div>
-            <div style="background:rgba(255,255,255,0.03);border-radius:14px;padding:14px;margin-bottom:14px;text-align:center;"><input type="text" id="referCodeInput" placeholder="Enter code..." style="width:100%;padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;margin-bottom:8px;outline:none;"><button id="referCodeSubmitBtn" onclick="submitReferCode()" style="background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;padding:8px 20px;border-radius:10px;border:none;font-weight:700;cursor:pointer;">Submit</button></div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;"><div style="background:rgba(255,255,255,0.03);padding:12px;border-radius:12px;text-align:center;"><div style="font-size:20px;font-weight:900;color:#fbbf24;" id="referTotal">0</div><div style="font-size:10px;color:#94a3b8;">Refs</div></div><div style="background:rgba(255,255,255,0.03);padding:12px;border-radius:12px;text-align:center;"><div style="font-size:20px;font-weight:900;color:#fbbf24;" id="referEarned">0</div><div style="font-size:10px;color:#94a3b8;">Coins</div></div><div style="background:rgba(255,255,255,0.03);padding:12px;border-radius:12px;text-align:center;"><div style="font-size:20px;font-weight:900;color:#fbbf24;" id="referBonus">0</div><div style="font-size:10px;color:#94a3b8;">Bonus</div></div></div>
-            <div id="referTierList"></div>
-        </div>
-
-        <div class="page" id="pageWallet"><h2 class="page-header">💰 Wallet</h2><div class="wallet-card"><p style="color:#94a3b8;">Coins Balance</p><div class="wallet-balance" id="walletBalance">0</div><div style="color:#10b981;font-size:18px;font-weight:bold;" id="walletUsd">≈ $0.00</div><div style="background:rgba(16,185,129,0.1);border-radius:10px;padding:10px;margin-top:15px;"><div style="font-size:11px;color:#94a3b8;">💵 Total USD</div><div style="font-size:18px;font-weight:bold;color:#10b981;" id="walletTotalUsd">$0.00</div></div><div class="withdraw-section"><p style="font-weight:bold;color:#fbbf24;margin-bottom:8px;" id="withdrawInfo">Min: $10.00</p><div class="form-group"><label>Method</label><select id="withdrawMethod"></select></div><div class="form-group"><label>Account Number</label><input type="text" id="withdrawAccount" placeholder="Enter number..."></div><p style="font-size:11px;color:#94a3b8;" id="withdrawStatus">You have: $0.00</p><button class="withdraw-btn" id="withdrawBtn" onclick="withdraw()">Withdraw Now</button></div>
-        <div class="history-card"><div style="font-size:11px;color:#94a3b8;margin-bottom:8px;">📜 Withdraw History</div><div id="withdrawHistoryList"><span style="color:#94a3b8;font-size:11px;">No withdrawals yet</span></div></div></div></div>
     </div>
 
-    <!-- FAB -->
-    <div class="fab-container"><div class="fab-options" id="fabOptions"><div class="fab-option" onclick="openAirdropPage()"><span class="fab-option-label">Live AirDrop</span><button class="fab-option-btn fab-airdrop">📢</button></div></div><button class="fab-main" id="fabMain" onclick="toggleFab()">+</button></div>
-
-    <!-- Bottom Nav -->
-    <div class="bottom-nav"><div class="nav-item active" onclick="switchPage('home', this)"><i class="fas fa-home"></i><span>Home</span></div><div class="nav-item" onclick="switchPage('tasks', this)"><i class="fas fa-tasks"></i><span>Tasks</span></div><div class="nav-item" onclick="switchPage('refer', this)"><i class="fas fa-users"></i><span>Refer</span></div><div class="nav-item" onclick="switchPage('wallet', this)"><i class="fas fa-wallet"></i><span>Wallet</span></div></div>
-
     <!-- Modals -->
-    <div class="modal" id="successModal"><div class="modal-content"><div style="font-size:50px;">🎉</div><h3>Completed!</h3><p id="rewardText">+50 Coins</p><button onclick="closeModal('successModal')">OK</button></div></div>
-    <div class="modal" id="conversionModal"><div class="modal-content"><div style="font-size:50px;">💰</div><h3>Converted!</h3><p id="conversionText"></p><button onclick="closeModal('conversionModal')">OK</button></div></div>
-    <div class="modal" id="withdrawModal"><div class="modal-content"><div style="font-size:50px;">💳</div><h3 id="withdrawModalTitle"></h3><p id="withdrawModalText"></p><button onclick="closeModal('withdrawModal')">OK</button></div></div>
-    <div class="modal" id="airdropModal"><div class="modal-content"><div style="font-size:50px;">🎁</div><h3>Airdrop Claimed!</h3><p id="airdropModalText"></p><button onclick="closeModal('airdropModal')">OK</button></div></div>
-
-    <div class="toast" id="toast"></div>
+    <div class="modal-overlay" id="editUserModal"><div class="modal-box"><h3>✏️ Edit User</h3><input type="hidden" id="editUserId"><div class="form-group"><label>Balance</label><input type="number" id="editBalance"></div><div class="form-group"><label>USD</label><input type="number" id="editUsd" step="0.01"></div><div class="form-group"><label>XP</label><input type="number" id="editXp"></div><div class="form-group"><label>Coins Left</label><input type="number" id="editProgress"></div><div class="modal-buttons"><button class="btn btn-primary" onclick="saveUserEdit()">💾 Save</button><button class="btn btn-info" onclick="closeModal('editUserModal')">Cancel</button></div></div></div>
+    <div class="modal-overlay" id="cancelModal"><div class="modal-box"><h3>❌ Cancel Withdrawal</h3><input type="hidden" id="cancelId"><div class="form-group"><label>Reason</label><textarea id="cancelReason" rows="3"></textarea></div><p style="color:#fbbf24;font-size:12px;">⚠️ Amount refunded.</p><div class="modal-buttons"><button class="btn btn-danger" onclick="confirmCancel()">❌ Cancel & Refund</button><button class="btn btn-info" onclick="closeModal('cancelModal')">Back</button></div></div></div>
+    <div class="modal-overlay" id="appealResponseModal"><div class="modal-box"><h3>📩 Respond to Appeal</h3><input type="hidden" id="appealUserId"><div class="form-group"><label>Response</label><textarea id="appealResponse" rows="3"></textarea></div><div class="modal-buttons"><button class="btn btn-success" onclick="approveAppeal()">✅ Unban</button><button class="btn btn-danger" onclick="rejectAppeal()">❌ Reject</button><button class="btn btn-info" onclick="closeModal('appealResponseModal')">Close</button></div></div></div>
+    <div class="toast" id="adminToast"></div>
 
     <script>
-        // ==================== FIREBASE ====================
-        const firebaseConfig = { apiKey: "AIzaSyAqCNHhu9oaBDea85tAH-iHucHczZnR7nY", authDomain: "tolaka-exc-reverb-b1afd.firebaseapp.com", databaseURL: "https://tolaka-exc-reverb-b1afd-default-rtdb.firebaseio.com", projectId: "tolaka-exc-reverb-b1afd", storageBucket: "tolaka-exc-reverb-b1afd.appspot.com", messagingSenderId: "25114300036", appId: "1:25114300036:android:579e5c869a075113603cd1" };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        let tg = window.Telegram.WebApp; tg.expand();
-        let userId = tg.initDataUnsafe?.user?.id?.toString() || 'default_user';
-        const tgUser = tg.initDataUnsafe?.user;
-        const tgUsername = tgUser?.username || '';
-        const tgFirstName = tgUser?.first_name || '';
-        const tgLastName = tgUser?.last_name || '';
-        const displayName = tgFirstName + (tgLastName ? ' ' + tgLastName : '') || tgUsername || 'User';
+        const fc = { apiKey: "AIzaSyAqCNHhu9oaBDea85tAH-iHucHczZnR7nY", authDomain: "tolaka-exc-reverb-b1afd.firebaseapp.com", databaseURL: "https://tolaka-exc-reverb-b1afd-default-rtdb.firebaseio.com", projectId: "tolaka-exc-reverb-b1afd", storageBucket: "tolaka-exc-reverb-b1afd.appspot.com", messagingSenderId: "25114300036", appId: "1:25114300036:android:579e5c869a075113603cd1" };
+        firebase.initializeApp(fc); const db = firebase.database();
+        function toast(m, t = 'success') { const el = document.getElementById('adminToast'); el.textContent = m; el.className = `toast show ${t}`; setTimeout(() => el.classList.remove('show'), 3000); }
+        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
-        // ==================== ADS ====================
-        if (typeof show_11197472 === 'function') show_11197472({ type: 'inApp', inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false } });
-        function showAd(cb) { if (typeof show_11197472 === 'function') show_11197472('pop').then(() => cb?.()).catch(() => cb?.()); else cb?.(); }
+        function adminLogin() { const u = document.getElementById('adminUser').value.trim(), p = document.getElementById('adminPass').value.trim(); if (!u || !p) { document.getElementById('loginError').style.display = 'block'; return; } db.ref('admin/credentials').once('value', s => { const c = s.val(); if (!c) { db.ref('admin/credentials').set({ username: 'admin', password: 'coinquest2024' }); if (u === 'admin' && p === 'coinquest2024') loginOk(); else document.getElementById('loginError').style.display = 'block'; } else { if (u === c.username && p === c.password) loginOk(); else document.getElementById('loginError').style.display = 'block'; } }); }
+        function loginOk() { document.getElementById('loginPage').style.display = 'none'; document.getElementById('adminPanel').style.display = 'flex'; loadDash(); loadAppealCount(); loadLiveWatchers(); }
+        function adminLogout() { document.getElementById('loginPage').style.display = 'flex'; document.getElementById('adminPanel').style.display = 'none'; }
+        function changeAdminCreds() { const u = document.getElementById('newAdminUser').value.trim(), p = document.getElementById('newAdminPass').value.trim(); if (!u || !p) { toast('Fill all!', 'error'); return; } db.ref('admin/credentials').set({ username: u, password: p }); toast('✅ Updated!'); }
 
-        // ==================== STATE ====================
-        let app = { balance: 0, usdBalance: 0, referralCount: 0, userLevel: 0, lastConversion: null, conversionRate: 1000, minWithdraw: 10, withdrawHistory: [], referCode: '', referTiers: {}, progressCoins: 1000, videoWatchedCount: 0, speedBoostCooldown: 0, taskLastCompleted: {}, airdropClaimed: false, xpPoints: -1000, withdrawMethods: ['Nagad','Rocket'], isBanned: false, banReason: '', banAppealSubmitted: false };
-        let tasks = [], conversionTimer = null, miningInterval = null, boostTimer = null, airdropTimer = null, currentFilter = 'all', currentLevelFilter = 'all';
-        let levelConfigCache = {};
-        const userRef = db.ref('users/' + userId), TOTAL_COINS = 1000, NEGATIVE_XP = -1000;
+        function switchPage(p, el) { document.querySelectorAll('.page').forEach(x => x.classList.remove('active')); const tp = document.getElementById('page' + p.charAt(0).toUpperCase() + p.slice(1)); if (tp) tp.classList.add('active'); document.querySelectorAll('.sidebar .nav-item').forEach(x => x.classList.remove('active')); if (el) el.classList.add('active'); if (p === 'dashboard') loadDash(); if (p === 'users') loadUsers(); if (p === 'mining') loadMining(); if (p === 'withdrawals') loadWithdrawals(); if (p === 'banAppeals') loadBanAppeals(); if (p === 'referral') loadReferralConfig(); if (p === 'tasks') loadTasks(); if (p === 'airdrop') { loadAirdropCfg(); loadLiveWatchers(); } if (p === 'levels') { clearLevelForm(); loadLevels(); } if (p === 'settings') loadSettings(); }
 
-        // ==================== FAB ====================
-        function toggleFab() { const m = document.getElementById('fabMain'), o = document.getElementById('fabOptions'); if (o.classList.contains('show')) { o.classList.remove('show'); m.classList.remove('active'); m.textContent = '+'; } else { o.classList.add('show'); m.classList.add('active'); m.textContent = '×'; } }
-        document.addEventListener('click', e => { if (!document.querySelector('.fab-container')?.contains(e.target)) { document.getElementById('fabOptions').classList.remove('show'); document.getElementById('fabMain').classList.remove('active'); document.getElementById('fabMain').textContent = '+'; } });
+        function loadDash() { db.ref('users').once('value', s => { let u = 0, c = 0, usd = 0, m = 0, b = 0; s.forEach(ch => { u++; const d = ch.val(); c += (d.balance || 0); usd += (d.usdBalance || 0); if (d.isCurrentlyMining) m++; if (d.banned) b++; }); document.getElementById('dashUsers').textContent = u; document.getElementById('dashCoins').textContent = c.toLocaleString(); document.getElementById('dashUSD').textContent = '$' + usd.toFixed(2); document.getElementById('dashMining').textContent = m; document.getElementById('dashBanned').textContent = b; }); db.ref('withdrawRequests').once('value', s => { let p = 0; s.forEach(ch => { if (ch.val().status === 'pending') p++; }); document.getElementById('dashPending') && (document.getElementById('dashPending').textContent = p); }); loadAppealCount(); }
 
-        // ==================== BAN SYSTEM (INSTANT + APPEAL) ====================
-        function checkBanStatus() {
-            userRef.child('banned').on('value', snapshot => {
-                const isBanned = snapshot.val() === true;
-                app.isBanned = isBanned;
-                if (isBanned) {
-                    document.getElementById('bannedOverlay').classList.add('show');
-                    document.getElementById('mainContent').style.display = 'none';
-                    document.querySelector('.bottom-nav').style.display = 'none';
-                    userRef.child('banReason').once('value', s => { 
-                        app.banReason = s.val() || 'Violation of terms';
-                        document.getElementById('banReason').textContent = `Reason: ${app.banReason}`; 
-                    });
-                    userRef.child('banAppealSubmitted').once('value', s => {
-                        app.banAppealSubmitted = s.val() || false;
-                        const btn = document.getElementById('appealBtn');
-                        const status = document.getElementById('appealStatus');
-                        if (app.banAppealSubmitted) {
-                            btn.disabled = true;
-                            btn.textContent = '✅ Appeal Submitted';
-                            status.style.display = 'block';
-                            status.textContent = 'Your appeal is under review. Admin will respond soon.';
-                        } else {
-                            btn.disabled = false;
-                            btn.textContent = '📩 Submit Appeal';
-                            status.style.display = 'none';
-                        }
-                    });
-                } else {
-                    document.getElementById('bannedOverlay').classList.remove('show');
-                    document.getElementById('mainContent').style.display = 'block';
-                    document.querySelector('.bottom-nav').style.display = 'flex';
-                }
-            });
-        }
+        function loadAppealCount() { db.ref('banAppeals').once('value', s => { let count = 0; if (s.exists()) s.forEach(ch => { if (ch.val().status === 'pending') count++; }); const dashEl = document.getElementById('dashAppeals'); if (dashEl) dashEl.textContent = count; const badge = document.getElementById('appealBadge'); if (count > 0) { badge.style.display = 'inline-block'; badge.textContent = count; } else { badge.style.display = 'none'; } }); }
 
-        function submitBanAppeal() {
-            if (app.banAppealSubmitted) { showToast('Appeal already submitted!', 'error'); return; }
-            const message = prompt('📩 Write your appeal message to the admin:\n\nExplain why you should be unbanned:');
-            if (!message || message.trim().length < 5) { showToast('Please write a proper appeal message!', 'error'); return; }
-            
-            db.ref('banAppeals/' + userId).set({
-                userId: userId,
-                username: displayName,
-                message: message.trim(),
-                banReason: app.banReason,
-                status: 'pending',
-                createdAt: Date.now()
-            }, (error) => {
-                if (error) { showToast('Error submitting appeal!', 'error'); return; }
-                userRef.update({ banAppealSubmitted: true });
-                app.banAppealSubmitted = true;
-                document.getElementById('appealBtn').disabled = true;
-                document.getElementById('appealBtn').textContent = '✅ Appeal Submitted';
-                document.getElementById('appealStatus').style.display = 'block';
-                document.getElementById('appealStatus').textContent = 'Your appeal has been submitted. Admin will review soon.';
-                showToast('📩 Appeal submitted successfully!');
-            });
-        }
+        // ==================== LIVE WATCHERS ====================
+        function loadLiveWatchers() { db.ref('airdropVisitors').on('value', s => { const count = s.exists() ? s.numChildren() : 0; const el = document.getElementById('liveCount'); if (el) el.textContent = count; }); }
 
-        // ==================== LEVEL SYSTEM ====================
-        function loadLevelConfigFromDB() { db.ref('levelConfig').on('value', snap => { levelConfigCache = {}; if (snap.exists()) snap.forEach(c => { levelConfigCache[parseInt(c.key)] = c.val(); }); updateLevelUI(); if (document.getElementById('levelOverlay').classList.contains('show')) { updateLevelPageUI(); renderLevelGrid(); } }); }
-        function getLevelConfig(level) { if (levelConfigCache[level]) { const cfg = levelConfigCache[level]; const m = { bronze:'🥉', silver:'🥈', gold:'🥇', platinum:'💎', diamond:'👑' }; return { tierName: (cfg.tier||'bronze').charAt(0).toUpperCase()+(cfg.tier||'bronze').slice(1), tierEmoji: m[cfg.tier]||'🥉', bonusPercent: cfg.bonus||0 }; } if (level===0) return { tierName:'Unlocking', tierEmoji:'🔒', bonusPercent:0 }; let tn,te,bp; if (level<=20){tn='Bronze';te='🥉';bp=level===1?1:level<=5?2:level<=10?3:level<=15?4:5;} else if (level<=40){tn='Silver';te='🥈';bp=level<=25?7:level<=30?10:level<=35?12:15;} else if (level<=60){tn='Gold';te='🥇';bp=level<=45?17:level<=50?20:level<=55?22:25;} else if (level<=80){tn='Platinum';te='💎';bp=level<=65?27:level<=70?30:level<=75?35:40;} else {tn='Diamond';te='👑';bp=level<=85?42:level<=90?45:level<=95?48:50;} return { tierName:tn, tierEmoji:te, bonusPercent:bp }; }
-        function calculateLevel(xp) { xp=xp||NEGATIVE_XP; if (xp<0) return { level:0, xp, progress:Math.max(0,Math.floor(((NEGATIVE_XP-Math.abs(xp))/Math.abs(NEGATIVE_XP))*100)), tierName:'Unlocking', tierEmoji:'🔒', bonusPercent:0, isMaxLevel:false }; let lvl=1, xpNext=getXPForLevel(1), totalXp=0; while (xp>=totalXp+xpNext&&lvl<100){totalXp+=xpNext;lvl++;xpNext=getXPForLevel(lvl);} let xpInto=xp-totalXp, prog=Math.min(100,Math.floor((xpInto/xpNext)*100)); let cfg=getLevelConfig(lvl); return { level:lvl, xp, xpForLevel:xpNext, progress:prog, ...cfg, isMaxLevel:lvl>=100 }; }
-        function getXPForLevel(lvl) { if (levelConfigCache[lvl]) return levelConfigCache[lvl].requiredXP||lvl*100; return lvl===1?0:lvl*100; }
-        function updateLevelUI() { const d=calculateLevel(app.xpPoints); app.userLevel=d.level; if (d.level===0) { document.getElementById('levelTitle').textContent='🔒 Unlocking'; document.getElementById('levelNumber').textContent='Level 0'; document.getElementById('levelProgressFill').style.width=d.progress+'%'; document.getElementById('levelCurrentPoints').textContent=`${d.xp} XP`; document.getElementById('levelNextPoints').textContent='/ 0 XP'; document.getElementById('userLevelBadge').textContent='🔒 Unlocking'; } else { document.getElementById('levelTitle').textContent=`${d.tierEmoji} ${d.tierName}`; document.getElementById('levelNumber').textContent=`Level ${d.level}`; document.getElementById('levelProgressFill').style.width=d.progress+'%'; document.getElementById('levelCurrentPoints').textContent=`${d.xp} XP`; document.getElementById('levelNextPoints').textContent=d.isMaxLevel?'⭐ MAX':`/ ${d.xpForLevel} XP`; document.getElementById('userLevelBadge').textContent=`${d.tierEmoji} Lv.${d.level}`; } }
-        function openLevelPage() { document.getElementById('levelOverlay').classList.add('show'); updateLevelPageUI(); renderLevelGrid(); }
-        function closeLevelPage() { document.getElementById('levelOverlay').classList.remove('show'); }
-        function updateLevelPageUI() { const d=calculateLevel(app.xpPoints); document.getElementById('lvlEmoji').textContent=d.tierEmoji; document.getElementById('lvlNumber').textContent=d.level===0?'Level 0':`Level ${d.level}`; document.getElementById('lvlName').textContent=d.tierName; document.getElementById('lvlXP').textContent=d.level===0?`${d.xp} / 0 XP`:`${d.xp} XP (${d.progress}%)`; document.getElementById('lvlProgressFill').style.width=d.progress+'%'; document.getElementById('lvlBonus').textContent=`Mining Bonus: +${d.bonusPercent}%`; }
-        function renderLevelGrid() { const grid=document.getElementById('levelGrid'), cl=calculateLevel(app.xpPoints); let html=''; for (let i=0;i<=100;i++){ if (currentLevelFilter!=='all'){ const r={bronze:[1,20],silver:[21,40],gold:[41,60],platinum:[61,80],diamond:[81,100]}; const ra=r[currentLevelFilter]; if (i>0&&(i<ra[0]||i>ra[1])) continue; if (i===0&&currentLevelFilter!=='bronze') continue; } let c=i===0?{tierName:'Unlocking',tierEmoji:'🔒',bonusPercent:0}:getLevelConfig(i); let isC=cl.level===i, isU=cl.level>=i; html+=`<div class="level-card ${isC?'current':isU?'unlocked':'locked'}"><div style="font-size:18px;font-weight:900;color:#fbbf24;">${c.tierEmoji} ${i}</div><div style="font-size:11px;color:#94a3b8;">${c.tierName}</div><div style="font-size:12px;color:#10b981;font-weight:bold;">+${c.bonusPercent}%</div><div style="font-size:10px;color:#94a3b8;">${isC?'👈 Current':isU?'✅':'🔒'}</div></div>`; } grid.innerHTML=html; }
-        function filterLevels(f,b) { currentLevelFilter=f; document.querySelectorAll('.lvl-filter-btn').forEach(x=>x.classList.remove('active')); if(b)b.classList.add('active'); renderLevelGrid(); }
+        function calcUserLevel(xp) { xp = xp || -1000; if (xp < 0) return { level: 0, progress: Math.max(0, Math.floor(((1000 - Math.abs(xp + 1000)) / 1000) * 100)), tierEmoji: '🔒', tierName: 'Unlocking' }; let lvl = 1, xpNext = 100, totalXp = 0; while (xp >= totalXp + xpNext && lvl < 100) { totalXp += xpNext; lvl++; xpNext = lvl * 100; } let te = '🥉', tn = 'Bronze'; if (lvl > 20) { te = '🥈'; tn = 'Silver'; } if (lvl > 40) { te = '🥇'; tn = 'Gold'; } if (lvl > 60) { te = '💎'; tn = 'Platinum'; } if (lvl > 80) { te = '👑'; tn = 'Diamond'; } return { level: lvl, progress: Math.min(100, Math.floor(((xp - totalXp) / xpNext) * 100)), tierEmoji: te, tierName: tn }; }
 
-        // ==================== MINING ====================
-        function updateProgressUI() { const circle=document.getElementById('miningCircle'), count=document.getElementById('progressCoinCount'), status=document.getElementById('progressStatus'), overlay=document.getElementById('circleStartOverlay'), watchBtn=document.getElementById('progressWatchBtn'), pct=(app.progressCoins/TOTAL_COINS*100); circle.style.background=`conic-gradient(#fbbf24 ${pct}%, #1e293b ${pct}%)`; count.textContent=app.progressCoins; document.getElementById('progressPercent').textContent=Math.round(pct)+'%'; if (app.progressCoins===0){ status.textContent='🎯 Empty!'; watchBtn.classList.remove('hidden'); overlay.classList.remove('hidden'); overlay.querySelector('.start-text').textContent='REFILL'; circle.classList.remove('mining-active'); } else if (miningInterval){ status.textContent='⚡ Mining...'; watchBtn.classList.add('hidden'); overlay.classList.add('hidden'); circle.classList.add('mining-active'); } else { status.textContent='Ready'; watchBtn.classList.add('hidden'); overlay.classList.remove('hidden'); overlay.querySelector('.start-text').textContent='START\nMINING'; circle.classList.remove('mining-active'); } }
-        function startMining() { if (miningInterval) return; if (app.progressCoins<=0){ showToast('❌ No coins left!','error'); startVideoProgress(); return; } document.getElementById('circleStartOverlay').classList.add('hidden'); userRef.update({ isCurrentlyMining:true, lastMiningActivity:Date.now() }); miningInterval=setInterval(()=>{ if (app.progressCoins<=0){ stopMining(); showToast('🎉 All coins earned!'); return; } const d=calculateLevel(app.xpPoints), ca=1+(d.bonusPercent/100); app.progressCoins-=1; app.balance+=ca; app.xpPoints+=1; userRef.update({ balance:app.balance, progressCoins:app.progressCoins, xpPoints:app.xpPoints, lastMiningActivity:Date.now() }); const coin=document.createElement('div'); coin.className='floating-coin'; coin.textContent=`+${ca.toFixed(2)} 🪙`; coin.style.left=(Math.random()*80+10)+'%'; coin.style.top='35%'; document.body.appendChild(coin); setTimeout(()=>coin.remove(),1000); updateProgressUI(); updateUI(); updateLevelUI(); },5000); updateProgressUI(); showToast('⛏️ Mining started!'); }
-        function stopMining() { if (miningInterval){ clearInterval(miningInterval); miningInterval=null; } userRef.update({ isCurrentlyMining:false }); updateProgressUI(); }
-        function startVideoProgress() { const btn=document.getElementById('progressWatchBtn'), threshold=5; if (app.videoWatchedCount>=threshold){ app.progressCoins=TOTAL_COINS; app.videoWatchedCount=0; userRef.update({ progressCoins:TOTAL_COINS, videoWatchedCount:0 }); updateProgressUI(); showToast('🪙 Refilled!'); return; } btn.disabled=true; btn.textContent='⏳ Watching...'; showAd(()=>{ let s=10; const t=setInterval(()=>{ s--; btn.textContent=`⏳ ${s}s`; if (s<=0){ clearInterval(t); btn.disabled=false; app.videoWatchedCount++; userRef.update({ videoWatchedCount:app.videoWatchedCount }); btn.textContent=`📺 Watch (${app.videoWatchedCount}/${threshold})`; if (app.videoWatchedCount>=threshold){ app.progressCoins=TOTAL_COINS; app.videoWatchedCount=0; userRef.update({ progressCoins:TOTAL_COINS, videoWatchedCount:0 }); updateProgressUI(); showToast('🪙 1000 refilled!'); } } },1000); }); }
+        // ==================== USERS ====================
+        function loadUsers() { db.ref('users').once('value', s => { let h = '<table><tr><th>ID</th><th>Name</th><th>Balance</th><th>USD</th><th>XP</th><th>Level</th><th>Coins</th><th>Mining</th><th>Refs</th><th>Status</th><th>Actions</th></tr>'; if (!s.exists()) h += '<tr><td colspan="11">No users</td></tr>'; else s.forEach(ch => { const d = ch.val(), id = ch.key; const lvl = calcUserLevel(d.xpPoints || -1000); const banned = d.banned || false; h += `<tr class="${banned ? 'banned-row' : ''}"><td title="${id}">${id.substring(0,8)}</td><td>${d.fullName||d.username||'User'}</td><td>${(d.balance||0).toLocaleString()}</td><td>$${(d.usdBalance||0).toFixed(2)}</td><td>${d.xpPoints||-1000}</td><td>${lvl.tierEmoji} Lv.${lvl.level}</td><td>${d.progressCoins||1000}</td><td>${d.isCurrentlyMining?'<span class="badge badge-mining">⛏️</span>':'<span class="badge">Idle</span>'}</td><td>${d.referCount||0}</td><td>${banned?'<span class="badge badge-danger">🚫</span>':'<span class="badge badge-success">✅</span>'}</td><td><button class="btn btn-sm btn-info" onclick="editUser('${id}')">✏️</button><button class="btn btn-sm ${banned?'btn-success':'btn-danger'}" onclick="toggleBan('${id}',${!banned})">${banned?'✅':'🚫'}</button><button class="btn btn-sm btn-warning" onclick="delUser('${id}')">🗑️</button></td></tr>`; }); document.getElementById('usersTable').innerHTML = h + '</table>'; }); }
+        function searchUsers() { const q = document.getElementById('userSearch').value.trim().toLowerCase(); if (!q) { loadUsers(); return; } db.ref('users').once('value', s => { let h = '<table><tr><th>ID</th><th>Name</th><th>Balance</th><th>USD</th><th>Status</th><th>Actions</th></tr>', f = false; s.forEach(ch => { const d = ch.val(), id = ch.key; if (id.toLowerCase().includes(q) || (d.fullName||d.username||'').toLowerCase().includes(q)) { f = true; h += `<tr><td>${id}</td><td>${d.fullName||d.username||'User'}</td><td>${(d.balance||0).toLocaleString()}</td><td>$${(d.usdBalance||0).toFixed(2)}</td><td>${d.banned?'🚫':'✅'}</td><td><button class="btn btn-sm btn-info" onclick="editUser('${id}')">✏️</button><button class="btn btn-sm ${d.banned?'btn-success':'btn-danger'}" onclick="toggleBan('${id}',${!d.banned})">${d.banned?'Unban':'Ban'}</button></td></tr>`; } }); if (!f) h += '<tr><td colspan="6">No match</td></tr>'; document.getElementById('usersTable').innerHTML = h + '</table>'; }); }
+        function editUser(uid) { db.ref('users/' + uid).once('value', s => { const d = s.val() || {}; document.getElementById('editUserId').value = uid; document.getElementById('editBalance').value = d.balance || 0; document.getElementById('editUsd').value = d.usdBalance || 0; document.getElementById('editXp').value = d.xpPoints || -1000; document.getElementById('editProgress').value = d.progressCoins || 1000; document.getElementById('editUserModal').classList.add('show'); }); }
+        function saveUserEdit() { const uid = document.getElementById('editUserId').value; db.ref('users/' + uid).update({ balance: +document.getElementById('editBalance').value || 0, usdBalance: +document.getElementById('editUsd').value || 0, xpPoints: +document.getElementById('editXp').value || -1000, progressCoins: +document.getElementById('editProgress').value || 1000 }); closeModal('editUserModal'); loadUsers(); toast('✅ Saved!'); }
+        function toggleBan(uid, ban) { const r = ban ? (prompt('Reason:') || 'Violation') : null; if (ban && !confirm(`Ban ${uid}?`)) return; db.ref('users/' + uid).update({ banned: ban, banReason: r, bannedAt: ban ? Date.now() : null, banAppealSubmitted: false }); if (!ban) db.ref('banAppeals/' + uid).update({ status: 'resolved', resolvedAt: Date.now() }); toast(ban ? '🚫 Banned!' : '✅ Unbanned!'); loadUsers(); loadDash(); loadAppealCount(); }
+        function delUser(uid) { if (confirm('Delete?')) { db.ref('users/' + uid).remove(); db.ref('referrals/' + uid).remove(); db.ref('banAppeals/' + uid).remove(); toast('🗑️ Deleted!'); loadUsers(); loadDash(); } }
 
-        // ==================== SPEED BOOST ====================
-        function updateSpeedBoostUI() { const bb=document.getElementById('speedBoostBtn'), cb=document.getElementById('boostCountdownBox'); if (app.speedBoostCooldown>Date.now()){ bb.style.display='none'; cb.classList.add('show'); if (boostTimer) clearInterval(boostTimer); boostTimer=setInterval(()=>{ const r=Math.max(0,Math.ceil((app.speedBoostCooldown-Date.now())/1000)); document.getElementById('boostCountdownTime').textContent=`${String(Math.floor(r/60)).padStart(2,'0')}:${String(r%60).padStart(2,'0')}`; if (r<=0){ app.speedBoostCooldown=0; userRef.update({ speedBoostCooldown:0 }); updateSpeedBoostUI(); } },1000); } else { bb.style.display='flex'; cb.classList.remove('show'); if (boostTimer){ clearInterval(boostTimer); boostTimer=null; } } }
-        function activateSpeedBoost() { if (app.speedBoostCooldown>Date.now()){ showToast('⏳ Cooldown!','error'); return; } showAd(()=>{ const st=Date.now(); userRef.update({ isCurrentlyMining:true, lastMiningActivity:Date.now() }); const bm=setInterval(()=>{ if (Date.now()-st>=3000||app.progressCoins<=0){ clearInterval(bm); userRef.update({ isCurrentlyMining:!!miningInterval }); app.speedBoostCooldown=Date.now()+3600000; userRef.update({ speedBoostCooldown:app.speedBoostCooldown }); updateSpeedBoostUI(); showToast('🚀 Boost ended!'); return; } app.progressCoins-=1; app.balance+=2; app.xpPoints+=3; userRef.update({ balance:app.balance, progressCoins:app.progressCoins, xpPoints:app.xpPoints, lastMiningActivity:Date.now() }); updateProgressUI(); updateUI(); updateLevelUI(); const coin=document.createElement('div'); coin.className='floating-coin'; coin.textContent='+2 🪙'; coin.style.left=(Math.random()*80+10)+'%'; coin.style.top='35%'; document.body.appendChild(coin); setTimeout(()=>coin.remove(),800); },100); showToast('⚡ Speed Boost!'); }); }
+        function loadMining() { db.ref('users').on('value', s => { let h = '', a = 0, i = 0; s.forEach(ch => { const d = ch.val(); if (d.banned) return; const act = d.isCurrentlyMining || false; if (act) a++; else i++; h += `<div class="mining-user-card ${act?'active-mining':''}"><div><b>${d.fullName||d.username||ch.key.substring(0,8)}</b><br><small>Bal: ${(d.balance||0).toLocaleString()} | Left: ${d.progressCoins||1000}</small></div><span class="badge ${act?'badge-mining':''}">${act?'⛏️ MINING':'😴 IDLE'}</span></div>`; }); document.getElementById('miningMonitorGrid').innerHTML = `<div style="margin-bottom:10px;display:flex;gap:10px;"><span class="badge badge-mining">⛏️ ${a} Active</span><span class="badge badge-info">😴 ${i} Idle</span></div>` + h; }); }
 
-        // ==================== TASKS ====================
-        function loadTasks() { db.ref('tasks').on('value', s=>{ tasks=s.exists()?Object.keys(s.val()).map(k=>({id:k,...s.val()[k]})):[]; renderTasks(); }); }
-        function renderTasks() { const c=document.getElementById('tasksContainer'), f=currentFilter==='all'?tasks:tasks.filter(t=>t.type===currentFilter); c.innerHTML=f.length?f.map(t=>{ const done=app.taskLastCompleted[t.id]===new Date().toDateString(); return `<div class="task-card"><div class="task-header"><span class="task-title">${t.title}</span><span class="task-reward">+${t.reward} 🪙</span></div><div style="font-size:11px;color:#94a3b8;">${t.description||''}</div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">${done?'<span style="color:#10b981;">✅ Done</span>':`<button class="task-btn" onclick="completeTask('${t.id}',${t.reward})">${t.actionText||'Complete'}</button>`}</div></div>`; }).join(''):'<p style="color:#94a3b8;text-align:center;">📭 No tasks</p>'; }
-        function filterTasks(f,b) { currentFilter=f; document.querySelectorAll('.task-filters .filter-btn').forEach(x=>x.classList.remove('active')); if(b)b.classList.add('active'); renderTasks(); }
-        function completeTask(tid,rw) { if (app.taskLastCompleted[tid]===new Date().toDateString()){ showToast('Done today!','error'); return; } showAd(()=>{ app.taskLastCompleted[tid]=new Date().toDateString(); app.balance+=rw; app.xpPoints+=rw*2; userRef.update({ balance:app.balance, taskLastCompleted:app.taskLastCompleted, xpPoints:app.xpPoints }); document.getElementById('rewardText').textContent=`+${rw} Coins`; document.getElementById('successModal').classList.add('active'); updateUI(); updateLevelUI(); renderTasks(); showToast(`🎉 +${rw} Coins!`); }); }
+        function loadWithdrawals() { db.ref('withdrawRequests').once('value', s => { let h = '<table><tr><th>User</th><th>Amount</th><th>Method</th><th>Account</th><th>Status</th><th>Reason</th><th>Date</th><th>Actions</th></tr>'; const arr = []; s.forEach(ch => arr.push({ id: ch.key, ...ch.val() })); arr.sort((a, b) => (b.requestedAt || 0) - (a.requestedAt || 0)); arr.forEach(d => { h += `<tr><td>${d.username||d.userId}</td><td>$${(d.amount||0).toFixed(2)}</td><td>${d.method}</td><td>${d.account}</td><td><span class="badge ${d.status==='approved'?'badge-success':d.status==='cancelled'?'badge-danger':'badge-warning'}">${d.status}</span></td><td style="font-size:11px;">${d.cancelReason||'-'}</td><td>${d.requestedAt?new Date(d.requestedAt).toLocaleDateString():''}</td><td>${d.status==='pending'?`<button class="btn btn-sm btn-success" onclick="apprWith('${d.id}')">✅</button><button class="btn btn-sm btn-danger" onclick="openCancel('${d.id}')">❌</button>`:'Done'}</td></tr>`; }); document.getElementById('withdrawalsTable').innerHTML = h + '</table>'; }); }
+        function apprWith(id) { db.ref('withdrawRequests/' + id).update({ status: 'approved' }); loadWithdrawals(); toast('✅ Approved!'); }
+        function openCancel(id) { document.getElementById('cancelId').value = id; document.getElementById('cancelReason').value = ''; document.getElementById('cancelModal').classList.add('show'); }
+        function confirmCancel() { const id = document.getElementById('cancelId').value; const reason = document.getElementById('cancelReason').value.trim() || 'Cancelled'; db.ref('withdrawRequests/' + id).once('value', s => { const d = s.val(); if (d && d.userId) { db.ref('users/' + d.userId).transaction(u => ({ ...(u||{}), usdBalance: (u?.usdBalance||0) + (d.amount||0) })); db.ref('withdrawRequests/' + id).update({ status: 'cancelled', cancelReason: reason }); } }); closeModal('cancelModal'); loadWithdrawals(); toast('❌ Cancelled & Refunded!'); }
 
-        // ==================== REFERRAL ====================
-        function updateReferUI() { const t=app.referralCount||0; document.getElementById('referTotal').textContent=t; document.getElementById('referEarned').textContent=t*50; document.getElementById('referBonus').textContent=Math.floor(t/10)*50; const tiers=[{l:1,c:10,b:50,n:'🥉 Bronze'},{l:2,c:25,b:150,n:'🥈 Silver'},{l:3,c:50,b:300,n:'🥇 Gold'},{l:4,c:100,b:500,n:'💎 Platinum'},{l:5,c:200,b:1000,n:'👑 Diamond'}]; document.getElementById('referTierList').innerHTML=tiers.map(r=>{ const cl=app.referTiers?.[r.l]===1, av=t>=r.c&&!cl; return `<div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;"><div><div style="font-size:13px;">${r.n}</div><div style="font-size:10px;color:#94a3b8;">${r.c} refs • +${r.b} 🪙</div></div><span style="color:${av?'#fbbf24':'#64748b'};cursor:${av?'pointer':'default'};" ${av?`onclick="claimTier(${r.l},${r.b})"`:''}>${cl?'✅':av?'🎁':'🔒'}</span></div>`; }).join(''); }
-        function claimTier(l,b) { if (app.referTiers?.[l]===1) return; app.balance+=b; app.xpPoints+=b*2; if (!app.referTiers) app.referTiers={}; app.referTiers[l]=1; userRef.update({ balance:app.balance, xpPoints:app.xpPoints, referTiers:app.referTiers }); updateUI(); updateLevelUI(); updateReferUI(); showToast(`🎁 +${b} Coins!`); }
-        function genRefCode() { return Array(8).fill(0).map(()=>'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random()*36)]).join(''); }
-        function submitReferCode() { const code=document.getElementById('referCodeInput').value.trim(); if (!code){ showToast('Enter code!','error'); return; } userRef.once('value',s=>{ if ((s.val()||{}).referCodeSubmitted){ showToast('Already submitted!','error'); return; } db.ref('users').orderByChild('referCode').equalTo(code).once('value',sn=>{ if (!sn.exists()){ showToast('Invalid!','error'); return; } sn.forEach(c=>{ if (c.key===userId){ showToast('Own code!','error'); return; } db.ref('referrals/'+userId).set({ referredBy:c.key, referredAt:Date.now(), username:displayName, bonus:50, userId }).then(()=>{ db.ref('users/'+c.key).transaction(cur=>({...(cur||{}), referCount:(cur?.referCount||0)+1 })); app.balance+=50; app.xpPoints+=100; userRef.update({ balance:app.balance, xpPoints:app.xpPoints, referCodeSubmitted:true }); document.getElementById('referCodeSubmitBtn').disabled=true; document.getElementById('referCodeInput').disabled=true; updateUI(); updateLevelUI(); showToast('🎉 +50 Coins!'); }); }); }); }); }
-        function copyReferLink() { navigator.clipboard.writeText(document.getElementById('referLinkHome').textContent).then(()=>showToast('📋 Copied!')).catch(()=>showToast('Copy manually','error')); }
+        // ==================== BAN APPEALS ====================
+        function loadBanAppeals() { db.ref('banAppeals').orderByChild('status').equalTo('pending').once('value', s => { const c = document.getElementById('banAppealsContainer'); if (!s.exists()) { c.innerHTML = '<p style="color:#94a3b8;">✅ No pending appeals</p>'; } else { let h = ''; s.forEach(ch => { const a = ch.val(); h += `<div class="appeal-card"><h4>📩 ${a.username||a.userId}</h4><p><b>ID:</b> ${a.userId}</p><p><b>Ban Reason:</b> ${a.banReason||'N/A'}</p><p><b>Message:</b> "${a.message}"</p><p style="font-size:10px;">📅 ${new Date(a.createdAt).toLocaleString()}</p><button class="btn btn-sm btn-success" onclick="respondAppeal('${a.userId}')">📩 Respond</button></div>`; }); c.innerHTML = h; } }); db.ref('users').orderByChild('banned').equalTo(true).once('value', s => { let h = '<table><tr><th>User ID</th><th>Name</th><th>Reason</th><th>Banned At</th><th>Appeal</th><th>Actions</th></tr>'; if (!s.exists()) h += '<tr><td colspan="6">No banned</td></tr>'; else s.forEach(ch => { const d = ch.val(), id = ch.key; h += `<tr><td>${id.substring(0,10)}</td><td>${d.fullName||d.username||'User'}</td><td>${d.banReason||'N/A'}</td><td>${d.bannedAt?new Date(d.bannedAt).toLocaleString():'N/A'}</td><td>${d.banAppealSubmitted?'<span class="badge badge-warning">Appealed</span>':'<span class="badge">None</span>'}</td><td><button class="btn btn-sm btn-success" onclick="toggleBan('${id}',false)">✅ Unban</button></td></tr>`; }); document.getElementById('bannedUsersTable').innerHTML = h + '</table>'; }); loadAppealCount(); }
+        function respondAppeal(uid) { document.getElementById('appealUserId').value = uid; document.getElementById('appealResponse').value = ''; document.getElementById('appealResponseModal').classList.add('show'); }
+        function approveAppeal() { const uid = document.getElementById('appealUserId').value; const r = document.getElementById('appealResponse').value || 'Approved'; db.ref('users/' + uid).update({ banned: false, banReason: null, bannedAt: null, banAppealSubmitted: false }); db.ref('banAppeals/' + uid).update({ status: 'approved', adminResponse: r, resolvedAt: Date.now() }); closeModal('appealResponseModal'); loadBanAppeals(); loadUsers(); loadDash(); loadAppealCount(); toast('✅ Unbanned!'); }
+        function rejectAppeal() { const uid = document.getElementById('appealUserId').value; const r = document.getElementById('appealResponse').value || 'Rejected'; db.ref('banAppeals/' + uid).update({ status: 'rejected', adminResponse: r, resolvedAt: Date.now() }); closeModal('appealResponseModal'); loadBanAppeals(); loadAppealCount(); toast('❌ Rejected!'); }
 
-        // ==================== AIRDROP ====================
-        function loadAirdrop() { db.ref('airdropConfig').on('value',snap=>{ const c=snap.val()||{}; document.getElementById('airdropPoolDisplay').textContent=`$${(c.poolAmount||50).toFixed(2)}`; if (c.startTime) startAirdropCountdown(c.startTime); }); }
-        function startAirdropCountdown(st) { if (airdropTimer) clearInterval(airdropTimer); const et=st+300000; airdropTimer=setInterval(()=>{ const r=Math.max(0,et-Date.now()), h=Math.floor(r/3600000), m=Math.floor((r%3600000)/60000), s=Math.floor((r%60000)/1000); document.getElementById('airdropCountdown').textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; const btn=document.getElementById('airdropClaimBtn'); if (r>0&&!app.airdropClaimed){ btn.disabled=false; btn.textContent='🎁 Claim'; } else { btn.disabled=true; btn.textContent=app.airdropClaimed?'✅ Claimed':'⛔ Ended'; } if (r<=0){ clearInterval(airdropTimer); airdropTimer=null; } },1000); }
-        function openAirdropPage() { document.getElementById('airdropOverlay').classList.add('show'); document.getElementById('fabOptions').classList.remove('show'); document.getElementById('fabMain').classList.remove('active'); document.getElementById('fabMain').textContent='+'; }
-        function closeAirdropPage() { document.getElementById('airdropOverlay').classList.remove('show'); }
-        function claimAirdrop() { if (app.airdropClaimed){ showToast('Already claimed!','error'); return; } document.getElementById('airdropClaimBtn').disabled=true; showAd(()=>{ const amt=Math.random()*1.5+0.5, coins=Math.floor(amt*app.conversionRate); app.balance+=coins; app.airdropClaimed=true; app.xpPoints+=coins; db.ref('airdropList/'+Date.now()).set({ userId, username:displayName, amount:amt, coins, timestamp:Date.now() }); userRef.update({ balance:app.balance, airdropClaimed:true, xpPoints:app.xpPoints }); document.getElementById('airdropModalText').textContent=`+${coins} Coins!`; document.getElementById('airdropModal').classList.add('active'); updateUI(); updateLevelUI(); showToast(`🎉 +${coins} Coins!`); }); }
+        // ==================== REFERRAL (Updated for User Panel Sync) ====================
+        function loadReferralConfig() { db.ref('referralConfig').once('value', s => { const c = s.val() || {}; document.getElementById('refPerReferral').value = c.perReferralCoins || 50; document.getElementById('refXpPerReferral').value = c.xpPerReferral || 100; document.getElementById('refT1Count').value = c.tier1?.count || 10; document.getElementById('refT1Bonus').value = c.tier1?.bonus || 50; document.getElementById('refT2Count').value = c.tier2?.count || 25; document.getElementById('refT2Bonus').value = c.tier2?.bonus || 150; document.getElementById('refT3Count').value = c.tier3?.count || 50; document.getElementById('refT3Bonus').value = c.tier3?.bonus || 300; document.getElementById('refT4Count').value = c.tier4?.count || 100; document.getElementById('refT4Bonus').value = c.tier4?.bonus || 500; document.getElementById('refT5Count').value = c.tier5?.count || 200; document.getElementById('refT5Bonus').value = c.tier5?.bonus || 1000; }); db.ref('referrals').once('value', s => { let h = '<table><tr><th>User</th><th>Referred By</th><th>Username</th><th>Bonus</th><th>Date</th></tr>'; if (s.exists()) { const arr = []; s.forEach(ch => arr.push({ id: ch.key, ...ch.val() })); arr.sort((a, b) => (b.referredAt || 0) - (a.referredAt || 0)); arr.forEach(r => h += `<tr><td>${r.id}</td><td>${r.referredBy}</td><td>${r.username||'User'}</td><td>+${r.bonus||50}</td><td>${r.referredAt?new Date(r.referredAt).toLocaleDateString():''}</td></tr>`); } else h += '<tr><td colspan="5">No referrals</td></tr>'; document.getElementById('referralStatsTable').innerHTML = h + '</table>'; }); }
+        function saveReferralConfig() { db.ref('referralConfig').set({ perReferralCoins: +document.getElementById('refPerReferral').value || 50, xpPerReferral: +document.getElementById('refXpPerReferral').value || 100, tier1: { count: +document.getElementById('refT1Count').value || 10, bonus: +document.getElementById('refT1Bonus').value || 50 }, tier2: { count: +document.getElementById('refT2Count').value || 25, bonus: +document.getElementById('refT2Bonus').value || 150 }, tier3: { count: +document.getElementById('refT3Count').value || 50, bonus: +document.getElementById('refT3Bonus').value || 300 }, tier4: { count: +document.getElementById('refT4Count').value || 100, bonus: +document.getElementById('refT4Bonus').value || 500 }, tier5: { count: +document.getElementById('refT5Count').value || 200, bonus: +document.getElementById('refT5Bonus').value || 1000 } }); toast('✅ Referral config saved!'); }
 
-        // ==================== WITHDRAW ====================
-        function updateWithdrawUI() { const b=app.usdBalance||0, m=app.minWithdraw||10; document.getElementById('withdrawInfo').textContent=`Min: $${m.toFixed(2)}`; document.getElementById('withdrawStatus').textContent=`You have: $${b.toFixed(2)}`; const sel=document.getElementById('withdrawMethod'); sel.innerHTML=''; (app.withdrawMethods||['Nagad','Rocket']).forEach(x=>sel.innerHTML+=`<option>${x}</option>`); const btn=document.getElementById('withdrawBtn'); btn.disabled=b<m; btn.textContent=b<m?`Need $${(m-b).toFixed(2)} more`:'Withdraw Now'; }
-        function withdraw() { const b=app.usdBalance||0; if (b<(app.minWithdraw||10)){ showToast('Insufficient!','error'); return; } const mt=document.getElementById('withdrawMethod').value, ac=document.getElementById('withdrawAccount').value.trim(); if (!ac){ showToast('Enter account!','error'); return; } const id=Date.now().toString(); db.ref('withdrawRequests/'+id).set({ userId, username:displayName, amount:b, method:mt, account:ac, status:'pending', requestedAt:new Date().toISOString() }); app.usdBalance=0; app.withdrawHistory=[...(app.withdrawHistory||[]),{id, amount:b, method:mt, account:ac, status:'pending', date:new Date().toISOString()}]; userRef.update({ usdBalance:0, withdrawHistory:app.withdrawHistory }); document.getElementById('withdrawModalTitle').textContent='Request Sent!'; document.getElementById('withdrawModalText').textContent=`$${b.toFixed(2)} via ${mt}`; document.getElementById('withdrawModal').classList.add('active'); document.getElementById('withdrawAccount').value=''; updateUI(); updateWithdrawUI(); updateWithdrawHistoryUI(); showToast(`$${b.toFixed(2)} requested!`); }
-        function updateWithdrawHistoryUI() { const container=document.getElementById('withdrawHistoryList'); const history=app.withdrawHistory||[]; if (history.length===0){ container.innerHTML='<span style="color:#94a3b8;font-size:11px;">No withdrawals yet</span>'; return; } const icons={pending:'⏳',approved:'✅',cancelled:'❌'}; container.innerHTML=history.slice(-20).reverse().map(h=>`<div class="history-item"><div><span style="font-weight:600;">$${h.amount?.toFixed(2)||'0.00'}</span><span style="color:#94a3b8;font-size:10px;"> via ${h.method||'N/A'}</span>${h.status==='cancelled'&&h.cancelReason?`<div style="color:#ef4444;font-size:10px;">⚠️ ${h.cancelReason}</div>`:''}</div><div style="text-align:right;"><span>${icons[h.status]||'❓'} ${h.status||'unknown'}</span><div style="font-size:9px;color:#94a3b8;">${h.date?new Date(h.date).toLocaleDateString():''}</div></div></div>`).join(''); }
+        // ==================== TASKS (Link & Video only, Edit/Delete) ====================
+        function saveTask() { const tid = document.getElementById('editingTaskId').value; const t = { title: document.getElementById('taskTitle').value, description: document.getElementById('taskDesc').value, reward: +document.getElementById('taskReward').value || 50, type: document.getElementById('taskType').value, link: document.getElementById('taskLink').value, actionText: 'Complete', updatedAt: Date.now() }; if (!t.title) { toast('Title required!', 'error'); return; } if (!t.createdAt) t.createdAt = Date.now(); if (tid) { db.ref('tasks/' + tid).update(t, () => { toast('✅ Updated!'); clearTaskForm(); loadTasks(); }); } else { db.ref('tasks').push(t, () => { toast('✅ Added!'); clearTaskForm(); loadTasks(); }); } }
+        function editTask(id) { db.ref('tasks/' + id).once('value', s => { const t = s.val(); if (!t) return; document.getElementById('taskTitle').value = t.title || ''; document.getElementById('taskDesc').value = t.description || ''; document.getElementById('taskReward').value = t.reward || 50; document.getElementById('taskType').value = t.type || 'link'; document.getElementById('taskLink').value = t.link || ''; document.getElementById('editingTaskId').value = id; document.getElementById('taskFormTitle').innerHTML = '✏️ Edit Task'; }); }
+        function clearTaskForm() { document.getElementById('taskTitle').value = ''; document.getElementById('taskDesc').value = ''; document.getElementById('taskReward').value = '50'; document.getElementById('taskType').value = 'link'; document.getElementById('taskLink').value = ''; document.getElementById('editingTaskId').value = ''; document.getElementById('taskFormTitle').innerHTML = '➕ Add Task'; }
+        function deleteTask(id) { if (confirm('Delete task?')) { db.ref('tasks/' + id).remove(); loadTasks(); toast('🗑️ Deleted!'); } }
+        function loadTasks() { db.ref('tasks').once('value', s => { const arr = []; if (s.exists()) s.forEach(ch => arr.push({ id: ch.key, ...ch.val() })); arr.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)); document.getElementById('tasksTableBody').innerHTML = arr.length ? arr.map(t => `<tr><td>${t.title}</td><td><span class="badge badge-info">${t.type}</span></td><td>+${t.reward}</td><td>${t.createdAt?new Date(t.createdAt).toLocaleDateString():'N/A'}</td><td><button class="btn btn-sm btn-info" onclick="editTask('${t.id}')">✏️</button><button class="btn btn-sm btn-danger" onclick="deleteTask('${t.id}')">🗑️</button></td></tr>`).join('') : '<tr><td colspan="5">No tasks</td></tr>'; }); }
 
-        // ==================== CONVERSION ====================
-        function startConversion() { if (conversionTimer) clearInterval(conversionTimer); const upd=()=>{ const n=Date.now(), nx=(app.lastConversion||n)+86400000, r=Math.max(0,nx-n); document.getElementById('conversionCountdown').textContent=`${String(Math.floor(r/3600000)).padStart(2,'0')}:${String(Math.floor((r%3600000)/60000)).padStart(2,'0')}:${String(Math.floor((r%60000)/1000)).padStart(2,'0')}`; if (r<=0){ clearInterval(conversionTimer); if (app.balance>0){ const e=app.balance/app.conversionRate; app.usdBalance+=e; app.balance=0; app.lastConversion=Date.now(); userRef.update({ balance:0, usdBalance:app.usdBalance, lastConversion:app.lastConversion }); document.getElementById('conversionText').textContent=`→ $${e.toFixed(2)} USD`; document.getElementById('conversionModal').classList.add('active'); updateUI(); } startConversion(); } }; upd(); conversionTimer=setInterval(upd,1000); }
+        // ==================== AIRDROP (Start Time, End Time, Live Watchers) ====================
+        function loadAirdropCfg() { db.ref('airdropConfig').once('value', s => { const c = s.val() || {}; document.getElementById('airdropPool').value = c.poolAmount || 50; document.getElementById('airdropMin').value = c.min || 0.5; document.getElementById('airdropMax').value = c.max || 2; document.getElementById('airdropDuration').value = c.duration || 5; if (c.startTime) document.getElementById('airdropStartTime').value = new Date(c.startTime).toISOString().slice(0, 16); if (c.endTime) document.getElementById('airdropEndTime').value = new Date(c.endTime).toISOString().slice(0, 16); }); }
+        function saveAirdrop() { const st = document.getElementById('airdropStartTime').value; const et = document.getElementById('airdropEndTime').value; db.ref('airdropConfig').set({ poolAmount: +document.getElementById('airdropPool').value, min: +document.getElementById('airdropMin').value, max: +document.getElementById('airdropMax').value, duration: +document.getElementById('airdropDuration').value, startTime: st ? new Date(st).getTime() : null, endTime: et ? new Date(et).getTime() : null }); toast('✅ Saved!'); }
+        function startAirdropNow() { const dur = (+document.getElementById('airdropDuration').value || 5) * 60000; db.ref('airdropConfig').update({ startTime: Date.now(), endTime: Date.now() + dur, active: true }); toast('🚀 Started!'); }
+        function resetAirdropClaims() { if (confirm('Reset all claims?')) { db.ref('users').once('value', s => { s.forEach(ch => { db.ref('users/' + ch.key + '/airdropClaimed').set(false); }); }); toast('🔄 Reset!'); } }
 
-        // ==================== UI ====================
-        function updateUI() { document.getElementById('balance').textContent=app.balance.toLocaleString(); document.getElementById('walletBalance').textContent=app.balance.toLocaleString(); const u=(app.balance/app.conversionRate).toFixed(2); document.getElementById('usdValue').textContent=`≈ $${u} USD`; document.getElementById('walletUsd').textContent=`≈ $${u} USD`; document.getElementById('totalUsdEarned').textContent=`💵 Total USD: $${app.usdBalance.toFixed(2)}`; document.getElementById('walletTotalUsd').textContent=`$${app.usdBalance.toFixed(2)}`; document.getElementById('rateInfo').textContent=`Rate: 1 USD = ${app.conversionRate} Coins`; updateWithdrawUI(); updateSpeedBoostUI(); }
-        function switchPage(p,el) { document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active')); if (el) el.classList.add('active'); document.querySelectorAll('.page').forEach(pg=>pg.classList.remove('active')); const t=document.getElementById('page'+p.charAt(0).toUpperCase()+p.slice(1)); if (t) t.classList.add('active'); if (p==='tasks') renderTasks(); if (p==='refer') updateReferUI(); if (p==='wallet'){ updateWithdrawUI(); updateWithdrawHistoryUI(); } }
-        function showToast(m,ty='success') { const t=document.getElementById('toast'); t.textContent=m; t.className='toast show'+(ty==='error'?' error':''); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3000); }
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        // ==================== LEVELS (Full History, Edit, Delete) ====================
+        let currentLevelFilter = 'all', allLevelsData = [];
+        function filterLevelTable(f, b) { currentLevelFilter = f; document.querySelectorAll('.level-filter-tabs button').forEach(x => x.classList.remove('active')); if (b) b.classList.add('active'); renderLevelTable(); }
+        function saveLevel() { const l = +document.getElementById('levelNum').value, xp = +document.getElementById('levelXp').value, b = +document.getElementById('levelBonus').value, tier = document.getElementById('levelTier').value, ek = document.getElementById('editingLevelKey').value; if (isNaN(l) || l < 0 || l > 100) { toast('Level 0-100!', 'error'); return; } const ld = { requiredXP: xp, bonus: b || 0, tier, updatedAt: Date.now() }; (ek ? db.ref('levelConfig/' + l).update(ld) : db.ref('levelConfig/' + l).set(ld)).then(() => { toast(`✅ Level ${l} saved!`); clearLevelForm(); loadLevels(); }).catch(() => toast('Error!', 'error')); }
+        function editLevel(l) { const d = allLevelsData.find(x => x.level === l); if (!d) return; document.getElementById('levelNum').value = d.level; document.getElementById('levelXp').value = d.requiredXP; document.getElementById('levelBonus').value = d.bonus || 0; document.getElementById('levelTier').value = d.tier || 'bronze'; document.getElementById('editingLevelKey').value = d.level; document.getElementById('levelFormTitle').innerHTML = `✏️ Editing Level ${d.level}`; document.getElementById('levelNum').disabled = true; document.getElementById('levelNum').scrollIntoView({ behavior: 'smooth' }); }
+        function clearLevelForm() { document.getElementById('levelNum').value = '0'; document.getElementById('levelXp').value = '-1000'; document.getElementById('levelBonus').value = '0'; document.getElementById('levelTier').value = 'unlocking'; document.getElementById('editingLevelKey').value = ''; document.getElementById('levelFormTitle').innerHTML = '➕ Add Level'; document.getElementById('levelNum').disabled = false; }
+        function deleteLevel(l) { if (confirm(`Delete Level ${l}?`)) { db.ref('levelConfig/' + l).remove(); loadLevels(); toast('🗑️ Deleted!'); } }
+        function loadLevels() { db.ref('levelConfig').once('value', s => { allLevelsData = []; if (s.exists()) s.forEach(c => allLevelsData.push({ level: +c.key, ...c.val() })); allLevelsData.sort((a, b) => a.level - b.level); renderLevelTable(); }); }
+        function renderLevelTable() { let fd = allLevelsData; if (currentLevelFilter !== 'all') { if (currentLevelFilter === 'unlocking') fd = allLevelsData.filter(d => d.level === 0); else { const r = { bronze: [1,20], silver: [21,40], gold: [41,60], platinum: [61,80], diamond: [81,100] }; fd = allLevelsData.filter(d => d.level >= r[currentLevelFilter][0] && d.level <= r[currentLevelFilter][1]); } } const te = { unlocking: '🔒', bronze: '🥉', silver: '🥈', gold: '🥇', platinum: '💎', diamond: '👑' }; document.getElementById('totalLevelsCount').textContent = allLevelsData.length; const lu = allLevelsData.length > 0 ? allLevelsData.reduce((max, d) => d.updatedAt > max ? d.updatedAt : max, 0) : 0; document.getElementById('lastLevelUpdate').textContent = lu ? new Date(lu).toLocaleString() : 'Never'; document.getElementById('levelsTableBody').innerHTML = fd.length ? fd.map(d => `<tr><td><b>${te[d.tier]||'🥉'} Lv.${d.level}</b></td><td>${d.tier||'N/A'}</td><td>${(d.requiredXP||0).toLocaleString()}</td><td>+${d.bonus||0}%</td><td style="font-size:10px;">${d.updatedAt?new Date(d.updatedAt).toLocaleString():''}</td><td><button class="btn btn-sm btn-info" onclick="editLevel(${d.level})">✏️</button><button class="btn btn-sm btn-danger" onclick="deleteLevel(${d.level})">🗑️</button></td></tr>`).join('') : '<tr><td colspan="6">No levels configured</td></tr>'; }
+        function bulkLevels() { if (!confirm('Overwrite all?')) return; const u = {}; u['levelConfig/0'] = { requiredXP: -1000, bonus: 0, tier: 'unlocking', updatedAt: Date.now() }; for (let i = 1; i <= 100; i++) { let bp, tier; if (i <= 20) { tier = 'bronze'; bp = i <= 5 ? 2 : i <= 10 ? 3 : i <= 15 ? 4 : 5; } else if (i <= 40) { tier = 'silver'; bp = i <= 25 ? 7 : i <= 30 ? 10 : i <= 35 ? 12 : 15; } else if (i <= 60) { tier = 'gold'; bp = i <= 45 ? 17 : i <= 50 ? 20 : i <= 55 ? 22 : 25; } else if (i <= 80) { tier = 'platinum'; bp = i <= 65 ? 27 : i <= 70 ? 30 : i <= 75 ? 35 : 40; } else { tier = 'diamond'; bp = i <= 85 ? 42 : i <= 90 ? 45 : i <= 95 ? 48 : 50; } u['levelConfig/' + i] = { requiredXP: i === 1 ? 0 : i * 100, bonus: bp, tier, updatedAt: Date.now() }; } db.ref().update(u, () => { loadLevels(); toast('✅ 101 levels done!'); }); }
 
-        // ==================== INIT ====================
-        function initApp() {
-            userRef.update({ username:tgUsername, firstName:tgFirstName, lastName:tgLastName, fullName:displayName, lastLogin:new Date().toISOString() });
-            document.getElementById('userName').textContent=displayName;
-            
-            // ✅ CHECK BAN STATUS
-            checkBanStatus();
-            
-            userRef.on('value',snap=>{
-                const d=snap.val()||{};
-                if (d.banned) return; // Skip if banned
-                app.balance=d.balance||0; app.usdBalance=d.usdBalance||0; app.referralCount=d.referCount||0;
-                app.lastConversion=d.lastConversion||Date.now(); app.referCode=d.referCode||genRefCode();
-                app.referTiers=d.referTiers||{}; app.progressCoins=d.progressCoins!==undefined?d.progressCoins:TOTAL_COINS;
-                app.videoWatchedCount=d.videoWatchedCount||0; app.speedBoostCooldown=d.speedBoostCooldown||0;
-                app.taskLastCompleted=d.taskLastCompleted||{}; app.xpPoints=d.xpPoints!==undefined?d.xpPoints:NEGATIVE_XP;
-                app.withdrawHistory=d.withdrawHistory||[]; app.airdropClaimed=d.airdropClaimed||false;
-                if (d.isCurrentlyMining&&!miningInterval) userRef.update({ isCurrentlyMining:false });
-                
-                const savedName=d.fullName||d.firstName||d.username||displayName;
-                document.getElementById('userName').textContent=savedName;
-                if (d.lastLogin) document.getElementById('lastLoginDisplay').textContent=`📅 Last: ${new Date(d.lastLogin).toLocaleString()}`;
-                
-                if (!d.balance&&d.xpPoints===undefined) userRef.update({ balance:0, usdBalance:0, referCode:app.referCode, progressCoins:TOTAL_COINS, xpPoints:NEGATIVE_XP, lastConversion:Date.now(), lastLogin:new Date().toISOString(), airdropClaimed:false, isCurrentlyMining:false, username:tgUsername, firstName:tgFirstName, lastName:tgLastName, fullName:displayName });
-                updateUI(); updateLevelUI(); updateProgressUI(); updateSpeedBoostUI(); startConversion();
-                document.getElementById('referLinkHome').textContent=`https://t.me/CoinQuist_bot?start=ref_${app.referCode}`;
-            });
+        // ==================== SETTINGS ====================
+        function loadSettings() { db.ref('conversionRate').once('value', s => document.getElementById('conversionRate').value = s.val() || 1000); db.ref('withdrawSettings').once('value', s => { if (s.exists()) { document.getElementById('minWithdraw').value = s.val().minAmount || 10; document.getElementById('withdrawMethods').value = (s.val().methods || ['Nagad','Rocket']).join(','); } }); db.ref('videoSettings').once('value', s => { if (s.exists()) { document.getElementById('videoReward').value = s.val().reward || 10; document.getElementById('videoDailyLimit').value = s.val().dailyLimit || 5; } }); }
+        function saveConv() { db.ref('conversionRate').set(+document.getElementById('conversionRate').value || 1000); toast('✅ Saved!'); }
+        function saveWithdrawSet() { db.ref('withdrawSettings').set({ minAmount: +document.getElementById('minWithdraw').value || 10, methods: document.getElementById('withdrawMethods').value.split(',').map(m => m.trim()).filter(m => m) }); toast('✅ Saved!'); }
+        function saveVideoSet() { db.ref('videoSettings').set({ reward: +document.getElementById('videoReward').value || 10, dailyLimit: +document.getElementById('videoDailyLimit').value || 5 }); toast('✅ Saved!'); }
 
-            db.ref('conversionRate').on('value',s=>{ app.conversionRate=s.val()||1000; updateUI(); });
-            db.ref('withdrawSettings').on('value',s=>{ if (s.exists()){ app.minWithdraw=s.val().minAmount||10; app.withdrawMethods=s.val().methods||['Nagad','Rocket']; } updateWithdrawUI(); });
-            loadLevelConfigFromDB(); loadTasks(); loadAirdrop();
-            db.ref('withdrawRequests').orderByChild('userId').equalTo(userId).on('child_changed',snap=>{ const d=snap.val(); if (d&&app.withdrawHistory){ const i=app.withdrawHistory.findIndex(h=>h.id===snap.key); if (i!==-1){ app.withdrawHistory[i].status=d.status; if (d.cancelReason) app.withdrawHistory[i].cancelReason=d.cancelReason; if (d.status==='cancelled'){ app.usdBalance+=(d.amount||0); userRef.update({ usdBalance:app.usdBalance }); showToast(`⚠️ Withdrawal cancelled: ${d.cancelReason||'No reason'}. Refunded $${(d.amount||0).toFixed(2)}`,'error'); } userRef.update({ withdrawHistory:app.withdrawHistory }); updateUI(); updateWithdrawHistoryUI(); } } });
-            const ref=tg.initDataUnsafe?.start_param||new URLSearchParams(location.search).get('start')||'';
-            if (ref.startsWith('ref_')){ const code=ref.replace('ref_',''); db.ref('users').orderByChild('referCode').equalTo(code).once('value',sn=>{ if (sn.exists()) sn.forEach(c=>{ if (c.key!==userId) db.ref('referrals/'+userId).once('value',s=>{ if (!s.exists()){ db.ref('referrals/'+userId).set({ referredBy:c.key, referredAt:Date.now(), username:displayName, bonus:50, userId }).then(()=>{ db.ref('users/'+c.key).transaction(cur=>({...(cur||{}), referCount:(cur?.referCount||0)+1 })); app.balance+=50; app.xpPoints+=100; userRef.update({ balance:app.balance, xpPoints:app.xpPoints }); updateUI(); updateLevelUI(); }); } }); }); }); }
-            setTimeout(()=>showToast('👋 Welcome '+displayName+'! Tap START to mine!'),1500);
-        }
-        document.addEventListener('DOMContentLoaded', initApp);
+        function init() { db.ref('admin/credentials').once('value', s => { if (!s.exists()) db.ref('admin/credentials').set({ username: 'admin', password: 'coinquest2024' }); }); db.ref('conversionRate').once('value', s => { if (!s.exists()) db.ref('conversionRate').set(1000); }); db.ref('withdrawSettings').once('value', s => { if (!s.exists()) db.ref('withdrawSettings').set({ minAmount: 10, methods: ['Nagad','Rocket','bKash'] }); }); db.ref('videoSettings').once('value', s => { if (!s.exists()) db.ref('videoSettings').set({ reward: 10, dailyLimit: 5 }); }); db.ref('referralConfig').once('value', s => { if (!s.exists()) db.ref('referralConfig').set({ perReferralCoins: 50, xpPerReferral: 100, tier1: { count: 10, bonus: 50 }, tier2: { count: 25, bonus: 150 }, tier3: { count: 50, bonus: 300 }, tier4: { count: 100, bonus: 500 }, tier5: { count: 200, bonus: 1000 } }); }); }
+        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('keydown', e => { if (e.key === 'Enter' && document.getElementById('loginPage').style.display !== 'none') adminLogin(); if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.show').forEach(m => m.classList.remove('show')); });
+        document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('show'); }));
     </script>
 </body>
 </html>
