@@ -49,7 +49,6 @@
         .fab-option-label { background: rgba(0,0,0,0.8); color: #fff; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; white-space: nowrap; }
         .fab-option-btn { width: 48px; height: 48px; border-radius: 50%; border: none; font-size: 20px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; }
         .fab-airdrop { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; }
-        .fab-special { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; }
 
         .mining-circle-wrapper { display: flex; justify-content: center; align-items: center; margin: 15px 0; position: relative; }
         .mining-circle { position: relative; width: 250px; height: 250px; border-radius: 50%; background: conic-gradient(#fbbf24 100%, #1e293b 100%); display: flex; justify-content: center; align-items: center; box-shadow: 0 0 50px rgba(251,191,36,0.2); transition: background 0.5s ease; cursor: pointer; }
@@ -138,12 +137,14 @@
         .level-card.unlocked { border-color: rgba(16,185,129,0.3); }
         .level-card.locked { opacity: 0.4; }
 
-        /* Special Offer Card */
-        .offer-card { background: linear-gradient(135deg, rgba(251,191,36,0.1), rgba(245,158,11,0.05)); border-radius: 20px; padding: 20px; text-align: center; border: 2px solid rgba(251,191,36,0.3); margin-bottom: 15px; }
-
         .floating-coin { position: fixed; font-size: 30px; pointer-events: none; z-index: 1000; animation: floatUp 1s ease-out forwards; }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-150px) scale(0.5); } }
         .hidden { display: none !important; }
+
+        /* Withdraw History */
+        .history-card { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 12px; margin-top: 12px; max-height: 250px; overflow-y: auto; }
+        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px; }
+        .history-item:last-child { border-bottom: none; }
     </style>
 </head>
 <body>
@@ -162,15 +163,6 @@
     <div class="overlay" id="airdropOverlay">
         <div class="overlay-header"><button class="back-btn" onclick="closeAirdropPage()"><i class="fas fa-arrow-left"></i> Back</button><h2 style="color:#fff;flex:1;text-align:center;">📢 Live AirDrop</h2></div>
         <div style="padding:15px;"><div style="background:rgba(255,255,255,0.05);border-radius:20px;padding:25px;text-align:center;border:2px solid rgba(251,191,36,0.3);"><div style="font-size:14px;color:#94a3b8;">Current Pool</div><div style="font-size:42px;font-weight:900;color:#fbbf24;" id="airdropPoolDisplay">$50.00</div><div style="font-size:36px;font-weight:bold;color:#fbbf24;margin:15px 0;" id="airdropCountdown">--:--:--</div><button style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:14px 30px;border:none;border-radius:30px;font-weight:700;font-size:16px;cursor:pointer;width:100%;" id="airdropClaimBtn" onclick="claimAirdrop()" disabled>🎁 Claim Your Share</button></div></div>
-    </div>
-
-    <!-- Special Offer Overlay (VIEW ONLY - NO SEND) -->
-    <div class="overlay" id="specialOfferOverlay">
-        <div class="overlay-header"><button class="back-btn" onclick="closeSpecialOfferPage()"><i class="fas fa-arrow-left"></i> Back</button><h2 style="color:#fff;flex:1;text-align:center;">🎁 Special Offers</h2></div>
-        <div style="padding:15px;">
-            <div style="text-align:center;margin-bottom:15px;color:#94a3b8;font-size:13px;">📥 Offers sent to you by Admin</div>
-            <div id="receivedOffersContainer"><p style="color:#94a3b8;text-align:center;">Checking for offers...</p></div>
-        </div>
     </div>
 
     <!-- Main Container -->
@@ -199,14 +191,15 @@
             <div id="referTierList"></div>
         </div>
 
-        <div class="page" id="pageWallet"><h2 class="page-header">💰 Wallet</h2><div class="wallet-card"><p style="color:#94a3b8;">Coins Balance</p><div class="wallet-balance" id="walletBalance">0</div><div style="color:#10b981;font-size:18px;font-weight:bold;" id="walletUsd">≈ $0.00</div><div style="background:rgba(16,185,129,0.1);border-radius:10px;padding:10px;margin-top:15px;"><div style="font-size:11px;color:#94a3b8;">💵 Total USD</div><div style="font-size:18px;font-weight:bold;color:#10b981;" id="walletTotalUsd">$0.00</div></div><div class="withdraw-section"><p style="font-weight:bold;color:#fbbf24;margin-bottom:8px;" id="withdrawInfo">Min: $10.00</p><div class="form-group"><label>Method</label><select id="withdrawMethod"></select></div><div class="form-group"><label>Account Number</label><input type="text" id="withdrawAccount" placeholder="Enter number..."></div><p style="font-size:11px;color:#94a3b8;" id="withdrawStatus">You have: $0.00</p><button class="withdraw-btn" id="withdrawBtn" onclick="withdraw()">Withdraw Now</button></div></div></div>
+        <div class="page" id="pageWallet"><h2 class="page-header">💰 Wallet</h2><div class="wallet-card"><p style="color:#94a3b8;">Coins Balance</p><div class="wallet-balance" id="walletBalance">0</div><div style="color:#10b981;font-size:18px;font-weight:bold;" id="walletUsd">≈ $0.00</div><div style="background:rgba(16,185,129,0.1);border-radius:10px;padding:10px;margin-top:15px;"><div style="font-size:11px;color:#94a3b8;">💵 Total USD Earned</div><div style="font-size:18px;font-weight:bold;color:#10b981;" id="walletTotalUsd">$0.00</div></div><div class="withdraw-section"><p style="font-weight:bold;color:#fbbf24;margin-bottom:8px;" id="withdrawInfo">Min: $10.00</p><div class="form-group"><label>Method</label><select id="withdrawMethod"></select></div><div class="form-group"><label>Account Number</label><input type="text" id="withdrawAccount" placeholder="Enter number..."></div><p style="font-size:11px;color:#94a3b8;" id="withdrawStatus">You have: $0.00</p><button class="withdraw-btn" id="withdrawBtn" onclick="withdraw()">Withdraw Now</button></div>
+            <!-- Withdraw History -->
+            <div class="history-card"><div style="font-size:11px;color:#94a3b8;margin-bottom:8px;">📜 Withdraw History</div><div id="withdrawHistoryList"><span style="color:#94a3b8;font-size:11px;">No withdrawals yet</span></div></div></div></div>
     </div>
 
-    <!-- FAB -->
+    <!-- FAB (Only Airdrop) -->
     <div class="fab-container">
         <div class="fab-options" id="fabOptions">
             <div class="fab-option" onclick="openAirdropPage()"><span class="fab-option-label">Live AirDrop</span><button class="fab-option-btn fab-airdrop">📢</button></div>
-            <div class="fab-option" onclick="openSpecialOfferPage()"><span class="fab-option-label">My Offers</span><button class="fab-option-btn fab-special">🎁</button></div>
         </div>
         <button class="fab-main" id="fabMain" onclick="toggleFab()">+</button>
     </div>
@@ -291,52 +284,40 @@
         function closeAirdropPage() { document.getElementById('airdropOverlay').classList.remove('show'); }
         function claimAirdrop() { if (app.airdropClaimed){ showToast('Already claimed!','error'); return; } document.getElementById('airdropClaimBtn').disabled=true; showAd(()=>{ const amt=Math.random()*1.5+0.5, coins=Math.floor(amt*app.conversionRate); app.balance+=coins; app.airdropClaimed=true; app.xpPoints+=coins; db.ref('airdropList/'+Date.now()).set({ userId, username:displayName, amount:amt, coins, timestamp:Date.now() }); userRef.update({ balance:app.balance, airdropClaimed:true, xpPoints:app.xpPoints }); document.getElementById('airdropModalText').textContent=`+${coins} Coins!`; document.getElementById('airdropModal').classList.add('active'); updateUI(); updateLevelUI(); showToast(`🎉 +${coins} Coins!`); }); }
 
-        // ==================== SPECIAL OFFER (VIEW ONLY - NO SEND) ====================
-        function openSpecialOfferPage() { document.getElementById('specialOfferOverlay').classList.add('show'); document.getElementById('fabOptions').classList.remove('show'); document.getElementById('fabMain').classList.remove('active'); document.getElementById('fabMain').textContent='+'; loadMyOffers(); }
-        function closeSpecialOfferPage() { document.getElementById('specialOfferOverlay').classList.remove('show'); }
-        
-        function loadMyOffers() {
-            db.ref('specialOffers/' + userId).on('value', snap => {
-                const offer = snap.val();
-                const container = document.getElementById('receivedOffersContainer');
-                if (!offer) {
-                    container.innerHTML = '<div style="text-align:center;padding:30px;color:#94a3b8;"><i class="fas fa-gift" style="font-size:50px;opacity:0.3;margin-bottom:15px;display:block;"></i>No special offers yet.<br><small>Admin will send you offers here.</small></div>';
-                    return;
-                }
-                if (offer.claimed) {
-                    container.innerHTML = `<div class="offer-card"><div style="font-size:24px;font-weight:900;color:#fbbf24;">✅ ${offer.title}</div><p style="color:#94a3b8;margin:8px 0;">${offer.description||''}</p><p style="color:#94a3b8;">From: <b>${offer.fromUsername||'Admin'}</b></p><div style="display:inline-block;background:rgba(16,185,129,0.15);color:#10b981;padding:6px 16px;border-radius:20px;font-weight:bold;margin-top:8px;">✅ Claimed</div></div>`;
-                } else {
-                    container.innerHTML = `<div class="offer-card"><div style="font-size:28px;font-weight:900;color:#fbbf24;">🎁 ${offer.title}</div><p style="color:#e2e8f0;margin:8px 0;">${offer.description||'Special reward for you!'}</p><p style="color:#94a3b8;">From: <b>${offer.fromUsername||'Admin'}</b></p><div style="display:inline-block;background:rgba(16,185,129,0.1);padding:12px 20px;border-radius:12px;margin:10px 0;"><span style="font-size:22px;font-weight:900;color:#10b981;">💰 +${offer.reward} Coins</span></div><br><button style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:14px 40px;border:none;border-radius:30px;font-weight:700;font-size:16px;cursor:pointer;margin-top:10px;" onclick="claimReceivedOffer()">🎁 Claim Reward</button></div>`;
-                }
-            });
-        }
-
-        function claimReceivedOffer() {
-            db.ref('specialOffers/' + userId).once('value', snap => {
-                const offer = snap.val();
-                if (offer && !offer.claimed) {
-                    app.balance += offer.reward;
-                    app.xpPoints += offer.reward * 2;
-                    userRef.update({ balance: app.balance, xpPoints: app.xpPoints });
-                    db.ref('specialOffers/' + userId).update({ claimed: true, claimedAt: Date.now() });
-                    updateUI();
-                    updateLevelUI();
-                    loadMyOffers();
-                    showToast(`🎉 +${offer.reward} Coins claimed!`);
-                }
-            });
-        }
-
         // ==================== WITHDRAW ====================
         function updateWithdrawUI() { const b=app.usdBalance||0, m=app.minWithdraw||10; document.getElementById('withdrawInfo').textContent=`Min: $${m.toFixed(2)}`; document.getElementById('withdrawStatus').textContent=`You have: $${b.toFixed(2)}`; const sel=document.getElementById('withdrawMethod'); sel.innerHTML=''; (app.withdrawMethods||['Nagad','Rocket']).forEach(x=>sel.innerHTML+=`<option>${x}</option>`); const btn=document.getElementById('withdrawBtn'); btn.disabled=b<m; btn.textContent=b<m?`Need $${(m-b).toFixed(2)} more`:'Withdraw Now'; }
-        function withdraw() { const b=app.usdBalance||0; if (b<(app.minWithdraw||10)){ showToast('Insufficient!','error'); return; } const mt=document.getElementById('withdrawMethod').value, ac=document.getElementById('withdrawAccount').value.trim(); if (!ac){ showToast('Enter account!','error'); return; } const id=Date.now().toString(); db.ref('withdrawRequests/'+id).set({ userId, username:displayName, amount:b, method:mt, account:ac, status:'pending', requestedAt:new Date().toISOString() }); app.usdBalance=0; app.withdrawHistory=[...(app.withdrawHistory||[]),{id, amount:b, method:mt, account:ac, status:'pending', date:new Date().toISOString()}]; userRef.update({ usdBalance:0, withdrawHistory:app.withdrawHistory }); document.getElementById('withdrawModalTitle').textContent='Request Sent!'; document.getElementById('withdrawModalText').textContent=`$${b.toFixed(2)} via ${mt}`; document.getElementById('withdrawModal').classList.add('active'); document.getElementById('withdrawAccount').value=''; updateUI(); updateWithdrawUI(); showToast(`$${b.toFixed(2)} requested!`); }
+        function withdraw() { const b=app.usdBalance||0; if (b<(app.minWithdraw||10)){ showToast('Insufficient!','error'); return; } const mt=document.getElementById('withdrawMethod').value, ac=document.getElementById('withdrawAccount').value.trim(); if (!ac){ showToast('Enter account!','error'); return; } const id=Date.now().toString(); db.ref('withdrawRequests/'+id).set({ userId, username:displayName, amount:b, method:mt, account:ac, status:'pending', requestedAt:new Date().toISOString() }); app.usdBalance=0; app.withdrawHistory=[...(app.withdrawHistory||[]),{id, amount:b, method:mt, account:ac, status:'pending', date:new Date().toISOString()}]; userRef.update({ usdBalance:0, withdrawHistory:app.withdrawHistory }); document.getElementById('withdrawModalTitle').textContent='Request Sent!'; document.getElementById('withdrawModalText').textContent=`$${b.toFixed(2)} via ${mt}`; document.getElementById('withdrawModal').classList.add('active'); document.getElementById('withdrawAccount').value=''; updateUI(); updateWithdrawUI(); updateWithdrawHistoryUI(); showToast(`$${b.toFixed(2)} requested!`); }
+
+        // ✅ WITHDRAW HISTORY DISPLAY
+        function updateWithdrawHistoryUI() {
+            const container = document.getElementById('withdrawHistoryList');
+            const history = app.withdrawHistory || [];
+            if (history.length === 0) {
+                container.innerHTML = '<span style="color:#94a3b8;font-size:11px;">No withdrawals yet</span>';
+                return;
+            }
+            const statusIcons = { pending: '⏳', approved: '✅', cancelled: '❌', processing: '🔄' };
+            container.innerHTML = history.slice(-20).reverse().map(h => `
+                <div class="history-item">
+                    <div>
+                        <span style="font-weight:600;">$${h.amount?.toFixed(2)||'0.00'}</span>
+                        <span style="color:#94a3b8;font-size:10px;"> via ${h.method||'N/A'}</span>
+                        ${h.status === 'cancelled' && h.cancelReason ? `<div style="color:#ef4444;font-size:10px;">⚠️ ${h.cancelReason}</div>` : ''}
+                    </div>
+                    <div style="text-align:right;">
+                        <span>${statusIcons[h.status]||'❓'} ${h.status||'unknown'}</span>
+                        <div style="font-size:9px;color:#94a3b8;">${h.date ? new Date(h.date).toLocaleDateString() : ''}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
 
         // ==================== CONVERSION ====================
         function startConversion() { if (conversionTimer) clearInterval(conversionTimer); const upd=()=>{ const n=Date.now(), nx=(app.lastConversion||n)+86400000, r=Math.max(0,nx-n); document.getElementById('conversionCountdown').textContent=`${String(Math.floor(r/3600000)).padStart(2,'0')}:${String(Math.floor((r%3600000)/60000)).padStart(2,'0')}:${String(Math.floor((r%60000)/1000)).padStart(2,'0')}`; if (r<=0){ clearInterval(conversionTimer); if (app.balance>0){ const e=app.balance/app.conversionRate; app.usdBalance+=e; app.balance=0; app.lastConversion=Date.now(); userRef.update({ balance:0, usdBalance:app.usdBalance, lastConversion:app.lastConversion }); document.getElementById('conversionText').textContent=`→ $${e.toFixed(2)} USD`; document.getElementById('conversionModal').classList.add('active'); updateUI(); } startConversion(); } }; upd(); conversionTimer=setInterval(upd,1000); }
 
         // ==================== UI ====================
         function updateUI() { document.getElementById('balance').textContent=app.balance.toLocaleString(); document.getElementById('walletBalance').textContent=app.balance.toLocaleString(); const u=(app.balance/app.conversionRate).toFixed(2); document.getElementById('usdValue').textContent=`≈ $${u} USD`; document.getElementById('walletUsd').textContent=`≈ $${u} USD`; document.getElementById('totalUsdEarned').textContent=`💵 Total USD: $${app.usdBalance.toFixed(2)}`; document.getElementById('walletTotalUsd').textContent=`$${app.usdBalance.toFixed(2)}`; document.getElementById('rateInfo').textContent=`Rate: 1 USD = ${app.conversionRate} Coins`; updateWithdrawUI(); updateSpeedBoostUI(); }
-        function switchPage(p,el) { document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active')); if (el) el.classList.add('active'); document.querySelectorAll('.page').forEach(pg=>pg.classList.remove('active')); const t=document.getElementById('page'+p.charAt(0).toUpperCase()+p.slice(1)); if (t) t.classList.add('active'); if (p==='tasks') renderTasks(); if (p==='refer') updateReferUI(); if (p==='wallet') updateWithdrawUI(); }
+        function switchPage(p,el) { document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active')); if (el) el.classList.add('active'); document.querySelectorAll('.page').forEach(pg=>pg.classList.remove('active')); const t=document.getElementById('page'+p.charAt(0).toUpperCase()+p.slice(1)); if (t) t.classList.add('active'); if (p==='tasks') renderTasks(); if (p==='refer') updateReferUI(); if (p==='wallet') { updateWithdrawUI(); updateWithdrawHistoryUI(); } }
         function showToast(m,ty='success') { const t=document.getElementById('toast'); t.textContent=m; t.className='toast show'+(ty==='error'?' error':''); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3000); }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
@@ -360,14 +341,34 @@
                 if (d.lastLogin) document.getElementById('lastLoginDisplay').textContent=`📅 Last: ${new Date(d.lastLogin).toLocaleString()}`;
                 
                 if (!d.balance&&d.xpPoints===undefined) userRef.update({ balance:0, usdBalance:0, referCode:app.referCode, progressCoins:TOTAL_COINS, xpPoints:NEGATIVE_XP, lastConversion:Date.now(), lastLogin:new Date().toISOString(), airdropClaimed:false, isCurrentlyMining:false, username:tgUsername, firstName:tgFirstName, lastName:tgLastName, fullName:displayName });
-                updateUI(); updateLevelUI(); updateProgressUI(); updateSpeedBoostUI(); startConversion();
+                updateUI(); updateLevelUI(); updateProgressUI(); updateSpeedBoostUI(); startConversion(); updateWithdrawHistoryUI();
                 document.getElementById('referLinkHome').textContent=`https://t.me/CoinQuist_bot?start=ref_${app.referCode}`;
             });
 
             db.ref('conversionRate').on('value',s=>{ app.conversionRate=s.val()||1000; updateUI(); });
             db.ref('withdrawSettings').on('value',s=>{ if (s.exists()){ app.minWithdraw=s.val().minAmount||10; app.withdrawMethods=s.val().methods||['Nagad','Rocket']; } updateWithdrawUI(); });
             loadLevelConfigFromDB(); loadTasks(); loadAirdrop();
-            db.ref('withdrawRequests').orderByChild('userId').equalTo(userId).on('child_changed',snap=>{ const d=snap.val(); if (d&&app.withdrawHistory){ const i=app.withdrawHistory.findIndex(h=>h.id===snap.key); if (i!==-1){ app.withdrawHistory[i].status=d.status; if (d.status==='cancelled'){ app.usdBalance+=d.amount||0; userRef.update({ usdBalance:app.usdBalance }); } userRef.update({ withdrawHistory:app.withdrawHistory }); updateUI(); } } });
+            
+            // ✅ LISTEN FOR WITHDRAW STATUS CHANGES (INCLUDING CANCEL REASON)
+            db.ref('withdrawRequests').orderByChild('userId').equalTo(userId).on('child_changed',snap=>{ 
+                const d=snap.val(); 
+                if (d&&app.withdrawHistory){ 
+                    const i=app.withdrawHistory.findIndex(h=>h.id===snap.key); 
+                    if (i!==-1){ 
+                        app.withdrawHistory[i].status=d.status; 
+                        if (d.cancelReason) app.withdrawHistory[i].cancelReason=d.cancelReason;
+                        if (d.status==='cancelled'){ 
+                            app.usdBalance+=(d.amount||0); 
+                            userRef.update({ usdBalance:app.usdBalance }); 
+                            showToast(`⚠️ Withdrawal cancelled: ${d.cancelReason||'No reason given'}. Refunded $${(d.amount||0).toFixed(2)}`, 'error');
+                        } 
+                        userRef.update({ withdrawHistory:app.withdrawHistory }); 
+                        updateUI(); 
+                        updateWithdrawHistoryUI(); 
+                    } 
+                } 
+            });
+            
             const ref=tg.initDataUnsafe?.start_param||new URLSearchParams(location.search).get('start')||'';
             if (ref.startsWith('ref_')){ const code=ref.replace('ref_',''); db.ref('users').orderByChild('referCode').equalTo(code).once('value',sn=>{ if (sn.exists()) sn.forEach(c=>{ if (c.key!==userId) db.ref('referrals/'+userId).once('value',s=>{ if (!s.exists()){ db.ref('referrals/'+userId).set({ referredBy:c.key, referredAt:Date.now(), username:displayName, bonus:50, userId }).then(()=>{ db.ref('users/'+c.key).transaction(cur=>({...(cur||{}), referCount:(cur?.referCount||0)+1 })); app.balance+=50; app.xpPoints+=100; userRef.update({ balance:app.balance, xpPoints:app.xpPoints }); updateUI(); updateLevelUI(); }); } }); }); }); }
             setTimeout(()=>showToast('👋 Welcome '+displayName+'! Tap START to mine!'),1500);
