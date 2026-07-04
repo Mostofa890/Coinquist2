@@ -169,38 +169,29 @@
         function submitBanAppeal() { if (app.banAppealSubmitted) { showToast('Already submitted!', 'error'); return; } const msg = prompt('📩 Write your appeal:'); if (!msg || msg.trim().length < 5) { showToast('Write proper message!', 'error'); return; } db.ref('banAppeals/' + userId).set({ userId, username: displayName, message: msg.trim(), banReason: app.banReason, status: 'pending', createdAt: Date.now() }, () => { userRef.update({ banAppealSubmitted: true }); app.banAppealSubmitted = true; document.getElementById('appealBtn').disabled = true; document.getElementById('appealBtn').textContent = '✅ Submitted'; document.getElementById('appealStatus').style.display = 'block'; document.getElementById('appealStatus').textContent = 'Submitted!'; showToast('📩 Appeal submitted!'); }); }
 
         // ==================== UPDATED LEVEL SYSTEM ====================
-        // XP progression: 1->1800, then doubles every level up to 100.
-        // Bonuses: Bronze 1-20:10%, Silver 21-40:20%, Gold 41-60:30%, Platinum 61-80:40%, Diamond 81-100:50%
         function getLevelConfig(level) {
-            // Level 0: Unlocking
             if (level === 0) return { tier: 'unlocking', tierName: 'Unlocking', tierEmoji: '🔒', bonusPercent: 0, xpForLevel: 10000 };
-            // Determine tier
             let tier, tierName, tierEmoji, bonus;
             if (level >= 1 && level <= 20) { tier = 'bronze'; tierName = 'Bronze'; tierEmoji = '🥉'; bonus = 10; }
             else if (level >= 21 && level <= 40) { tier = 'silver'; tierName = 'Silver'; tierEmoji = '🥈'; bonus = 20; }
             else if (level >= 41 && level <= 60) { tier = 'gold'; tierName = 'Gold'; tierEmoji = '🥇'; bonus = 30; }
             else if (level >= 61 && level <= 80) { tier = 'platinum'; tierName = 'Platinum'; tierEmoji = '💎'; bonus = 40; }
             else if (level >= 81 && level <= 100) { tier = 'diamond'; tierName = 'Diamond'; tierEmoji = '👑'; bonus = 50; }
-            else { tier = 'max'; tierName = 'MAX'; tierEmoji = '⭐'; bonus = 50; } // fallback
-
-            // XP: level 1 = 1800, then doubles each level
+            else { tier = 'max'; tierName = 'MAX'; tierEmoji = '⭐'; bonus = 50; }
             let xpForLevel;
             if (level === 1) xpForLevel = 1800;
             else if (level >= 2) xpForLevel = 1800 * Math.pow(2, level - 1);
-            else xpForLevel = 10000; // level 0
-
+            else xpForLevel = 10000;
             return { tier, tierName, tierEmoji, bonusPercent: bonus, xpForLevel: Math.floor(xpForLevel) };
         }
 
         function calculateLevel(xp) {
             xp = xp || NEGATIVE_XP;
             if (xp < 0) {
-                // Unlocking stage (level 0)
                 const baseXP = 10000;
                 const progress = Math.min(100, Math.floor((xp + baseXP) / baseXP * 100));
                 return { level: 0, xp, progress, tierName: 'Unlocking', tierEmoji: '🔒', bonusPercent: 0, isMaxLevel: false, xpForLevel: baseXP };
             }
-            // Find level
             let level = 1;
             let xpNeeded = 1800;
             let totalXP = 0;
@@ -234,8 +225,6 @@
         }
 
         function loadLevelConfigFromDB() {
-            // No need to load from DB anymore since we hardcoded the new system
-            // But keep the listener for backward compatibility or if admin wants to override
             db.ref('levelConfig').on('value', snap => {
                 if (snap.exists()) {
                     levelConfigCache = {};
@@ -298,7 +287,29 @@
         function closeAirdropPage() { document.getElementById('airdropOverlay').classList.remove('show'); db.ref('airdropVisitors/' + userId).remove(); }
         function claimAirdrop() { if (app.airdropClaimed) { showToast('Already claimed!', 'error'); return; } document.getElementById('airdropClaimBtn').disabled = true; showAd(() => { const amt = Math.random() * 1.5 + 0.5, coins = Math.floor(amt * app.conversionRate); app.balance += coins; app.airdropClaimed = true; app.xpPoints += coins; db.ref('airdropList/' + Date.now()).set({ userId, username: displayName, amount: amt, coins, timestamp: Date.now() }); userRef.update({ balance: app.balance, airdropClaimed: true, xpPoints: app.xpPoints }); document.getElementById('airdropModalText').textContent = `+${coins} Coins!`; document.getElementById('airdropModal').classList.add('active'); updateUI(); updateLevelUI(); showToast(`🎉 +${coins} Coins!`); }); }
 
-        function updateWithdrawUI() { const b = app.usdBalance || 0, m = app.minWithdraw || 10; document.getElementById('withdrawInfo').textContent = `Min: $${m.toFixed(2)}`; document.getElementById('withdrawStatus').textContent = `You have: $${b.toFixed(2)}`; const sel = document.getElementById('withdrawMethod'); sel.innerHTML = ''; (app.withdrawMethods || ['Nagad', 'Rocket']).forEach(x => sel.innerHTML += `<option>${x}</option>`); const btn = document.getElementById('withdrawBtn'); btn.disabled = b < m; btn.textContent = b < m ? `Need $${(m - b).toFixed(2)} more` : 'Withdraw Now'; }
+        // ==================== FIXED WITHDRAW UI (preserves selected method) ====================
+        function updateWithdrawUI() {
+            const b = app.usdBalance || 0, m = app.minWithdraw || 10;
+            document.getElementById('withdrawInfo').textContent = `Min: $${m.toFixed(2)}`;
+            document.getElementById('withdrawStatus').textContent = `You have: $${b.toFixed(2)}`;
+            
+            const sel = document.getElementById('withdrawMethod');
+            const currentValue = sel.value || 'Nagad';  // ← save current selection
+            
+            sel.innerHTML = '';
+            (app.withdrawMethods || ['Nagad', 'Rocket']).forEach(x => {
+                const opt = document.createElement('option');
+                opt.value = x;
+                opt.textContent = x;
+                if (x === currentValue) opt.selected = true;  // ← restore selection
+                sel.appendChild(opt);
+            });
+            
+            const btn = document.getElementById('withdrawBtn');
+            btn.disabled = b < m;
+            btn.textContent = b < m ? `Need $${(m - b).toFixed(2)} more` : 'Withdraw Now';
+        }
+
         function withdraw() { const b = app.usdBalance || 0; if (b < (app.minWithdraw || 10)) { showToast('Insufficient!', 'error'); return; } const mt = document.getElementById('withdrawMethod').value, ac = document.getElementById('withdrawAccount').value.trim(); if (!ac) { showToast('Enter account!', 'error'); return; } const id = Date.now().toString(); db.ref('withdrawRequests/' + id).set({ userId, username: displayName, amount: b, method: mt, account: ac, status: 'pending', requestedAt: new Date().toISOString() }); app.usdBalance = 0; app.withdrawHistory = [...(app.withdrawHistory || []), { id, amount: b, method: mt, account: ac, status: 'pending', date: new Date().toISOString() }]; userRef.update({ usdBalance: 0, withdrawHistory: app.withdrawHistory }); document.getElementById('withdrawModalTitle').textContent = 'Sent!'; document.getElementById('withdrawModalText').textContent = `$${b.toFixed(2)} via ${mt}`; document.getElementById('withdrawModal').classList.add('active'); document.getElementById('withdrawAccount').value = ''; updateUI(); updateWithdrawUI(); updateWithdrawHistoryUI(); showToast(`$${b.toFixed(2)} requested!`); }
         function updateWithdrawHistoryUI() { const c = document.getElementById('withdrawHistoryList'), h = app.withdrawHistory || []; if (!h.length) { c.innerHTML = '<span style="color:#94a3b8;font-size:11px;">No history</span>'; return; } c.innerHTML = h.slice(-20).reverse().map(h => `<div class="history-item"><div><b>$${h.amount?.toFixed(2) || '0'}</b> <small>${h.method || ''}</small>${h.status === 'cancelled' && h.cancelReason ? `<div style="color:#ef4444;font-size:10px;">⚠️ ${h.cancelReason}</div>` : ''}</div><div style="text-align:right;"><span>${h.status === 'approved' ? '✅' : h.status === 'cancelled' ? '❌' : '⏳'} ${h.status}</span><div style="font-size:9px;">${h.date ? new Date(h.date).toLocaleDateString() : ''}</div></div></div>`).join(''); }
 
