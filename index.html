@@ -225,16 +225,88 @@
         function checkBanStatus() { userRef.child('banned').on('value', s => { const b = s.val() === true; app.isBanned = b; if (b) { document.getElementById('bannedOverlay').classList.add('show'); document.getElementById('mainContent').style.display = 'none'; document.querySelector('.bottom-nav').style.display = 'none'; userRef.child('banReason').once('value', rs => { app.banReason = rs.val() || 'Violation'; document.getElementById('banReason').textContent = `Reason: ${app.banReason}`; }); userRef.child('banAppealSubmitted').once('value', as => { app.banAppealSubmitted = as.val() || false; const btn = document.getElementById('appealBtn'), st = document.getElementById('appealStatus'); if (app.banAppealSubmitted) { btn.disabled = true; btn.textContent = '✅ Submitted'; st.style.display = 'block'; st.textContent = 'Under review.'; } else { btn.disabled = false; btn.textContent = '📩 Submit Appeal'; st.style.display = 'none'; } }); } else { document.getElementById('bannedOverlay').classList.remove('show'); document.getElementById('mainContent').style.display = 'block'; document.querySelector('.bottom-nav').style.display = 'flex'; } }); }
         function submitBanAppeal() { if (app.banAppealSubmitted) { showToast('Already submitted!', 'error'); return; } const msg = prompt('📩 Write your appeal:'); if (!msg || msg.trim().length < 5) { showToast('Write proper message!', 'error'); return; } db.ref('banAppeals/' + userId).set({ userId, username: displayName, message: msg.trim(), banReason: app.banReason, status: 'pending', createdAt: Date.now() }, () => { userRef.update({ banAppealSubmitted: true }); app.banAppealSubmitted = true; document.getElementById('appealBtn').disabled = true; document.getElementById('appealBtn').textContent = '✅ Submitted'; document.getElementById('appealStatus').style.display = 'block'; document.getElementById('appealStatus').textContent = 'Submitted!'; showToast('📩 Appeal submitted!'); }); }
 
-        function loadLevelConfigFromDB() { db.ref('levelConfig').on('value', snap => { levelConfigCache = {}; if (snap.exists()) snap.forEach(c => { levelConfigCache[parseInt(c.key)] = c.val(); }); updateLevelUI(); if (document.getElementById('levelOverlay').classList.contains('show')) { updateLevelPageUI(); renderLevelGrid(); } }); }
-        function getLevelConfig(lvl) { if (levelConfigCache[lvl]) { const c = levelConfigCache[lvl]; const m = { bronze:'🥉', silver:'🥈', gold:'🥇', platinum:'💎', diamond:'👑' }; return { tierName: (c.tier||'bronze').charAt(0).toUpperCase()+(c.tier||'bronze').slice(1), tierEmoji: m[c.tier]||'🥉', bonusPercent: c.bonus||0 }; } if (lvl===0) return { tierName:'Unlocking', tierEmoji:'🔒', bonusPercent:0 }; let tn,te,bp; if (lvl<=20){tn='Bronze';te='🥉';bp=lvl===1?1:lvl<=5?2:lvl<=10?3:lvl<=15?4:5;} else if (lvl<=40){tn='Silver';te='🥈';bp=lvl<=25?7:lvl<=30?10:lvl<=35?12:15;} else if (lvl<=60){tn='Gold';te='🥇';bp=lvl<=45?17:lvl<=50?20:lvl<=55?22:25;} else if (lvl<=80){tn='Platinum';te='💎';bp=lvl<=65?27:lvl<=70?30:lvl<=75?35:40;} else {tn='Diamond';te='👑';bp=lvl<=85?42:lvl<=90?45:lvl<=95?48:50;} return { tierName:tn, tierEmoji:te, bonusPercent:bp }; }
-        function calculateLevel(xp) { xp=xp||NEGATIVE_XP; if (xp<0) return { level:0, xp, progress:Math.max(0,Math.floor(((NEGATIVE_XP-Math.abs(xp))/Math.abs(NEGATIVE_XP))*100)), tierName:'Unlocking', tierEmoji:'🔒', bonusPercent:0, isMaxLevel:false }; let lvl=1, xpNext=100, totalXp=0; while (xp>=totalXp+xpNext&&lvl<100){totalXp+=xpNext;lvl++;xpNext=lvl*100;} let xpInto=xp-totalXp, prog=Math.min(100,Math.floor((xpInto/xpNext)*100)); let cfg=getLevelConfig(lvl); return { level:lvl, xp, xpForLevel:xpNext, progress:prog, ...cfg, isMaxLevel:lvl>=100 }; }
-        function updateLevelUI() { const d=calculateLevel(app.xpPoints); if (d.level===0) { document.getElementById('levelTitle').textContent='🔒 Unlocking'; document.getElementById('levelNumber').textContent='Level 0'; document.getElementById('levelProgressFill').style.width=d.progress+'%'; document.getElementById('levelCurrentPoints').textContent=`${d.xp} XP`; document.getElementById('levelNextPoints').textContent='/ 0 XP'; document.getElementById('userLevelBadge').textContent='🔒 Unlocking'; } else { document.getElementById('levelTitle').textContent=`${d.tierEmoji} ${d.tierName}`; document.getElementById('levelNumber').textContent=`Level ${d.level}`; document.getElementById('levelProgressFill').style.width=d.progress+'%'; document.getElementById('levelCurrentPoints').textContent=`${d.xp} XP`; document.getElementById('levelNextPoints').textContent=d.isMaxLevel?'⭐ MAX':`/ ${d.xpForLevel} XP`; document.getElementById('userLevelBadge').textContent=`${d.tierEmoji} Lv.${d.level}`; } }
+        // ==================== LEVEL SYSTEM (FIXED - REAL-TIME FROM FIREBASE) ====================
+        function loadLevelConfigFromDB() {
+            // ✅ Use .on() for REAL-TIME updates from admin panel
+            db.ref('levelConfig').on('value', snap => {
+                levelConfigCache = {};
+                if (snap.exists()) {
+                    snap.forEach(c => {
+                        levelConfigCache[parseInt(c.key)] = c.val();
+                    });
+                }
+                console.log('Level config updated from Firebase:', Object.keys(levelConfigCache).length, 'levels loaded');
+                // Update all level displays
+                updateLevelUI();
+                if (document.getElementById('levelOverlay').classList.contains('show')) {
+                    updateLevelPageUI();
+                    renderLevelGrid();
+                }
+            });
+        }
+
+        function getLevelConfig(level) {
+            // ✅ First check Firebase config (from admin panel)
+            if (levelConfigCache[level]) {
+                const cfg = levelConfigCache[level];
+                const emojiMap = { unlocking: '🔒', bronze: '🥉', silver: '🥈', gold: '🥇', platinum: '💎', diamond: '👑' };
+                const nameMap = { unlocking: 'Unlocking', bronze: 'Bronze', silver: 'Silver', gold: 'Gold', platinum: 'Platinum', diamond: 'Diamond' };
+                return {
+                    tierName: nameMap[cfg.tier] || 'Bronze',
+                    tierEmoji: emojiMap[cfg.tier] || '🥉',
+                    bonusPercent: cfg.bonus || 0,
+                    requiredXP: cfg.requiredXP || 0
+                };
+            }
+            
+            // ✅ Fallback default values (same as admin panel bulk config)
+            if (level === 0) return { tierName: 'Unlocking', tierEmoji: '🔒', bonusPercent: 0 };
+            
+            let tn, te, bp;
+            if (level <= 20) { tn = 'Bronze'; te = '🥉'; bp = level === 1 ? 1 : level <= 5 ? 2 : level <= 10 ? 3 : level <= 15 ? 4 : 5; }
+            else if (level <= 40) { tn = 'Silver'; te = '🥈'; bp = level <= 25 ? 7 : level <= 30 ? 10 : level <= 35 ? 12 : 15; }
+            else if (level <= 60) { tn = 'Gold'; te = '🥇'; bp = level <= 45 ? 17 : level <= 50 ? 20 : level <= 55 ? 22 : 25; }
+            else if (level <= 80) { tn = 'Platinum'; te = '💎'; bp = level <= 65 ? 27 : level <= 70 ? 30 : level <= 75 ? 35 : 40; }
+            else { tn = 'Diamond'; te = '👑'; bp = level <= 85 ? 42 : level <= 90 ? 45 : level <= 95 ? 48 : 50; }
+            return { tierName: tn, tierEmoji: te, bonusPercent: bp };
+        }
+
+        function calculateLevel(xp) {
+            xp = xp || NEGATIVE_XP;
+            if (xp < 0) return { level: 0, xp, progress: Math.max(0, Math.floor(((NEGATIVE_XP - Math.abs(xp)) / Math.abs(NEGATIVE_XP)) * 100)), tierName: 'Unlocking', tierEmoji: '🔒', bonusPercent: 0, isMaxLevel: false };
+            let lvl = 1, xpNext = 100, totalXp = 0;
+            while (xp >= totalXp + xpNext && lvl < 100) { totalXp += xpNext; lvl++; xpNext = lvl * 100; }
+            let xpInto = xp - totalXp, prog = Math.min(100, Math.floor((xpInto / xpNext) * 100));
+            let cfg = getLevelConfig(lvl);
+            return { level: lvl, xp, xpForLevel: xpNext, progress: prog, ...cfg, isMaxLevel: lvl >= 100 };
+        }
+
+        function updateLevelUI() {
+            const d = calculateLevel(app.xpPoints);
+            if (d.level === 0) {
+                document.getElementById('levelTitle').textContent = '🔒 Unlocking';
+                document.getElementById('levelNumber').textContent = 'Level 0';
+                document.getElementById('levelProgressFill').style.width = d.progress + '%';
+                document.getElementById('levelCurrentPoints').textContent = `${d.xp} XP`;
+                document.getElementById('levelNextPoints').textContent = '/ 0 XP';
+                document.getElementById('userLevelBadge').textContent = '🔒 Unlocking';
+            } else {
+                document.getElementById('levelTitle').textContent = `${d.tierEmoji} ${d.tierName}`;
+                document.getElementById('levelNumber').textContent = `Level ${d.level}`;
+                document.getElementById('levelProgressFill').style.width = d.progress + '%';
+                document.getElementById('levelCurrentPoints').textContent = `${d.xp} XP`;
+                document.getElementById('levelNextPoints').textContent = d.isMaxLevel ? '⭐ MAX' : `/ ${d.xpForLevel} XP`;
+                document.getElementById('userLevelBadge').textContent = `${d.tierEmoji} Lv.${d.level}`;
+            }
+        }
+
         function openLevelPage() { document.getElementById('levelOverlay').classList.add('show'); updateLevelPageUI(); renderLevelGrid(); }
         function closeLevelPage() { document.getElementById('levelOverlay').classList.remove('show'); }
-        function updateLevelPageUI() { const d=calculateLevel(app.xpPoints); document.getElementById('lvlEmoji').textContent=d.tierEmoji; document.getElementById('lvlNumber').textContent=d.level===0?'Level 0':`Level ${d.level}`; document.getElementById('lvlName').textContent=d.tierName; document.getElementById('lvlXP').textContent=d.level===0?`${d.xp} / 0 XP`:`${d.xp} XP (${d.progress}%)`; document.getElementById('lvlProgressFill').style.width=d.progress+'%'; document.getElementById('lvlBonus').textContent=`Mining Bonus: +${d.bonusPercent}%`; }
-        function renderLevelGrid() { const grid=document.getElementById('levelGrid'), cl=calculateLevel(app.xpPoints); let html=''; for (let i=0;i<=100;i++){ if (currentLevelFilter!=='all'){ const r={bronze:[1,20],silver:[21,40],gold:[41,60],platinum:[61,80],diamond:[81,100]}; const ra=r[currentLevelFilter]; if (i>0&&(i<ra[0]||i>ra[1])) continue; if (i===0&&currentLevelFilter!=='bronze') continue; } let c=i===0?{tierName:'Unlocking',tierEmoji:'🔒',bonusPercent:0}:getLevelConfig(i); let isC=cl.level===i, isU=cl.level>=i; html+=`<div class="level-card ${isC?'current':isU?'unlocked':'locked'}"><div style="font-size:18px;font-weight:900;color:#fbbf24;">${c.tierEmoji} ${i}</div><div style="font-size:11px;color:#94a3b8;">${c.tierName}</div><div style="font-size:12px;color:#10b981;">+${c.bonusPercent}%</div><div style="font-size:10px;color:#94a3b8;">${isC?'👈':isU?'✅':'🔒'}</div></div>`; } grid.innerHTML=html; }
-        function filterLevels(f,b) { currentLevelFilter=f; document.querySelectorAll('.lvl-filter-btn').forEach(x=>x.classList.remove('active')); if(b)b.classList.add('active'); renderLevelGrid(); }
+        function updateLevelPageUI() { const d = calculateLevel(app.xpPoints); document.getElementById('lvlEmoji').textContent = d.tierEmoji; document.getElementById('lvlNumber').textContent = d.level === 0 ? 'Level 0' : `Level ${d.level}`; document.getElementById('lvlName').textContent = d.tierName; document.getElementById('lvlXP').textContent = d.level === 0 ? `${d.xp} / 0 XP` : `${d.xp} XP (${d.progress}%)`; document.getElementById('lvlProgressFill').style.width = d.progress + '%'; document.getElementById('lvlBonus').textContent = `Mining Bonus: +${d.bonusPercent}%`; }
+        function renderLevelGrid() { const grid = document.getElementById('levelGrid'), cl = calculateLevel(app.xpPoints); let html = ''; for (let i = 0; i <= 100; i++) { if (currentLevelFilter !== 'all') { const r = { bronze: [1, 20], silver: [21, 40], gold: [41, 60], platinum: [61, 80], diamond: [81, 100] }; const ra = r[currentLevelFilter]; if (i > 0 && (i < ra[0] || i > ra[1])) continue; if (i === 0 && currentLevelFilter !== 'bronze') continue; } let c = getLevelConfig(i); let isC = cl.level === i, isU = cl.level >= i; html += `<div class="level-card ${isC ? 'current' : isU ? 'unlocked' : 'locked'}"><div style="font-size:18px;font-weight:900;color:#fbbf24;">${c.tierEmoji} ${i}</div><div style="font-size:11px;color:#94a3b8;">${c.tierName}</div><div style="font-size:12px;color:#10b981;">+${c.bonusPercent}%</div><div style="font-size:10px;color:#94a3b8;">${isC ? '👈' : isU ? '✅' : '🔒'}</div></div>`; } grid.innerHTML = html; }
+        function filterLevels(f, b) { currentLevelFilter = f; document.querySelectorAll('.lvl-filter-btn').forEach(x => x.classList.remove('active')); if (b) b.classList.add('active'); renderLevelGrid(); }
 
+        // ==================== MINING ====================
         function updateProgressUI() { const circle=document.getElementById('miningCircle'), count=document.getElementById('progressCoinCount'), status=document.getElementById('progressStatus'), overlay=document.getElementById('circleStartOverlay'), watchBtn=document.getElementById('progressWatchBtn'), pct=(app.progressCoins/TOTAL_COINS*100); circle.style.background=`conic-gradient(#fbbf24 ${pct}%, #1e293b ${pct}%)`; count.textContent=app.progressCoins; document.getElementById('progressPercent').textContent=Math.round(pct)+'%'; if (app.progressCoins===0){ status.textContent='🎯 Empty!'; watchBtn.classList.remove('hidden'); overlay.classList.remove('hidden'); overlay.querySelector('.start-text').textContent='REFILL'; circle.classList.remove('mining-active'); } else if (miningInterval){ status.textContent='⚡ Mining...'; watchBtn.classList.add('hidden'); overlay.classList.add('hidden'); circle.classList.add('mining-active'); } else { status.textContent='Ready'; watchBtn.classList.add('hidden'); overlay.classList.remove('hidden'); overlay.querySelector('.start-text').textContent='START\nMINING'; circle.classList.remove('mining-active'); } }
         function startMining() { if (miningInterval) return; if (app.progressCoins<=0){ showToast('❌ No coins!','error'); startVideoProgress(); return; } document.getElementById('circleStartOverlay').classList.add('hidden'); userRef.update({ isCurrentlyMining:true, lastMiningActivity:Date.now() }); miningInterval=setInterval(()=>{ if (app.progressCoins<=0){ stopMining(); showToast('🎉 Done!'); return; } const d=calculateLevel(app.xpPoints), ca=1+(d.bonusPercent/100); app.progressCoins-=1; app.balance+=ca; app.xpPoints+=1; userRef.update({ balance:app.balance, progressCoins:app.progressCoins, xpPoints:app.xpPoints, lastMiningActivity:Date.now() }); const coin=document.createElement('div'); coin.className='floating-coin'; coin.textContent=`+${ca.toFixed(2)} 🪙`; coin.style.left=(Math.random()*80+10)+'%'; coin.style.top='35%'; document.body.appendChild(coin); setTimeout(()=>coin.remove(),1000); updateProgressUI(); updateUI(); updateLevelUI(); },5000); updateProgressUI(); showToast('⛏️ Mining!'); }
         function stopMining() { if (miningInterval){ clearInterval(miningInterval); miningInterval=null; } userRef.update({ isCurrentlyMining:false }); updateProgressUI(); }
@@ -262,75 +334,29 @@
         function closeAirdropPage() { document.getElementById('airdropOverlay').classList.remove('show'); db.ref('airdropVisitors/' + userId).remove(); }
         function claimAirdrop() { if (app.airdropClaimed){ showToast('Already claimed!','error'); return; } document.getElementById('airdropClaimBtn').disabled=true; showAd(()=>{ const amt=Math.random()*1.5+0.5, coins=Math.floor(amt*app.conversionRate); app.balance+=coins; app.airdropClaimed=true; app.xpPoints+=coins; db.ref('airdropList/'+Date.now()).set({ userId, username:displayName, amount:amt, coins, timestamp:Date.now() }); userRef.update({ balance:app.balance, airdropClaimed:true, xpPoints:app.xpPoints }); document.getElementById('airdropModalText').textContent=`+${coins} Coins!`; document.getElementById('airdropModal').classList.add('active'); updateUI(); updateLevelUI(); showToast(`🎉 +${coins} Coins!`); }); }
 
-        // ==================== WITHDRAW ====================
         function updateWithdrawUI() { const b=app.usdBalance||0, m=app.minWithdraw||10; document.getElementById('withdrawInfo').textContent=`Min: $${m.toFixed(2)}`; document.getElementById('withdrawStatus').textContent=`You have: $${b.toFixed(2)}`; const sel=document.getElementById('withdrawMethod'); sel.innerHTML=''; (app.withdrawMethods||['Nagad','Rocket']).forEach(x=>sel.innerHTML+=`<option>${x}</option>`); const btn=document.getElementById('withdrawBtn'); btn.disabled=b<m; btn.textContent=b<m?`Need $${(m-b).toFixed(2)} more`:'Withdraw Now'; }
         function withdraw() { const b=app.usdBalance||0; if (b<(app.minWithdraw||10)){ showToast('Insufficient!','error'); return; } const mt=document.getElementById('withdrawMethod').value, ac=document.getElementById('withdrawAccount').value.trim(); if (!ac){ showToast('Enter account!','error'); return; } const id=Date.now().toString(); db.ref('withdrawRequests/'+id).set({ userId, username:displayName, amount:b, method:mt, account:ac, status:'pending', requestedAt:new Date().toISOString() }); app.usdBalance=0; app.withdrawHistory=[...(app.withdrawHistory||[]),{id, amount:b, method:mt, account:ac, status:'pending', date:new Date().toISOString()}]; userRef.update({ usdBalance:0, withdrawHistory:app.withdrawHistory }); document.getElementById('withdrawModalTitle').textContent='Sent!'; document.getElementById('withdrawModalText').textContent=`$${b.toFixed(2)} via ${mt}`; document.getElementById('withdrawModal').classList.add('active'); document.getElementById('withdrawAccount').value=''; updateUI(); updateWithdrawUI(); updateWithdrawHistoryUI(); showToast(`$${b.toFixed(2)} requested!`); }
         function updateWithdrawHistoryUI() { const c=document.getElementById('withdrawHistoryList'), h=app.withdrawHistory||[]; if (!h.length){ c.innerHTML='<span style="color:#94a3b8;font-size:11px;">No history</span>'; return; } c.innerHTML=h.slice(-20).reverse().map(h=>`<div class="history-item"><div><b>$${h.amount?.toFixed(2)||'0'}</b> <small>${h.method||''}</small>${h.status==='cancelled'&&h.cancelReason?`<div style="color:#ef4444;font-size:10px;">⚠️ ${h.cancelReason}</div>`:''}</div><div style="text-align:right;"><span>${h.status==='approved'?'✅':h.status==='cancelled'?'❌':'⏳'} ${h.status}</span><div style="font-size:9px;">${h.date?new Date(h.date).toLocaleDateString():''}</div></div></div>`).join(''); }
 
-        // ==================== CONVERSION (FIXED) ====================
-        function performConversion() {
-            if (app.balance > 0) {
-                const earned = app.balance / app.conversionRate;
-                app.usdBalance += earned;
-                const coins = app.balance;
-                app.balance = 0;
-                app.lastConversion = Date.now();
-                userRef.update({ balance: 0, usdBalance: app.usdBalance, lastConversion: app.lastConversion });
-                document.getElementById('conversionText').textContent = `${coins.toLocaleString()} Coins → $${earned.toFixed(4)} USD`;
-                document.getElementById('conversionModal').classList.add('active');
-                updateUI();
-                showToast(`💰 Converted ${coins} Coins to $${earned.toFixed(2)} USD!`);
-            } else {
-                app.lastConversion = Date.now();
-                userRef.update({ lastConversion: app.lastConversion });
-            }
-            startConversion();
-        }
+        function performConversion() { if (app.balance > 0) { const earned = app.balance / app.conversionRate; app.usdBalance += earned; const coins = app.balance; app.balance = 0; app.lastConversion = Date.now(); userRef.update({ balance: 0, usdBalance: app.usdBalance, lastConversion: app.lastConversion }); document.getElementById('conversionText').textContent = `${coins.toLocaleString()} Coins → $${earned.toFixed(4)} USD`; document.getElementById('conversionModal').classList.add('active'); updateUI(); showToast(`💰 Converted ${coins} Coins to $${earned.toFixed(2)} USD!`); } else { app.lastConversion = Date.now(); userRef.update({ lastConversion: app.lastConversion }); } startConversion(); }
+        function startConversion() { if (conversionTimer) clearInterval(conversionTimer); const upd = () => { const n = Date.now(), nx = (app.lastConversion || n) + 86400000, r = Math.max(0, nx - n); document.getElementById('conversionCountdown').textContent = `${String(Math.floor(r/3600000)).padStart(2,'0')}:${String(Math.floor((r%3600000)/60000)).padStart(2,'0')}:${String(Math.floor((r%60000)/1000)).padStart(2,'0')}`; if (r <= 0) { clearInterval(conversionTimer); performConversion(); } }; upd(); conversionTimer = setInterval(upd, 1000); }
 
-        function startConversion() { 
-            if (conversionTimer) clearInterval(conversionTimer); 
-            const upd = () => { 
-                const n = Date.now(), nx = (app.lastConversion || n) + 86400000, r = Math.max(0, nx - n); 
-                document.getElementById('conversionCountdown').textContent = `${String(Math.floor(r/3600000)).padStart(2,'0')}:${String(Math.floor((r%3600000)/60000)).padStart(2,'0')}:${String(Math.floor((r%60000)/1000)).padStart(2,'0')}`; 
-                if (r <= 0) { 
-                    clearInterval(conversionTimer); 
-                    performConversion(); 
-                } 
-            }; 
-            upd(); 
-            conversionTimer = setInterval(upd, 1000); 
-        }
-
-        // ==================== UI ====================
-        function updateUI() { 
-            document.getElementById('balance').textContent = app.balance.toLocaleString(); 
-            document.getElementById('walletBalance').textContent = app.balance.toLocaleString(); 
-            const usdValue = (app.balance / app.conversionRate).toFixed(4);
-            const usdDisplay = (app.balance / app.conversionRate).toFixed(2);
-            document.getElementById('usdValue').textContent = `≈ $${usdDisplay} USD`; 
-            document.getElementById('walletUsd').textContent = `≈ $${usdDisplay} USD`; 
-            document.getElementById('totalUsdEarned') && (document.getElementById('totalUsdEarned').textContent = `💵 Total USD: $${app.usdBalance.toFixed(2)}`); 
-            document.getElementById('walletTotalUsd').textContent = `$${app.usdBalance.toFixed(2)}`; 
-            document.getElementById('rateInfo').textContent = `1 USD = ${app.conversionRate} Coins`; 
-            updateWithdrawUI(); 
-            updateSpeedBoostUI(); 
-        }
+        function updateUI() { document.getElementById('balance').textContent = app.balance.toLocaleString(); document.getElementById('walletBalance').textContent = app.balance.toLocaleString(); const usdDisplay = (app.balance / app.conversionRate).toFixed(2); document.getElementById('usdValue').textContent = `≈ $${usdDisplay} USD`; document.getElementById('walletUsd').textContent = `≈ $${usdDisplay} USD`; document.getElementById('walletTotalUsd').textContent = `$${app.usdBalance.toFixed(2)}`; document.getElementById('rateInfo').textContent = `1 USD = ${app.conversionRate} Coins`; updateWithdrawUI(); updateSpeedBoostUI(); }
         function switchPage(p,el) { document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active')); if (el) el.classList.add('active'); document.querySelectorAll('.page').forEach(pg=>pg.classList.remove('active')); const t=document.getElementById('page'+p.charAt(0).toUpperCase()+p.slice(1)); if (t) t.classList.add('active'); if (p==='tasks') renderTasks(); if (p==='refer') updateReferUI(); if (p==='wallet'){ updateWithdrawUI(); updateWithdrawHistoryUI(); } }
         function showToast(m,ty='success') { const t=document.getElementById('toast'); t.textContent=m; t.className='toast show'+(ty==='error'?' error':''); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3000); }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-        // ==================== INIT ====================
         function initApp() {
             userRef.update({ username:tgUsername, firstName:tgFirstName, lastName:tgLastName, fullName:displayName, lastLogin:new Date().toISOString() });
             document.getElementById('userName').textContent=displayName;
             checkBanStatus();
             loadReferralConfigFromDB();
             
-            // ✅ LOAD CONVERSION RATE FROM FIREBASE (REAL-TIME)
-            db.ref('conversionRate').on('value', s => { 
-                app.conversionRate = s.val() || 1000;
-                updateUI(); 
-            });
+            // ✅ Load conversion rate from Firebase
+            db.ref('conversionRate').on('value', s => { app.conversionRate = s.val() || 1000; updateUI(); });
+            
+            // ✅ Load level config from Firebase (REAL-TIME)
+            loadLevelConfigFromDB();
             
             userRef.on('value',snap=>{
                 const d=snap.val()||{};
@@ -351,7 +377,7 @@
             });
 
             db.ref('withdrawSettings').on('value',s=>{ if (s.exists()){ app.minWithdraw=s.val().minAmount||10; app.withdrawMethods=s.val().methods||['Nagad','Rocket']; } updateWithdrawUI(); });
-            loadLevelConfigFromDB(); loadTasks(); loadAirdrop();
+            loadTasks(); loadAirdrop();
             db.ref('withdrawRequests').orderByChild('userId').equalTo(userId).on('child_changed',snap=>{ const d=snap.val(); if (d&&app.withdrawHistory){ const i=app.withdrawHistory.findIndex(h=>h.id===snap.key); if (i!==-1){ app.withdrawHistory[i].status=d.status; if (d.cancelReason) app.withdrawHistory[i].cancelReason=d.cancelReason; if (d.status==='cancelled'){ app.usdBalance+=(d.amount||0); userRef.update({ usdBalance:app.usdBalance }); showToast(`⚠️ Cancelled: ${d.cancelReason||'No reason'}. Refunded $${(d.amount||0).toFixed(2)}`,'error'); } userRef.update({ withdrawHistory:app.withdrawHistory }); updateUI(); updateWithdrawHistoryUI(); } } });
             const ref=tg.initDataUnsafe?.start_param||new URLSearchParams(location.search).get('start')||'';
             if (ref.startsWith('ref_')){ const code=ref.replace('ref_',''); db.ref('users').orderByChild('referCode').equalTo(code).once('value',sn=>{ if (sn.exists()) sn.forEach(c=>{ if (c.key!==userId) db.ref('referrals/'+userId).once('value',s=>{ if (!s.exists()){ const bonus = referralConfigCache.perReferralCoins || 50; const xpBonus = referralConfigCache.xpPerReferral || 100; db.ref('referrals/'+userId).set({ referredBy:c.key, referredAt:Date.now(), username:displayName, bonus:bonus, userId }).then(()=>{ db.ref('users/'+c.key).transaction(cur=>({...(cur||{}), referCount:(cur?.referCount||0)+1 })); app.balance+=bonus; app.xpPoints+=xpBonus; userRef.update({ balance:app.balance, xpPoints:app.xpPoints }); updateUI(); updateLevelUI(); }); } }); }); }); }
