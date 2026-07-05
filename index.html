@@ -290,6 +290,7 @@
         let wasMiningBeforeOffline = false;
         let miningStartedManually = false;
         let isAppHidden = false;
+        let isAdShowing = false;
 
         // ==================== REFILL CONFIG ====================
         let refillConfig = { enabled: true, totalRefills: 5, rewardCoins: 1000 };
@@ -317,19 +318,14 @@
             // Update badge
             if (badge) badge.textContent = remaining;
             
-            // Show/hide button based on coins
-            const shouldShow = (app.progressCoins === 0 && remaining > 0 && refillConfig.enabled);
-            
+            // Show/hide button based on coins - always show if refills remaining
             if (remaining <= 0 || !refillConfig.enabled) {
                 btn.classList.add('hidden');
                 btn.disabled = true;
-            } else if (shouldShow) {
+            } else {
                 btn.classList.remove('hidden');
                 btn.disabled = false;
                 btn.innerHTML = `<i class="fas fa-sync-alt"></i> Refill Coins <span class="badge">${remaining}</span>`;
-            } else {
-                btn.classList.add('hidden');
-                btn.disabled = true;
             }
             
             // Update circle button
@@ -375,7 +371,7 @@
             if (navigator.onLine) {
                 document.getElementById('networkOverlay').classList.remove('show');
                 isOnline = true;
-                if (wasMiningBeforeOffline && app.progressCoins > 0 && !miningInterval && !isAppHidden) {
+                if (wasMiningBeforeOffline && app.progressCoins > 0 && !miningInterval && !isAppHidden && !isAdShowing) {
                     startMining();
                 }
                 showToast('✅ Network restored!');
@@ -405,7 +401,7 @@
                         el.style.opacity = '';
                     });
                     showToast('✅ Network restored!');
-                    if (wasMiningBeforeOffline && app.progressCoins > 0 && !miningInterval && !isAppHidden) {
+                    if (wasMiningBeforeOffline && app.progressCoins > 0 && !miningInterval && !isAppHidden && !isAdShowing) {
                         startMining();
                     }
                 }
@@ -419,13 +415,13 @@
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) {
                 isAppHidden = true;
-                if (miningInterval) {
+                if (miningInterval && !isAdShowing) {
                     wasMiningBeforeOffline = true;
                     stopMining();
                 }
             } else {
                 isAppHidden = false;
-                if (wasMiningBeforeOffline && app.progressCoins > 0 && !miningInterval && isOnline) {
+                if (wasMiningBeforeOffline && app.progressCoins > 0 && !miningInterval && isOnline && !isAdShowing) {
                     startMining();
                 }
             }
@@ -435,6 +431,13 @@
 
         function showRewardedAd(cb, btnId) {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
+            
+            // Pause mining while ad is showing
+            if (miningInterval) {
+                wasMiningBeforeOffline = true;
+                stopMining();
+            }
+            isAdShowing = true;
             
             const btn = document.getElementById(btnId);
             if (btn) {
@@ -456,20 +459,33 @@
             
             if (typeof show_11197472 === 'function') {
                 show_11197472('pop').then(() => {
+                    isAdShowing = false;
+                    // Resume mining if it was active before ad
+                    if (wasMiningBeforeOffline && app.progressCoins > 0 && !isAppHidden && isOnline) {
+                        startMining();
+                    }
                     if (cb) cb();
                 }).catch(() => {
+                    isAdShowing = false;
                     if (btn) {
                         clearInterval(adCooldownTimers[btnId]);
                         btn.disabled = false;
                         btn.textContent = btn.dataset.originalText || '▶ Watch Video';
                     }
+                    if (wasMiningBeforeOffline && app.progressCoins > 0 && !isAppHidden && isOnline) {
+                        startMining();
+                    }
                     if (cb) cb();
                 });
             } else { 
+                isAdShowing = false;
                 if (btn) {
                     clearInterval(adCooldownTimers[btnId]);
                     btn.disabled = false;
                     btn.textContent = btn.dataset.originalText || '▶ Watch Video';
+                }
+                if (wasMiningBeforeOffline && app.progressCoins > 0 && !isAppHidden && isOnline) {
+                    startMining();
                 }
                 if (cb) cb(); 
             }
@@ -477,6 +493,13 @@
 
         function showInterstitialAd(cb, btnId) {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
+            
+            // Pause mining while ad is showing
+            if (miningInterval) {
+                wasMiningBeforeOffline = true;
+                stopMining();
+            }
+            isAdShowing = true;
             
             const btn = document.getElementById(btnId);
             if (btn) {
@@ -498,20 +521,32 @@
             
             if (typeof show_11197472 === 'function') {
                 show_11197472().then(() => {
+                    isAdShowing = false;
+                    if (wasMiningBeforeOffline && app.progressCoins > 0 && !isAppHidden && isOnline) {
+                        startMining();
+                    }
                     if (cb) cb();
                 }).catch(() => {
+                    isAdShowing = false;
                     if (btn) {
                         clearInterval(adCooldownTimers[btnId]);
                         btn.disabled = false;
                         btn.textContent = btn.dataset.originalText || 'Speed Boost';
                     }
+                    if (wasMiningBeforeOffline && app.progressCoins > 0 && !isAppHidden && isOnline) {
+                        startMining();
+                    }
                     if (cb) cb();
                 });
             } else { 
+                isAdShowing = false;
                 if (btn) {
                     clearInterval(adCooldownTimers[btnId]);
                     btn.disabled = false;
                     btn.textContent = btn.dataset.originalText || 'Speed Boost';
+                }
+                if (wasMiningBeforeOffline && app.progressCoins > 0 && !isAppHidden && isOnline) {
+                    startMining();
                 }
                 if (cb) cb(); 
             }
@@ -519,6 +554,13 @@
 
         function showAirdropAd(cb, btnId) {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
+            
+            // Pause mining while ad is showing
+            if (miningInterval) {
+                wasMiningBeforeOffline = true;
+                stopMining();
+            }
+            isAdShowing = true;
             
             const btn = document.getElementById(btnId);
             if (btn) {
@@ -540,20 +582,32 @@
             
             if (typeof show_11197472 === 'function') {
                 show_11197472('pop').then(() => {
+                    isAdShowing = false;
+                    if (wasMiningBeforeOffline && app.progressCoins > 0 && !isAppHidden && isOnline) {
+                        startMining();
+                    }
                     if (cb) cb();
                 }).catch(() => {
+                    isAdShowing = false;
                     if (btn) {
                         clearInterval(adCooldownTimers[btnId]);
                         btn.disabled = false;
                         btn.textContent = '🎁 Claim';
                     }
+                    if (wasMiningBeforeOffline && app.progressCoins > 0 && !isAppHidden && isOnline) {
+                        startMining();
+                    }
                     if (cb) cb();
                 });
             } else { 
+                isAdShowing = false;
                 if (btn) {
                     clearInterval(adCooldownTimers[btnId]);
                     btn.disabled = false;
                     btn.textContent = '🎁 Claim';
+                }
+                if (wasMiningBeforeOffline && app.progressCoins > 0 && !isAppHidden && isOnline) {
+                    startMining();
                 }
                 if (cb) cb(); 
             }
@@ -824,6 +878,7 @@
 
         function startMining() { 
             if (!isOnline) { showToast('No internet!', 'error'); return; }
+            if (isAdShowing) { showToast('⏳ Please wait for ad to finish', 'error'); return; }
             if (miningInterval) return; 
             if (app.progressCoins <= 0) { showToast('❌ No coins!', 'error'); return; } 
             document.getElementById('circleStartOverlay').classList.add('hidden'); 
@@ -836,7 +891,7 @@
                     showToast('⚠️ Network lost! Mining paused.', 'error'); 
                     return; 
                 }
-                if (document.hidden) {
+                if (document.hidden || isAdShowing) {
                     stopMining();
                     return;
                 }
@@ -877,6 +932,7 @@
         }
 
         function updateSpeedBoostUI() { const bb = document.getElementById('speedBoostBtn'), cb = document.getElementById('boostCountdownBox'); if (app.speedBoostCooldown > Date.now()) { bb.style.display = 'none'; cb.classList.add('show'); if (boostTimer) clearInterval(boostTimer); boostTimer = setInterval(() => { const r = Math.max(0, Math.ceil((app.speedBoostCooldown - Date.now()) / 1000)); document.getElementById('boostCountdownTime').textContent = `${String(Math.floor(r / 60)).padStart(2, '0')}:${String(r % 60).padStart(2, '0')}`; if (r <= 0) { app.speedBoostCooldown = 0; userRef.update({ speedBoostCooldown: 0 }); updateSpeedBoostUI(); } }, 1000); } else { bb.style.display = 'flex'; cb.classList.remove('show'); if (boostTimer) { clearInterval(boostTimer); boostTimer = null; } } }
+        
         function activateSpeedBoost() { 
             if (!isOnline) { showToast('No internet!', 'error'); return; }
             if (app.speedBoostCooldown > Date.now()) { showToast('⏳ Cooldown!', 'error'); return; } 
@@ -884,23 +940,34 @@
             btn.dataset.originalText = 'Speed Boost';
             showInterstitialAd(() => { 
                 const st = Date.now(); 
+                const totalBoostTime = 3000; // 3 seconds
+                const intervalTime = 500; // 500ms per coin
+                let boostCount = 0;
+                const maxCoins = 6; // 6 coins in 3 seconds
+                
                 userRef.update({ isCurrentlyMining: true, lastMiningActivity: Date.now() }); 
                 const bm = setInterval(() => { 
                     if (!isOnline) { clearInterval(bm); showToast('⚠️ Network lost!', 'error'); return; }
-                    if (document.hidden) { clearInterval(bm); showToast('⚠️ App hidden!', 'error'); return; }
-                    if (Date.now() - st >= 3000 || app.progressCoins <= 0) { 
+                    if (document.hidden || isAdShowing) { clearInterval(bm); showToast('⚠️ Interrupted!', 'error'); return; }
+                    if (Date.now() - st >= totalBoostTime || app.progressCoins <= 0 || boostCount >= maxCoins) { 
                         clearInterval(bm); 
                         userRef.update({ isCurrentlyMining: !!miningInterval }); 
                         app.speedBoostCooldown = Date.now() + 3600000; 
                         userRef.update({ speedBoostCooldown: app.speedBoostCooldown }); 
                         updateSpeedBoostUI(); 
-                        showToast('🚀 Done!'); 
+                        showToast('🚀 Speed Boost Done!'); 
                         return; 
                     } 
                     app.progressCoins -= 1; 
                     app.balance += 2; 
                     app.xpPoints += 3; 
-                    userRef.update({ balance: app.balance, progressCoins: app.progressCoins, xpPoints: app.xpPoints, lastMiningActivity: Date.now() }); 
+                    boostCount++;
+                    userRef.update({ 
+                        balance: app.balance, 
+                        progressCoins: app.progressCoins, 
+                        xpPoints: app.xpPoints, 
+                        lastMiningActivity: Date.now() 
+                    }); 
                     updateProgressUI(); 
                     updateUI(); 
                     updateLevelUI(); 
@@ -911,8 +978,8 @@
                     coin.style.top = '35%'; 
                     document.body.appendChild(coin); 
                     setTimeout(() => coin.remove(), 800); 
-                }, 100); 
-                showToast('⚡ Boost!'); 
+                }, intervalTime); 
+                showToast('⚡ Speed Boost Active!'); 
             }, 'speedBoostBtn');
         }
 
@@ -1082,9 +1149,18 @@
         }
 
         function loadReferralConfigFromDB() { db.ref('referralConfig').on('value', s => { referralConfigCache = s.val() || { perReferralCoins: 50, xpPerReferral: 100 }; updateReferUI(); }); }
-        function updateReferUI() { const t = app.referralCount || 0; const perRef = referralConfigCache.perReferralCoins || 50; document.getElementById('referTotal').textContent = t; document.getElementById('referEarned').textContent = t * perRef; document.getElementById('referBonus').textContent = Math.floor(t / 10) * 50; const tiers = [{ l: 1, c: referralConfigCache.tier1?.count || 10, b: referralConfigCache.tier1?.bonus || 50, n: '🥉 Bronze' }, { l: 2, c: referralConfigCache.tier2?.count || 25, b: referralConfigCache.tier2?.bonus || 150, n: '🥈 Silver' }, { l: 3, c: referralConfigCache.tier3?.count || 50, b: referralConfigCache.tier3?.bonus || 300, n: '🥇 Gold' }, { l: 4, c: referralConfigCache.tier4?.count || 100, b: referralConfigCache.tier4?.bonus || 500, n: '💎 Platinum' }, { l: 5, c: referralConfigCache.tier5?.count || 200, b: referralConfigCache.tier5?.bonus || 1000, n: '👑 Diamond' }]; document.getElementById('referTierList').innerHTML = tiers.map(r => { const cl = app.referTiers?.[r.l] === 1, av = t >= r.c && !cl; return `<div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;"><div><div style="font-size:13px;">${r.n}</div><div style="font-size:10px;color:#94a3b8;">${r.c} refs • +${r.b} 🪙</div></div><span style="color:${av ? '#fbbf24' : '#64748b'};cursor:${av ? 'pointer' : 'default'};" ${av ? `onclick="claimTier(${r.l},${r.b})"` : ''}>${cl ? '✅' : av ? '🎁' : '🔒'}</span></div>`; }).join(''); }
+        function updateReferUI() { 
+            const t = app.referralCount || 0; 
+            const perRef = referralConfigCache.perReferralCoins || 50; 
+            document.getElementById('referTotal').textContent = t; 
+            document.getElementById('referEarned').textContent = t * perRef; 
+            document.getElementById('referBonus').textContent = Math.floor(t / 10) * 50; 
+            const tiers = [{ l: 1, c: referralConfigCache.tier1?.count || 10, b: referralConfigCache.tier1?.bonus || 50, n: '🥉 Bronze' }, { l: 2, c: referralConfigCache.tier2?.count || 25, b: referralConfigCache.tier2?.bonus || 150, n: '🥈 Silver' }, { l: 3, c: referralConfigCache.tier3?.count || 50, b: referralConfigCache.tier3?.bonus || 300, n: '🥇 Gold' }, { l: 4, c: referralConfigCache.tier4?.count || 100, b: referralConfigCache.tier4?.bonus || 500, n: '💎 Platinum' }, { l: 5, c: referralConfigCache.tier5?.count || 200, b: referralConfigCache.tier5?.bonus || 1000, n: '👑 Diamond' }]; 
+            document.getElementById('referTierList').innerHTML = tiers.map(r => { const cl = app.referTiers?.[r.l] === 1, av = t >= r.c && !cl; return `<div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;"><div><div style="font-size:13px;">${r.n}</div><div style="font-size:10px;color:#94a3b8;">${r.c} refs • +${r.b} 🪙</div></div><span style="color:${av ? '#fbbf24' : '#64748b'};cursor:${av ? 'pointer' : 'default'};" ${av ? `onclick="claimTier(${r.l},${r.b})"` : ''}>${cl ? '✅' : av ? '🎁' : '🔒'}</span></div>`; }).join(''); 
+        }
         function claimTier(l, b) { if (app.referTiers?.[l] === 1) return; app.balance += b; app.xpPoints += b * 2; if (!app.referTiers) app.referTiers = {}; app.referTiers[l] = 1; userRef.update({ balance: app.balance, xpPoints: app.xpPoints, referTiers: app.referTiers }); updateUI(); updateLevelUI(); updateReferUI(); showToast(`🎁 +${b} Coins!`); }
         function genRefCode() { return Array(8).fill(0).map(() => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random() * 36)]).join(''); }
+        
         function submitReferCode() { 
             if (!isOnline) { showToast('No internet!', 'error'); return; }
             const code = document.getElementById('referCodeInput').value.trim(); 
@@ -1112,7 +1188,14 @@
                 }); 
             }); 
         }
-        function copyReferLink() { navigator.clipboard.writeText(document.getElementById('referLinkHome').textContent).then(() => showToast('📋 Copied!')).catch(() => showToast('Copy manually', 'error')); }
+        function copyReferLink() { 
+            const link = document.getElementById('referLinkHome').textContent; 
+            if (link && link !== 'Loading...') {
+                navigator.clipboard.writeText(link).then(() => showToast('📋 Copied!')).catch(() => showToast('Copy manually', 'error')); 
+            } else {
+                showToast('Loading referral link...', 'error');
+            }
+        }
 
         function loadAirdrop() { 
             db.ref('airdropConfig').on('value', snap => { 
@@ -1360,7 +1443,10 @@
                 videoWatchProgress = d.videoWatchProgress || 0;
                 refillProgress = d.refillProgress || 0;
                 
-                if (miningStartedManually && !miningInterval && isOnline && app.progressCoins > 0 && !document.hidden) {
+                // Update referral link
+                document.getElementById('referLinkHome').textContent = `https://t.me/CoinQuist_bot?start=ref_${app.referCode}`;
+                
+                if (miningStartedManually && !miningInterval && isOnline && app.progressCoins > 0 && !document.hidden && !isAdShowing) {
                     startMining();
                 }
                 
@@ -1379,8 +1465,6 @@
                 updateVideoWatchUI();
                 updateRefillUI();
                 startConversionTimer();
-                
-                document.getElementById('referLinkHome').textContent = `https://t.me/CoinQuist_bot?start=ref_${app.referCode}`;
             });
 
             db.ref('withdrawSettings').on('value', s => { 
