@@ -1221,8 +1221,64 @@
             c.innerHTML = h.slice(-20).reverse().map(h => `<div class="history-item"><div><b>$${h.amount?.toFixed(2) || '0'}</b> <small>${h.method || ''}</small>${h.status === 'cancelled' && h.cancelReason ? `<div style="color:#ef4444;font-size:10px;">⚠️ ${h.cancelReason}</div>` : ''}</div><div style="text-align:right;"><span>${h.status === 'approved' ? '✅' : h.status === 'cancelled' ? '❌' : '⏳'} ${h.status}</span><div style="font-size:9px;">${h.date ? new Date(h.date).toLocaleDateString() : ''}</div></div></div>`).join(''); 
         }
 
-        function performConversion() { if (app.balance > 0) { const earned = app.balance / app.conversionRate; app.usdBalance += earned; const coins = app.balance; app.balance = 0; app.lastConversion = Date.now(); userRef.update({ balance: 0, usdBalance: app.usdBalance, lastConversion: app.lastConversion }); document.getElementById('conversionText').textContent = `${coins.toLocaleString()} Coins → $${earned.toFixed(4)} USD`; document.getElementById('conversionModal').classList.add('active'); updateUI(); showToast(`💰 Converted ${coins} Coins to $${earned.toFixed(2)} USD!`); } else { app.lastConversion = Date.now(); userRef.update({ lastConversion: app.lastConversion }); } startConversion(); }
-        function startConversion() { if (conversionTimer) clearInterval(conversionTimer); const upd = () => { const n = Date.now(), nx = (app.lastConversion || n) + 86400000, r = Math.max(0, nx - n); document.getElementById('conversionCountdown').textContent = `${String(Math.floor(r / 3600000)).padStart(2, '0')}:${String(Math.floor((r % 3600000) / 60000)).padStart(2, '0')}:${String(Math.floor((r % 60000) / 1000)).padStart(2, '0')}`; if (r <= 0) { clearInterval(conversionTimer); performConversion(); } }; upd(); conversionTimer = setInterval(upd, 1000); }
+        // ==================== CONVERSION TIMER FIX ====================
+        let conversionTimerInterval = null;
+
+        function performConversion() { 
+            if (app.balance > 0) { 
+                const earned = app.balance / app.conversionRate; 
+                app.usdBalance += earned; 
+                const coins = app.balance; 
+                app.balance = 0; 
+                app.lastConversion = Date.now(); 
+                userRef.update({ balance: 0, usdBalance: app.usdBalance, lastConversion: app.lastConversion }); 
+                document.getElementById('conversionText').textContent = `${coins.toLocaleString()} Coins → $${earned.toFixed(4)} USD`; 
+                document.getElementById('conversionModal').classList.add('active'); 
+                updateUI(); 
+                showToast(`💰 Converted ${coins} Coins to $${earned.toFixed(2)} USD!`); 
+            } else { 
+                app.lastConversion = Date.now(); 
+                userRef.update({ lastConversion: app.lastConversion }); 
+            } 
+            startConversionTimer(); 
+        }
+
+        function startConversionTimer() { 
+            if (conversionTimerInterval) {
+                clearInterval(conversionTimerInterval);
+                conversionTimerInterval = null;
+            }
+            
+            const updateDisplay = () => { 
+                const now = Date.now();
+                const last = app.lastConversion || now;
+                const nextConversion = last + 86400000; // 24 hours
+                const remaining = Math.max(0, nextConversion - now);
+                
+                if (remaining <= 0) {
+                    // Time is up - perform conversion
+                    if (conversionTimerInterval) {
+                        clearInterval(conversionTimerInterval);
+                        conversionTimerInterval = null;
+                    }
+                    performConversion();
+                    return;
+                }
+                
+                const hours = Math.floor(remaining / 3600000);
+                const minutes = Math.floor((remaining % 3600000) / 60000);
+                const seconds = Math.floor((remaining % 60000) / 1000);
+                
+                document.getElementById('conversionCountdown').textContent = 
+                    `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            };
+            
+            // Update immediately
+            updateDisplay();
+            
+            // Update every second
+            conversionTimerInterval = setInterval(updateDisplay, 1000);
+        }
 
         function updateUI() { 
             document.getElementById('balance').textContent = app.balance.toLocaleString(); 
@@ -1234,6 +1290,7 @@
             document.getElementById('rateInfo').textContent = `1 USD = ${app.conversionRate} Coins`; 
             updateWithdrawUI(); 
             updateSpeedBoostUI(); 
+            startConversionTimer(); // Keep timer running
         }
 
         function switchPage(p, el) { 
@@ -1321,7 +1378,7 @@
                 updateSpeedBoostUI();
                 updateVideoWatchUI();
                 updateRefillUI();
-                startConversion();
+                startConversionTimer();
                 
                 document.getElementById('referLinkHome').textContent = `https://t.me/CoinQuist_bot?start=ref_${app.referCode}`;
             });
