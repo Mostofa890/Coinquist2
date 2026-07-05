@@ -153,6 +153,7 @@
         /* Refill watch button inside circle */
         .refill-circle-btn { margin-top: 8px; background: linear-gradient(135deg, #10b981, #059669); color: #fff; padding: 8px 16px; border: none; border-radius: 20px; font-weight: 600; font-size: 12px; cursor: pointer; transition: all 0.3s ease; }
         .refill-circle-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .refill-watch-btn.hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -310,19 +311,31 @@
 
         function updateRefillUI() {
             const remaining = Math.max(0, refillConfig.totalRefills - refillProgress);
-            document.getElementById('refillBadge').textContent = remaining;
             const btn = document.getElementById('mainRefillBtn');
-            if (remaining <= 0) {
+            const badge = document.getElementById('refillBadge');
+            
+            // Update badge
+            if (badge) badge.textContent = remaining;
+            
+            // Show/hide button based on coins
+            const shouldShow = (app.progressCoins === 0 && remaining > 0 && refillConfig.enabled);
+            
+            if (remaining <= 0 || !refillConfig.enabled) {
+                btn.classList.add('hidden');
                 btn.disabled = true;
-                btn.innerHTML = '<i class="fas fa-check-circle"></i> Refilled';
-            } else {
+            } else if (shouldShow) {
+                btn.classList.remove('hidden');
                 btn.disabled = false;
                 btn.innerHTML = `<i class="fas fa-sync-alt"></i> Refill Coins <span class="badge">${remaining}</span>`;
+            } else {
+                btn.classList.add('hidden');
+                btn.disabled = true;
             }
+            
             // Update circle button
             const circleBtn = document.getElementById('refillCircleBtn');
             if (circleBtn) {
-                if (remaining <= 0) {
+                if (remaining <= 0 || !refillConfig.enabled || app.progressCoins > 0) {
                     circleBtn.classList.add('hidden');
                 } else {
                     circleBtn.classList.remove('hidden');
@@ -336,6 +349,10 @@
             if (!refillConfig.enabled) { showToast('Refill is disabled!', 'error'); return; }
             if (refillProgress >= refillConfig.totalRefills) {
                 showToast('🎉 All refills used!', 'error');
+                return;
+            }
+            if (app.progressCoins > 0) {
+                showToast('You still have coins!', 'error');
                 return;
             }
             const btn = document.getElementById('mainRefillBtn');
@@ -772,12 +789,20 @@
             circle.style.background = `conic-gradient(#fbbf24 ${pct}%, #1e293b ${pct}%)`; 
             count.textContent = app.progressCoins; 
             document.getElementById('progressPercent').textContent = Math.round(pct) + '%'; 
+            
+            // Update refill UI based on coins
+            updateRefillUI();
+            
             if (app.progressCoins === 0) { 
                 status.textContent = '🎯 Empty!'; 
                 watchBtn.classList.add('hidden');
-                refillCircleBtn.classList.remove('hidden');
                 const remaining = Math.max(0, refillConfig.totalRefills - refillProgress);
-                refillCircleBtn.textContent = `📺 Refill (${remaining} left)`;
+                if (remaining > 0 && refillConfig.enabled) {
+                    refillCircleBtn.classList.remove('hidden');
+                    refillCircleBtn.textContent = `📺 Refill (${remaining} left)`;
+                } else {
+                    refillCircleBtn.classList.add('hidden');
+                }
                 overlay.classList.remove('hidden'); 
                 overlay.querySelector('.start-text').textContent = 'REFILL'; 
                 circle.classList.remove('mining-active'); 
@@ -1234,10 +1259,6 @@
         }
 
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-
-        // ==================== ADMIN PANEL UPDATE ====================
-        // The admin panel HTML needs to be updated separately with refillConfig and rules.
-        // This is the user panel - admin panel will be provided separately.
 
         // ==================== INIT ====================
         function initApp() {
