@@ -149,6 +149,8 @@
         .network-overlay p { color: #94a3b8; font-size: 14px; }
         .network-overlay .retry-btn { margin-top: 20px; padding: 12px 30px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none; border-radius: 12px; color: #fff; font-weight: 700; font-size: 16px; cursor: pointer; }
         .ad-cooldown { font-size: 12px; color: #94a3b8; margin-left: 6px; }
+        /* Screen lock awareness - keep mining active */
+        .mining-active-indicator { display: none; }
     </style>
 </head>
 <body>
@@ -261,16 +263,31 @@
         const tgLastName = tgUser?.last_name || '';
         const displayName = tgFirstName + (tgLastName ? ' ' + tgLastName : '') || tgUsername || 'User';
 
+        // ==================== IN-APP INTERSTITIAL AUTO ADS ====================
+        if (typeof show_11197472 === 'function') {
+            show_11197472({
+                type: 'inApp',
+                inAppSettings: {
+                    frequency: 2,
+                    capping: 0.1,
+                    interval: 30,
+                    timeout: 5,
+                    everyPage: false
+                }
+            });
+        }
+
         // Network status monitoring
         let isOnline = navigator.onLine;
         let wasMiningBeforeOffline = false;
         let miningStartedManually = false;
+        let isAppHidden = false;
 
         function checkNetworkAndReload() {
             if (navigator.onLine) {
                 document.getElementById('networkOverlay').classList.remove('show');
                 isOnline = true;
-                if (wasMiningBeforeOffline && app.progressCoins > 0 && !miningInterval) {
+                if (wasMiningBeforeOffline && app.progressCoins > 0 && !miningInterval && !isAppHidden) {
                     startMining();
                 }
                 showToast('✅ Network restored!');
@@ -300,7 +317,7 @@
                         el.style.opacity = '';
                     });
                     showToast('✅ Network restored!');
-                    if (wasMiningBeforeOffline && app.progressCoins > 0 && !miningInterval) {
+                    if (wasMiningBeforeOffline && app.progressCoins > 0 && !miningInterval && !isAppHidden) {
                         startMining();
                     }
                 }
@@ -311,13 +328,18 @@
         window.addEventListener('offline', updateNetworkStatus);
         setInterval(updateNetworkStatus, 3000);
 
+        // ==================== FIXED: Only stop mining when app is fully hidden (not screen lock) ====================
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) {
+                // App is hidden (switched to another app or tab)
+                isAppHidden = true;
                 if (miningInterval) {
                     wasMiningBeforeOffline = true;
                     stopMining();
                 }
             } else {
+                // App is visible again
+                isAppHidden = false;
                 if (wasMiningBeforeOffline && app.progressCoins > 0 && !miningInterval && isOnline) {
                     startMining();
                 }
@@ -330,12 +352,12 @@
         function showRewardedAd(cb, btnId) {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
             
-            // Disable button and show cooldown
             const btn = document.getElementById(btnId);
             if (btn) {
                 btn.disabled = true;
                 btn.textContent = '⏳ 15s';
                 let seconds = 15;
+                if (adCooldownTimers[btnId]) clearInterval(adCooldownTimers[btnId]);
                 adCooldownTimers[btnId] = setInterval(() => {
                     seconds--;
                     if (seconds > 0) {
@@ -349,7 +371,6 @@
             }
             
             if (typeof show_11197472 === 'function') {
-                // Rewarded Popup
                 show_11197472('pop').then(() => {
                     if (cb) cb();
                 }).catch(() => {
@@ -378,6 +399,7 @@
                 btn.disabled = true;
                 btn.textContent = '⏳ 15s';
                 let seconds = 15;
+                if (adCooldownTimers[btnId]) clearInterval(adCooldownTimers[btnId]);
                 adCooldownTimers[btnId] = setInterval(() => {
                     seconds--;
                     if (seconds > 0) {
@@ -391,7 +413,6 @@
             }
             
             if (typeof show_11197472 === 'function') {
-                // Rewarded Interstitial
                 show_11197472().then(() => {
                     if (cb) cb();
                 }).catch(() => {
@@ -420,6 +441,7 @@
                 btn.disabled = true;
                 btn.textContent = '⏳ 15s';
                 let seconds = 15;
+                if (adCooldownTimers[btnId]) clearInterval(adCooldownTimers[btnId]);
                 adCooldownTimers[btnId] = setInterval(() => {
                     seconds--;
                     if (seconds > 0) {
@@ -708,6 +730,7 @@
                     showToast('⚠️ Network lost! Mining paused.', 'error'); 
                     return; 
                 }
+                // ONLY stop mining if app is actually hidden (not screen lock)
                 if (document.hidden) {
                     stopMining();
                     return;
@@ -759,7 +782,7 @@
                 userRef.update({ isCurrentlyMining: true, lastMiningActivity: Date.now() }); 
                 const bm = setInterval(() => { 
                     if (!isOnline) { clearInterval(bm); showToast('⚠️ Network lost!', 'error'); return; }
-                    if (document.hidden) { clearInterval(bm); showToast('⚠️ App minimized!', 'error'); return; }
+                    if (document.hidden) { clearInterval(bm); showToast('⚠️ App hidden!', 'error'); return; }
                     if (Date.now() - st >= 3000 || app.progressCoins <= 0) { 
                         clearInterval(bm); 
                         userRef.update({ isCurrentlyMining: !!miningInterval }); 
