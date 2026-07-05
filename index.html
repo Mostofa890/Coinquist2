@@ -73,7 +73,7 @@
         .withdraw-section { margin-top: 15px; padding: 15px; background: rgba(239,68,68,0.08); border-radius: 14px; border: 1px solid rgba(239,68,68,0.15); text-align: left; }
         .withdraw-section .form-group { margin-bottom: 12px; }
         .withdraw-section .form-group label { font-size: 12px; color: #94a3b8; margin-bottom: 5px; display: block; }
-        .withdraw-section .form-group select, .withdraw-section .form-group input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #fff; font-size: 14px; outline: none; }
+        .withdraw-section .form-group input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #fff; font-size: 14px; outline: none; }
         .withdraw-section .withdraw-btn { margin-top: 8px; padding: 12px 20px; background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; width: 100%; font-size: 15px; }
         .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; background: rgba(15,23,42,0.95); backdrop-filter: blur(24px); display: flex; justify-content: space-around; padding: 10px 4px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
         .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; color: #64748b; font-size: 10px; cursor: pointer; flex: 1; }
@@ -108,6 +108,12 @@
         .level-filters { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; }
         .level-filters .lvl-filter-btn { padding: 5px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #94a3b8; cursor: pointer; font-size: 11px; white-space: nowrap; }
         .level-filters .lvl-filter-btn.active { background: linear-gradient(135deg, #fbbf24, #f59e0b); border-color: transparent; color: #0f172a; }
+        /* Payment method button style */
+        .method-selector { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+        .method-btn { padding: 8px 16px; border-radius: 10px; border: 2px solid #334155; background: #1e293b; color: #94a3b8; cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.3s ease; flex: 1; min-width: 70px; text-align: center; }
+        .method-btn.active { border-color: #10b981; background: rgba(16,185,129,0.15); color: #10b981; }
+        .method-btn:hover { border-color: #64748b; }
+        .method-btn i { margin-right: 6px; }
     </style>
 </head>
 <body>
@@ -133,7 +139,12 @@
         </div>
         <div class="page" id="pageTasks"><h2 class="page-header">📋 Tasks</h2><div class="task-filters"><button class="filter-btn active" onclick="filterTasks('all',this)">All</button><button class="filter-btn" onclick="filterTasks('link',this)">🔗 Link</button><button class="filter-btn" onclick="filterTasks('video',this)">📺 Video</button></div><div id="tasksContainer"></div></div>
         <div class="page" id="pageRefer"><h2 class="page-header">👥 Refer & Earn</h2><div style="background:rgba(255,255,255,0.03);border-radius:14px;padding:14px;margin-bottom:14px;text-align:center;"><p>Your Referral Link</p><div id="referLinkHome" style="background:rgba(255,255,255,0.05);padding:10px;border-radius:10px;font-size:12px;color:#3b82f6;word-break:break-all;">Loading...</div><button onclick="copyReferLink()" style="background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;padding:8px 20px;border-radius:10px;border:none;font-weight:700;cursor:pointer;">📋 Copy</button></div><div style="background:rgba(255,255,255,0.03);border-radius:14px;padding:14px;margin-bottom:14px;text-align:center;"><input type="text" id="referCodeInput" placeholder="Enter code..." style="width:100%;padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;margin-bottom:8px;outline:none;"><button id="referCodeSubmitBtn" onclick="submitReferCode()" style="background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;padding:8px 20px;border-radius:10px;border:none;font-weight:700;cursor:pointer;">Submit</button></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;"><div style="background:rgba(255,255,255,0.03);padding:12px;border-radius:12px;text-align:center;"><div id="referTotal" style="font-size:20px;font-weight:900;color:#fbbf24;">0</div><div style="font-size:10px;color:#94a3b8;">Refs</div></div><div style="background:rgba(255,255,255,0.03);padding:12px;border-radius:12px;text-align:center;"><div id="referEarned" style="font-size:20px;font-weight:900;color:#fbbf24;">0</div><div style="font-size:10px;color:#94a3b8;">Coins</div></div><div style="background:rgba(255,255,255,0.03);padding:12px;border-radius:12px;text-align:center;"><div id="referBonus" style="font-size:20px;font-weight:900;color:#fbbf24;">0</div><div style="font-size:10px;color:#94a3b8;">Bonus</div></div></div><div id="referTierList"></div></div>
-        <div class="page" id="pageWallet"><h2 class="page-header">💰 Wallet</h2><div class="wallet-card"><p>Coins Balance</p><div class="wallet-balance" id="walletBalance">0</div><div id="walletUsd" style="color:#10b981;font-size:18px;font-weight:bold;">≈ $0.00</div><div style="background:rgba(16,185,129,0.1);border-radius:10px;padding:10px;margin-top:15px;"><div>💵 Total USD</div><div id="walletTotalUsd" style="font-size:18px;font-weight:bold;color:#10b981;">$0.00</div></div><div class="withdraw-section"><p id="withdrawInfo" style="font-weight:bold;color:#fbbf24;">Min: $10.00</p><div class="form-group"><label>Method</label><select id="withdrawMethod"></select></div><div class="form-group"><label>Account</label><input type="text" id="withdrawAccount" placeholder="Number..."></div><p id="withdrawStatus" style="font-size:11px;color:#94a3b8;">You have: $0.00</p><button class="withdraw-btn" id="withdrawBtn" onclick="withdraw()">Withdraw Now</button></div><div class="history-card"><div style="font-size:11px;color:#94a3b8;margin-bottom:8px;">📜 History</div><div id="withdrawHistoryList"></div></div></div></div>
+        <div class="page" id="pageWallet"><h2 class="page-header">💰 Wallet</h2><div class="wallet-card"><p>Coins Balance</p><div class="wallet-balance" id="walletBalance">0</div><div id="walletUsd" style="color:#10b981;font-size:18px;font-weight:bold;">≈ $0.00</div><div style="background:rgba(16,185,129,0.1);border-radius:10px;padding:10px;margin-top:15px;"><div>💵 Total USD</div><div id="walletTotalUsd" style="font-size:18px;font-weight:bold;color:#10b981;">$0.00</div></div><div class="withdraw-section"><p id="withdrawInfo" style="font-weight:bold;color:#fbbf24;">Min: $10.00</p>
+            <!-- NEW: Payment method buttons instead of dropdown -->
+            <div class="form-group"><label>Payment Method</label><div class="method-selector" id="methodSelector"></div></div>
+            <div class="form-group"><label>Account Number</label><input type="text" id="withdrawAccount" placeholder="Enter your account number..."></div>
+            <p id="withdrawStatus" style="font-size:11px;color:#94a3b8;">You have: $0.00</p><button class="withdraw-btn" id="withdrawBtn" onclick="withdraw()">Withdraw Now</button></div>
+            <div class="history-card"><div style="font-size:11px;color:#94a3b8;margin-bottom:8px;">📜 History</div><div id="withdrawHistoryList"></div></div></div></div>
     </div>
     <div class="fab-container"><div class="fab-options" id="fabOptions"><div class="fab-option" onclick="openAirdropPage()"><span class="fab-option-label">Live AirDrop</span><button class="fab-option-btn fab-airdrop">📢</button></div></div><button class="fab-main" id="fabMain" onclick="toggleFab()">+</button></div>
     <div class="bottom-nav"><div class="nav-item active" onclick="switchPage('home',this)"><i class="fas fa-home"></i><span>Home</span></div><div class="nav-item" onclick="switchPage('tasks',this)"><i class="fas fa-tasks"></i><span>Tasks</span></div><div class="nav-item" onclick="switchPage('refer',this)"><i class="fas fa-users"></i><span>Refer</span></div><div class="nav-item" onclick="switchPage('wallet',this)"><i class="fas fa-wallet"></i><span>Wallet</span></div></div>
@@ -158,7 +169,7 @@
         if (typeof show_11197472 === 'function') show_11197472({ type: 'inApp', inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false } });
         function showAd(cb) { if (typeof show_11197472 === 'function') show_11197472('pop').then(() => cb?.()).catch(() => cb?.()); else cb?.(); }
 
-        let app = { balance: 0, usdBalance: 0, referralCount: 0, lastConversion: null, conversionRate: 1000, minWithdraw: 10, withdrawHistory: [], referCode: '', referTiers: {}, progressCoins: 1000, videoWatchedCount: 0, speedBoostCooldown: 0, taskLastCompleted: {}, airdropClaimed: false, xpPoints: -1000, withdrawMethods: ['Nagad','Rocket'], isBanned: false, banReason: '', banAppealSubmitted: false };
+        let app = { balance: 0, usdBalance: 0, referralCount: 0, lastConversion: null, conversionRate: 1000, minWithdraw: 10, withdrawHistory: [], referCode: '', referTiers: {}, progressCoins: 1000, videoWatchedCount: 0, speedBoostCooldown: 0, taskLastCompleted: {}, airdropClaimed: false, xpPoints: -1000, withdrawMethods: ['Nagad','Rocket'], selectedMethod: 'Nagad', isBanned: false, banReason: '', banAppealSubmitted: false };
         let tasks = [], conversionTimer = null, miningInterval = null, boostTimer = null, airdropTimer = null, currentFilter = 'all', currentLevelFilter = 'all', levelConfigCache = {}, referralConfigCache = {};
         const userRef = db.ref('users/' + userId), TOTAL_COINS = 1000, NEGATIVE_XP = -1000;
 
@@ -168,7 +179,7 @@
         function checkBanStatus() { userRef.child('banned').on('value', s => { const b = s.val() === true; app.isBanned = b; if (b) { document.getElementById('bannedOverlay').classList.add('show'); document.getElementById('mainContent').style.display = 'none'; document.querySelector('.bottom-nav').style.display = 'none'; userRef.child('banReason').once('value', rs => { app.banReason = rs.val() || 'Violation'; document.getElementById('banReason').textContent = `Reason: ${app.banReason}`; }); userRef.child('banAppealSubmitted').once('value', as => { app.banAppealSubmitted = as.val() || false; const btn = document.getElementById('appealBtn'), st = document.getElementById('appealStatus'); if (app.banAppealSubmitted) { btn.disabled = true; btn.textContent = '✅ Submitted'; st.style.display = 'block'; st.textContent = 'Under review.'; } else { btn.disabled = false; btn.textContent = '📩 Submit Appeal'; st.style.display = 'none'; } }); } else { document.getElementById('bannedOverlay').classList.remove('show'); document.getElementById('mainContent').style.display = 'block'; document.querySelector('.bottom-nav').style.display = 'flex'; } }); }
         function submitBanAppeal() { if (app.banAppealSubmitted) { showToast('Already submitted!', 'error'); return; } const msg = prompt('📩 Write your appeal:'); if (!msg || msg.trim().length < 5) { showToast('Write proper message!', 'error'); return; } db.ref('banAppeals/' + userId).set({ userId, username: displayName, message: msg.trim(), banReason: app.banReason, status: 'pending', createdAt: Date.now() }, () => { userRef.update({ banAppealSubmitted: true }); app.banAppealSubmitted = true; document.getElementById('appealBtn').disabled = true; document.getElementById('appealBtn').textContent = '✅ Submitted'; document.getElementById('appealStatus').style.display = 'block'; document.getElementById('appealStatus').textContent = 'Submitted!'; showToast('📩 Appeal submitted!'); }); }
 
-        // ==================== UPDATED LEVEL SYSTEM ====================
+        // ==================== LEVEL SYSTEM ====================
         function getLevelConfig(level) {
             if (level === 0) return { tier: 'unlocking', tierName: 'Unlocking', tierEmoji: '🔒', bonusPercent: 0, xpForLevel: 10000 };
             let tier, tierName, tierEmoji, bonus;
@@ -287,31 +298,87 @@
         function closeAirdropPage() { document.getElementById('airdropOverlay').classList.remove('show'); db.ref('airdropVisitors/' + userId).remove(); }
         function claimAirdrop() { if (app.airdropClaimed) { showToast('Already claimed!', 'error'); return; } document.getElementById('airdropClaimBtn').disabled = true; showAd(() => { const amt = Math.random() * 1.5 + 0.5, coins = Math.floor(amt * app.conversionRate); app.balance += coins; app.airdropClaimed = true; app.xpPoints += coins; db.ref('airdropList/' + Date.now()).set({ userId, username: displayName, amount: amt, coins, timestamp: Date.now() }); userRef.update({ balance: app.balance, airdropClaimed: true, xpPoints: app.xpPoints }); document.getElementById('airdropModalText').textContent = `+${coins} Coins!`; document.getElementById('airdropModal').classList.add('active'); updateUI(); updateLevelUI(); showToast(`🎉 +${coins} Coins!`); }); }
 
-        // ==================== FIXED WITHDRAW UI (preserves selected method) ====================
+        // ==================== UPDATED WITHDRAW UI (Button based method selector) ====================
         function updateWithdrawUI() {
             const b = app.usdBalance || 0, m = app.minWithdraw || 10;
             document.getElementById('withdrawInfo').textContent = `Min: $${m.toFixed(2)}`;
             document.getElementById('withdrawStatus').textContent = `You have: $${b.toFixed(2)}`;
             
-            const sel = document.getElementById('withdrawMethod');
-            const currentValue = sel.value || 'Nagad';  // ← save current selection
-            
-            sel.innerHTML = '';
-            (app.withdrawMethods || ['Nagad', 'Rocket']).forEach(x => {
-                const opt = document.createElement('option');
-                opt.value = x;
-                opt.textContent = x;
-                if (x === currentValue) opt.selected = true;  // ← restore selection
-                sel.appendChild(opt);
-            });
+            // Update method buttons
+            const container = document.getElementById('methodSelector');
+            const methods = app.withdrawMethods || ['Nagad', 'Rocket'];
+            // Keep selected method if it exists in the list, otherwise default to first
+            if (!methods.includes(app.selectedMethod)) {
+                app.selectedMethod = methods[0] || 'Nagad';
+            }
+            container.innerHTML = methods.map(m => {
+                const activeClass = m === app.selectedMethod ? 'active' : '';
+                const icon = m.toLowerCase() === 'nagad' ? 'fa-mobile-alt' : 
+                             m.toLowerCase() === 'rocket' ? 'fa-rocket' : 'fa-wallet';
+                return `<button class="method-btn ${activeClass}" onclick="selectMethod('${m}')"><i class="fas ${icon}"></i> ${m}</button>`;
+            }).join('');
             
             const btn = document.getElementById('withdrawBtn');
             btn.disabled = b < m;
             btn.textContent = b < m ? `Need $${(m - b).toFixed(2)} more` : 'Withdraw Now';
         }
 
-        function withdraw() { const b = app.usdBalance || 0; if (b < (app.minWithdraw || 10)) { showToast('Insufficient!', 'error'); return; } const mt = document.getElementById('withdrawMethod').value, ac = document.getElementById('withdrawAccount').value.trim(); if (!ac) { showToast('Enter account!', 'error'); return; } const id = Date.now().toString(); db.ref('withdrawRequests/' + id).set({ userId, username: displayName, amount: b, method: mt, account: ac, status: 'pending', requestedAt: new Date().toISOString() }); app.usdBalance = 0; app.withdrawHistory = [...(app.withdrawHistory || []), { id, amount: b, method: mt, account: ac, status: 'pending', date: new Date().toISOString() }]; userRef.update({ usdBalance: 0, withdrawHistory: app.withdrawHistory }); document.getElementById('withdrawModalTitle').textContent = 'Sent!'; document.getElementById('withdrawModalText').textContent = `$${b.toFixed(2)} via ${mt}`; document.getElementById('withdrawModal').classList.add('active'); document.getElementById('withdrawAccount').value = ''; updateUI(); updateWithdrawUI(); updateWithdrawHistoryUI(); showToast(`$${b.toFixed(2)} requested!`); }
-        function updateWithdrawHistoryUI() { const c = document.getElementById('withdrawHistoryList'), h = app.withdrawHistory || []; if (!h.length) { c.innerHTML = '<span style="color:#94a3b8;font-size:11px;">No history</span>'; return; } c.innerHTML = h.slice(-20).reverse().map(h => `<div class="history-item"><div><b>$${h.amount?.toFixed(2) || '0'}</b> <small>${h.method || ''}</small>${h.status === 'cancelled' && h.cancelReason ? `<div style="color:#ef4444;font-size:10px;">⚠️ ${h.cancelReason}</div>` : ''}</div><div style="text-align:right;"><span>${h.status === 'approved' ? '✅' : h.status === 'cancelled' ? '❌' : '⏳'} ${h.status}</span><div style="font-size:9px;">${h.date ? new Date(h.date).toLocaleDateString() : ''}</div></div></div>`).join(''); }
+        function selectMethod(method) {
+            app.selectedMethod = method;
+            updateWithdrawUI();
+        }
+
+        function withdraw() {
+            const b = app.usdBalance || 0;
+            if (b < (app.minWithdraw || 10)) {
+                showToast('Insufficient!', 'error');
+                return;
+            }
+            const mt = app.selectedMethod;
+            const ac = document.getElementById('withdrawAccount').value.trim();
+            if (!ac) {
+                showToast('Enter account number!', 'error');
+                return;
+            }
+            const id = Date.now().toString();
+            db.ref('withdrawRequests/' + id).set({
+                userId, username: displayName, amount: b,
+                method: mt, account: ac,
+                status: 'pending', requestedAt: new Date().toISOString()
+            });
+            app.usdBalance = 0;
+            app.withdrawHistory = [...(app.withdrawHistory || []), {
+                id, amount: b, method: mt, account: ac,
+                status: 'pending', date: new Date().toISOString()
+            }];
+            userRef.update({ usdBalance: 0, withdrawHistory: app.withdrawHistory });
+            document.getElementById('withdrawModalTitle').textContent = 'Sent!';
+            document.getElementById('withdrawModalText').textContent = `$${b.toFixed(2)} via ${mt}`;
+            document.getElementById('withdrawModal').classList.add('active');
+            document.getElementById('withdrawAccount').value = '';
+            updateUI();
+            updateWithdrawUI();
+            updateWithdrawHistoryUI();
+            showToast(`$${b.toFixed(2)} requested!`);
+        }
+
+        function updateWithdrawHistoryUI() {
+            const c = document.getElementById('withdrawHistoryList'), h = app.withdrawHistory || [];
+            if (!h.length) {
+                c.innerHTML = '<span style="color:#94a3b8;font-size:11px;">No history</span>';
+                return;
+            }
+            c.innerHTML = h.slice(-20).reverse().map(h => `
+                <div class="history-item">
+                    <div><b>$${h.amount?.toFixed(2) || '0'}</b> <small>${h.method || ''}</small>
+                    ${h.status === 'cancelled' && h.cancelReason ? `<div style="color:#ef4444;font-size:10px;">⚠️ ${h.cancelReason}</div>` : ''}</div>
+                    <div style="text-align:right;">
+                        <span>${h.status === 'approved' ? '✅' : h.status === 'cancelled' ? '❌' : '⏳'} ${h.status}</span>
+                        <div style="font-size:9px;">${h.date ? new Date(h.date).toLocaleDateString() : ''}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
 
         function performConversion() { if (app.balance > 0) { const earned = app.balance / app.conversionRate; app.usdBalance += earned; const coins = app.balance; app.balance = 0; app.lastConversion = Date.now(); userRef.update({ balance: 0, usdBalance: app.usdBalance, lastConversion: app.lastConversion }); document.getElementById('conversionText').textContent = `${coins.toLocaleString()} Coins → $${earned.toFixed(4)} USD`; document.getElementById('conversionModal').classList.add('active'); updateUI(); showToast(`💰 Converted ${coins} Coins to $${earned.toFixed(2)} USD!`); } else { app.lastConversion = Date.now(); userRef.update({ lastConversion: app.lastConversion }); } startConversion(); }
         function startConversion() { if (conversionTimer) clearInterval(conversionTimer); const upd = () => { const n = Date.now(), nx = (app.lastConversion || n) + 86400000, r = Math.max(0, nx - n); document.getElementById('conversionCountdown').textContent = `${String(Math.floor(r / 3600000)).padStart(2, '0')}:${String(Math.floor((r % 3600000) / 60000)).padStart(2, '0')}:${String(Math.floor((r % 60000) / 1000)).padStart(2, '0')}`; if (r <= 0) { clearInterval(conversionTimer); performConversion(); } }; upd(); conversionTimer = setInterval(upd, 1000); }
@@ -372,7 +439,17 @@
                 document.getElementById('referLinkHome').textContent = `https://t.me/CoinQuist_bot?start=ref_${app.referCode}`;
             });
 
-            db.ref('withdrawSettings').on('value', s => { if (s.exists()) { app.minWithdraw = s.val().minAmount || 10; app.withdrawMethods = s.val().methods || ['Nagad', 'Rocket']; } updateWithdrawUI(); });
+            db.ref('withdrawSettings').on('value', s => {
+                if (s.exists()) {
+                    app.minWithdraw = s.val().minAmount || 10;
+                    app.withdrawMethods = s.val().methods || ['Nagad', 'Rocket'];
+                    // Ensure selected method is valid
+                    if (!app.withdrawMethods.includes(app.selectedMethod)) {
+                        app.selectedMethod = app.withdrawMethods[0] || 'Nagad';
+                    }
+                }
+                updateWithdrawUI();
+            });
             loadTasks();
             loadAirdrop();
             
