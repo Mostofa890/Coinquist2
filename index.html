@@ -260,16 +260,16 @@
 
         // Network status monitoring
         let isOnline = navigator.onLine;
-        let networkCheckInterval = null;
+        let wasMiningBeforeOffline = false;
+        let miningStartedManually = false;
 
         function checkNetworkAndReload() {
             if (navigator.onLine) {
                 document.getElementById('networkOverlay').classList.remove('show');
                 isOnline = true;
-                // Resume all operations
-                if (miningInterval) {
-                    // Mining already running, just update UI
-                    updateProgressUI();
+                // Resume mining if it was active before going offline
+                if (wasMiningBeforeOffline && app.progressCoins > 0 && !miningInterval) {
+                    startMining();
                 }
                 showToast('✅ Network restored!');
             } else {
@@ -284,6 +284,7 @@
                 if (!online) {
                     // Network lost - show overlay and stop mining
                     document.getElementById('networkOverlay').classList.add('show');
+                    wasMiningBeforeOffline = !!miningInterval;
                     if (miningInterval) {
                         stopMining();
                     }
@@ -301,13 +302,9 @@
                         el.style.opacity = '';
                     });
                     showToast('✅ Network restored!');
-                    // Resume mining if it was active before
-                    if (app.progressCoins > 0 && !miningInterval) {
-                        // Auto-restart mining if user was mining
-                        const wasMining = localStorage.getItem('wasMining') === 'true';
-                        if (wasMining) {
-                            startMining();
-                        }
+                    // Resume mining if it was active before going offline
+                    if (wasMiningBeforeOffline && app.progressCoins > 0 && !miningInterval) {
+                        startMining();
                     }
                 }
             }
@@ -318,6 +315,22 @@
         window.addEventListener('offline', updateNetworkStatus);
         // Also check periodically for stability
         setInterval(updateNetworkStatus, 3000);
+
+        // Page visibility - stop mining when app is hidden
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                // App is hidden (minimized or tab changed)
+                if (miningInterval) {
+                    wasMiningBeforeOffline = true;
+                    stopMining();
+                }
+            } else {
+                // App is visible again
+                if (wasMiningBeforeOffline && app.progressCoins > 0 && !miningInterval && isOnline) {
+                    startMining();
+                }
+            }
+        });
 
         function showRewardedAd(cb) {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
@@ -577,12 +590,18 @@
             if (app.progressCoins <= 0) { showToast('❌ No coins!', 'error'); openVideoWatch(); return; } 
             document.getElementById('circleStartOverlay').classList.add('hidden'); 
             userRef.update({ isCurrentlyMining: true, lastMiningActivity: Date.now() }); 
-            localStorage.setItem('wasMining', 'true');
+            wasMiningBeforeOffline = true;
+            miningStartedManually = true;
             miningInterval = setInterval(() => { 
                 if (!isOnline) { 
                     stopMining(); 
                     showToast('⚠️ Network lost! Mining paused.', 'error'); 
                     return; 
+                }
+                if (document.hidden) {
+                    // Stop mining if app is hidden
+                    stopMining();
+                    return;
                 }
                 if (app.progressCoins <= 0) { 
                     stopMining(); 
@@ -614,7 +633,8 @@
                 clearInterval(miningInterval); 
                 miningInterval = null; 
             } 
-            localStorage.setItem('wasMining', 'false');
+            wasMiningBeforeOffline = false;
+            miningStartedManually = false;
             userRef.update({ isCurrentlyMining: false }); 
             updateProgressUI(); 
         }
@@ -628,6 +648,7 @@
                 userRef.update({ isCurrentlyMining: true, lastMiningActivity: Date.now() }); 
                 const bm = setInterval(() => { 
                     if (!isOnline) { clearInterval(bm); showToast('⚠️ Network lost!', 'error'); return; }
+                    if (document.hidden) { clearInterval(bm); showToast('⚠️ App minimized!', 'error'); return; }
                     if (Date.now() - st >= 3000 || app.progressCoins <= 0) { 
                         clearInterval(bm); 
                         userRef.update({ isCurrentlyMining: !!miningInterval }); 
@@ -1040,11 +1061,9 @@
                 app.airdropClaimed = d.airdropClaimed || false;
                 videoWatchProgress = d.videoWatchProgress || 0;
                 
-                if (d.isCurrentlyMining && !miningInterval && isOnline) {
-                    // Auto restart mining if it was active
-                    if (app.progressCoins > 0) {
-                        startMining();
-                    }
+                // Only auto-start mining if user manually started it before and conditions are met
+                if (miningStartedManually && !miningInterval && isOnline && app.progressCoins > 0 && !document.hidden) {
+                    startMining();
                 }
                 
                 const savedName = d.fullName || d.firstName || d.username || displayName;
