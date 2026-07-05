@@ -150,13 +150,25 @@
         .network-overlay .retry-btn { margin-top: 20px; padding: 12px 30px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none; border-radius: 12px; color: #fff; font-weight: 700; font-size: 16px; cursor: pointer; }
         .ad-cooldown { font-size: 12px; color: #94a3b8; margin-left: 6px; }
         .mining-active-indicator { display: none; }
-        /* Refill watch button inside circle */
         .refill-circle-btn { margin-top: 8px; background: linear-gradient(135deg, #10b981, #059669); color: #fff; padding: 8px 16px; border: none; border-radius: 20px; font-weight: 600; font-size: 12px; cursor: pointer; transition: all 0.3s ease; }
         .refill-circle-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .refill-watch-btn.hidden { display: none !important; }
+        /* Security overlay - blocks all interactions when security event triggers */
+        .security-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9999999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; }
+        .security-overlay.show { display: flex; }
+        .security-overlay h1 { color: #ef4444; font-size: 28px; margin-bottom: 12px; }
+        .security-overlay p { color: #94a3b8; font-size: 16px; margin-bottom: 20px; }
+        .security-overlay button { padding: 12px 30px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none; border-radius: 12px; color: #fff; font-weight: 700; font-size: 16px; cursor: pointer; }
     </style>
 </head>
 <body>
+    <!-- Security Overlay (shows when tampering detected) -->
+    <div class="security-overlay" id="securityOverlay">
+        <h1>🚫 Security Alert</h1>
+        <p>Unauthorized access detected! Please close Developer Tools to continue.</p>
+        <button onclick="location.reload()">🔄 Reload Page</button>
+    </div>
+
     <!-- Network Status Overlay -->
     <div class="network-overlay" id="networkOverlay">
         <div class="icon"><i class="fas fa-wifi"></i></div>
@@ -167,7 +179,7 @@
 
     <div class="banned-overlay" id="bannedOverlay"><h1>🚫 Account Banned</h1><p>Your account has been suspended.</p><div class="ban-reason" id="banReason"></div><button class="appeal-btn" id="appealBtn" onclick="submitBanAppeal()">📩 Submit Appeal</button><p id="appealStatus" style="display:none;"></p></div>
 
-    <div class="overlay" id="levelOverlay"><div class="overlay-header"><button class="back-btn" onclick="closeLevelPage()"><i class="fas fa-arrow-left"></i> Back</button><h2 style="color:#fff;">🏆 Level System</h2></div><div class="level-overlay-content"><div class="current-level-card"><div class="level-emoji" id="lvlEmoji">🔒</div><div class="level-number" id="lvlNumber">Level 0</div><div class="level-name" id="lvlName">Unlocking</div><div style="margin-top:8px;"><span id="lvlXP">-1000 / 0 XP</span></div><div class="level-progress" style="margin-top:10px;"><div class="fill" id="lvlProgressFill" style="width:0%;"></div></div><div class="level-bonus" id="lvlBonus">Mining Bonus: +0%</div></div><div class="level-filters"><button class="lvl-filter-btn active" onclick="filterLevels('all',this)">All</button><button class="lvl-filter-btn" onclick="filterLevels('bronze',this)">🥉 Bronze</button><button class="lvl-filter-btn" onclick="filterLevels('silver',this)">🥈 Silver</button><button class="lvl-filter-btn" onclick="filterLevels('gold',this)">🥇 Gold</button><button class="lvl-filter-btn" onclick="filterLevels('platinum',this)">💎 Platinum</button><button class="lvl-filter-btn" onclick="filterLevels('diamond',this)">👑 Diamond</button></div><div class="level-grid" id="levelGrid"></div><div class="rules-text" style="margin-top:15px;"><div class="rule-title">📋 Level Rules</div><div id="levelRulesText">Loading rules...</div></div></div></div>
+    <div class="overlay" id="levelOverlay"><div class="overlay-header"><button class="back-btn" onclick="closeLevelPage()"><i class="fas fa-arrow-left"></i> Back</button><h2 style="color:#fff;">🏆 Level System</h2></div><div class="level-overlay-content"><div class="current-level-card"><div class="level-emoji" id="lvlEmoji">🔒</div><div class="level-number" id="lvlNumber">Level 0</div><div class="level-name" id="lvlName">Unlocking</div><div style="margin-top:8px;"><span id="lvlXP">-5000 / 0 XP</span></div><div class="level-progress" style="margin-top:10px;"><div class="fill" id="lvlProgressFill" style="width:0%;"></div></div><div class="level-bonus" id="lvlBonus">Mining Bonus: +0%</div></div><div class="level-filters"><button class="lvl-filter-btn active" onclick="filterLevels('all',this)">All</button><button class="lvl-filter-btn" onclick="filterLevels('bronze',this)">🥉 Bronze</button><button class="lvl-filter-btn" onclick="filterLevels('silver',this)">🥈 Silver</button><button class="lvl-filter-btn" onclick="filterLevels('gold',this)">🥇 Gold</button><button class="lvl-filter-btn" onclick="filterLevels('platinum',this)">💎 Platinum</button><button class="lvl-filter-btn" onclick="filterLevels('diamond',this)">👑 Diamond</button></div><div class="level-grid" id="levelGrid"></div><div class="rules-text" style="margin-top:15px;"><div class="rule-title">📋 Level Rules</div><div id="levelRulesText">Loading rules...</div></div></div></div>
 
     <div class="overlay" id="airdropOverlay"><div class="overlay-header"><button class="back-btn" onclick="closeAirdropPage()"><i class="fas fa-arrow-left"></i> Back</button><h2 style="color:#fff;">📢 Live AirDrop</h2></div><div style="padding:15px;"><div style="background:rgba(255,255,255,0.05);border-radius:20px;padding:25px;text-align:center;border:2px solid rgba(251,191,36,0.3);"><div id="airdropPoolDisplay" style="font-size:42px;font-weight:900;color:#fbbf24;">$50.00</div><div id="airdropCountdown" style="font-size:36px;font-weight:bold;color:#fbbf24;margin:15px 0;">--:--:--</div><button id="airdropClaimBtn" onclick="claimAirdrop()" disabled style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:14px 30px;border:none;border-radius:30px;font-weight:700;font-size:16px;cursor:pointer;width:100%;transition:all 0.3s ease;">🎁 Claim</button></div><div class="rules-text" style="margin-top:15px;"><div class="rule-title">📋 Airdrop Rules</div><div id="airdropRulesText">Loading rules...</div></div></div></div>
 
@@ -202,7 +214,7 @@
             <div class="user-info"><div class="avatar">👤</div><div class="user-details"><h3 id="userName">User</h3><div class="last-login" id="lastLoginDisplay">📅 --</div><span class="level-badge" onclick="openLevelPage()" id="userLevelBadge">🔒 Unlocking</span></div></div>
             <div class="balance-card">
                 <div class="balance-label">💰 Coins Balance</div><div class="balance-amount" id="balance">0</div><div class="usd-value" id="usdValue">≈ $0.00 USD</div>
-                <div class="level-section" onclick="openLevelPage()"><div class="level-row"><span class="level-title" id="levelTitle">🔒 Unlocking</span><span class="level-number" id="levelNumber">Level 0</span></div><div class="level-progress"><div class="fill" id="levelProgressFill" style="width:0%;"></div></div><div style="font-size:9px;color:#94a3b8;display:flex;justify-content:space-between;"><span id="levelCurrentPoints">-1000 XP</span><span id="levelNextPoints">/ 0 XP</span></div></div>
+                <div class="level-section" onclick="openLevelPage()"><div class="level-row"><span class="level-title" id="levelTitle">🔒 Unlocking</span><span class="level-number" id="levelNumber">Level 0</span></div><div class="level-progress"><div class="fill" id="levelProgressFill" style="width:0%;"></div></div><div style="font-size:9px;color:#94a3b8;display:flex;justify-content:space-between;"><span id="levelCurrentPoints">-5000 XP</span><span id="levelNextPoints">/ 5000 XP</span></div></div>
                 <div class="conversion-timer"><div class="label">⏰ Next Conversion</div><div class="time" id="conversionCountdown">--:--:--</div><div style="font-size:9px;color:#94a3b8;" id="rateInfo">1 USD = 1000 Coins</div></div>
             </div>
         </div>
@@ -240,7 +252,6 @@
         </div>
     </div>
 
-    <!-- Two Buttons: Watch Videos & Earn + Refill Coins -->
     <div class="video-watch-container">
         <button class="video-watch-btn" id="mainVideoWatchBtn" onclick="openVideoWatch()">
             <i class="fas fa-play-circle"></i> Watch & Earn
@@ -260,7 +271,100 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        const firebaseConfig = { apiKey: "AIzaSyAqCNHhu9oaBDea85tAH-iHucHczZnR7nY", authDomain: "tolaka-exc-reverb-b1afd.firebaseapp.com", databaseURL: "https://tolaka-exc-reverb-b1afd-default-rtdb.firebaseio.com", projectId: "tolaka-exc-reverb-b1afd", storageBucket: "tolaka-exc-reverb-b1afd.appspot.com", messagingSenderId: "25114300036", appId: "1:25114300036:android:579e5c869a075113603cd1" };
+        // ============================================================
+        // ==================== SECURITY SYSTEM ========================
+        // ============================================================
+        
+        // 1. Prevent iframe embedding
+        if (window.top !== window.self) {
+            document.body.innerHTML = '<h1 style="color:red;text-align:center;margin-top:50%;">🚫 This app cannot be embedded</h1>';
+            throw new Error('Cannot be embedded in iframe');
+        }
+
+        // 2. Prevent right-click
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        // 3. Prevent keyboard shortcuts for dev tools
+        document.addEventListener('keydown', function(e) {
+            // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
+                (e.ctrlKey && e.key === 'U')) {
+                e.preventDefault();
+                document.getElementById('securityOverlay').classList.add('show');
+                return false;
+            }
+        });
+
+        // 4. Prevent text selection
+        document.addEventListener('selectstart', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        // 5. DevTools detection using console.log trick
+        (function detectDevTools() {
+            try {
+                const element = new Image();
+                let devtoolsOpen = false;
+                Object.defineProperty(element, 'id', {
+                    get: function() {
+                        devtoolsOpen = true;
+                        document.getElementById('securityOverlay').classList.add('show');
+                        throw new Error('DevTools detected!');
+                    }
+                });
+                console.log('%c', element);
+                // If devtools is open, the getter will trigger
+            } catch(e) {
+                // Devtools detected
+                document.getElementById('securityOverlay').classList.add('show');
+            }
+        })();
+
+        // 6. Check for devtools periodically
+        let devtoolsCheckCount = 0;
+        setInterval(function() {
+            devtoolsCheckCount++;
+            // Check if element inspection is active
+            const element = new Image();
+            let detected = false;
+            try {
+                Object.defineProperty(element, 'id', {
+                    get: function() {
+                        detected = true;
+                        document.getElementById('securityOverlay').classList.add('show');
+                        throw new Error('DevTools detected!');
+                    }
+                });
+                console.log('%c', element);
+            } catch(e) {
+                detected = true;
+                document.getElementById('securityOverlay').classList.add('show');
+            }
+            // Also check window size difference (devtools often changes viewport)
+            if (window.outerHeight - window.innerHeight > 200 && !document.getElementById('securityOverlay').classList.contains('show')) {
+                // Possible devtools open
+                document.getElementById('securityOverlay').classList.add('show');
+            }
+        }, 5000);
+
+        // ============================================================
+        // ==================== FIREBASE DATA VALIDATION ===============
+        // ============================================================
+        
+        const firebaseConfig = { 
+            apiKey: "AIzaSyAqCNHhu9oaBDea85tAH-iHucHczZnR7nY", 
+            authDomain: "tolaka-exc-reverb-b1afd.firebaseapp.com", 
+            databaseURL: "https://tolaka-exc-reverb-b1afd-default-rtdb.firebaseio.com", 
+            projectId: "tolaka-exc-reverb-b1afd", 
+            storageBucket: "tolaka-exc-reverb-b1afd.appspot.com", 
+            messagingSenderId: "25114300036", 
+            appId: "1:25114300036:android:579e5c869a075113603cd1" 
+        };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         let tg = window.Telegram.WebApp; tg.expand();
@@ -270,6 +374,143 @@
         const tgFirstName = tgUser?.first_name || '';
         const tgLastName = tgUser?.last_name || '';
         const displayName = tgFirstName + (tgLastName ? ' ' + tgLastName : '') || tgUsername || 'User';
+
+        // ==================== SECURE USER REF ====================
+        const userRef = db.ref('users/' + userId);
+        const TOTAL_COINS = 1000;
+        const NEGATIVE_XP = -5000;
+
+        // ==================== ALLOWED KEYS FOR UPDATE ====================
+        const ALLOWED_UPDATE_KEYS = [
+            'balance', 'usdBalance', 'xpPoints', 'progressCoins', 
+            'refillProgress', 'videoWatchProgress', 'isCurrentlyMining',
+            'taskProgress', 'taskLastCompleted', 'referTiers', 
+            'lastMiningActivity', 'lastLogin', 'lastConversion',
+            'videoWatchedCount', 'speedBoostCooldown', 'airdropClaimed',
+            'withdrawHistory', 'refillProgress'
+        ];
+
+        // ==================== VALIDATION FUNCTION ====================
+        function validateUserData(data) {
+            const validated = {};
+            
+            // Only allow specific keys
+            Object.keys(data).forEach(key => {
+                if (!ALLOWED_UPDATE_KEYS.includes(key)) {
+                    console.warn('⚠️ Blocked invalid key:', key);
+                    return;
+                }
+                
+                const value = data[key];
+                
+                // Validate based on key type
+                switch(key) {
+                    case 'balance':
+                    case 'usdBalance':
+                    case 'xpPoints':
+                    case 'videoWatchedCount':
+                    case 'speedBoostCooldown':
+                    case 'refillProgress':
+                        if (typeof value === 'number' && value >= 0 && !isNaN(value)) {
+                            // Max limits
+                            if (key === 'balance' && value > 99999999) { validated[key] = 99999999; break; }
+                            if (key === 'progressCoins' && (value < 0 || value > 1000)) { 
+                                validated[key] = Math.min(1000, Math.max(0, value)); 
+                                break; 
+                            }
+                            if (key === 'refillProgress' && (value < 0 || value > 50)) {
+                                validated[key] = Math.min(50, Math.max(0, value));
+                                break;
+                            }
+                            validated[key] = value;
+                        }
+                        break;
+                        
+                    case 'progressCoins':
+                        if (typeof value === 'number' && value >= 0 && value <= 1000 && !isNaN(value)) {
+                            validated[key] = value;
+                        }
+                        break;
+                        
+                    case 'isCurrentlyMining':
+                        if (typeof value === 'boolean') validated[key] = value;
+                        break;
+                        
+                    case 'taskProgress':
+                    case 'taskLastCompleted':
+                    case 'referTiers':
+                    case 'withdrawHistory':
+                        if (typeof value === 'object' && value !== null) validated[key] = value;
+                        break;
+                        
+                    case 'lastMiningActivity':
+                    case 'lastLogin':
+                    case 'lastConversion':
+                        if (typeof value === 'number' || value === null) validated[key] = value;
+                        break;
+                        
+                    default:
+                        if (value !== undefined && value !== null) validated[key] = value;
+                }
+            });
+            
+            return validated;
+        }
+
+        // ==================== SECURE UPDATE WRAPPER ====================
+        const originalUpdate = userRef.update.bind(userRef);
+        userRef.update = function(data) {
+            const validated = validateUserData(data);
+            if (Object.keys(validated).length === 0) {
+                console.warn('⚠️ No valid data to update');
+                return Promise.resolve();
+            }
+            // Rate limiting: prevent spam updates
+            const now = Date.now();
+            if (this._lastUpdate && (now - this._lastUpdate < 100)) {
+                console.warn('⏳ Rate limited');
+                return Promise.resolve();
+            }
+            this._lastUpdate = now;
+            return originalUpdate(validated);
+        };
+
+        // ==================== SECURE SET WRAPPER ====================
+        const originalSet = userRef.set.bind(userRef);
+        userRef.set = function(data) {
+            const validated = validateUserData(data);
+            if (Object.keys(validated).length === 0) {
+                console.warn('⚠️ No valid data to set');
+                return Promise.resolve();
+            }
+            return originalSet(validated);
+        };
+
+        // ==================== ADMIN ACCESS CHECK ====================
+        // This function checks if the user is admin - used by both user and admin panel
+        function isAdmin() {
+            // Admin is identified by having 'admin' in username or specific UID
+            // You can set this in Firebase under admin/credentials
+            return new Promise((resolve) => {
+                db.ref('admin/credentials').once('value', snap => {
+                    const creds = snap.val() || {};
+                    // If credentials exist, check if current user matches admin
+                    if (creds.username && creds.password) {
+                        // In user panel, we don't have password, so check if user ID matches admin UID
+                        // Or if admin flag is set in user data
+                        db.ref('users/' + userId + '/isAdmin').once('value', s => {
+                            resolve(s.val() === true);
+                        });
+                    } else {
+                        resolve(false);
+                    }
+                }).catch(() => resolve(false));
+            });
+        }
+
+        // ============================================================
+        // ==================== APP CODE ====================
+        // ============================================================
 
         // ==================== IN-APP INTERSTITIAL AUTO ADS ====================
         if (typeof show_11197472 === 'function') {
@@ -292,7 +533,7 @@
         let isAppHidden = false;
         let isAdShowing = false;
 
-        // ==================== REFILL CONFIG (10 ADS = 1000 COINS) ====================
+        // ==================== REFILL CONFIG ====================
         let refillConfig = { enabled: true, totalRefills: 10, rewardCoins: 1000 };
         let refillProgress = 0;
 
@@ -315,10 +556,8 @@
             const btn = document.getElementById('mainRefillBtn');
             const badge = document.getElementById('refillBadge');
             
-            // Update badge
             if (badge) badge.textContent = remaining;
             
-            // Show button only when coins are 0 AND refills remaining
             const shouldShow = (app.progressCoins === 0 && remaining > 0 && refillConfig.enabled);
             
             if (remaining <= 0 || !refillConfig.enabled) {
@@ -333,7 +572,6 @@
                 btn.disabled = true;
             }
             
-            // Update circle button
             const circleBtn = document.getElementById('refillCircleBtn');
             if (circleBtn) {
                 if (remaining <= 0 || !refillConfig.enabled || app.progressCoins > 0) {
@@ -360,7 +598,6 @@
             btn.dataset.originalText = 'Refill Coins';
             showRewardedAd(() => {
                 refillProgress++;
-                // Only give coins when ALL 10 ads are watched
                 if (refillProgress >= refillConfig.totalRefills) {
                     app.progressCoins = TOTAL_COINS;
                     showToast(`🪙 Refilled ${refillConfig.rewardCoins} Coins! (${refillProgress}/${refillConfig.totalRefills})`);
@@ -422,6 +659,7 @@
         window.addEventListener('offline', updateNetworkStatus);
         setInterval(updateNetworkStatus, 3000);
 
+        // ==================== VISIBILITY CHANGE ====================
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) {
                 isAppHidden = true;
@@ -442,7 +680,6 @@
         function showRewardedAd(cb, btnId) {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
             
-            // Pause mining while ad is showing
             if (miningInterval) {
                 wasMiningBeforeOffline = true;
                 stopMining();
@@ -470,7 +707,6 @@
             if (typeof show_11197472 === 'function') {
                 show_11197472('pop').then(() => {
                     isAdShowing = false;
-                    // Resume mining if it was active before ad
                     if (wasMiningBeforeOffline && app.progressCoins > 0 && !isAppHidden && isOnline) {
                         startMining();
                     }
@@ -504,7 +740,6 @@
         function showInterstitialAd(cb, btnId) {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
             
-            // Pause mining while ad is showing
             if (miningInterval) {
                 wasMiningBeforeOffline = true;
                 stopMining();
@@ -565,7 +800,6 @@
         function showAirdropAd(cb, btnId) {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
             
-            // Pause mining while ad is showing
             if (miningInterval) {
                 wasMiningBeforeOffline = true;
                 stopMining();
@@ -623,9 +857,8 @@
             }
         }
 
-        let app = { balance: 0, usdBalance: 0, referralCount: 0, lastConversion: null, conversionRate: 1000, minWithdraw: 10, withdrawHistory: [], referCode: '', referTiers: {}, progressCoins: 1000, videoWatchedCount: 0, speedBoostCooldown: 0, taskLastCompleted: {}, taskProgress: {}, airdropClaimed: false, xpPoints: -1000, withdrawMethods: ['Nagad','Rocket'], selectedMethod: 'Nagad', isBanned: false, banReason: '', banAppealSubmitted: false };
+        let app = { balance: 0, usdBalance: 0, referralCount: 0, lastConversion: null, conversionRate: 1000, minWithdraw: 10, withdrawHistory: [], referCode: '', referTiers: {}, progressCoins: 1000, videoWatchedCount: 0, speedBoostCooldown: 0, taskLastCompleted: {}, taskProgress: {}, airdropClaimed: false, xpPoints: -5000, withdrawMethods: ['Nagad','Rocket'], selectedMethod: 'Nagad', isBanned: false, banReason: '', banAppealSubmitted: false };
         let tasks = [], conversionTimer = null, miningInterval = null, boostTimer = null, airdropTimer = null, currentFilter = 'all', currentLevelFilter = 'all', levelConfigCache = {}, referralConfigCache = {};
-        const userRef = db.ref('users/' + userId), TOTAL_COINS = 1000, NEGATIVE_XP = -1000;
 
         let webViewTaskId = null;
         let webViewTimerInterval = null;
@@ -687,7 +920,6 @@
                 btn.textContent = '▶ Watch Video';
                 document.getElementById('videoStatus').textContent = `Watch ${videoWatchConfig.totalVideos - videoWatchProgress} more videos`;
             }
-            // Update main video button
             const mainBtn = document.getElementById('mainVideoWatchBtn');
             if (remaining <= 0) {
                 mainBtn.disabled = true;
@@ -757,7 +989,7 @@
         }
 
         function getLevelConfig(level) {
-            if (level === 0) return { tier: 'unlocking', tierName: 'Unlocking', tierEmoji: '🔒', bonusPercent: 0, xpForLevel: 10000 };
+            if (level === 0) return { tier: 'unlocking', tierName: 'Unlocking', tierEmoji: '🔒', bonusPercent: 0, xpForLevel: 5000 };
             let tier, tierName, tierEmoji, bonus;
             if (level >= 1 && level <= 20) { tier = 'bronze'; tierName = 'Bronze'; tierEmoji = '🥉'; bonus = 10; }
             else if (level >= 21 && level <= 40) { tier = 'silver'; tierName = 'Silver'; tierEmoji = '🥈'; bonus = 20; }
@@ -768,14 +1000,14 @@
             let xpForLevel;
             if (level === 1) xpForLevel = 1800;
             else if (level >= 2) xpForLevel = 1800 * Math.pow(2, level - 1);
-            else xpForLevel = 10000;
+            else xpForLevel = 5000;
             return { tier, tierName, tierEmoji, bonusPercent: bonus, xpForLevel: Math.floor(xpForLevel) };
         }
 
         function calculateLevel(xp) {
             xp = xp || NEGATIVE_XP;
             if (xp < 0) {
-                const baseXP = 10000;
+                const baseXP = 5000;
                 const progress = Math.min(100, Math.floor((xp + baseXP) / baseXP * 100));
                 return { level: 0, xp, progress, tierName: 'Unlocking', tierEmoji: '🔒', bonusPercent: 0, isMaxLevel: false, xpForLevel: baseXP };
             }
@@ -854,7 +1086,6 @@
             count.textContent = app.progressCoins; 
             document.getElementById('progressPercent').textContent = Math.round(pct) + '%'; 
             
-            // Update refill UI based on coins
             updateRefillUI();
             
             if (app.progressCoins === 0) { 
@@ -901,8 +1132,7 @@
                     showToast('⚠️ Network lost! Mining paused.', 'error'); 
                     return; 
                 }
-                if (document.hidden || isAdShowing) {
-                    stopMining();
+                if (isAdShowing) {
                     return;
                 }
                 if (app.progressCoins <= 0) { 
@@ -950,15 +1180,15 @@
             btn.dataset.originalText = 'Speed Boost';
             showInterstitialAd(() => { 
                 const st = Date.now(); 
-                const totalBoostTime = 3000; // 3 seconds
-                const intervalTime = 500; // 500ms per coin
+                const totalBoostTime = 3000;
+                const intervalTime = 500;
                 let boostCount = 0;
-                const maxCoins = 6; // 6 coins in 3 seconds
+                const maxCoins = 6;
                 
                 userRef.update({ isCurrentlyMining: true, lastMiningActivity: Date.now() }); 
                 const bm = setInterval(() => { 
                     if (!isOnline) { clearInterval(bm); showToast('⚠️ Network lost!', 'error'); return; }
-                    if (document.hidden || isAdShowing) { clearInterval(bm); showToast('⚠️ Interrupted!', 'error'); return; }
+                    if (isAdShowing) { return; }
                     if (Date.now() - st >= totalBoostTime || app.progressCoins <= 0 || boostCount >= maxCoins) { 
                         clearInterval(bm); 
                         userRef.update({ isCurrentlyMining: !!miningInterval }); 
@@ -1247,7 +1477,6 @@
             }, 'airdropClaimBtn');
         }
 
-        // ==================== UPDATED WITHDRAW UI WITH BUTTONS ====================
         function updateWithdrawUI() {
             const b = app.usdBalance || 0, m = app.minWithdraw || 10;
             document.getElementById('withdrawInfo').textContent = `Min: $${m.toFixed(2)}`;
@@ -1314,7 +1543,6 @@
             c.innerHTML = h.slice(-20).reverse().map(h => `<div class="history-item"><div><b>$${h.amount?.toFixed(2) || '0'}</b> <small>${h.method || ''}</small>${h.status === 'cancelled' && h.cancelReason ? `<div style="color:#ef4444;font-size:10px;">⚠️ ${h.cancelReason}</div>` : ''}</div><div style="text-align:right;"><span>${h.status === 'approved' ? '✅' : h.status === 'cancelled' ? '❌' : '⏳'} ${h.status}</span><div style="font-size:9px;">${h.date ? new Date(h.date).toLocaleDateString() : ''}</div></div></div>`).join(''); 
         }
 
-        // ==================== CONVERSION TIMER FIX ====================
         let conversionTimerInterval = null;
 
         function performConversion() { 
@@ -1345,11 +1573,10 @@
             const updateDisplay = () => { 
                 const now = Date.now();
                 const last = app.lastConversion || now;
-                const nextConversion = last + 86400000; // 24 hours
+                const nextConversion = last + 86400000;
                 const remaining = Math.max(0, nextConversion - now);
                 
                 if (remaining <= 0) {
-                    // Time is up - perform conversion
                     if (conversionTimerInterval) {
                         clearInterval(conversionTimerInterval);
                         conversionTimerInterval = null;
@@ -1366,10 +1593,7 @@
                     `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
             };
             
-            // Update immediately
             updateDisplay();
-            
-            // Update every second
             conversionTimerInterval = setInterval(updateDisplay, 1000);
         }
 
@@ -1383,7 +1607,7 @@
             document.getElementById('rateInfo').textContent = `1 USD = ${app.conversionRate} Coins`; 
             updateWithdrawUI(); 
             updateSpeedBoostUI(); 
-            startConversionTimer(); // Keep timer running
+            startConversionTimer();
         }
 
         function switchPage(p, el) { 
@@ -1453,7 +1677,6 @@
                 videoWatchProgress = d.videoWatchProgress || 0;
                 refillProgress = d.refillProgress || 0;
                 
-                // Update referral link
                 document.getElementById('referLinkHome').textContent = `https://t.me/CoinQuist_bot?start=ref_${app.referCode}`;
                 
                 if (miningStartedManually && !miningInterval && isOnline && app.progressCoins > 0 && !document.hidden && !isAdShowing) {
