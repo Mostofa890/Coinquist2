@@ -159,73 +159,9 @@
         .security-overlay h1 { color: #ef4444; font-size: 28px; margin-bottom: 12px; }
         .security-overlay p { color: #94a3b8; font-size: 16px; margin-bottom: 20px; }
         .security-overlay button { padding: 12px 30px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none; border-radius: 12px; color: #fff; font-weight: 700; font-size: 16px; cursor: pointer; }
-        
-        /* ===== LOADING PAGE STYLES ===== */
-        #loadingPage {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #0f172a;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 99999999;
-            transition: opacity 0.5s ease;
-        }
-        #loadingPage.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-        .loader-container {
-            text-align: center;
-        }
-        .loader-ring {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 8px solid transparent;
-            border-top-color: #fbbf24;
-            border-right-color: #f59e0b;
-            border-bottom-color: #3b82f6;
-            border-left-color: #8b5cf6;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .loader-text {
-            color: #fbbf24;
-            font-size: 18px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            animation: pulseText 1.5s ease-in-out infinite;
-        }
-        @keyframes pulseText {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-        .loader-sub {
-            color: #94a3b8;
-            font-size: 13px;
-            margin-top: 8px;
-        }
     </style>
 </head>
 <body>
-    <!-- ===== LOADING PAGE ===== -->
-    <div id="loadingPage">
-        <div class="loader-container">
-            <div class="loader-ring"></div>
-            <div class="loader-text">CoinQuest</div>
-            <div class="loader-sub">⏳ Loading your data...</div>
-        </div>
-    </div>
-
     <!-- Security Overlay (shows when tampering detected) -->
     <div class="security-overlay" id="securityOverlay">
         <h1>🚫 Security Alert</h1>
@@ -577,7 +513,7 @@
                 inAppSettings: {
                     frequency: 2,
                     capping: 0.1,
-                    interval: 90,
+                    interval: 30,
                     timeout: 5,
                     everyPage: false
                 }
@@ -1180,29 +1116,44 @@
             if (isAdShowing) { showToast('⏳ Please wait for ad to finish', 'error'); return; }
             if (miningInterval) return; 
             if (app.progressCoins <= 0) { showToast('❌ No coins!', 'error'); return; } 
+            
             document.getElementById('circleStartOverlay').classList.add('hidden'); 
             userRef.update({ isCurrentlyMining: true, lastMiningActivity: Date.now() }); 
             wasMiningBeforeOffline = true;
             miningStartedManually = true;
-            miningInterval = setInterval(() => { 
+            
+            // নতুন লজিক: setInterval-এর পরিবর্তে recursive setTimeout
+            function mineNextCoin() {
                 if (!isOnline) { 
                     stopMining(); 
                     showToast('⚠️ Network lost! Mining paused.', 'error'); 
                     return; 
                 }
                 if (isAdShowing) {
+                    // অ্যাড দেখার সময় মাইনিং থামবে না, শুধু অপেক্ষা করবে
+                    setTimeout(mineNextCoin, 1000);
                     return;
                 }
                 if (app.progressCoins <= 0) { 
                     stopMining(); 
                     showToast('🎉 Done!'); 
                     return; 
-                } 
-                const d = calculateLevel(app.xpPoints), ca = 1 + (d.bonusPercent / 100); 
-                app.progressCoins -= 1; 
-                app.balance += ca; 
-                app.xpPoints += 1; 
-                userRef.update({ balance: app.balance, progressCoins: app.progressCoins, xpPoints: app.xpPoints, lastMiningActivity: Date.now() }); 
+                }
+                
+                const d = calculateLevel(app.xpPoints);
+                const ca = 1 + (d.bonusPercent / 100);
+                
+                app.progressCoins -= 1;
+                app.balance += ca;
+                app.xpPoints += 1;
+                
+                userRef.update({ 
+                    balance: app.balance, 
+                    progressCoins: app.progressCoins, 
+                    xpPoints: app.xpPoints, 
+                    lastMiningActivity: Date.now() 
+                });
+                
                 const coin = document.createElement('div'); 
                 coin.className = 'floating-coin'; 
                 coin.textContent = `+${ca.toFixed(2)} 🪙`; 
@@ -1210,17 +1161,25 @@
                 coin.style.top = '35%'; 
                 document.body.appendChild(coin); 
                 setTimeout(() => coin.remove(), 1000); 
+                
                 updateProgressUI(); 
                 updateUI(); 
-                updateLevelUI(); 
-            }, 5000); 
+                updateLevelUI();
+                
+                // পরবর্তী কয়েনের জন্য ৫ সেকেন্ড অপেক্ষা করুন
+                miningInterval = setTimeout(mineNextCoin, 5000);
+            }
+            
+            // মাইনিং শুরু করুন
+            mineNextCoin();
+            
             updateProgressUI(); 
             showToast('⛏️ Mining!'); 
         }
 
         function stopMining() { 
             if (miningInterval) { 
-                clearInterval(miningInterval); 
+                clearTimeout(miningInterval); 
                 miningInterval = null; 
             } 
             wasMiningBeforeOffline = false;
@@ -1806,9 +1765,6 @@
                 updateVideoWatchUI();
                 updateRefillUI();
                 startConversionTimer();
-                
-                // ===== HIDE LOADING PAGE AFTER DATA LOADED =====
-                document.getElementById('loadingPage').classList.add('hidden');
             });
 
             db.ref('withdrawSettings').on('value', s => { 
