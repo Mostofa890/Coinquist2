@@ -1166,14 +1166,14 @@
         }
 
         // ==================== SPEED BOOST FIX ====================
-        // Only allow speed boost once per hour, and only when NOT mining
+        // Only allow speed boost once per hour
         function updateSpeedBoostUI() { 
             const bb = document.getElementById('speedBoostBtn'); 
             const cb = document.getElementById('boostCountdownBox'); 
             
             // Check if speed boost is available
             if (app.speedBoostCooldown > Date.now()) { 
-                // Cooldown active - show countdown
+                // Cooldown active - HIDE button, show countdown box
                 bb.style.display = 'none'; 
                 cb.classList.add('show'); 
                 if (boostTimer) clearInterval(boostTimer); 
@@ -1188,7 +1188,7 @@
                     } 
                 }, 1000); 
             } else { 
-                // Speed boost available - show button
+                // Speed boost available - SHOW button
                 bb.style.display = 'flex'; 
                 cb.classList.remove('show'); 
                 if (boostTimer) { 
