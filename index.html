@@ -1165,15 +1165,15 @@
             updateProgressUI(); 
         }
 
-        // ==================== SPEED BOOST FIX ====================
-        // Only allow speed boost once per hour
+        // ==================== SPEED BOOST UPDATED ====================
+        // Always available (mining ON or OFF), 1 hour cooldown, button hidden during cooldown
         function updateSpeedBoostUI() { 
             const bb = document.getElementById('speedBoostBtn'); 
             const cb = document.getElementById('boostCountdownBox'); 
             
             // Check if speed boost is available
             if (app.speedBoostCooldown > Date.now()) { 
-                // Cooldown active - HIDE button, show countdown box
+                // Cooldown active (1 hour) - HIDE button, show countdown box
                 bb.style.display = 'none'; 
                 cb.classList.add('show'); 
                 if (boostTimer) clearInterval(boostTimer); 
@@ -1195,16 +1195,10 @@
                     clearInterval(boostTimer); 
                     boostTimer = null; 
                 } 
-                // Disable button if currently mining
-                if (miningInterval) {
-                    bb.disabled = true;
-                    bb.style.opacity = '0.5';
-                    bb.title = 'Stop mining first to use speed boost';
-                } else {
-                    bb.disabled = false;
-                    bb.style.opacity = '1';
-                    bb.title = 'Activate Speed Boost (once per hour)';
-                }
+                // Always enabled - mining ON or OFF doesn't matter
+                bb.disabled = false;
+                bb.style.opacity = '1';
+                bb.title = 'Activate Speed Boost (once per hour)';
             } 
         }
         
@@ -1213,11 +1207,6 @@
             if (app.speedBoostCooldown > Date.now()) { 
                 showToast('⏳ Cooldown active!', 'error'); 
                 return; 
-            }
-            // Check if mining is active - prevent speed boost while mining
-            if (miningInterval) {
-                showToast('⛔ Stop mining first!', 'error');
-                return;
             }
             if (app.progressCoins <= 0) {
                 showToast('❌ No coins to boost!', 'error');
@@ -1234,13 +1223,10 @@
                 let boostCount = 0;
                 const maxCoins = 6;
                 
-                // Mark as mining for the duration
-                userRef.update({ isCurrentlyMining: true, lastMiningActivity: Date.now() }); 
-                
+                // Boost runs - mining can continue or not, doesn't matter
                 const bm = setInterval(() => { 
                     if (!isOnline) { 
                         clearInterval(bm); 
-                        userRef.update({ isCurrentlyMining: false });
                         showToast('⚠️ Network lost!', 'error'); 
                         return; 
                     }
@@ -1249,8 +1235,7 @@
                     }
                     if (Date.now() - st >= totalBoostTime || app.progressCoins <= 0 || boostCount >= maxCoins) { 
                         clearInterval(bm); 
-                        userRef.update({ isCurrentlyMining: false }); 
-                        // Set 1 hour cooldown
+                        // Set 1 hour cooldown (3600000 ms)
                         app.speedBoostCooldown = Date.now() + 3600000; 
                         userRef.update({ speedBoostCooldown: app.speedBoostCooldown }); 
                         updateSpeedBoostUI(); 
