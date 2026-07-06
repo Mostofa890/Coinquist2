@@ -487,17 +487,11 @@
         };
 
         // ==================== ADMIN ACCESS CHECK ====================
-        // This function checks if the user is admin - used by both user and admin panel
         function isAdmin() {
-            // Admin is identified by having 'admin' in username or specific UID
-            // You can set this in Firebase under admin/credentials
             return new Promise((resolve) => {
                 db.ref('admin/credentials').once('value', snap => {
                     const creds = snap.val() || {};
-                    // If credentials exist, check if current user matches admin
                     if (creds.username && creds.password) {
-                        // In user panel, we don't have password, so check if user ID matches admin UID
-                        // Or if admin flag is set in user data
                         db.ref('users/' + userId + '/isAdmin').once('value', s => {
                             resolve(s.val() === true);
                         });
@@ -1171,13 +1165,68 @@
             updateProgressUI(); 
         }
 
-        function updateSpeedBoostUI() { const bb = document.getElementById('speedBoostBtn'), cb = document.getElementById('boostCountdownBox'); if (app.speedBoostCooldown > Date.now()) { bb.style.display = 'none'; cb.classList.add('show'); if (boostTimer) clearInterval(boostTimer); boostTimer = setInterval(() => { const r = Math.max(0, Math.ceil((app.speedBoostCooldown - Date.now()) / 1000)); document.getElementById('boostCountdownTime').textContent = `${String(Math.floor(r / 60)).padStart(2, '0')}:${String(r % 60).padStart(2, '0')}`; if (r <= 0) { app.speedBoostCooldown = 0; userRef.update({ speedBoostCooldown: 0 }); updateSpeedBoostUI(); } }, 1000); } else { bb.style.display = 'flex'; cb.classList.remove('show'); if (boostTimer) { clearInterval(boostTimer); boostTimer = null; } } }
+        // ==================== SPEED BOOST FIX ====================
+        // Only allow speed boost once per hour, and only when NOT mining
+        function updateSpeedBoostUI() { 
+            const bb = document.getElementById('speedBoostBtn'); 
+            const cb = document.getElementById('boostCountdownBox'); 
+            
+            // Check if speed boost is available
+            if (app.speedBoostCooldown > Date.now()) { 
+                // Cooldown active - show countdown
+                bb.style.display = 'none'; 
+                cb.classList.add('show'); 
+                if (boostTimer) clearInterval(boostTimer); 
+                boostTimer = setInterval(() => { 
+                    const r = Math.max(0, Math.ceil((app.speedBoostCooldown - Date.now()) / 1000)); 
+                    document.getElementById('boostCountdownTime').textContent = `${String(Math.floor(r / 60)).padStart(2, '0')}:${String(r % 60).padStart(2, '0')}`; 
+                    if (r <= 0) { 
+                        app.speedBoostCooldown = 0; 
+                        userRef.update({ speedBoostCooldown: 0 }); 
+                        updateSpeedBoostUI(); 
+                        showToast('⚡ Speed Boost ready!');
+                    } 
+                }, 1000); 
+            } else { 
+                // Speed boost available - show button
+                bb.style.display = 'flex'; 
+                cb.classList.remove('show'); 
+                if (boostTimer) { 
+                    clearInterval(boostTimer); 
+                    boostTimer = null; 
+                } 
+                // Disable button if currently mining
+                if (miningInterval) {
+                    bb.disabled = true;
+                    bb.style.opacity = '0.5';
+                    bb.title = 'Stop mining first to use speed boost';
+                } else {
+                    bb.disabled = false;
+                    bb.style.opacity = '1';
+                    bb.title = 'Activate Speed Boost (once per hour)';
+                }
+            } 
+        }
         
         function activateSpeedBoost() { 
             if (!isOnline) { showToast('No internet!', 'error'); return; }
-            if (app.speedBoostCooldown > Date.now()) { showToast('⏳ Cooldown!', 'error'); return; } 
+            if (app.speedBoostCooldown > Date.now()) { 
+                showToast('⏳ Cooldown active!', 'error'); 
+                return; 
+            }
+            // Check if mining is active - prevent speed boost while mining
+            if (miningInterval) {
+                showToast('⛔ Stop mining first!', 'error');
+                return;
+            }
+            if (app.progressCoins <= 0) {
+                showToast('❌ No coins to boost!', 'error');
+                return;
+            }
+            
             const btn = document.getElementById('speedBoostBtn');
             btn.dataset.originalText = 'Speed Boost';
+            
             showInterstitialAd(() => { 
                 const st = Date.now(); 
                 const totalBoostTime = 3000;
@@ -1185,17 +1234,27 @@
                 let boostCount = 0;
                 const maxCoins = 6;
                 
+                // Mark as mining for the duration
                 userRef.update({ isCurrentlyMining: true, lastMiningActivity: Date.now() }); 
+                
                 const bm = setInterval(() => { 
-                    if (!isOnline) { clearInterval(bm); showToast('⚠️ Network lost!', 'error'); return; }
-                    if (isAdShowing) { return; }
+                    if (!isOnline) { 
+                        clearInterval(bm); 
+                        userRef.update({ isCurrentlyMining: false });
+                        showToast('⚠️ Network lost!', 'error'); 
+                        return; 
+                    }
+                    if (isAdShowing) { 
+                        return; 
+                    }
                     if (Date.now() - st >= totalBoostTime || app.progressCoins <= 0 || boostCount >= maxCoins) { 
                         clearInterval(bm); 
-                        userRef.update({ isCurrentlyMining: !!miningInterval }); 
+                        userRef.update({ isCurrentlyMining: false }); 
+                        // Set 1 hour cooldown
                         app.speedBoostCooldown = Date.now() + 3600000; 
                         userRef.update({ speedBoostCooldown: app.speedBoostCooldown }); 
                         updateSpeedBoostUI(); 
-                        showToast('🚀 Speed Boost Done!'); 
+                        showToast('🚀 Speed Boost Done! (1 hour cooldown)'); 
                         return; 
                     } 
                     app.progressCoins -= 1; 
