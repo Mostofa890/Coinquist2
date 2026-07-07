@@ -1829,7 +1829,15 @@
                 updateVideoWatchUI();
                 updateRefillUI();
                 startConversionTimer();
+
+                // ===== LOADING PAGE HIDE (ডাটা লোড হলে) =====
+                document.getElementById('loadingPage').classList.add('hidden');
             });
+
+            // ===== LOADING PAGE TIMEOUT (৫ সেকেন্ড) =====
+            setTimeout(() => {
+                document.getElementById('loadingPage').classList.add('hidden');
+            }, 5000);
 
             db.ref('withdrawSettings').on('value', s => { 
                 if (s.exists()) { 
