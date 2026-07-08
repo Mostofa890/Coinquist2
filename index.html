@@ -613,12 +613,16 @@
             const remaining = Math.max(0, refillConfig.totalRefills - refillProgress);
             const btn = document.getElementById('mainRefillBtn');
             const badge = document.getElementById('refillBadge');
+            const circleBtn = document.getElementById('refillCircleBtn');
             
             if (badge) badge.textContent = remaining;
             
-            // শর্ত: কয়েন জিরো হলেই বাটন শো হবে, অ্যাড দেখার পর হাইড হবে না
+            // 🔥 ফিক্স: কয়েন জিরো এবং রিফিল বাকি থাকলেই বাটন শো হবে
             const shouldShow = (app.progressCoins === 0 && remaining > 0 && refillConfig.enabled);
             
+            console.log('🔍 Refill Check:', { progressCoins: app.progressCoins, remaining, enabled: refillConfig.enabled, shouldShow });
+            
+            // মেইন বাটন
             if (remaining <= 0 || !refillConfig.enabled) {
                 btn.classList.add('hidden');
                 btn.disabled = true;
@@ -631,7 +635,7 @@
                 btn.disabled = true;
             }
             
-            const circleBtn = document.getElementById('refillCircleBtn');
+            // সার্কেল বাটন (মাইনিং সার্কেলের ভেতরে)
             if (circleBtn) {
                 if (remaining <= 0 || !refillConfig.enabled || app.progressCoins > 0) {
                     circleBtn.classList.add('hidden');
@@ -1013,10 +1017,13 @@
         function watchVideoAd() {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
             if (isVideoWatching) return;
+            
+            // চেক করুন: ভিডিও কাউন্ট ৫-এর কম কিনা
             if (videoWatchProgress >= videoWatchConfig.totalVideos) {
-                showToast('All videos watched!', 'error');
+                showToast('🎉 All videos watched! Please wait 24 hours.', 'error');
                 return;
             }
+            
             isVideoWatching = true;
             const btn = document.getElementById('videoWatchBtn');
             btn.dataset.originalText = '▶ Watch Video';
@@ -1025,30 +1032,38 @@
             
             showRewardedAd(() => {
                 isVideoWatching = false;
+                
+                // কাউন্ট বাড়ান এবং ব্যালেন্স যোগ করুন
                 videoWatchProgress++;
                 app.balance += videoWatchConfig.rewardPerVideo;
                 app.xpPoints += videoWatchConfig.rewardPerVideo * 2;
-                // ভিডিও দেখার শেষ সময় রেকর্ড করুন (২৪ ঘন্টা রিসেটের জন্য)
                 app.lastVideoWatchTime = Date.now();
+                
+                // ডাটাবেসে আপডেট করুন
                 userRef.update({ 
                     balance: app.balance, 
                     xpPoints: app.xpPoints,
                     videoWatchProgress: videoWatchProgress,
                     lastVideoWatchTime: app.lastVideoWatchTime
                 });
+                
                 updateUI();
                 updateLevelUI();
                 updateVideoWatchUI();
                 showToast(`🎉 +${videoWatchConfig.rewardPerVideo} Coins!`);
+                
+                // বাটন রিসেট করুন
                 btn.disabled = false;
                 btn.textContent = '▶ Watch Video';
+                
+                // যদি ৫টি ভিডিও শেষ হয়, তবে বাটন ডিজেবল করুন এবং ২৪ ঘন্টা পরে রিসেট করুন
                 if (videoWatchProgress >= videoWatchConfig.totalVideos) {
                     btn.disabled = true;
                     btn.textContent = '✅ All Watched!';
                     document.getElementById('videoStatus').innerHTML = '<span class="done">🎉 All videos watched!</span>';
-                    // ২৪ ঘন্টা পর রিসেট করার লজিক
+                    
+                    // ২৪ ঘন্টা পর রিসেট করার জন্য setTimeout
                     setTimeout(() => {
-                        // পরবর্তী ২৪ ঘন্টা পর চেক করবে
                         const resetTime = app.lastVideoWatchTime + 86400000;
                         if (Date.now() >= resetTime) {
                             videoWatchProgress = 0;
@@ -1057,6 +1072,7 @@
                             showToast('🔄 Video watch reset! You can watch again.');
                         }
                     }, 86400000); // ২৪ ঘন্টা
+                    
                     setTimeout(() => closeVideoWatch(), 1500);
                 }
             }, 'videoWatchBtn');
