@@ -616,6 +616,7 @@
             
             if (badge) badge.textContent = remaining;
             
+            // শর্ত: কয়েন জিরো হলেই বাটন শো হবে, অ্যাড দেখার পর হাইড হবে না
             const shouldShow = (app.progressCoins === 0 && remaining > 0 && refillConfig.enabled);
             
             if (remaining <= 0 || !refillConfig.enabled) {
@@ -660,6 +661,7 @@
                     app.progressCoins = TOTAL_COINS;
                     showToast(`🪙 Refilled ${refillConfig.rewardCoins} Coins! (${refillProgress}/${refillConfig.totalRefills})`);
                 } else {
+                    app.progressCoins = TOTAL_COINS;
                     showToast(`📺 Ad ${refillProgress}/${refillConfig.totalRefills} watched. ${refillConfig.totalRefills - refillProgress} more to go!`);
                 }
                 userRef.update({ 
@@ -668,7 +670,7 @@
                 });
                 updateUI();
                 updateProgressUI();
-                updateRefillUI();
+                updateRefillUI(); // রিফিল করার পর বাটন হাইড হবে না, আবার কয়েন জিরো হলে শো হবে
             }, 'mainRefillBtn');
         }
 
@@ -1026,10 +1028,13 @@
                 videoWatchProgress++;
                 app.balance += videoWatchConfig.rewardPerVideo;
                 app.xpPoints += videoWatchConfig.rewardPerVideo * 2;
+                // ভিডিও দেখার শেষ সময় রেকর্ড করুন (২৪ ঘন্টা রিসেটের জন্য)
+                app.lastVideoWatchTime = Date.now();
                 userRef.update({ 
                     balance: app.balance, 
                     xpPoints: app.xpPoints,
-                    videoWatchProgress: videoWatchProgress 
+                    videoWatchProgress: videoWatchProgress,
+                    lastVideoWatchTime: app.lastVideoWatchTime
                 });
                 updateUI();
                 updateLevelUI();
@@ -1041,6 +1046,17 @@
                     btn.disabled = true;
                     btn.textContent = '✅ All Watched!';
                     document.getElementById('videoStatus').innerHTML = '<span class="done">🎉 All videos watched!</span>';
+                    // ২৪ ঘন্টা পর রিসেট করার লজিক
+                    setTimeout(() => {
+                        // পরবর্তী ২৪ ঘন্টা পর চেক করবে
+                        const resetTime = app.lastVideoWatchTime + 86400000;
+                        if (Date.now() >= resetTime) {
+                            videoWatchProgress = 0;
+                            userRef.update({ videoWatchProgress: 0 });
+                            updateVideoWatchUI();
+                            showToast('🔄 Video watch reset! You can watch again.');
+                        }
+                    }, 86400000); // ২৪ ঘন্টা
                     setTimeout(() => closeVideoWatch(), 1500);
                 }
             }, 'videoWatchBtn');
