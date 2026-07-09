@@ -153,14 +153,12 @@
         .refill-circle-btn { margin-top: 8px; background: linear-gradient(135deg, #10b981, #059669); color: #fff; padding: 8px 16px; border: none; border-radius: 20px; font-weight: 600; font-size: 12px; cursor: pointer; transition: all 0.3s ease; }
         .refill-circle-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .refill-watch-btn.hidden { display: none !important; }
-        /* Security overlay - blocks all interactions when security event triggers */
         .security-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9999999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; }
         .security-overlay.show { display: flex; }
         .security-overlay h1 { color: #ef4444; font-size: 28px; margin-bottom: 12px; }
         .security-overlay p { color: #94a3b8; font-size: 16px; margin-bottom: 20px; }
         .security-overlay button { padding: 12px 30px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none; border-radius: 12px; color: #fff; font-weight: 700; font-size: 16px; cursor: pointer; }
         
-        /* ===== LOADING PAGE STYLES ===== */
         #loadingPage {
             position: fixed;
             top: 0;
@@ -217,7 +215,6 @@
     </style>
 </head>
 <body>
-    <!-- ===== LOADING PAGE ===== -->
     <div id="loadingPage">
         <div class="loader-container">
             <div class="loader-ring"></div>
@@ -226,14 +223,12 @@
         </div>
     </div>
 
-    <!-- Security Overlay (shows when tampering detected) -->
     <div class="security-overlay" id="securityOverlay">
         <h1>🚫 Security Alert</h1>
         <p>Unauthorized access detected! Please close Developer Tools to continue.</p>
         <button onclick="location.reload()">🔄 Reload Page</button>
     </div>
 
-    <!-- Network Status Overlay -->
     <div class="network-overlay" id="networkOverlay">
         <div class="icon"><i class="fas fa-wifi"></i></div>
         <h2>🔌 No Internet Connection</h2>
@@ -339,21 +334,17 @@
         // ==================== SECURITY SYSTEM ========================
         // ============================================================
         
-        // 1. Prevent iframe embedding
         if (window.top !== window.self) {
             document.body.innerHTML = '<h1 style="color:red;text-align:center;margin-top:50%;">🚫 This app cannot be embedded</h1>';
             throw new Error('Cannot be embedded in iframe');
         }
 
-        // 2. Prevent right-click
         document.addEventListener('contextmenu', function(e) {
             e.preventDefault();
             return false;
         });
 
-        // 3. Prevent keyboard shortcuts for dev tools
         document.addEventListener('keydown', function(e) {
-            // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
             if (e.key === 'F12' || 
                 (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
                 (e.ctrlKey && e.key === 'U')) {
@@ -363,13 +354,11 @@
             }
         });
 
-        // 4. Prevent text selection
         document.addEventListener('selectstart', function(e) {
             e.preventDefault();
             return false;
         });
 
-        // 5. DevTools detection using console.log trick
         (function detectDevTools() {
             try {
                 const element = new Image();
@@ -382,18 +371,14 @@
                     }
                 });
                 console.log('%c', element);
-                // If devtools is open, the getter will trigger
             } catch(e) {
-                // Devtools detected
                 document.getElementById('securityOverlay').classList.add('show');
             }
         })();
 
-        // 6. Check for devtools periodically
         let devtoolsCheckCount = 0;
         setInterval(function() {
             devtoolsCheckCount++;
-            // Check if element inspection is active
             const element = new Image();
             let detected = false;
             try {
@@ -409,9 +394,7 @@
                 detected = true;
                 document.getElementById('securityOverlay').classList.add('show');
             }
-            // Also check window size difference (devtools often changes viewport)
             if (window.outerHeight - window.innerHeight > 200 && !document.getElementById('securityOverlay').classList.contains('show')) {
-                // Possible devtools open
                 document.getElementById('securityOverlay').classList.add('show');
             }
         }, 5000);
@@ -439,35 +422,27 @@
         const tgLastName = tgUser?.last_name || '';
         const displayName = tgFirstName + (tgLastName ? ' ' + tgLastName : '') || tgUsername || 'User';
 
-        // ==================== SECURE USER REF ====================
         const userRef = db.ref('users/' + userId);
         const TOTAL_COINS = 1000;
         const NEGATIVE_XP = -5000;
 
-        // ==================== ALLOWED KEYS FOR UPDATE ====================
         const ALLOWED_UPDATE_KEYS = [
             'balance', 'usdBalance', 'xpPoints', 'progressCoins', 
             'refillProgress', 'videoWatchProgress', 'isCurrentlyMining',
             'taskProgress', 'taskLastCompleted', 'referTiers', 
             'lastMiningActivity', 'lastLogin', 'lastConversion',
             'videoWatchedCount', 'speedBoostCooldown', 'airdropClaimed',
-            'withdrawHistory', 'refillProgress'
+            'withdrawHistory', 'refillProgress', 'lastVideoWatchTime'
         ];
 
-        // ==================== VALIDATION FUNCTION ====================
         function validateUserData(data) {
             const validated = {};
-            
-            // Only allow specific keys
             Object.keys(data).forEach(key => {
                 if (!ALLOWED_UPDATE_KEYS.includes(key)) {
                     console.warn('⚠️ Blocked invalid key:', key);
                     return;
                 }
-                
                 const value = data[key];
-                
-                // Validate based on key type
                 switch(key) {
                     case 'balance':
                     case 'usdBalance':
@@ -476,7 +451,6 @@
                     case 'speedBoostCooldown':
                     case 'refillProgress':
                         if (typeof value === 'number' && value >= 0 && !isNaN(value)) {
-                            // Max limits
                             if (key === 'balance' && value > 99999999) { validated[key] = 99999999; break; }
                             if (key === 'progressCoins' && (value < 0 || value > 1000)) { 
                                 validated[key] = Math.min(1000, Math.max(0, value)); 
@@ -489,39 +463,33 @@
                             validated[key] = value;
                         }
                         break;
-                        
                     case 'progressCoins':
                         if (typeof value === 'number' && value >= 0 && value <= 1000 && !isNaN(value)) {
                             validated[key] = value;
                         }
                         break;
-                        
                     case 'isCurrentlyMining':
                         if (typeof value === 'boolean') validated[key] = value;
                         break;
-                        
                     case 'taskProgress':
                     case 'taskLastCompleted':
                     case 'referTiers':
                     case 'withdrawHistory':
                         if (typeof value === 'object' && value !== null) validated[key] = value;
                         break;
-                        
                     case 'lastMiningActivity':
                     case 'lastLogin':
                     case 'lastConversion':
+                    case 'lastVideoWatchTime':
                         if (typeof value === 'number' || value === null) validated[key] = value;
                         break;
-                        
                     default:
                         if (value !== undefined && value !== null) validated[key] = value;
                 }
             });
-            
             return validated;
         }
 
-        // ==================== SECURE UPDATE WRAPPER ====================
         const originalUpdate = userRef.update.bind(userRef);
         userRef.update = function(data) {
             const validated = validateUserData(data);
@@ -529,7 +497,6 @@
                 console.warn('⚠️ No valid data to update');
                 return Promise.resolve();
             }
-            // Rate limiting: prevent spam updates
             const now = Date.now();
             if (this._lastUpdate && (now - this._lastUpdate < 100)) {
                 console.warn('⏳ Rate limited');
@@ -539,7 +506,6 @@
             return originalUpdate(validated);
         };
 
-        // ==================== SECURE SET WRAPPER ====================
         const originalSet = userRef.set.bind(userRef);
         userRef.set = function(data) {
             const validated = validateUserData(data);
@@ -550,7 +516,6 @@
             return originalSet(validated);
         };
 
-        // ==================== ADMIN ACCESS CHECK ====================
         function isAdmin() {
             return new Promise((resolve) => {
                 db.ref('admin/credentials').once('value', snap => {
@@ -570,7 +535,6 @@
         // ==================== APP CODE ====================
         // ============================================================
 
-        // ==================== IN-APP INTERSTITIAL AUTO ADS ====================
         if (typeof show_11197472 === 'function') {
             show_11197472({
                 type: 'inApp',
@@ -584,14 +548,12 @@
             });
         }
 
-        // Network status monitoring
         let isOnline = navigator.onLine;
         let wasMiningBeforeOffline = false;
         let miningStartedManually = false;
         let isAppHidden = false;
         let isAdShowing = false;
 
-        // ==================== REFILL CONFIG ====================
         let refillConfig = { enabled: true, totalRefills: 10, rewardCoins: 1000 };
         let refillProgress = 0;
 
@@ -617,29 +579,20 @@
             
             if (badge) badge.textContent = remaining;
             
-            // 🔥 ফিক্স: কয়েন জিরো এবং রিফিল বাকি থাকলেই বাটন শো হবে
-            const shouldShow = (app.progressCoins === 0 && remaining > 0 && refillConfig.enabled);
+            // ✅ শুধুমাত্র কয়েন জিরো এবং রিফিল বাকি থাকলে দেখাবে (মাইনিং বন্ধ অবস্থায়)
+            const shouldShow = (app.progressCoins === 0 && remaining > 0 && refillConfig.enabled && !miningInterval);
             
-            console.log('🔍 Refill Check:', { progressCoins: app.progressCoins, remaining, enabled: refillConfig.enabled, shouldShow });
+            if (badge) badge.textContent = remaining;
             
-            // মেইন বাটন
-            if (remaining <= 0 || !refillConfig.enabled) {
+            if (remaining <= 0 || !refillConfig.enabled || app.progressCoins > 0) {
                 btn.classList.add('hidden');
                 btn.disabled = true;
-            } else if (shouldShow) {
+                if (circleBtn) circleBtn.classList.add('hidden');
+            } else {
                 btn.classList.remove('hidden');
                 btn.disabled = false;
                 btn.innerHTML = `<i class="fas fa-sync-alt"></i> Refill Coins <span class="badge">${remaining}</span>`;
-            } else {
-                btn.classList.add('hidden');
-                btn.disabled = true;
-            }
-            
-            // সার্কেল বাটন (মাইনিং সার্কেলের ভেতরে)
-            if (circleBtn) {
-                if (remaining <= 0 || !refillConfig.enabled || app.progressCoins > 0) {
-                    circleBtn.classList.add('hidden');
-                } else {
+                if (circleBtn) {
                     circleBtn.classList.remove('hidden');
                     circleBtn.textContent = `📺 Refill (${remaining} left)`;
                 }
@@ -661,20 +614,19 @@
             btn.dataset.originalText = 'Refill Coins';
             showRewardedAd(() => {
                 refillProgress++;
-                if (refillProgress >= refillConfig.totalRefills) {
-                    app.progressCoins = TOTAL_COINS;
-                    showToast(`🪙 Refilled ${refillConfig.rewardCoins} Coins! (${refillProgress}/${refillConfig.totalRefills})`);
-                } else {
-                    app.progressCoins = TOTAL_COINS;
-                    showToast(`📺 Ad ${refillProgress}/${refillConfig.totalRefills} watched. ${refillConfig.totalRefills - refillProgress} more to go!`);
-                }
+                app.progressCoins = TOTAL_COINS;
                 userRef.update({ 
                     progressCoins: app.progressCoins,
                     refillProgress: refillProgress 
                 });
                 updateUI();
                 updateProgressUI();
-                updateRefillUI(); // রিফিল করার পর বাটন হাইড হবে না, আবার কয়েন জিরো হলে শো হবে
+                updateRefillUI();
+                // ✅ রিফিল করার পর অটোমেটিক মাইনিং স্টার্ট
+                if (isOnline && !miningInterval && app.progressCoins > 0 && !isAppHidden && !isAdShowing) {
+                    startMining();
+                }
+                showToast(`🪙 Refilled ${refillConfig.rewardCoins} Coins! (${refillProgress}/${refillConfig.totalRefills})`);
             }, 'mainRefillBtn');
         }
 
@@ -723,7 +675,6 @@
         window.addEventListener('offline', updateNetworkStatus);
         setInterval(updateNetworkStatus, 3000);
 
-        // ==================== VISIBILITY CHANGE ====================
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) {
                 isAppHidden = true;
@@ -921,7 +872,7 @@
             }
         }
 
-        let app = { balance: 0, usdBalance: 0, referralCount: 0, lastConversion: null, conversionRate: 1000, minWithdraw: 10, withdrawHistory: [], referCode: '', referTiers: {}, progressCoins: 1000, videoWatchedCount: 0, speedBoostCooldown: 0, taskLastCompleted: {}, taskProgress: {}, airdropClaimed: false, xpPoints: -5000, withdrawMethods: ['Nagad','Rocket'], selectedMethod: 'Nagad', isBanned: false, banReason: '', banAppealSubmitted: false };
+        let app = { balance: 0, usdBalance: 0, referralCount: 0, lastConversion: null, conversionRate: 1000, minWithdraw: 10, withdrawHistory: [], referCode: '', referTiers: {}, progressCoins: 1000, videoWatchedCount: 0, speedBoostCooldown: 0, taskLastCompleted: {}, taskProgress: {}, airdropClaimed: false, xpPoints: -5000, withdrawMethods: ['Nagad','Rocket'], selectedMethod: 'Nagad', isBanned: false, banReason: '', banAppealSubmitted: false, lastVideoWatchTime: 0 };
         let tasks = [], conversionTimer = null, miningInterval = null, boostTimer = null, airdropTimer = null, currentFilter = 'all', currentLevelFilter = 'all', levelConfigCache = {}, referralConfigCache = {};
 
         let webViewTaskId = null;
@@ -994,6 +945,16 @@
             }
         }
 
+        // ✅ প্রতি মিনিটে চেক করবে ২৪ ঘন্টা পার হলে রিসেট করবে
+        setInterval(() => {
+            if (app.lastVideoWatchTime && Date.now() - app.lastVideoWatchTime >= 86400000) {
+                videoWatchProgress = 0;
+                userRef.update({ videoWatchProgress: 0, lastVideoWatchTime: 0 });
+                updateVideoWatchUI();
+                showToast('🔄 Video watch reset! You can watch again.');
+            }
+        }, 60000);
+
         function openVideoWatch() {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
             if (!videoWatchConfig.enabled) { showToast('Video watch is disabled!', 'error'); return; }
@@ -1017,8 +978,6 @@
         function watchVideoAd() {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
             if (isVideoWatching) return;
-            
-            // চেক করুন: ভিডিও কাউন্ট ৫-এর কম কিনা
             if (videoWatchProgress >= videoWatchConfig.totalVideos) {
                 showToast('🎉 All videos watched! Please wait 24 hours.', 'error');
                 return;
@@ -1032,14 +991,11 @@
             
             showRewardedAd(() => {
                 isVideoWatching = false;
-                
-                // কাউন্ট বাড়ান এবং ব্যালেন্স যোগ করুন
                 videoWatchProgress++;
                 app.balance += videoWatchConfig.rewardPerVideo;
                 app.xpPoints += videoWatchConfig.rewardPerVideo * 2;
                 app.lastVideoWatchTime = Date.now();
                 
-                // ডাটাবেসে আপডেট করুন
                 userRef.update({ 
                     balance: app.balance, 
                     xpPoints: app.xpPoints,
@@ -1052,27 +1008,13 @@
                 updateVideoWatchUI();
                 showToast(`🎉 +${videoWatchConfig.rewardPerVideo} Coins!`);
                 
-                // বাটন রিসেট করুন
                 btn.disabled = false;
                 btn.textContent = '▶ Watch Video';
                 
-                // যদি ৫টি ভিডিও শেষ হয়, তবে বাটন ডিজেবল করুন এবং ২৪ ঘন্টা পরে রিসেট করুন
                 if (videoWatchProgress >= videoWatchConfig.totalVideos) {
                     btn.disabled = true;
                     btn.textContent = '✅ All Watched!';
                     document.getElementById('videoStatus').innerHTML = '<span class="done">🎉 All videos watched!</span>';
-                    
-                    // ২৪ ঘন্টা পর রিসেট করার জন্য setTimeout
-                    setTimeout(() => {
-                        const resetTime = app.lastVideoWatchTime + 86400000;
-                        if (Date.now() >= resetTime) {
-                            videoWatchProgress = 0;
-                            userRef.update({ videoWatchProgress: 0 });
-                            updateVideoWatchUI();
-                            showToast('🔄 Video watch reset! You can watch again.');
-                        }
-                    }, 86400000); // ২৪ ঘন্টা
-                    
                     setTimeout(() => closeVideoWatch(), 1500);
                 }
             }, 'videoWatchBtn');
@@ -1182,7 +1124,7 @@
                 status.textContent = '🎯 Empty!'; 
                 watchBtn.classList.add('hidden');
                 const remaining = Math.max(0, refillConfig.totalRefills - refillProgress);
-                if (remaining > 0 && refillConfig.enabled) {
+                if (remaining > 0 && refillConfig.enabled && !miningInterval) {
                     refillCircleBtn.classList.remove('hidden');
                     refillCircleBtn.textContent = `📺 Refill (${remaining} left)`;
                 } else {
@@ -1218,7 +1160,6 @@
             wasMiningBeforeOffline = true;
             miningStartedManually = true;
             
-            // নতুন লজিক: setInterval-এর পরিবর্তে recursive setTimeout
             function mineNextCoin() {
                 if (!isOnline) { 
                     stopMining(); 
@@ -1226,7 +1167,6 @@
                     return; 
                 }
                 if (isAdShowing) {
-                    // অ্যাড দেখার সময় মাইনিং থামবে না, শুধু অপেক্ষা করবে
                     setTimeout(mineNextCoin, 1000);
                     return;
                 }
@@ -1262,13 +1202,10 @@
                 updateUI(); 
                 updateLevelUI();
                 
-                // পরবর্তী কয়েনের জন্য ৫ সেকেন্ড অপেক্ষা করুন
                 miningInterval = setTimeout(mineNextCoin, 5000);
             }
             
-            // মাইনিং শুরু করুন
             mineNextCoin();
-            
             updateProgressUI(); 
             showToast('⛏️ Mining!'); 
         }
@@ -1284,15 +1221,11 @@
             updateProgressUI(); 
         }
 
-        // ==================== SPEED BOOST UPDATED ====================
-        // Always available (mining ON or OFF), 1 hour cooldown, button hidden during cooldown
         function updateSpeedBoostUI() { 
             const bb = document.getElementById('speedBoostBtn'); 
             const cb = document.getElementById('boostCountdownBox'); 
             
-            // Check if speed boost is available
             if (app.speedBoostCooldown > Date.now()) { 
-                // Cooldown active (1 hour) - HIDE button, show countdown box
                 bb.style.display = 'none'; 
                 cb.classList.add('show'); 
                 if (boostTimer) clearInterval(boostTimer); 
@@ -1307,14 +1240,12 @@
                     } 
                 }, 1000); 
             } else { 
-                // Speed boost available - SHOW button
                 bb.style.display = 'flex'; 
                 cb.classList.remove('show'); 
                 if (boostTimer) { 
                     clearInterval(boostTimer); 
                     boostTimer = null; 
                 } 
-                // Always enabled - mining ON or OFF doesn't matter
                 bb.disabled = false;
                 bb.style.opacity = '1';
                 bb.title = 'Activate Speed Boost (once per hour)';
@@ -1342,7 +1273,6 @@
                 let boostCount = 0;
                 const maxCoins = 6;
                 
-                // Boost runs - mining can continue or not, doesn't matter
                 const bm = setInterval(() => { 
                     if (!isOnline) { 
                         clearInterval(bm); 
@@ -1354,7 +1284,6 @@
                     }
                     if (Date.now() - st >= totalBoostTime || app.progressCoins <= 0 || boostCount >= maxCoins) { 
                         clearInterval(bm); 
-                        // Set 1 hour cooldown (3600000 ms)
                         app.speedBoostCooldown = Date.now() + 3600000; 
                         userRef.update({ speedBoostCooldown: app.speedBoostCooldown }); 
                         updateSpeedBoostUI(); 
@@ -1837,6 +1766,7 @@
                 app.xpPoints = d.xpPoints !== undefined ? d.xpPoints : NEGATIVE_XP;
                 app.withdrawHistory = d.withdrawHistory || [];
                 app.airdropClaimed = d.airdropClaimed || false;
+                app.lastVideoWatchTime = d.lastVideoWatchTime || 0;
                 videoWatchProgress = d.videoWatchProgress || 0;
                 refillProgress = d.refillProgress || 0;
                 
@@ -1862,11 +1792,9 @@
                 updateRefillUI();
                 startConversionTimer();
 
-                // ===== LOADING PAGE HIDE (ডাটা লোড হলে) =====
                 document.getElementById('loadingPage').classList.add('hidden');
             });
 
-            // ===== LOADING PAGE TIMEOUT (৫ সেকেন্ড) =====
             setTimeout(() => {
                 document.getElementById('loadingPage').classList.add('hidden');
             }, 5000);
