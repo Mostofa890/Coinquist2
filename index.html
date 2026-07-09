@@ -10,7 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* আপনার দেওয়া CSS (কোনো পরিবর্তন নেই) */
+        /* আপনার দেওয়া CSS (শুধু রিমুভ করা বাটনগুলোর CSS সরানো হয়েছে) */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', -apple-system, sans-serif; }
         body { background: #0f172a; color: #e2e8f0; padding-bottom: 80px; min-height: 100vh; background: radial-gradient(circle at 20% 30%, #1e293b, #0f172a); }
         .container { max-width: 500px; margin: 0 auto; padding: 12px; }
@@ -31,12 +31,6 @@
         .conversion-timer { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.15); border-radius: 12px; padding: 10px; margin-top: 10px; }
         .conversion-timer .label { font-size: 10px; color: #94a3b8; }
         .conversion-timer .time { font-size: 16px; font-weight: bold; color: #10b981; }
-        .video-watch-container { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); z-index: 999; width: 100%; max-width: 500px; padding: 0 16px; display: flex; gap: 10px; }
-        .video-watch-btn, .refill-watch-btn { width: 50%; padding: 12px 16px; border: none; border-radius: 14px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .video-watch-btn { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; box-shadow: 0 4px 25px rgba(59,130,246,0.4); }
-        .refill-watch-btn { background: linear-gradient(135deg, #10b981, #059669); color: #fff; box-shadow: 0 4px 25px rgba(16,185,129,0.4); }
-        .video-watch-btn:disabled, .refill-watch-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .video-watch-btn .badge, .refill-watch-btn .badge { background: rgba(255,255,255,0.2); padding: 2px 10px; border-radius: 20px; font-size: 11px; }
         .mining-circle-wrapper { display: flex; justify-content: center; align-items: center; margin: 15px 0; position: relative; }
         .mining-circle { position: relative; width: 250px; height: 250px; border-radius: 50%; background: conic-gradient(#fbbf24 100%, #1e293b 100%); display: flex; justify-content: center; align-items: center; box-shadow: 0 0 50px rgba(251,191,36,0.2); transition: background 0.5s ease; cursor: pointer; }
         .mining-circle.mining-active { box-shadow: 0 0 60px rgba(251,191,36,0.4); animation: miningPulse 2s infinite; }
@@ -50,8 +44,6 @@
         .mining-circle .coin-icon { font-size: 32px; margin-bottom: 5px; animation: coinSpin 3s linear infinite; }
         @keyframes coinSpin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
         .mining-circle .coin-count { font-size: 30px; font-weight: 900; color: #fbbf24; }
-        .circle-watch-btn { margin-top: 12px; background: linear-gradient(135deg, #10b981, #059669); color: #fff; padding: 10px 20px; border: none; border-radius: 25px; font-weight: 700; font-size: 13px; cursor: pointer; width: 100%; max-width: 280px; transition: all 0.3s ease; }
-        .circle-watch-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .speed-btn-container { margin-top: 12px; width: 100%; display: flex; justify-content: center; flex-direction: column; align-items: center; }
         .speed-boost-btn { background: linear-gradient(135deg, #f97316, #f59e0b); color: #fff; padding: 10px 20px; border: none; border-radius: 25px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; }
         .speed-boost-btn:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -151,9 +143,6 @@
         .network-overlay .retry-btn { margin-top: 20px; padding: 12px 30px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none; border-radius: 12px; color: #fff; font-weight: 700; font-size: 16px; cursor: pointer; }
         .ad-cooldown { font-size: 12px; color: #94a3b8; margin-left: 6px; }
         .mining-active-indicator { display: none; }
-        .refill-circle-btn { margin-top: 8px; background: linear-gradient(135deg, #10b981, #059669); color: #fff; padding: 8px 16px; border: none; border-radius: 20px; font-weight: 600; font-size: 12px; cursor: pointer; transition: all 0.3s ease; }
-        .refill-circle-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .refill-watch-btn.hidden { display: none !important; }
         .security-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9999999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; }
         .security-overlay.show { display: flex; }
         .security-overlay h1 { color: #ef4444; font-size: 28px; margin-bottom: 12px; }
@@ -244,18 +233,6 @@
 
     <div class="overlay" id="airdropOverlay"><div class="overlay-header"><button class="back-btn" onclick="closeAirdropPage()"><i class="fas fa-arrow-left"></i> Back</button><h2 style="color:#fff;">📢 Live AirDrop</h2></div><div style="padding:15px;"><div style="background:rgba(255,255,255,0.05);border-radius:20px;padding:25px;text-align:center;border:2px solid rgba(251,191,36,0.3);"><div id="airdropPoolDisplay" style="font-size:42px;font-weight:900;color:#fbbf24;">$50.00</div><div id="airdropCountdown" style="font-size:36px;font-weight:bold;color:#fbbf24;margin:15px 0;">--:--:--</div><button id="airdropClaimBtn" onclick="claimAirdrop()" disabled style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:14px 30px;border:none;border-radius:30px;font-weight:700;font-size:16px;cursor:pointer;width:100%;transition:all 0.3s ease;">🎁 Claim</button></div><div class="rules-text" style="margin-top:15px;"><div class="rule-title">📋 Airdrop Rules</div><div id="airdropRulesText">Loading rules...</div></div></div></div>
 
-    <div class="video-overlay" id="videoOverlay">
-        <button class="close-btn" onclick="closeVideoWatch()"><i class="fas fa-times"></i></button>
-        <div class="video-container">
-            <div class="video-icon">📺</div>
-            <div class="video-title" id="videoTitle">Watch Video</div>
-            <div class="video-reward" id="videoRewardText">+0 Coins</div>
-            <div class="video-progress">Watched: <span id="videoProgressCount">0</span> / <span id="videoTotalCount">25</span></div>
-            <button class="watch-btn" id="videoWatchBtn" onclick="watchVideoAd()">▶ Watch Video</button>
-            <div class="video-status" id="videoStatus"></div>
-        </div>
-    </div>
-
     <div class="webview-overlay" id="webviewOverlay">
         <div class="webview-header">
             <button class="back-btn" onclick="closeWebView()"><i class="fas fa-arrow-left"></i> Back</button>
@@ -280,8 +257,7 @@
             </div>
         </div>
         <div class="page active" id="pageHome">
-            <div class="mining-circle-wrapper"><div class="mining-circle" id="miningCircle"><div class="circle-start-overlay" id="circleStartOverlay" onclick="startMining()"><div class="start-icon">⚡</div><div class="start-text">START<br>MINING</div><div class="start-subtext">Tap to earn coins</div></div><div class="inner-circle"><span class="coin-icon">🪙</span><span class="coin-count" id="progressCoinCount">1000</span><div class="circle-status" id="progressStatus">Ready</div><div class="circle-progress-text" id="progressPercent">100%</div><button class="refill-circle-btn hidden" id="refillCircleBtn" onclick="watchRefillAd()">📺 Refill (0/10)</button></div></div></div>
-            <div style="display:flex;justify-content:center;"><button class="circle-watch-btn hidden" id="progressWatchBtn" onclick="openVideoWatch()">📺 Watch Ads (0/25)</button></div>
+            <div class="mining-circle-wrapper"><div class="mining-circle" id="miningCircle"><div class="circle-start-overlay" id="circleStartOverlay" onclick="startMining()"><div class="start-icon">⚡</div><div class="start-text">START<br>MINING</div><div class="start-subtext">Tap to earn coins</div></div><div class="inner-circle"><span class="coin-icon">🪙</span><span class="coin-count" id="progressCoinCount">1000</span><div class="circle-status" id="progressStatus">Ready</div><div class="circle-progress-text" id="progressPercent">100%</div></div></div></div>
             <div class="speed-btn-container"><button class="speed-boost-btn" id="speedBoostBtn" onclick="activateSpeedBoost()"><i class="fas fa-rocket"></i> Speed Boost</button><div class="boost-countdown-box" id="boostCountdownBox"><div class="countdown-label">⏳ Cooldown</div><div class="countdown-time" id="boostCountdownTime">00:00</div></div></div>
             <div class="rules-text"><div class="rule-title">📋 Mining Rules</div><div id="miningRulesText">Loading rules...</div></div>
         </div>
@@ -311,17 +287,6 @@
                 <div class="rules-text"><div class="rule-title">📋 Withdraw Rules</div><div id="withdrawRulesText">Loading rules...</div></div>
             </div>
         </div>
-    </div>
-
-    <div class="video-watch-container">
-        <button class="video-watch-btn" id="mainVideoWatchBtn" onclick="openVideoWatch()">
-            <i class="fas fa-play-circle"></i> Watch & Earn
-            <span class="badge" id="videoWatchBadge">0</span>
-        </button>
-        <button class="refill-watch-btn" id="mainRefillBtn" onclick="watchRefillAd()">
-            <i class="fas fa-sync-alt"></i> Refill Coins
-            <span class="badge" id="refillBadge">0</span>
-        </button>
     </div>
 
     <div class="bottom-nav"><div class="nav-item active" onclick="switchPage('home',this)"><i class="fas fa-home"></i><span>Home</span></div><div class="nav-item" onclick="switchPage('tasks',this)"><i class="fas fa-tasks"></i><span>Tasks</span></div><div class="nav-item" onclick="switchPage('refer',this)"><i class="fas fa-users"></i><span>Refer</span></div><div class="nav-item" onclick="switchPage('wallet',this)"><i class="fas fa-wallet"></i><span>Wallet</span></div></div>
@@ -370,10 +335,6 @@
         };
         let tasks = [], conversionTimer = null, miningInterval = null, boostTimer = null, airdropTimer = null, 
             currentFilter = 'all', currentLevelFilter = 'all', levelConfigCache = {}, referralConfigCache = {};
-        let videoWatchConfig = { enabled: true, totalVideos: 25, rewardPerVideo: 10, title: 'Watch Video & Earn' };
-        let videoWatchProgress = 0, isVideoWatching = false;
-        let refillConfig = { enabled: true, totalRefills: 10, rewardCoins: 1000 };
-        let refillProgress = 0;
         let isOnline = navigator.onLine;
         let wasMiningBeforeOffline = false;
         let isAppHidden = false;
@@ -526,8 +487,7 @@
             if (!isOnline) { showToast('No internet!', 'error'); return; }
             if (miningInterval) return;
             if (app.progressCoins <= 0) { 
-                // যদি কয়েন ০ হয়, তাহলে রিফিল বাটন দেখাবে
-                showToast('❌ No coins! Please refill.', 'error');
+                showToast('❌ No coins!', 'error');
                 updateProgressUI();
                 return; 
             }
@@ -541,7 +501,7 @@
                 if (isAdShowing) { setTimeout(mineNextCoin, 1000); return; }
                 if (app.progressCoins <= 0) { 
                     stopMining(); 
-                    showToast('🎉 Coins finished! Refill now.', 'success');
+                    showToast('🎉 Coins finished!', 'success');
                     updateProgressUI();
                     return; 
                 }
@@ -581,203 +541,8 @@
             updateProgressUI();
         }
 
-        // ================== REFILL SYSTEM (FIXED) ===================
-        function loadRefillConfig() {
-            db.ref('refillConfig').on('value', snap => {
-                const cfg = snap.val() || {};
-                refillConfig.totalRefills = cfg.totalRefills || 10;
-                refillConfig.rewardCoins = cfg.rewardCoins || 1000;
-                refillConfig.enabled = cfg.enabled !== false;
-                updateRefillUI();
-            });
-            db.ref('users/' + userId + '/refillProgress').on('value', snap => {
-                refillProgress = snap.val() || 0;
-                updateRefillUI();
-            });
-        }
-
-        function updateRefillUI() {
-            const remaining = Math.max(0, refillConfig.totalRefills - refillProgress);
-            const btn = document.getElementById('mainRefillBtn');
-            const badge = document.getElementById('refillBadge');
-            const circleBtn = document.getElementById('refillCircleBtn');
-            
-            if (badge) badge.textContent = remaining;
-            
-            // ✅ শুধুমাত্র তখনই রিফিল বাটন দেখাবে যখন progressCoins === 0 এবং রিফিল বাকি আছে
-            const shouldShow = (app.progressCoins === 0 && remaining > 0 && refillConfig.enabled && !miningInterval);
-            
-            if (shouldShow) {
-                btn.classList.remove('hidden');
-                btn.disabled = false;
-                btn.innerHTML = `<i class="fas fa-sync-alt"></i> Refill Coins <span class="badge">${remaining}</span>`;
-                if (circleBtn) {
-                    circleBtn.classList.remove('hidden');
-                    circleBtn.textContent = `📺 Refill (${remaining} left)`;
-                }
-            } else {
-                btn.classList.add('hidden');
-                btn.disabled = true;
-                if (circleBtn) circleBtn.classList.add('hidden');
-            }
-        }
-
-        function watchRefillAd() {
-            if (!isOnline) { showToast('No internet!', 'error'); return; }
-            if (!refillConfig.enabled) { showToast('Refill disabled!', 'error'); return; }
-            if (refillProgress >= refillConfig.totalRefills) { showToast('🎉 All refills used!', 'error'); return; }
-            if (app.progressCoins > 0) { 
-                showToast('You still have coins!', 'error'); 
-                return; 
-            }
-            
-            const btn = document.getElementById('mainRefillBtn');
-            btn.dataset.originalText = 'Refill Coins';
-            
-            // Ad দেখার আগে বাটন ইনঅ্যাক্টিভ এবং কাউন্টডাউন শুরু
-            btn.disabled = true;
-            let countdown = 15;
-            btn.textContent = `⏳ ${countdown}s`;
-            
-            const countdownInterval = setInterval(() => {
-                countdown--;
-                if (countdown > 0) {
-                    btn.textContent = `⏳ ${countdown}s`;
-                } else {
-                    clearInterval(countdownInterval);
-                    btn.textContent = '▶ Watch Ad';
-                    btn.disabled = false;
-                }
-            }, 1000);
-            
-            showRewardedAd(() => {
-                // ✅ Ad দেখার পর কয়েন যোগ হবে
-                refillProgress++;
-                app.progressCoins = TOTAL_COINS; // ১০০০ কয়েন রিফিল
-                userRef.update({ 
-                    progressCoins: app.progressCoins, 
-                    refillProgress: refillProgress 
-                });
-                updateUI();
-                updateProgressUI();
-                updateRefillUI();
-                // ✅ রিফিল করার পর অটোমেটিক মাইনিং শুরু
-                if (isOnline && !miningInterval && app.progressCoins > 0 && !isAppHidden && !isAdShowing) {
-                    startMining();
-                }
-                showToast(`🪙 Refilled ${refillConfig.rewardCoins} Coins! (${refillProgress}/${refillConfig.totalRefills})`);
-            }, 'mainRefillBtn');
-        }
-
-        // ================== VIDEO WATCH =============================
-        function loadVideoWatchConfig() {
-            db.ref('videoWatchConfig').on('value', snap => {
-                const cfg = snap.val() || {};
-                videoWatchConfig.totalVideos = cfg.totalVideos || 25; // ২৫টি ভিডিও
-                videoWatchConfig.rewardPerVideo = cfg.rewardPerVideo || 10;
-                videoWatchConfig.title = cfg.title || 'Watch Video & Earn';
-                videoWatchConfig.enabled = cfg.enabled !== false;
-                updateVideoWatchUI();
-            });
-            db.ref('users/' + userId + '/videoWatchProgress').on('value', snap => {
-                videoWatchProgress = snap.val() || 0;
-                updateVideoWatchUI();
-            });
-        }
-
-        function updateVideoWatchUI() {
-            const remaining = Math.max(0, videoWatchConfig.totalVideos - videoWatchProgress);
-            document.getElementById('videoWatchBadge').textContent = remaining;
-            document.getElementById('videoTotalCount').textContent = videoWatchConfig.totalVideos;
-            document.getElementById('videoProgressCount').textContent = videoWatchProgress;
-            document.getElementById('videoTitle').textContent = videoWatchConfig.title;
-            document.getElementById('videoRewardText').textContent = `+${videoWatchConfig.rewardPerVideo} Coins per video`;
-            const btn = document.getElementById('videoWatchBtn');
-            if (videoWatchProgress >= videoWatchConfig.totalVideos) {
-                btn.disabled = true; btn.textContent = '✅ All Watched!';
-                document.getElementById('videoStatus').innerHTML = '<span class="done">🎉 All videos watched!</span>';
-            } else {
-                btn.dataset.originalText = '▶ Watch Video';
-                btn.disabled = false; btn.textContent = '▶ Watch Video';
-                document.getElementById('videoStatus').textContent = `Watch ${videoWatchConfig.totalVideos - videoWatchProgress} more videos`;
-            }
-            const mainBtn = document.getElementById('mainVideoWatchBtn');
-            if (remaining <= 0) {
-                mainBtn.disabled = true; mainBtn.innerHTML = '<i class="fas fa-check-circle"></i> Done';
-            } else {
-                mainBtn.disabled = false; mainBtn.innerHTML = `<i class="fas fa-play-circle"></i> Watch & Earn <span class="badge">${remaining}</span>`;
-            }
-        }
-
-        function openVideoWatch() {
-            if (!isOnline) { showToast('No internet!', 'error'); return; }
-            if (!videoWatchConfig.enabled) { showToast('Video watch disabled!', 'error'); return; }
-            if (videoWatchProgress >= videoWatchConfig.totalVideos) {
-                showToast('🎉 All videos watched today!', 'error');
-                return;
-            }
-            document.getElementById('videoOverlay').classList.add('show');
-            updateVideoWatchUI();
-        }
-
-        function closeVideoWatch() {
-            document.getElementById('videoOverlay').classList.remove('show');
-            isVideoWatching = false;
-            document.getElementById('videoWatchBtn').disabled = false;
-            document.getElementById('videoWatchBtn').textContent = '▶ Watch Video';
-        }
-
-        function watchVideoAd() {
-            if (!isOnline) { showToast('No internet!', 'error'); return; }
-            if (isVideoWatching) return;
-            if (videoWatchProgress >= videoWatchConfig.totalVideos) {
-                showToast('🎉 All videos watched!', 'error');
-                return;
-            }
-            
-            isVideoWatching = true;
-            const btn = document.getElementById('videoWatchBtn');
-            btn.dataset.originalText = '▶ Watch Video';
-            
-            // Ad দেখার আগে বাটন ইনঅ্যাক্টিভ এবং কাউন্টডাউন শুরু
-            btn.disabled = true;
-            let countdown = 15;
-            btn.textContent = `⏳ ${countdown}s`;
-            
-            const countdownInterval = setInterval(() => {
-                countdown--;
-                if (countdown > 0) {
-                    btn.textContent = `⏳ ${countdown}s`;
-                } else {
-                    clearInterval(countdownInterval);
-                    btn.textContent = '▶ Watch Video';
-                    btn.disabled = false;
-                }
-            }, 1000);
-            
-            showRewardedAd(() => {
-                isVideoWatching = false;
-                videoWatchProgress++;
-                app.balance += videoWatchConfig.rewardPerVideo;
-                app.xpPoints += videoWatchConfig.rewardPerVideo * 2;
-                app.lastVideoWatchTime = Date.now();
-                
-                userRef.update({ 
-                    balance: app.balance, xpPoints: app.xpPoints,
-                    videoWatchProgress: videoWatchProgress, lastVideoWatchTime: app.lastVideoWatchTime
-                });
-                
-                updateUI(); updateLevelUI(); updateVideoWatchUI();
-                showToast(`🎉 +${videoWatchConfig.rewardPerVideo} Coins!`);
-                
-                btn.disabled = false; btn.textContent = '▶ Watch Video';
-                if (videoWatchProgress >= videoWatchConfig.totalVideos) {
-                    btn.disabled = true; btn.textContent = '✅ All Watched!';
-                    document.getElementById('videoStatus').innerHTML = '<span class="done">🎉 All videos watched!</span>';
-                    setTimeout(() => closeVideoWatch(), 1500);
-                }
-            }, 'videoWatchBtn');
-        }
+        // ================== VIDEO WATCH & REFILL REMOVED ==============
+        // Watch & Earn এবং Refill Coins সম্পর্কিত সব ফাংশন রিমুভ করা হয়েছে
 
         // ================== TASKS ===================================
         function loadTasks() { 
@@ -1171,35 +936,22 @@
         }
 
         function updateProgressUI() { 
-            const circle = document.getElementById('miningCircle'), count = document.getElementById('progressCoinCount'), status = document.getElementById('progressStatus'), overlay = document.getElementById('circleStartOverlay'), watchBtn = document.getElementById('progressWatchBtn'), refillCircleBtn = document.getElementById('refillCircleBtn'), pct = (app.progressCoins / TOTAL_COINS * 100); 
+            const circle = document.getElementById('miningCircle'), count = document.getElementById('progressCoinCount'), status = document.getElementById('progressStatus'), overlay = document.getElementById('circleStartOverlay'), pct = (app.progressCoins / TOTAL_COINS * 100); 
             circle.style.background = `conic-gradient(#fbbf24 ${pct}%, #1e293b ${pct}%)`; 
             count.textContent = app.progressCoins; 
             document.getElementById('progressPercent').textContent = Math.round(pct) + '%'; 
-            updateRefillUI();
             
             if (app.progressCoins === 0) { 
                 status.textContent = '🎯 Empty!'; 
-                watchBtn.classList.add('hidden');
-                const remaining = Math.max(0, refillConfig.totalRefills - refillProgress);
-                if (remaining > 0 && refillConfig.enabled && !miningInterval) {
-                    refillCircleBtn.classList.remove('hidden');
-                    refillCircleBtn.textContent = `📺 Refill (${remaining} left)`;
-                } else {
-                    refillCircleBtn.classList.add('hidden');
-                }
                 overlay.classList.remove('hidden'); 
                 overlay.querySelector('.start-text').textContent = 'REFILL'; 
                 circle.classList.remove('mining-active'); 
             } else if (miningInterval) { 
                 status.textContent = '⚡ Mining...'; 
-                watchBtn.classList.add('hidden'); 
-                refillCircleBtn.classList.add('hidden');
                 overlay.classList.add('hidden'); 
                 circle.classList.add('mining-active'); 
             } else { 
                 status.textContent = 'Ready'; 
-                watchBtn.classList.add('hidden'); 
-                refillCircleBtn.classList.add('hidden');
                 overlay.classList.remove('hidden'); 
                 overlay.querySelector('.start-text').textContent = 'START\nMINING'; 
                 circle.classList.remove('mining-active'); 
@@ -1286,7 +1038,6 @@
                     document.getElementById('bannedOverlay').classList.add('show'); 
                     document.getElementById('mainContent').style.display = 'none'; 
                     document.querySelector('.bottom-nav').style.display = 'none'; 
-                    document.querySelector('.video-watch-container').style.display = 'none'; 
                     userRef.child('banReason').once('value', rs => { 
                         app.banReason = rs.val() || 'Violation'; 
                         document.getElementById('banReason').textContent = `Reason: ${app.banReason}`; 
@@ -1306,7 +1057,6 @@
                     document.getElementById('bannedOverlay').classList.remove('show'); 
                     document.getElementById('mainContent').style.display = 'block'; 
                     document.querySelector('.bottom-nav').style.display = 'flex'; 
-                    document.querySelector('.video-watch-container').style.display = 'flex'; 
                 } 
             }); 
         }
@@ -1351,8 +1101,6 @@
             checkBanStatus();
             loadReferralConfigFromDB();
             loadRules();
-            loadVideoWatchConfig();
-            loadRefillConfig();
             
             db.ref('conversionRate').on('value', s => { app.conversionRate = s.val() || 1000; updateUI(); });
             loadLevelConfigFromDB();
@@ -1367,16 +1115,12 @@
                 app.referCode = d.referCode || genRefCode();
                 app.referTiers = d.referTiers || {};
                 app.progressCoins = d.progressCoins !== undefined ? d.progressCoins : TOTAL_COINS;
-                app.videoWatchedCount = d.videoWatchedCount || 0;
                 app.speedBoostCooldown = d.speedBoostCooldown || 0;
                 app.taskLastCompleted = d.taskLastCompleted || {};
                 app.taskProgress = d.taskProgress || {};
                 app.xpPoints = d.xpPoints !== undefined ? d.xpPoints : NEGATIVE_XP;
                 app.withdrawHistory = d.withdrawHistory || [];
                 app.airdropClaimed = d.airdropClaimed || false;
-                app.lastVideoWatchTime = d.lastVideoWatchTime || 0;
-                videoWatchProgress = d.videoWatchProgress || 0;
-                refillProgress = d.refillProgress || 0;
                 
                 document.getElementById('referLinkHome').textContent = `https://t.me/CoinQuist_bot?start=ref_${app.referCode}`;
                 
@@ -1399,8 +1143,6 @@
                 updateLevelUI();
                 updateProgressUI();
                 updateSpeedBoostUI();
-                updateVideoWatchUI();
-                updateRefillUI();
                 startConversionTimer();
 
                 document.getElementById('loadingPage').classList.add('hidden');
