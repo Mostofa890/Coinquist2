@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>CoinQuest - Tap & Earn</title>
+    <!-- Ad SDK (আপনার দেওয়া) -->
     <script src='//libtl.com/sdk.js' data-zone='11197472' data-sdk='show_11197472'></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* আপনার দেওয়া CSS ঠিক আছে, কোনো পরিবর্তন নেই */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', -apple-system, sans-serif; }
         body { background: #0f172a; color: #e2e8f0; padding-bottom: 80px; min-height: 100vh; background: radial-gradient(circle at 20% 30%, #1e293b, #0f172a); }
         .container { max-width: 500px; margin: 0 auto; padding: 12px; }
@@ -223,6 +225,7 @@
         </div>
     </div>
 
+    <!-- Security & Network Overlays same as your code (no change) -->
     <div class="security-overlay" id="securityOverlay">
         <h1>🚫 Security Alert</h1>
         <p>Unauthorized access detected! Please close Developer Tools to continue.</p>
@@ -331,78 +334,8 @@
 
     <script>
         // ============================================================
-        // ==================== SECURITY SYSTEM ========================
+        // ================== FIREBASE & CONFIG ========================
         // ============================================================
-        
-        if (window.top !== window.self) {
-            document.body.innerHTML = '<h1 style="color:red;text-align:center;margin-top:50%;">🚫 This app cannot be embedded</h1>';
-            throw new Error('Cannot be embedded in iframe');
-        }
-
-        document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-            return false;
-        });
-
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'F12' || 
-                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
-                (e.ctrlKey && e.key === 'U')) {
-                e.preventDefault();
-                document.getElementById('securityOverlay').classList.add('show');
-                return false;
-            }
-        });
-
-        document.addEventListener('selectstart', function(e) {
-            e.preventDefault();
-            return false;
-        });
-
-        (function detectDevTools() {
-            try {
-                const element = new Image();
-                let devtoolsOpen = false;
-                Object.defineProperty(element, 'id', {
-                    get: function() {
-                        devtoolsOpen = true;
-                        document.getElementById('securityOverlay').classList.add('show');
-                        throw new Error('DevTools detected!');
-                    }
-                });
-                console.log('%c', element);
-            } catch(e) {
-                document.getElementById('securityOverlay').classList.add('show');
-            }
-        })();
-
-        let devtoolsCheckCount = 0;
-        setInterval(function() {
-            devtoolsCheckCount++;
-            const element = new Image();
-            let detected = false;
-            try {
-                Object.defineProperty(element, 'id', {
-                    get: function() {
-                        detected = true;
-                        document.getElementById('securityOverlay').classList.add('show');
-                        throw new Error('DevTools detected!');
-                    }
-                });
-                console.log('%c', element);
-            } catch(e) {
-                detected = true;
-                document.getElementById('securityOverlay').classList.add('show');
-            }
-            if (window.outerHeight - window.innerHeight > 200 && !document.getElementById('securityOverlay').classList.contains('show')) {
-                document.getElementById('securityOverlay').classList.add('show');
-            }
-        }, 5000);
-
-        // ============================================================
-        // ==================== FIREBASE DATA VALIDATION ===============
-        // ============================================================
-        
         const firebaseConfig = { 
             apiKey: "AIzaSyAqCNHhu9oaBDea85tAH-iHucHczZnR7nY", 
             authDomain: "tolaka-exc-reverb-b1afd.firebaseapp.com", 
@@ -426,137 +359,183 @@
         const TOTAL_COINS = 1000;
         const NEGATIVE_XP = -5000;
 
-        const ALLOWED_UPDATE_KEYS = [
-            'balance', 'usdBalance', 'xpPoints', 'progressCoins', 
-            'refillProgress', 'videoWatchProgress', 'isCurrentlyMining',
-            'taskProgress', 'taskLastCompleted', 'referTiers', 
-            'lastMiningActivity', 'lastLogin', 'lastConversion',
-            'videoWatchedCount', 'speedBoostCooldown', 'airdropClaimed',
-            'withdrawHistory', 'refillProgress', 'lastVideoWatchTime'
-        ];
-
-        function validateUserData(data) {
-            const validated = {};
-            Object.keys(data).forEach(key => {
-                if (!ALLOWED_UPDATE_KEYS.includes(key)) {
-                    console.warn('⚠️ Blocked invalid key:', key);
-                    return;
-                }
-                const value = data[key];
-                switch(key) {
-                    case 'balance':
-                    case 'usdBalance':
-                    case 'xpPoints':
-                    case 'videoWatchedCount':
-                    case 'speedBoostCooldown':
-                    case 'refillProgress':
-                        if (typeof value === 'number' && value >= 0 && !isNaN(value)) {
-                            if (key === 'balance' && value > 99999999) { validated[key] = 99999999; break; }
-                            if (key === 'progressCoins' && (value < 0 || value > 1000)) { 
-                                validated[key] = Math.min(1000, Math.max(0, value)); 
-                                break; 
-                            }
-                            if (key === 'refillProgress' && (value < 0 || value > 50)) {
-                                validated[key] = Math.min(50, Math.max(0, value));
-                                break;
-                            }
-                            validated[key] = value;
-                        }
-                        break;
-                    case 'progressCoins':
-                        if (typeof value === 'number' && value >= 0 && value <= 1000 && !isNaN(value)) {
-                            validated[key] = value;
-                        }
-                        break;
-                    case 'isCurrentlyMining':
-                        if (typeof value === 'boolean') validated[key] = value;
-                        break;
-                    case 'taskProgress':
-                    case 'taskLastCompleted':
-                    case 'referTiers':
-                    case 'withdrawHistory':
-                        if (typeof value === 'object' && value !== null) validated[key] = value;
-                        break;
-                    case 'lastMiningActivity':
-                    case 'lastLogin':
-                    case 'lastConversion':
-                    case 'lastVideoWatchTime':
-                        if (typeof value === 'number' || value === null) validated[key] = value;
-                        break;
-                    default:
-                        if (value !== undefined && value !== null) validated[key] = value;
-                }
-            });
-            return validated;
-        }
-
-        const originalUpdate = userRef.update.bind(userRef);
-        userRef.update = function(data) {
-            const validated = validateUserData(data);
-            if (Object.keys(validated).length === 0) {
-                console.warn('⚠️ No valid data to update');
-                return Promise.resolve();
-            }
-            const now = Date.now();
-            if (this._lastUpdate && (now - this._lastUpdate < 100)) {
-                console.warn('⏳ Rate limited');
-                return Promise.resolve();
-            }
-            this._lastUpdate = now;
-            return originalUpdate(validated);
+        let app = { 
+            balance: 0, usdBalance: 0, referralCount: 0, lastConversion: null, 
+            conversionRate: 1000, minWithdraw: 10, withdrawHistory: [], 
+            referCode: '', referTiers: {}, progressCoins: TOTAL_COINS, 
+            videoWatchedCount: 0, speedBoostCooldown: 0, 
+            taskLastCompleted: {}, taskProgress: {}, airdropClaimed: false, 
+            xpPoints: NEGATIVE_XP, withdrawMethods: ['Nagad','Rocket'], 
+            selectedMethod: 'Nagad', isBanned: false, banReason: '', 
+            banAppealSubmitted: false, lastVideoWatchTime: 0 
         };
-
-        const originalSet = userRef.set.bind(userRef);
-        userRef.set = function(data) {
-            const validated = validateUserData(data);
-            if (Object.keys(validated).length === 0) {
-                console.warn('⚠️ No valid data to set');
-                return Promise.resolve();
-            }
-            return originalSet(validated);
-        };
-
-        function isAdmin() {
-            return new Promise((resolve) => {
-                db.ref('admin/credentials').once('value', snap => {
-                    const creds = snap.val() || {};
-                    if (creds.username && creds.password) {
-                        db.ref('users/' + userId + '/isAdmin').once('value', s => {
-                            resolve(s.val() === true);
-                        });
-                    } else {
-                        resolve(false);
-                    }
-                }).catch(() => resolve(false));
-            });
-        }
-
-        // ============================================================
-        // ==================== APP CODE ====================
-        // ============================================================
-
-        if (typeof show_11197472 === 'function') {
-            show_11197472({
-                type: 'inApp',
-                inAppSettings: {
-                    frequency: 2,
-                    capping: 0.1,
-                    interval: 30,
-                    timeout: 5,
-                    everyPage: false
-                }
-            });
-        }
-
+        let tasks = [], conversionTimer = null, miningInterval = null, boostTimer = null, airdropTimer = null, 
+            currentFilter = 'all', currentLevelFilter = 'all', levelConfigCache = {}, referralConfigCache = {};
+        let videoWatchConfig = { enabled: true, totalVideos: 5, rewardPerVideo: 10, title: 'Watch Video & Earn' };
+        let videoWatchProgress = 0, isVideoWatching = false;
+        let refillConfig = { enabled: true, totalRefills: 10, rewardCoins: 1000 };
+        let refillProgress = 0;
         let isOnline = navigator.onLine;
         let wasMiningBeforeOffline = false;
-        let miningStartedManually = false;
         let isAppHidden = false;
         let isAdShowing = false;
 
-        let refillConfig = { enabled: true, totalRefills: 10, rewardCoins: 1000 };
-        let refillProgress = 0;
+        // ================== NETWORK & SECURITY ======================
+        window.addEventListener('online', () => { isOnline = true; document.getElementById('networkOverlay').classList.remove('show'); });
+        window.addEventListener('offline', () => { isOnline = false; document.getElementById('networkOverlay').classList.add('show'); });
+        document.addEventListener('visibilitychange', function() {
+            isAppHidden = document.hidden;
+            if (isAppHidden && miningInterval) {
+                wasMiningBeforeOffline = true;
+                stopMining();
+            } else if (!isAppHidden && wasMiningBeforeOffline && app.progressCoins > 0 && isOnline && !isAdShowing) {
+                startMining();
+            }
+        });
 
+        function checkNetworkAndReload() {
+            if (navigator.onLine) { location.reload(); }
+            else { showToast('❌ Still offline!', 'error'); }
+        }
+
+        // ================== AD HANDLER (FIXED) ======================
+        function showRewardedAd(cb, btnId) {
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            if (typeof show_11197472 !== 'function') { if (cb) cb(); return; }
+            
+            isAdShowing = true;
+            const btn = document.getElementById(btnId);
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = '⏳ Loading...';
+            }
+            
+            show_11197472('pop').then(() => {
+                isAdShowing = false;
+                if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || '▶ Watch'; }
+                if (cb) cb();
+            }).catch(() => {
+                isAdShowing = false;
+                if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || '▶ Watch'; }
+                if (cb) cb();
+            });
+        }
+
+        function showInterstitialAd(cb, btnId) {
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            if (typeof show_11197472 !== 'function') { if (cb) cb(); return; }
+            
+            isAdShowing = true;
+            const btn = document.getElementById(btnId);
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = '⏳ Loading...';
+            }
+            
+            show_11197472().then(() => {
+                isAdShowing = false;
+                if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || 'Speed Boost'; }
+                if (cb) cb();
+            }).catch(() => {
+                isAdShowing = false;
+                if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || 'Speed Boost'; }
+                if (cb) cb();
+            });
+        }
+
+        // ================== USER LEVEL ==============================
+        function getLevelConfig(level) {
+            if (level === 0) return { tier: 'unlocking', tierName: 'Unlocking', tierEmoji: '🔒', bonusPercent: 0, xpForLevel: 5000 };
+            let tier, tierName, tierEmoji, bonus;
+            if (level >= 1 && level <= 20) { tier = 'bronze'; tierName = 'Bronze'; tierEmoji = '🥉'; bonus = 10; }
+            else if (level >= 21 && level <= 40) { tier = 'silver'; tierName = 'Silver'; tierEmoji = '🥈'; bonus = 20; }
+            else if (level >= 41 && level <= 60) { tier = 'gold'; tierName = 'Gold'; tierEmoji = '🥇'; bonus = 30; }
+            else if (level >= 61 && level <= 80) { tier = 'platinum'; tierName = 'Platinum'; tierEmoji = '💎'; bonus = 40; }
+            else if (level >= 81 && level <= 100) { tier = 'diamond'; tierName = 'Diamond'; tierEmoji = '👑'; bonus = 50; }
+            else { tier = 'max'; tierName = 'MAX'; tierEmoji = '⭐'; bonus = 50; }
+            let xpForLevel;
+            if (level === 1) xpForLevel = 1800;
+            else if (level >= 2) xpForLevel = 1800 * Math.pow(2, level - 1);
+            else xpForLevel = 5000;
+            return { tier, tierName, tierEmoji, bonusPercent: bonus, xpForLevel: Math.floor(xpForLevel) };
+        }
+
+        function calculateLevel(xp) {
+            xp = xp || NEGATIVE_XP;
+            if (xp < 0) {
+                const baseXP = 5000;
+                const progress = Math.min(100, Math.floor((xp + baseXP) / baseXP * 100));
+                return { level: 0, xp, progress, tierName: 'Unlocking', tierEmoji: '🔒', bonusPercent: 0, isMaxLevel: false, xpForLevel: baseXP };
+            }
+            let level = 1, xpNeeded = 1800, totalXP = 0;
+            while (level <= 100) {
+                if (xp < totalXP + xpNeeded) break;
+                totalXP += xpNeeded;
+                level++;
+                if (level > 100) break;
+                xpNeeded = 1800 * Math.pow(2, level - 1);
+            }
+            if (level > 100) { level = 100; xpNeeded = 1800 * Math.pow(2, 99); totalXP = 0; for (let i = 1; i < 100; i++) totalXP += 1800 * Math.pow(2, i - 1); }
+            const config = getLevelConfig(level);
+            const xpInto = xp - totalXP;
+            const progress = Math.min(100, Math.floor((xpInto / xpNeeded) * 100));
+            return {
+                level, xp, progress, tierName: config.tierName, tierEmoji: config.tierEmoji,
+                bonusPercent: config.bonusPercent, isMaxLevel: level >= 100, xpForLevel: xpNeeded, xpInto
+            };
+        }
+
+        // ================== MINING CORE =============================
+        function startMining() {
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            if (miningInterval) return;
+            if (app.progressCoins <= 0) { showToast('❌ No coins!', 'error'); return; }
+            
+            document.getElementById('circleStartOverlay').classList.add('hidden');
+            userRef.update({ isCurrentlyMining: true, lastMiningActivity: Date.now() });
+            wasMiningBeforeOffline = true;
+            
+            function mineNextCoin() {
+                if (!isOnline) { stopMining(); showToast('⚠️ Network lost!', 'error'); return; }
+                if (isAdShowing) { setTimeout(mineNextCoin, 1000); return; }
+                if (app.progressCoins <= 0) { stopMining(); showToast('🎉 Done!'); return; }
+                
+                const d = calculateLevel(app.xpPoints);
+                const ca = 1 + (d.bonusPercent / 100);
+                
+                app.progressCoins -= 1;
+                app.balance += ca;
+                app.xpPoints += 1;
+                
+                userRef.update({ balance: app.balance, progressCoins: app.progressCoins, xpPoints: app.xpPoints, lastMiningActivity: Date.now() });
+                
+                const coin = document.createElement('div');
+                coin.className = 'floating-coin';
+                coin.textContent = `+${ca.toFixed(2)} 🪙`;
+                coin.style.left = (Math.random() * 80 + 10) + '%';
+                coin.style.top = '35%';
+                document.body.appendChild(coin);
+                setTimeout(() => coin.remove(), 1000);
+                
+                updateProgressUI();
+                updateUI();
+                updateLevelUI();
+                
+                miningInterval = setTimeout(mineNextCoin, 5000);
+            }
+            mineNextCoin();
+            updateProgressUI();
+            showToast('⛏️ Mining!');
+        }
+
+        function stopMining() {
+            if (miningInterval) { clearTimeout(miningInterval); miningInterval = null; }
+            wasMiningBeforeOffline = false;
+            userRef.update({ isCurrentlyMining: false });
+            updateProgressUI();
+        }
+
+        // ================== REFILL SYSTEM ==========================
         function loadRefillConfig() {
             db.ref('refillConfig').on('value', snap => {
                 const cfg = snap.val() || {};
@@ -579,11 +558,6 @@
             
             if (badge) badge.textContent = remaining;
             
-            // ✅ শুধুমাত্র কয়েন জিরো এবং রিফিল বাকি থাকলে দেখাবে (মাইনিং বন্ধ অবস্থায়)
-            const shouldShow = (app.progressCoins === 0 && remaining > 0 && refillConfig.enabled && !miningInterval);
-            
-            if (badge) badge.textContent = remaining;
-            
             if (remaining <= 0 || !refillConfig.enabled || app.progressCoins > 0) {
                 btn.classList.add('hidden');
                 btn.disabled = true;
@@ -601,28 +575,19 @@
 
         function watchRefillAd() {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
-            if (!refillConfig.enabled) { showToast('Refill is disabled!', 'error'); return; }
-            if (refillProgress >= refillConfig.totalRefills) {
-                showToast('🎉 All refills used!', 'error');
-                return;
-            }
-            if (app.progressCoins > 0) {
-                showToast('You still have coins!', 'error');
-                return;
-            }
+            if (!refillConfig.enabled) { showToast('Refill disabled!', 'error'); return; }
+            if (refillProgress >= refillConfig.totalRefills) { showToast('🎉 All refills used!', 'error'); return; }
+            if (app.progressCoins > 0) { showToast('You still have coins!', 'error'); return; }
+            
             const btn = document.getElementById('mainRefillBtn');
             btn.dataset.originalText = 'Refill Coins';
             showRewardedAd(() => {
                 refillProgress++;
                 app.progressCoins = TOTAL_COINS;
-                userRef.update({ 
-                    progressCoins: app.progressCoins,
-                    refillProgress: refillProgress 
-                });
+                userRef.update({ progressCoins: app.progressCoins, refillProgress: refillProgress });
                 updateUI();
                 updateProgressUI();
                 updateRefillUI();
-                // ✅ রিফিল করার পর অটোমেটিক মাইনিং স্টার্ট
                 if (isOnline && !miningInterval && app.progressCoins > 0 && !isAppHidden && !isAdShowing) {
                     startMining();
                 }
@@ -630,278 +595,7 @@
             }, 'mainRefillBtn');
         }
 
-        function checkNetworkAndReload() {
-            if (navigator.onLine) {
-                document.getElementById('networkOverlay').classList.remove('show');
-                isOnline = true;
-                if (wasMiningBeforeOffline && app.progressCoins > 0 && !miningInterval && !isAppHidden && !isAdShowing) {
-                    startMining();
-                }
-                showToast('✅ Network restored!');
-            } else {
-                showToast('❌ Still offline. Please check your connection.', 'error');
-            }
-        }
-
-        function updateNetworkStatus() {
-            const online = navigator.onLine;
-            if (online !== isOnline) {
-                isOnline = online;
-                if (!online) {
-                    document.getElementById('networkOverlay').classList.add('show');
-                    wasMiningBeforeOffline = !!miningInterval;
-                    if (miningInterval) {
-                        stopMining();
-                    }
-                    document.querySelectorAll('.mining-circle, .circle-start-overlay, .video-watch-btn, .watch-btn, .task-btn, .withdraw-btn, .speed-boost-btn, .refill-watch-btn, .refill-circle-btn').forEach(el => {
-                        el.style.pointerEvents = 'none';
-                        el.style.opacity = '0.5';
-                    });
-                } else {
-                    document.getElementById('networkOverlay').classList.remove('show');
-                    document.querySelectorAll('.mining-circle, .circle-start-overlay, .video-watch-btn, .watch-btn, .task-btn, .withdraw-btn, .speed-boost-btn, .refill-watch-btn, .refill-circle-btn').forEach(el => {
-                        el.style.pointerEvents = '';
-                        el.style.opacity = '';
-                    });
-                    showToast('✅ Network restored!');
-                    if (wasMiningBeforeOffline && app.progressCoins > 0 && !miningInterval && !isAppHidden && !isAdShowing) {
-                        startMining();
-                    }
-                }
-            }
-        }
-
-        window.addEventListener('online', updateNetworkStatus);
-        window.addEventListener('offline', updateNetworkStatus);
-        setInterval(updateNetworkStatus, 3000);
-
-        document.addEventListener('visibilitychange', function() {
-            if (document.hidden) {
-                isAppHidden = true;
-                if (miningInterval && !isAdShowing) {
-                    wasMiningBeforeOffline = true;
-                    stopMining();
-                }
-            } else {
-                isAppHidden = false;
-                if (wasMiningBeforeOffline && app.progressCoins > 0 && !miningInterval && isOnline && !isAdShowing) {
-                    startMining();
-                }
-            }
-        });
-
-        let adCooldownTimers = {};
-
-        function showRewardedAd(cb, btnId) {
-            if (!isOnline) { showToast('No internet!', 'error'); return; }
-            
-            if (miningInterval) {
-                wasMiningBeforeOffline = true;
-                stopMining();
-            }
-            isAdShowing = true;
-            
-            const btn = document.getElementById(btnId);
-            if (btn) {
-                btn.disabled = true;
-                btn.textContent = '⏳ 15s';
-                let seconds = 15;
-                if (adCooldownTimers[btnId]) clearInterval(adCooldownTimers[btnId]);
-                adCooldownTimers[btnId] = setInterval(() => {
-                    seconds--;
-                    if (seconds > 0) {
-                        btn.textContent = `⏳ ${seconds}s`;
-                    } else {
-                        clearInterval(adCooldownTimers[btnId]);
-                        btn.disabled = false;
-                        btn.textContent = btn.dataset.originalText || '▶ Watch Video';
-                    }
-                }, 1000);
-            }
-            
-            if (typeof show_11197472 === 'function') {
-                show_11197472('pop').then(() => {
-                    isAdShowing = false;
-                    if (wasMiningBeforeOffline && app.progressCoins > 0 && !isAppHidden && isOnline) {
-                        startMining();
-                    }
-                    if (cb) cb();
-                }).catch(() => {
-                    isAdShowing = false;
-                    if (btn) {
-                        clearInterval(adCooldownTimers[btnId]);
-                        btn.disabled = false;
-                        btn.textContent = btn.dataset.originalText || '▶ Watch Video';
-                    }
-                    if (wasMiningBeforeOffline && app.progressCoins > 0 && !isAppHidden && isOnline) {
-                        startMining();
-                    }
-                    if (cb) cb();
-                });
-            } else { 
-                isAdShowing = false;
-                if (btn) {
-                    clearInterval(adCooldownTimers[btnId]);
-                    btn.disabled = false;
-                    btn.textContent = btn.dataset.originalText || '▶ Watch Video';
-                }
-                if (wasMiningBeforeOffline && app.progressCoins > 0 && !isAppHidden && isOnline) {
-                    startMining();
-                }
-                if (cb) cb(); 
-            }
-        }
-
-        function showInterstitialAd(cb, btnId) {
-            if (!isOnline) { showToast('No internet!', 'error'); return; }
-            
-            if (miningInterval) {
-                wasMiningBeforeOffline = true;
-                stopMining();
-            }
-            isAdShowing = true;
-            
-            const btn = document.getElementById(btnId);
-            if (btn) {
-                btn.disabled = true;
-                btn.textContent = '⏳ 15s';
-                let seconds = 15;
-                if (adCooldownTimers[btnId]) clearInterval(adCooldownTimers[btnId]);
-                adCooldownTimers[btnId] = setInterval(() => {
-                    seconds--;
-                    if (seconds > 0) {
-                        btn.textContent = `⏳ ${seconds}s`;
-                    } else {
-                        clearInterval(adCooldownTimers[btnId]);
-                        btn.disabled = false;
-                        btn.textContent = btn.dataset.originalText || 'Speed Boost';
-                    }
-                }, 1000);
-            }
-            
-            if (typeof show_11197472 === 'function') {
-                show_11197472().then(() => {
-                    isAdShowing = false;
-                    if (wasMiningBeforeOffline && app.progressCoins > 0 && !isAppHidden && isOnline) {
-                        startMining();
-                    }
-                    if (cb) cb();
-                }).catch(() => {
-                    isAdShowing = false;
-                    if (btn) {
-                        clearInterval(adCooldownTimers[btnId]);
-                        btn.disabled = false;
-                        btn.textContent = btn.dataset.originalText || 'Speed Boost';
-                    }
-                    if (wasMiningBeforeOffline && app.progressCoins > 0 && !isAppHidden && isOnline) {
-                        startMining();
-                    }
-                    if (cb) cb();
-                });
-            } else { 
-                isAdShowing = false;
-                if (btn) {
-                    clearInterval(adCooldownTimers[btnId]);
-                    btn.disabled = false;
-                    btn.textContent = btn.dataset.originalText || 'Speed Boost';
-                }
-                if (wasMiningBeforeOffline && app.progressCoins > 0 && !isAppHidden && isOnline) {
-                    startMining();
-                }
-                if (cb) cb(); 
-            }
-        }
-
-        function showAirdropAd(cb, btnId) {
-            if (!isOnline) { showToast('No internet!', 'error'); return; }
-            
-            if (miningInterval) {
-                wasMiningBeforeOffline = true;
-                stopMining();
-            }
-            isAdShowing = true;
-            
-            const btn = document.getElementById(btnId);
-            if (btn) {
-                btn.disabled = true;
-                btn.textContent = '⏳ 15s';
-                let seconds = 15;
-                if (adCooldownTimers[btnId]) clearInterval(adCooldownTimers[btnId]);
-                adCooldownTimers[btnId] = setInterval(() => {
-                    seconds--;
-                    if (seconds > 0) {
-                        btn.textContent = `⏳ ${seconds}s`;
-                    } else {
-                        clearInterval(adCooldownTimers[btnId]);
-                        btn.disabled = false;
-                        btn.textContent = '🎁 Claim';
-                    }
-                }, 1000);
-            }
-            
-            if (typeof show_11197472 === 'function') {
-                show_11197472('pop').then(() => {
-                    isAdShowing = false;
-                    if (wasMiningBeforeOffline && app.progressCoins > 0 && !isAppHidden && isOnline) {
-                        startMining();
-                    }
-                    if (cb) cb();
-                }).catch(() => {
-                    isAdShowing = false;
-                    if (btn) {
-                        clearInterval(adCooldownTimers[btnId]);
-                        btn.disabled = false;
-                        btn.textContent = '🎁 Claim';
-                    }
-                    if (wasMiningBeforeOffline && app.progressCoins > 0 && !isAppHidden && isOnline) {
-                        startMining();
-                    }
-                    if (cb) cb();
-                });
-            } else { 
-                isAdShowing = false;
-                if (btn) {
-                    clearInterval(adCooldownTimers[btnId]);
-                    btn.disabled = false;
-                    btn.textContent = '🎁 Claim';
-                }
-                if (wasMiningBeforeOffline && app.progressCoins > 0 && !isAppHidden && isOnline) {
-                    startMining();
-                }
-                if (cb) cb(); 
-            }
-        }
-
-        let app = { balance: 0, usdBalance: 0, referralCount: 0, lastConversion: null, conversionRate: 1000, minWithdraw: 10, withdrawHistory: [], referCode: '', referTiers: {}, progressCoins: 1000, videoWatchedCount: 0, speedBoostCooldown: 0, taskLastCompleted: {}, taskProgress: {}, airdropClaimed: false, xpPoints: -5000, withdrawMethods: ['Nagad','Rocket'], selectedMethod: 'Nagad', isBanned: false, banReason: '', banAppealSubmitted: false, lastVideoWatchTime: 0 };
-        let tasks = [], conversionTimer = null, miningInterval = null, boostTimer = null, airdropTimer = null, currentFilter = 'all', currentLevelFilter = 'all', levelConfigCache = {}, referralConfigCache = {};
-
-        let webViewTaskId = null;
-        let webViewTimerInterval = null;
-        let webViewSeconds = 0;
-        let webViewRequiredTime = 10;
-        let webViewTaskReward = 0;
-
-        let videoWatchConfig = { enabled: true, totalVideos: 5, rewardPerVideo: 10, title: 'Watch Video & Earn' };
-        let videoWatchProgress = 0;
-        let isVideoWatching = false;
-
-        document.addEventListener('click', e => { if (!document.querySelector('.video-watch-container')?.contains(e.target)) { /* keep */ } });
-
-        function checkBanStatus() { userRef.child('banned').on('value', s => { const b = s.val() === true; app.isBanned = b; if (b) { document.getElementById('bannedOverlay').classList.add('show'); document.getElementById('mainContent').style.display = 'none'; document.querySelector('.bottom-nav').style.display = 'none'; document.querySelector('.video-watch-container').style.display = 'none'; userRef.child('banReason').once('value', rs => { app.banReason = rs.val() || 'Violation'; document.getElementById('banReason').textContent = `Reason: ${app.banReason}`; }); userRef.child('banAppealSubmitted').once('value', as => { app.banAppealSubmitted = as.val() || false; const btn = document.getElementById('appealBtn'), st = document.getElementById('appealStatus'); if (app.banAppealSubmitted) { btn.disabled = true; btn.textContent = '✅ Submitted'; st.style.display = 'block'; st.textContent = 'Under review.'; } else { btn.disabled = false; btn.textContent = '📩 Submit Appeal'; st.style.display = 'none'; } }); } else { document.getElementById('bannedOverlay').classList.remove('show'); document.getElementById('mainContent').style.display = 'block'; document.querySelector('.bottom-nav').style.display = 'flex'; document.querySelector('.video-watch-container').style.display = 'flex'; } }); }
-        function submitBanAppeal() { if (app.banAppealSubmitted) { showToast('Already submitted!', 'error'); return; } const msg = prompt('📩 Write your appeal:'); if (!msg || msg.trim().length < 5) { showToast('Write proper message!', 'error'); return; } db.ref('banAppeals/' + userId).set({ userId, username: displayName, message: msg.trim(), banReason: app.banReason, status: 'pending', createdAt: Date.now() }, () => { userRef.update({ banAppealSubmitted: true }); app.banAppealSubmitted = true; document.getElementById('appealBtn').disabled = true; document.getElementById('appealBtn').textContent = '✅ Submitted'; document.getElementById('appealStatus').style.display = 'block'; document.getElementById('appealStatus').textContent = 'Submitted!'; showToast('📩 Appeal submitted!'); }); }
-
-        function loadRules() {
-            db.ref('rules').on('value', snap => {
-                const rules = snap.val() || {};
-                document.getElementById('miningRulesText').textContent = rules.mining || 'No rules set.';
-                document.getElementById('taskRulesText').textContent = rules.tasks || 'No rules set.';
-                document.getElementById('referRulesText').textContent = rules.referral || 'No rules set.';
-                document.getElementById('withdrawRulesText').textContent = rules.withdraw || 'No rules set.';
-                document.getElementById('levelRulesText').textContent = rules.level || 'No rules set.';
-                document.getElementById('airdropRulesText').textContent = rules.airdrop || 'No rules set.';
-            });
-        }
-
+        // ================== VIDEO WATCH =============================
         function loadVideoWatchConfig() {
             db.ref('videoWatchConfig').on('value', snap => {
                 const cfg = snap.val() || {};
@@ -926,40 +620,26 @@
             document.getElementById('videoRewardText').textContent = `+${videoWatchConfig.rewardPerVideo} Coins per video`;
             const btn = document.getElementById('videoWatchBtn');
             if (videoWatchProgress >= videoWatchConfig.totalVideos) {
-                btn.disabled = true;
-                btn.textContent = '✅ All Watched!';
-                document.getElementById('videoStatus').innerHTML = '<span class="done">🎉 You have watched all videos today!</span>';
+                btn.disabled = true; btn.textContent = '✅ All Watched!';
+                document.getElementById('videoStatus').innerHTML = '<span class="done">🎉 All videos watched!</span>';
             } else {
                 btn.dataset.originalText = '▶ Watch Video';
-                btn.disabled = false;
-                btn.textContent = '▶ Watch Video';
+                btn.disabled = false; btn.textContent = '▶ Watch Video';
                 document.getElementById('videoStatus').textContent = `Watch ${videoWatchConfig.totalVideos - videoWatchProgress} more videos`;
             }
             const mainBtn = document.getElementById('mainVideoWatchBtn');
             if (remaining <= 0) {
-                mainBtn.disabled = true;
-                mainBtn.innerHTML = '<i class="fas fa-check-circle"></i> Done';
+                mainBtn.disabled = true; mainBtn.innerHTML = '<i class="fas fa-check-circle"></i> Done';
             } else {
-                mainBtn.disabled = false;
-                mainBtn.innerHTML = `<i class="fas fa-play-circle"></i> Watch & Earn <span class="badge">${remaining}</span>`;
+                mainBtn.disabled = false; mainBtn.innerHTML = `<i class="fas fa-play-circle"></i> Watch & Earn <span class="badge">${remaining}</span>`;
             }
         }
 
-        // ✅ প্রতি মিনিটে চেক করবে ২৪ ঘন্টা পার হলে রিসেট করবে
-        setInterval(() => {
-            if (app.lastVideoWatchTime && Date.now() - app.lastVideoWatchTime >= 86400000) {
-                videoWatchProgress = 0;
-                userRef.update({ videoWatchProgress: 0, lastVideoWatchTime: 0 });
-                updateVideoWatchUI();
-                showToast('🔄 Video watch reset! You can watch again.');
-            }
-        }, 60000);
-
         function openVideoWatch() {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
-            if (!videoWatchConfig.enabled) { showToast('Video watch is disabled!', 'error'); return; }
+            if (!videoWatchConfig.enabled) { showToast('Video watch disabled!', 'error'); return; }
             if (videoWatchProgress >= videoWatchConfig.totalVideos) {
-                showToast('🎉 You have watched all videos today!', 'error');
+                showToast('🎉 All videos watched today!', 'error');
                 return;
             }
             document.getElementById('videoOverlay').classList.add('show');
@@ -968,26 +648,22 @@
 
         function closeVideoWatch() {
             document.getElementById('videoOverlay').classList.remove('show');
-            if (isVideoWatching) {
-                isVideoWatching = false;
-                document.getElementById('videoWatchBtn').disabled = false;
-                document.getElementById('videoWatchBtn').textContent = '▶ Watch Video';
-            }
+            isVideoWatching = false;
+            document.getElementById('videoWatchBtn').disabled = false;
+            document.getElementById('videoWatchBtn').textContent = '▶ Watch Video';
         }
 
         function watchVideoAd() {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
             if (isVideoWatching) return;
             if (videoWatchProgress >= videoWatchConfig.totalVideos) {
-                showToast('🎉 All videos watched! Please wait 24 hours.', 'error');
+                showToast('🎉 All videos watched!', 'error');
                 return;
             }
-            
             isVideoWatching = true;
             const btn = document.getElementById('videoWatchBtn');
             btn.dataset.originalText = '▶ Watch Video';
-            btn.disabled = true;
-            btn.textContent = '⏳ Loading Ad...';
+            btn.disabled = true; btn.textContent = '⏳ Loading Ad...';
             
             showRewardedAd(() => {
                 isVideoWatching = false;
@@ -997,129 +673,435 @@
                 app.lastVideoWatchTime = Date.now();
                 
                 userRef.update({ 
-                    balance: app.balance, 
-                    xpPoints: app.xpPoints,
-                    videoWatchProgress: videoWatchProgress,
-                    lastVideoWatchTime: app.lastVideoWatchTime
+                    balance: app.balance, xpPoints: app.xpPoints,
+                    videoWatchProgress: videoWatchProgress, lastVideoWatchTime: app.lastVideoWatchTime
                 });
                 
-                updateUI();
-                updateLevelUI();
-                updateVideoWatchUI();
+                updateUI(); updateLevelUI(); updateVideoWatchUI();
                 showToast(`🎉 +${videoWatchConfig.rewardPerVideo} Coins!`);
                 
-                btn.disabled = false;
-                btn.textContent = '▶ Watch Video';
-                
+                btn.disabled = false; btn.textContent = '▶ Watch Video';
                 if (videoWatchProgress >= videoWatchConfig.totalVideos) {
-                    btn.disabled = true;
-                    btn.textContent = '✅ All Watched!';
+                    btn.disabled = true; btn.textContent = '✅ All Watched!';
                     document.getElementById('videoStatus').innerHTML = '<span class="done">🎉 All videos watched!</span>';
                     setTimeout(() => closeVideoWatch(), 1500);
                 }
             }, 'videoWatchBtn');
         }
 
-        function getLevelConfig(level) {
-            if (level === 0) return { tier: 'unlocking', tierName: 'Unlocking', tierEmoji: '🔒', bonusPercent: 0, xpForLevel: 5000 };
-            let tier, tierName, tierEmoji, bonus;
-            if (level >= 1 && level <= 20) { tier = 'bronze'; tierName = 'Bronze'; tierEmoji = '🥉'; bonus = 10; }
-            else if (level >= 21 && level <= 40) { tier = 'silver'; tierName = 'Silver'; tierEmoji = '🥈'; bonus = 20; }
-            else if (level >= 41 && level <= 60) { tier = 'gold'; tierName = 'Gold'; tierEmoji = '🥇'; bonus = 30; }
-            else if (level >= 61 && level <= 80) { tier = 'platinum'; tierName = 'Platinum'; tierEmoji = '💎'; bonus = 40; }
-            else if (level >= 81 && level <= 100) { tier = 'diamond'; tierName = 'Diamond'; tierEmoji = '👑'; bonus = 50; }
-            else { tier = 'max'; tierName = 'MAX'; tierEmoji = '⭐'; bonus = 50; }
-            let xpForLevel;
-            if (level === 1) xpForLevel = 1800;
-            else if (level >= 2) xpForLevel = 1800 * Math.pow(2, level - 1);
-            else xpForLevel = 5000;
-            return { tier, tierName, tierEmoji, bonusPercent: bonus, xpForLevel: Math.floor(xpForLevel) };
+        // ================== TASKS ===================================
+        function loadTasks() { 
+            db.ref('tasks').on('value', s => { 
+                tasks = s.exists() ? Object.keys(s.val()).map(k => ({ id: k, ...s.val()[k] })) : []; 
+                renderTasks(); 
+            }); 
         }
 
-        function calculateLevel(xp) {
-            xp = xp || NEGATIVE_XP;
-            if (xp < 0) {
-                const baseXP = 5000;
-                const progress = Math.min(100, Math.floor((xp + baseXP) / baseXP * 100));
-                return { level: 0, xp, progress, tierName: 'Unlocking', tierEmoji: '🔒', bonusPercent: 0, isMaxLevel: false, xpForLevel: baseXP };
-            }
-            let level = 1;
-            let xpNeeded = 1800;
-            let totalXP = 0;
-            while (level <= 100) {
-                if (xp < totalXP + xpNeeded) break;
-                totalXP += xpNeeded;
-                level++;
-                if (level > 100) break;
-                xpNeeded = 1800 * Math.pow(2, level - 1);
-            }
-            if (level > 100) {
-                level = 100;
-                xpNeeded = 1800 * Math.pow(2, 99);
-                totalXP = 0;
-                for (let i = 1; i < 100; i++) totalXP += 1800 * Math.pow(2, i - 1);
-            }
-            const config = getLevelConfig(level);
-            const xpInto = xp - totalXP;
-            const progress = Math.min(100, Math.floor((xpInto / xpNeeded) * 100));
-            return {
-                level,
-                xp,
-                progress,
-                tierName: config.tierName,
-                tierEmoji: config.tierEmoji,
-                bonusPercent: config.bonusPercent,
-                isMaxLevel: level >= 100,
-                xpForLevel: xpNeeded,
-                xpInto
-            };
-        }
-
-        function loadLevelConfigFromDB() {
-            db.ref('levelConfig').on('value', snap => {
-                if (snap.exists()) {
-                    levelConfigCache = {};
-                    snap.forEach(c => { levelConfigCache[parseInt(c.key)] = c.val(); });
+        function renderTasks() { 
+            const c = document.getElementById('tasksContainer'), f = currentFilter === 'all' ? tasks : tasks.filter(t => t.type === currentFilter); 
+            c.innerHTML = f.length ? f.map(t => { 
+                const done = app.taskLastCompleted[t.id] === new Date().toDateString();
+                const progress = app.taskProgress[t.id] || 0;
+                const limit = t.limit || 1;
+                const isCompleted = progress >= limit;
+                let statusText = '', btnHtml = '';
+                if (done && isCompleted) {
+                    statusText = '<span style="color:#10b981;">✅ Done</span>';
+                } else if (isCompleted) {
+                    statusText = '<span style="color:#10b981;">✅ Completed</span>';
+                } else {
+                    const remaining = limit - progress;
+                    if (t.type === 'video') {
+                        btnHtml = `<button class="task-btn" id="taskBtn_${t.id}" data-original-text="📺 Watch" onclick="completeTask('${t.id}',${t.reward},'${t.type}')">📺 Watch (${remaining} left)</button>`;
+                    } else if (t.type === 'link') {
+                        btnHtml = `<button class="task-btn" id="taskBtn_${t.id}" onclick="openWebViewTask('${t.id}','${t.link || '#'}',${t.reward},${t.waitTime || 10})">🔗 Open (${remaining} left)</button>`;
+                    } else {
+                        btnHtml = `<button class="task-btn" id="taskBtn_${t.id}" onclick="completeTask('${t.id}',${t.reward},'${t.type}')">🔗 Open (${remaining} left)</button>`;
+                    }
                 }
-                updateLevelUI();
-                if (document.getElementById('levelOverlay').classList.contains('show')) { updateLevelPageUI(); renderLevelGrid(); }
+                return `<div class="task-card"><div class="task-header"><span class="task-title">${t.title}</span><span class="task-reward">+${t.reward} 🪙</span></div><div style="font-size:11px;color:#94a3b8;">${t.description || ''}</div><div class="task-progress">Progress: ${progress}/${limit}</div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">${statusText || btnHtml}</div></div>`; 
+            }).join('') : '<p style="color:#94a3b8;text-align:center;">📭 No tasks</p>'; 
+        }
+
+        function filterTasks(f, b) { currentFilter = f; document.querySelectorAll('.task-filters .filter-btn').forEach(x => x.classList.remove('active')); if (b) b.classList.add('active'); renderTasks(); }
+
+        // === Webview Task Functions (same as your code) ===
+        let webViewTaskId = null, webViewTimerInterval = null, webViewSeconds = 0, webViewRequiredTime = 10, webViewTaskReward = 0;
+        function openWebViewTask(taskId, url, reward, waitTime) {
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            if (app.taskProgress[taskId] >= (tasks.find(t => t.id === taskId)?.limit || 1)) { showToast('Task already completed!', 'error'); return; }
+            if (app.taskLastCompleted[taskId] === new Date().toDateString()) { showToast('Already done today!', 'error'); return; }
+            webViewTaskId = taskId; webViewTaskReward = reward; webViewRequiredTime = waitTime || 10; webViewSeconds = 0;
+            const overlay = document.getElementById('webviewOverlay');
+            document.getElementById('webviewIframe').src = url;
+            document.getElementById('webviewUrlText').textContent = url;
+            overlay.classList.add('show');
+            if (webViewTimerInterval) clearInterval(webViewTimerInterval);
+            webViewTimerInterval = setInterval(() => {
+                webViewSeconds++;
+                const remaining = Math.max(0, webViewRequiredTime - webViewSeconds);
+                document.getElementById('webviewTimer').textContent = `⏱ ${remaining}s`;
+                if (remaining <= 0) {
+                    clearInterval(webViewTimerInterval); webViewTimerInterval = null;
+                    document.getElementById('webviewClaimBtn').disabled = false;
+                    document.getElementById('webviewClaimBtn').textContent = '✅ Claim Reward';
+                } else {
+                    document.getElementById('webviewClaimBtn').textContent = `⏳ ${remaining}s`;
+                }
+            }, 1000);
+        }
+        function closeWebView() {
+            document.getElementById('webviewOverlay').classList.remove('show');
+            if (webViewTimerInterval) { clearInterval(webViewTimerInterval); webViewTimerInterval = null; }
+            document.getElementById('webviewIframe').src = 'about:blank';
+            webViewTaskId = null;
+        }
+        function claimWebViewTask() {
+            if (!webViewTaskId) return;
+            const task = tasks.find(t => t.id === webViewTaskId);
+            if (!task) { showToast('Task not found!', 'error'); return; }
+            const limit = task.limit || 1;
+            const progress = (app.taskProgress[webViewTaskId] || 0) + 1;
+            app.taskProgress[webViewTaskId] = progress;
+            if (progress >= limit) app.taskLastCompleted[webViewTaskId] = new Date().toDateString();
+            app.balance += webViewTaskReward;
+            app.xpPoints += webViewTaskReward * 2;
+            userRef.update({ balance: app.balance, xpPoints: app.xpPoints, taskProgress: app.taskProgress, taskLastCompleted: app.taskLastCompleted });
+            closeWebView();
+            updateUI(); updateLevelUI(); renderTasks();
+            showToast(`🎉 +${webViewTaskReward} Coins!`);
+            document.getElementById('rewardText').textContent = `+${webViewTaskReward} Coins`;
+            document.getElementById('successModal').classList.add('active');
+        }
+
+        function completeTask(tid, rw, type) { 
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            const task = tasks.find(t => t.id === tid);
+            if (!task) return;
+            const limit = task.limit || 1;
+            const progress = (app.taskProgress[tid] || 0);
+            if (progress >= limit) { showToast('Task completed!', 'error'); return; }
+            if (app.taskLastCompleted[tid] === new Date().toDateString() && progress >= limit) { showToast('Done today!', 'error'); return; }
+            if (type === 'video') { 
+                const btn = document.getElementById('taskBtn_' + tid);
+                if (btn) btn.dataset.originalText = '📺 Watch';
+                showRewardedAd(() => { finishTaskProgress(tid, rw, limit); }, 'taskBtn_' + tid);
+            } else { 
+                finishTaskProgress(tid, rw, limit); 
+            } 
+        }
+
+        function finishTaskProgress(tid, rw, limit) {
+            const newProgress = (app.taskProgress[tid] || 0) + 1;
+            app.taskProgress[tid] = newProgress;
+            if (newProgress >= limit) app.taskLastCompleted[tid] = new Date().toDateString();
+            app.balance += rw; app.xpPoints += rw * 2;
+            userRef.update({ balance: app.balance, taskLastCompleted: app.taskLastCompleted, taskProgress: app.taskProgress, xpPoints: app.xpPoints });
+            document.getElementById('rewardText').textContent = `+${rw} Coins`;
+            document.getElementById('successModal').classList.add('active');
+            updateUI(); updateLevelUI(); renderTasks();
+            showToast(`🎉 +${rw} Coins!`);
+        }
+
+        // ================== REFERRAL ================================
+        function loadReferralConfigFromDB() { 
+            db.ref('referralConfig').on('value', s => { 
+                referralConfigCache = s.val() || { perReferralCoins: 50, xpPerReferral: 100 }; 
+                updateReferUI(); 
+            }); 
+        }
+        function updateReferUI() { 
+            const t = app.referralCount || 0; 
+            const perRef = referralConfigCache.perReferralCoins || 50; 
+            document.getElementById('referTotal').textContent = t; 
+            document.getElementById('referEarned').textContent = t * perRef; 
+            document.getElementById('referBonus').textContent = Math.floor(t / 10) * 50; 
+            const tiers = [{ l: 1, c: referralConfigCache.tier1?.count || 10, b: referralConfigCache.tier1?.bonus || 50, n: '🥉 Bronze' }, { l: 2, c: referralConfigCache.tier2?.count || 25, b: referralConfigCache.tier2?.bonus || 150, n: '🥈 Silver' }, { l: 3, c: referralConfigCache.tier3?.count || 50, b: referralConfigCache.tier3?.bonus || 300, n: '🥇 Gold' }, { l: 4, c: referralConfigCache.tier4?.count || 100, b: referralConfigCache.tier4?.bonus || 500, n: '💎 Platinum' }, { l: 5, c: referralConfigCache.tier5?.count || 200, b: referralConfigCache.tier5?.bonus || 1000, n: '👑 Diamond' }]; 
+            document.getElementById('referTierList').innerHTML = tiers.map(r => { 
+                const cl = app.referTiers?.[r.l] === 1, av = t >= r.c && !cl; 
+                return `<div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;"><div><div style="font-size:13px;">${r.n}</div><div style="font-size:10px;color:#94a3b8;">${r.c} refs • +${r.b} 🪙</div></div><span style="color:${av ? '#fbbf24' : '#64748b'};cursor:${av ? 'pointer' : 'default'};" ${av ? `onclick="claimTier(${r.l},${r.b})"` : ''}>${cl ? '✅' : av ? '🎁' : '🔒'}</span></div>`; 
+            }).join(''); 
+        }
+        function claimTier(l, b) { 
+            if (app.referTiers?.[l] === 1) return; 
+            app.balance += b; app.xpPoints += b * 2; 
+            if (!app.referTiers) app.referTiers = {}; 
+            app.referTiers[l] = 1; 
+            userRef.update({ balance: app.balance, xpPoints: app.xpPoints, referTiers: app.referTiers }); 
+            updateUI(); updateLevelUI(); updateReferUI(); 
+            showToast(`🎁 +${b} Coins!`); 
+        }
+        function genRefCode() { return Array(8).fill(0).map(() => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random() * 36)]).join(''); }
+        function submitReferCode() { 
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            const code = document.getElementById('referCodeInput').value.trim(); 
+            if (!code) { showToast('Enter code!', 'error'); return; } 
+            userRef.once('value', s => { 
+                if ((s.val() || {}).referCodeSubmitted) { showToast('Already submitted!', 'error'); return; } 
+                db.ref('users').orderByChild('referCode').equalTo(code).once('value', sn => { 
+                    if (!sn.exists()) { showToast('Invalid!', 'error'); return; } 
+                    sn.forEach(c => { 
+                        if (c.key === userId) { showToast('Own code!', 'error'); return; } 
+                        const bonus = referralConfigCache.perReferralCoins || 50; 
+                        const xpBonus = referralConfigCache.xpPerReferral || 100; 
+                        db.ref('referrals/' + userId).set({ referredBy: c.key, referredAt: Date.now(), username: displayName, bonus: bonus, userId }).then(() => { 
+                            db.ref('users/' + c.key).transaction(cur => ({ ...(cur || {}), referCount: (cur?.referCount || 0) + 1 })); 
+                            app.balance += bonus; app.xpPoints += xpBonus; 
+                            userRef.update({ balance: app.balance, xpPoints: app.xpPoints, referCodeSubmitted: true }); 
+                            document.getElementById('referCodeSubmitBtn').disabled = true; 
+                            document.getElementById('referCodeInput').disabled = true; 
+                            updateUI(); updateLevelUI(); 
+                            showToast(`🎉 +${bonus} Coins!`); 
+                        }); 
+                    }); 
+                }); 
+            }); 
+        }
+        function copyReferLink() { 
+            const link = document.getElementById('referLinkHome').textContent; 
+            if (link && link !== 'Loading...') {
+                navigator.clipboard.writeText(link).then(() => showToast('📋 Copied!')).catch(() => showToast('Copy manually', 'error')); 
+            } else {
+                showToast('Loading referral link...', 'error');
+            }
+        }
+
+        // ================== AIRDROP ================================
+        function loadAirdrop() { 
+            db.ref('airdropConfig').on('value', snap => { 
+                const c = snap.val() || {}; 
+                document.getElementById('airdropPoolDisplay').textContent = `$${(c.poolAmount || 50).toFixed(2)}`; 
+                if (c.startTime) startAirdropCountdown(c.startTime, c.endTime); 
+            }); 
+        }
+        function startAirdropCountdown(st, et) { 
+            if (airdropTimer) clearInterval(airdropTimer); 
+            const endTime = et || st + 300000; 
+            airdropTimer = setInterval(() => { 
+                const r = Math.max(0, endTime - Date.now()), h = Math.floor(r / 3600000), m = Math.floor((r % 3600000) / 60000), s = Math.floor((r % 60000) / 1000); 
+                document.getElementById('airdropCountdown').textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`; 
+                const btn = document.getElementById('airdropClaimBtn'); 
+                if (r > 0 && !app.airdropClaimed) { btn.disabled = false; btn.textContent = '🎁 Claim'; } 
+                else { btn.disabled = true; btn.textContent = app.airdropClaimed ? '✅ Claimed' : '⛔ Ended'; } 
+                if (r <= 0) { clearInterval(airdropTimer); airdropTimer = null; } 
+            }, 1000); 
+        }
+        function openAirdropPage() { 
+            document.getElementById('airdropOverlay').classList.add('show'); 
+            db.ref('airdropVisitors/' + userId).set(true); 
+            db.ref('airdropVisitors/' + userId).onDisconnect().remove(); 
+        }
+        function closeAirdropPage() { 
+            document.getElementById('airdropOverlay').classList.remove('show'); 
+            db.ref('airdropVisitors/' + userId).remove(); 
+        }
+        function claimAirdrop() { 
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            if (app.airdropClaimed) { showToast('Already claimed!', 'error'); return; } 
+            const btn = document.getElementById('airdropClaimBtn');
+            btn.dataset.originalText = '🎁 Claim';
+            showAirdropAd(() => { 
+                const amt = Math.random() * 1.5 + 0.5, coins = Math.floor(amt * app.conversionRate); 
+                app.balance += coins; app.airdropClaimed = true; app.xpPoints += coins; 
+                db.ref('airdropList/' + Date.now()).set({ userId, username: displayName, amount: amt, coins, timestamp: Date.now() }); 
+                userRef.update({ balance: app.balance, airdropClaimed: true, xpPoints: app.xpPoints }); 
+                document.getElementById('airdropModalText').textContent = `+${coins} Coins!`; 
+                document.getElementById('airdropModal').classList.add('active'); 
+                updateUI(); updateLevelUI(); 
+                showToast(`🎉 +${coins} Coins!`); 
+            }, 'airdropClaimBtn');
+        }
+        function showAirdropAd(cb, btnId) {
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            if (typeof show_11197472 !== 'function') { if (cb) cb(); return; }
+            isAdShowing = true;
+            const btn = document.getElementById(btnId);
+            if (btn) { btn.disabled = true; btn.textContent = '⏳ Loading...'; }
+            show_11197472('pop').then(() => {
+                isAdShowing = false;
+                if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || '🎁 Claim'; }
+                if (cb) cb();
+            }).catch(() => {
+                isAdShowing = false;
+                if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || '🎁 Claim'; }
+                if (cb) cb();
             });
         }
 
-        function updateLevelUI() {
-            const d = calculateLevel(app.xpPoints);
-            if (d.level === 0) {
-                document.getElementById('levelTitle').textContent = '🔒 Unlocking';
-                document.getElementById('levelNumber').textContent = 'Level 0';
-                document.getElementById('levelProgressFill').style.width = d.progress + '%';
-                document.getElementById('levelCurrentPoints').textContent = `${d.xp} XP`;
-                document.getElementById('levelNextPoints').textContent = `/ ${d.xpForLevel} XP`;
-                document.getElementById('userLevelBadge').textContent = '🔒 Unlocking';
-            } else {
-                document.getElementById('levelTitle').textContent = `${d.tierEmoji} ${d.tierName}`;
-                document.getElementById('levelNumber').textContent = `Level ${d.level}`;
-                document.getElementById('levelProgressFill').style.width = d.progress + '%';
-                document.getElementById('levelCurrentPoints').textContent = `${d.xp} XP`;
-                document.getElementById('levelNextPoints').textContent = d.isMaxLevel ? '⭐ MAX' : `/ ${d.xpForLevel} XP`;
-                document.getElementById('userLevelBadge').textContent = `${d.tierEmoji} Lv.${d.level}`;
-            }
+        // ================== WITHDRAW ================================
+        function updateWithdrawUI() {
+            const b = app.usdBalance || 0, m = app.minWithdraw || 10;
+            document.getElementById('withdrawInfo').textContent = `Min: $${m.toFixed(2)}`;
+            document.getElementById('withdrawStatus').textContent = `You have: $${b.toFixed(2)}`;
+            const container = document.getElementById('methodSelector');
+            const methods = app.withdrawMethods || ['Nagad', 'Rocket'];
+            if (!methods.includes(app.selectedMethod)) app.selectedMethod = methods[0] || 'Nagad';
+            container.innerHTML = methods.map(m => {
+                const activeClass = m === app.selectedMethod ? 'active' : '';
+                const icon = m.toLowerCase() === 'nagad' ? 'fa-mobile-alt' : 
+                             m.toLowerCase() === 'rocket' ? 'fa-rocket' : 
+                             m.toLowerCase() === 'bkash' ? 'fa-money-bill-wave' : 'fa-wallet';
+                return `<button class="method-btn ${activeClass}" onclick="selectMethod('${m}')"><i class="fas ${icon}"></i> ${m}</button>`;
+            }).join('');
+            const btn = document.getElementById('withdrawBtn');
+            btn.disabled = b < m || !isOnline;
+            btn.textContent = !isOnline ? 'No Internet' : (b < m ? `Need $${(m - b).toFixed(2)} more` : 'Withdraw Now');
         }
 
-        function openLevelPage() { document.getElementById('levelOverlay').classList.add('show'); updateLevelPageUI(); renderLevelGrid(); }
-        function closeLevelPage() { document.getElementById('levelOverlay').classList.remove('show'); }
-        function updateLevelPageUI() { const d = calculateLevel(app.xpPoints); document.getElementById('lvlEmoji').textContent = d.tierEmoji; document.getElementById('lvlNumber').textContent = d.level === 0 ? 'Level 0' : `Level ${d.level}`; document.getElementById('lvlName').textContent = d.tierName; document.getElementById('lvlXP').textContent = d.level === 0 ? `${d.xp} / ${d.xpForLevel} XP` : `${d.xp} XP (${d.progress}%)`; document.getElementById('lvlProgressFill').style.width = d.progress + '%'; document.getElementById('lvlBonus').textContent = `Mining Bonus: +${d.bonusPercent}%`; }
-        function renderLevelGrid() { const grid = document.getElementById('levelGrid'), cl = calculateLevel(app.xpPoints); let html = ''; for (let i = 0; i <= 100; i++) { if (currentLevelFilter !== 'all') { const r = { bronze: [1, 20], silver: [21, 40], gold: [41, 60], platinum: [61, 80], diamond: [81, 100] }; const ra = r[currentLevelFilter]; if (i > 0 && (i < ra[0] || i > ra[1])) continue; if (i === 0 && currentLevelFilter !== 'bronze') continue; } let c = getLevelConfig(i); let isC = cl.level === i, isU = cl.level >= i; html += `<div class="level-card ${isC ? 'current' : isU ? 'unlocked' : 'locked'}"><div style="font-size:18px;font-weight:900;color:#fbbf24;">${c.tierEmoji} ${i}</div><div style="font-size:11px;color:#94a3b8;">${c.tierName}</div><div style="font-size:12px;color:#10b981;">+${c.bonusPercent}%</div><div style="font-size:10px;color:#94a3b8;">${isC ? '👈' : isU ? '✅' : '🔒'}</div></div>`; } grid.innerHTML = html; }
-        function filterLevels(f, b) { currentLevelFilter = f; document.querySelectorAll('.lvl-filter-btn').forEach(x => x.classList.remove('active')); if (b) b.classList.add('active'); renderLevelGrid(); }
+        function selectMethod(method) { app.selectedMethod = method; updateWithdrawUI(); }
+
+        function withdraw() { 
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            const b = app.usdBalance || 0; 
+            if (b < (app.minWithdraw || 10)) { showToast('Insufficient!', 'error'); return; } 
+            const mt = app.selectedMethod; 
+            const ac = document.getElementById('withdrawAccount').value.trim(); 
+            if (!ac) { showToast('Enter account number!', 'error'); return; } 
+            const id = Date.now().toString(); 
+            db.ref('withdrawRequests/' + id).set({ 
+                userId, username: displayName, amount: b, 
+                method: mt, account: ac, status: 'pending', requestedAt: new Date().toISOString() 
+            }); 
+            app.usdBalance = 0; 
+            app.withdrawHistory = [...(app.withdrawHistory || []), { 
+                id, amount: b, method: mt, account: ac, 
+                status: 'pending', date: new Date().toISOString() 
+            }]; 
+            userRef.update({ usdBalance: 0, withdrawHistory: app.withdrawHistory }); 
+            document.getElementById('withdrawModalTitle').textContent = 'Sent!'; 
+            document.getElementById('withdrawModalText').textContent = `$${b.toFixed(2)} via ${mt}`; 
+            document.getElementById('withdrawModal').classList.add('active'); 
+            document.getElementById('withdrawAccount').value = ''; 
+            updateUI(); updateWithdrawUI(); updateWithdrawHistoryUI(); 
+            showToast(`$${b.toFixed(2)} requested!`); 
+        }
+
+        function updateWithdrawHistoryUI() { 
+            const c = document.getElementById('withdrawHistoryList'), h = app.withdrawHistory || []; 
+            if (!h.length) { c.innerHTML = '<span style="color:#94a3b8;font-size:11px;">No history</span>'; return; } 
+            c.innerHTML = h.slice(-20).reverse().map(h => `<div class="history-item"><div><b>$${h.amount?.toFixed(2) || '0'}</b> <small>${h.method || ''}</small>${h.status === 'cancelled' && h.cancelReason ? `<div style="color:#ef4444;font-size:10px;">⚠️ ${h.cancelReason}</div>` : ''}</div><div style="text-align:right;"><span>${h.status === 'approved' ? '✅' : h.status === 'cancelled' ? '❌' : '⏳'} ${h.status}</span><div style="font-size:9px;">${h.date ? new Date(h.date).toLocaleDateString() : ''}</div></div></div>`).join(''); 
+        }
+
+        // ================== SPEED BOOST =============================
+        function updateSpeedBoostUI() { 
+            const bb = document.getElementById('speedBoostBtn'); 
+            const cb = document.getElementById('boostCountdownBox'); 
+            if (app.speedBoostCooldown > Date.now()) { 
+                bb.style.display = 'none'; 
+                cb.classList.add('show'); 
+                if (boostTimer) clearInterval(boostTimer); 
+                boostTimer = setInterval(() => { 
+                    const r = Math.max(0, Math.ceil((app.speedBoostCooldown - Date.now()) / 1000)); 
+                    document.getElementById('boostCountdownTime').textContent = `${String(Math.floor(r / 60)).padStart(2, '0')}:${String(r % 60).padStart(2, '0')}`; 
+                    if (r <= 0) { app.speedBoostCooldown = 0; userRef.update({ speedBoostCooldown: 0 }); updateSpeedBoostUI(); showToast('⚡ Speed Boost ready!'); } 
+                }, 1000); 
+            } else { 
+                bb.style.display = 'flex'; 
+                cb.classList.remove('show'); 
+                if (boostTimer) { clearInterval(boostTimer); boostTimer = null; } 
+                bb.disabled = false; bb.style.opacity = '1'; bb.title = 'Activate Speed Boost (once per hour)';
+            } 
+        }
+        function activateSpeedBoost() { 
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            if (app.speedBoostCooldown > Date.now()) { showToast('⏳ Cooldown active!', 'error'); return; }
+            if (app.progressCoins <= 0) { showToast('❌ No coins to boost!', 'error'); return; }
+            const btn = document.getElementById('speedBoostBtn');
+            btn.dataset.originalText = 'Speed Boost';
+            showInterstitialAd(() => { 
+                const st = Date.now(); 
+                const totalBoostTime = 3000;
+                const intervalTime = 500;
+                let boostCount = 0;
+                const maxCoins = 6;
+                const bm = setInterval(() => { 
+                    if (!isOnline) { clearInterval(bm); showToast('⚠️ Network lost!', 'error'); return; }
+                    if (isAdShowing) return;
+                    if (Date.now() - st >= totalBoostTime || app.progressCoins <= 0 || boostCount >= maxCoins) { 
+                        clearInterval(bm); 
+                        app.speedBoostCooldown = Date.now() + 3600000; 
+                        userRef.update({ speedBoostCooldown: app.speedBoostCooldown }); 
+                        updateSpeedBoostUI(); 
+                        showToast('🚀 Speed Boost Done! (1 hour cooldown)'); 
+                        return; 
+                    } 
+                    app.progressCoins -= 1; app.balance += 2; app.xpPoints += 3; 
+                    boostCount++;
+                    userRef.update({ balance: app.balance, progressCoins: app.progressCoins, xpPoints: app.xpPoints, lastMiningActivity: Date.now() }); 
+                    updateProgressUI(); updateUI(); updateLevelUI(); 
+                    const coin = document.createElement('div'); 
+                    coin.className = 'floating-coin'; 
+                    coin.textContent = '+2 🪙'; 
+                    coin.style.left = (Math.random() * 80 + 10) + '%'; 
+                    coin.style.top = '35%'; 
+                    document.body.appendChild(coin); 
+                    setTimeout(() => coin.remove(), 800); 
+                }, intervalTime); 
+                showToast('⚡ Speed Boost Active!'); 
+            }, 'speedBoostBtn');
+        }
+
+        // ================== CONVERSION ==============================
+        let conversionTimerInterval = null;
+        function performConversion() { 
+            if (app.balance > 0) { 
+                const earned = app.balance / app.conversionRate; 
+                app.usdBalance += earned; 
+                const coins = app.balance; 
+                app.balance = 0; 
+                app.lastConversion = Date.now(); 
+                userRef.update({ balance: 0, usdBalance: app.usdBalance, lastConversion: app.lastConversion }); 
+                document.getElementById('conversionText').textContent = `${coins.toLocaleString()} Coins → $${earned.toFixed(4)} USD`; 
+                document.getElementById('conversionModal').classList.add('active'); 
+                updateUI(); 
+                showToast(`💰 Converted ${coins} Coins to $${earned.toFixed(2)} USD!`); 
+            } else { 
+                app.lastConversion = Date.now(); 
+                userRef.update({ lastConversion: app.lastConversion }); 
+            } 
+            startConversionTimer(); 
+        }
+
+        function startConversionTimer() { 
+            if (conversionTimerInterval) { clearInterval(conversionTimerInterval); conversionTimerInterval = null; }
+            const updateDisplay = () => { 
+                const now = Date.now();
+                const last = app.lastConversion || now;
+                const nextConversion = last + 86400000;
+                const remaining = Math.max(0, nextConversion - now);
+                if (remaining <= 0) {
+                    if (conversionTimerInterval) { clearInterval(conversionTimerInterval); conversionTimerInterval = null; }
+                    performConversion();
+                    return;
+                }
+                const hours = Math.floor(remaining / 3600000);
+                const minutes = Math.floor((remaining % 3600000) / 60000);
+                const seconds = Math.floor((remaining % 60000) / 1000);
+                document.getElementById('conversionCountdown').textContent = 
+                    `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            };
+            updateDisplay();
+            conversionTimerInterval = setInterval(updateDisplay, 1000);
+        }
+
+        // ================== UI UPDATES ==============================
+        function updateUI() { 
+            document.getElementById('balance').textContent = app.balance.toLocaleString(); 
+            document.getElementById('walletBalance').textContent = app.balance.toLocaleString(); 
+            const usdDisplay = (app.balance / app.conversionRate).toFixed(2); 
+            document.getElementById('usdValue').textContent = `≈ $${usdDisplay} USD`; 
+            document.getElementById('walletUsd').textContent = `≈ $${usdDisplay} USD`; 
+            document.getElementById('walletTotalUsd').textContent = `$${app.usdBalance.toFixed(2)}`; 
+            document.getElementById('rateInfo').textContent = `1 USD = ${app.conversionRate} Coins`; 
+            updateWithdrawUI(); updateSpeedBoostUI(); startConversionTimer();
+        }
 
         function updateProgressUI() { 
-            if (!isOnline) return;
             const circle = document.getElementById('miningCircle'), count = document.getElementById('progressCoinCount'), status = document.getElementById('progressStatus'), overlay = document.getElementById('circleStartOverlay'), watchBtn = document.getElementById('progressWatchBtn'), refillCircleBtn = document.getElementById('refillCircleBtn'), pct = (app.progressCoins / TOTAL_COINS * 100); 
             circle.style.background = `conic-gradient(#fbbf24 ${pct}%, #1e293b ${pct}%)`; 
             count.textContent = app.progressCoins; 
             document.getElementById('progressPercent').textContent = Math.round(pct) + '%'; 
-            
             updateRefillUI();
-            
             if (app.progressCoins === 0) { 
                 status.textContent = '🎯 Empty!'; 
                 watchBtn.classList.add('hidden');
@@ -1149,559 +1131,56 @@
             } 
         }
 
-        function startMining() { 
-            if (!isOnline) { showToast('No internet!', 'error'); return; }
-            if (isAdShowing) { showToast('⏳ Please wait for ad to finish', 'error'); return; }
-            if (miningInterval) return; 
-            if (app.progressCoins <= 0) { showToast('❌ No coins!', 'error'); return; } 
-            
-            document.getElementById('circleStartOverlay').classList.add('hidden'); 
-            userRef.update({ isCurrentlyMining: true, lastMiningActivity: Date.now() }); 
-            wasMiningBeforeOffline = true;
-            miningStartedManually = true;
-            
-            function mineNextCoin() {
-                if (!isOnline) { 
-                    stopMining(); 
-                    showToast('⚠️ Network lost! Mining paused.', 'error'); 
-                    return; 
-                }
-                if (isAdShowing) {
-                    setTimeout(mineNextCoin, 1000);
-                    return;
-                }
-                if (app.progressCoins <= 0) { 
-                    stopMining(); 
-                    showToast('🎉 Done!'); 
-                    return; 
-                }
-                
-                const d = calculateLevel(app.xpPoints);
-                const ca = 1 + (d.bonusPercent / 100);
-                
-                app.progressCoins -= 1;
-                app.balance += ca;
-                app.xpPoints += 1;
-                
-                userRef.update({ 
-                    balance: app.balance, 
-                    progressCoins: app.progressCoins, 
-                    xpPoints: app.xpPoints, 
-                    lastMiningActivity: Date.now() 
-                });
-                
-                const coin = document.createElement('div'); 
-                coin.className = 'floating-coin'; 
-                coin.textContent = `+${ca.toFixed(2)} 🪙`; 
-                coin.style.left = (Math.random() * 80 + 10) + '%'; 
-                coin.style.top = '35%'; 
-                document.body.appendChild(coin); 
-                setTimeout(() => coin.remove(), 1000); 
-                
-                updateProgressUI(); 
-                updateUI(); 
-                updateLevelUI();
-                
-                miningInterval = setTimeout(mineNextCoin, 5000);
-            }
-            
-            mineNextCoin();
-            updateProgressUI(); 
-            showToast('⛏️ Mining!'); 
-        }
-
-        function stopMining() { 
-            if (miningInterval) { 
-                clearTimeout(miningInterval); 
-                miningInterval = null; 
-            } 
-            wasMiningBeforeOffline = false;
-            miningStartedManually = false;
-            userRef.update({ isCurrentlyMining: false }); 
-            updateProgressUI(); 
-        }
-
-        function updateSpeedBoostUI() { 
-            const bb = document.getElementById('speedBoostBtn'); 
-            const cb = document.getElementById('boostCountdownBox'); 
-            
-            if (app.speedBoostCooldown > Date.now()) { 
-                bb.style.display = 'none'; 
-                cb.classList.add('show'); 
-                if (boostTimer) clearInterval(boostTimer); 
-                boostTimer = setInterval(() => { 
-                    const r = Math.max(0, Math.ceil((app.speedBoostCooldown - Date.now()) / 1000)); 
-                    document.getElementById('boostCountdownTime').textContent = `${String(Math.floor(r / 60)).padStart(2, '0')}:${String(r % 60).padStart(2, '0')}`; 
-                    if (r <= 0) { 
-                        app.speedBoostCooldown = 0; 
-                        userRef.update({ speedBoostCooldown: 0 }); 
-                        updateSpeedBoostUI(); 
-                        showToast('⚡ Speed Boost ready!');
-                    } 
-                }, 1000); 
-            } else { 
-                bb.style.display = 'flex'; 
-                cb.classList.remove('show'); 
-                if (boostTimer) { 
-                    clearInterval(boostTimer); 
-                    boostTimer = null; 
-                } 
-                bb.disabled = false;
-                bb.style.opacity = '1';
-                bb.title = 'Activate Speed Boost (once per hour)';
-            } 
-        }
-        
-        function activateSpeedBoost() { 
-            if (!isOnline) { showToast('No internet!', 'error'); return; }
-            if (app.speedBoostCooldown > Date.now()) { 
-                showToast('⏳ Cooldown active!', 'error'); 
-                return; 
-            }
-            if (app.progressCoins <= 0) {
-                showToast('❌ No coins to boost!', 'error');
-                return;
-            }
-            
-            const btn = document.getElementById('speedBoostBtn');
-            btn.dataset.originalText = 'Speed Boost';
-            
-            showInterstitialAd(() => { 
-                const st = Date.now(); 
-                const totalBoostTime = 3000;
-                const intervalTime = 500;
-                let boostCount = 0;
-                const maxCoins = 6;
-                
-                const bm = setInterval(() => { 
-                    if (!isOnline) { 
-                        clearInterval(bm); 
-                        showToast('⚠️ Network lost!', 'error'); 
-                        return; 
-                    }
-                    if (isAdShowing) { 
-                        return; 
-                    }
-                    if (Date.now() - st >= totalBoostTime || app.progressCoins <= 0 || boostCount >= maxCoins) { 
-                        clearInterval(bm); 
-                        app.speedBoostCooldown = Date.now() + 3600000; 
-                        userRef.update({ speedBoostCooldown: app.speedBoostCooldown }); 
-                        updateSpeedBoostUI(); 
-                        showToast('🚀 Speed Boost Done! (1 hour cooldown)'); 
-                        return; 
-                    } 
-                    app.progressCoins -= 1; 
-                    app.balance += 2; 
-                    app.xpPoints += 3; 
-                    boostCount++;
-                    userRef.update({ 
-                        balance: app.balance, 
-                        progressCoins: app.progressCoins, 
-                        xpPoints: app.xpPoints, 
-                        lastMiningActivity: Date.now() 
-                    }); 
-                    updateProgressUI(); 
-                    updateUI(); 
-                    updateLevelUI(); 
-                    const coin = document.createElement('div'); 
-                    coin.className = 'floating-coin'; 
-                    coin.textContent = '+2 🪙'; 
-                    coin.style.left = (Math.random() * 80 + 10) + '%'; 
-                    coin.style.top = '35%'; 
-                    document.body.appendChild(coin); 
-                    setTimeout(() => coin.remove(), 800); 
-                }, intervalTime); 
-                showToast('⚡ Speed Boost Active!'); 
-            }, 'speedBoostBtn');
-        }
-
-        function loadTasks() { 
-            db.ref('tasks').on('value', s => { 
-                tasks = s.exists() ? Object.keys(s.val()).map(k => ({ id: k, ...s.val()[k] })) : []; 
-                renderTasks(); 
-            }); 
-        }
-
-        function renderTasks() { 
-            const c = document.getElementById('tasksContainer'), f = currentFilter === 'all' ? tasks : tasks.filter(t => t.type === currentFilter); 
-            c.innerHTML = f.length ? f.map(t => { 
-                const done = app.taskLastCompleted[t.id] === new Date().toDateString();
-                const progress = app.taskProgress[t.id] || 0;
-                const limit = t.limit || 1;
-                const isCompleted = progress >= limit;
-                let statusText = '';
-                let btnHtml = '';
-                if (done && isCompleted) {
-                    statusText = '<span style="color:#10b981;">✅ Done</span>';
-                } else if (isCompleted) {
-                    statusText = '<span style="color:#10b981;">✅ Completed</span>';
-                } else {
-                    const remaining = limit - progress;
-                    if (t.type === 'video') {
-                        btnHtml = `<button class="task-btn" id="taskBtn_${t.id}" data-original-text="📺 Watch" onclick="completeTask('${t.id}',${t.reward},'${t.type}')">📺 Watch (${remaining} left)</button>`;
-                    } else if (t.type === 'link') {
-                        btnHtml = `<button class="task-btn" id="taskBtn_${t.id}" onclick="openWebViewTask('${t.id}','${t.link || '#'}',${t.reward},${t.waitTime || 10})">🔗 Open (${remaining} left)</button>`;
-                    } else {
-                        btnHtml = `<button class="task-btn" id="taskBtn_${t.id}" onclick="completeTask('${t.id}',${t.reward},'${t.type}')">🔗 Open (${remaining} left)</button>`;
-                    }
-                }
-                return `<div class="task-card"><div class="task-header"><span class="task-title">${t.title}</span><span class="task-reward">+${t.reward} 🪙</span></div><div style="font-size:11px;color:#94a3b8;">${t.description || ''}</div><div class="task-progress">Progress: ${progress}/${limit}</div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">${statusText || btnHtml}</div></div>`; 
-            }).join('') : '<p style="color:#94a3b8;text-align:center;">📭 No tasks</p>'; 
-        }
-
-        function filterTasks(f, b) { currentFilter = f; document.querySelectorAll('.task-filters .filter-btn').forEach(x => x.classList.remove('active')); if (b) b.classList.add('active'); renderTasks(); }
-
-        function openWebViewTask(taskId, url, reward, waitTime) {
-            if (!isOnline) { showToast('No internet!', 'error'); return; }
-            if (app.taskProgress[taskId] >= (tasks.find(t => t.id === taskId)?.limit || 1)) {
-                showToast('Task already completed!', 'error');
-                return;
-            }
-            if (app.taskLastCompleted[taskId] === new Date().toDateString()) {
-                showToast('Already done today!', 'error');
-                return;
-            }
-            webViewTaskId = taskId;
-            webViewTaskReward = reward;
-            webViewRequiredTime = waitTime || 10;
-            webViewSeconds = 0;
-            
-            const overlay = document.getElementById('webviewOverlay');
-            const iframe = document.getElementById('webviewIframe');
-            const urlText = document.getElementById('webviewUrlText');
-            const timerBadge = document.getElementById('webviewTimer');
-            const claimBtn = document.getElementById('webviewClaimBtn');
-            
-            urlText.textContent = url;
-            iframe.src = url;
-            claimBtn.disabled = true;
-            claimBtn.textContent = `⏳ ${webViewRequiredTime}s`;
-            overlay.classList.add('show');
-            
-            if (webViewTimerInterval) clearInterval(webViewTimerInterval);
-            webViewTimerInterval = setInterval(() => {
-                webViewSeconds++;
-                const remaining = Math.max(0, webViewRequiredTime - webViewSeconds);
-                timerBadge.textContent = `⏱ ${remaining}s`;
-                if (remaining <= 0) {
-                    clearInterval(webViewTimerInterval);
-                    webViewTimerInterval = null;
-                    claimBtn.disabled = false;
-                    claimBtn.textContent = '✅ Claim Reward';
-                    timerBadge.textContent = '⏱ Done!';
-                } else {
-                    claimBtn.textContent = `⏳ ${remaining}s`;
-                }
-            }, 1000);
-        }
-
-        function closeWebView() {
-            const overlay = document.getElementById('webviewOverlay');
-            overlay.classList.remove('show');
-            if (webViewTimerInterval) {
-                clearInterval(webViewTimerInterval);
-                webViewTimerInterval = null;
-            }
-            document.getElementById('webviewIframe').src = 'about:blank';
-            webViewTaskId = null;
-        }
-
-        function claimWebViewTask() {
-            if (!webViewTaskId) return;
-            const task = tasks.find(t => t.id === webViewTaskId);
-            if (!task) { showToast('Task not found!', 'error'); return; }
-            const limit = task.limit || 1;
-            const progress = (app.taskProgress[webViewTaskId] || 0) + 1;
-            app.taskProgress[webViewTaskId] = progress;
-            if (progress >= limit) {
-                app.taskLastCompleted[webViewTaskId] = new Date().toDateString();
-            }
-            app.balance += webViewTaskReward;
-            app.xpPoints += webViewTaskReward * 2;
-            userRef.update({ 
-                balance: app.balance, 
-                xpPoints: app.xpPoints,
-                taskProgress: app.taskProgress,
-                taskLastCompleted: app.taskLastCompleted 
-            });
-            closeWebView();
-            updateUI();
-            updateLevelUI();
-            renderTasks();
-            showToast(`🎉 +${webViewTaskReward} Coins!`);
-            document.getElementById('rewardText').textContent = `+${webViewTaskReward} Coins`;
-            document.getElementById('successModal').classList.add('active');
-        }
-
-        function completeTask(tid, rw, type) { 
-            if (!isOnline) { showToast('No internet!', 'error'); return; }
-            const task = tasks.find(t => t.id === tid);
-            if (!task) return;
-            const limit = task.limit || 1;
-            const progress = (app.taskProgress[tid] || 0);
-            if (progress >= limit) {
-                showToast('Task completed!', 'error');
-                return;
-            }
-            if (app.taskLastCompleted[tid] === new Date().toDateString() && progress >= limit) {
-                showToast('Done today!', 'error');
-                return;
-            }
-            if (type === 'video') { 
-                const btn = document.getElementById('taskBtn_' + tid);
-                if (btn) btn.dataset.originalText = '📺 Watch';
-                showRewardedAd(() => { 
-                    finishTaskProgress(tid, rw, limit); 
-                }, 'taskBtn_' + tid);
-            } else { 
-                finishTaskProgress(tid, rw, limit); 
-            } 
-        }
-
-        function finishTaskProgress(tid, rw, limit) {
-            const newProgress = (app.taskProgress[tid] || 0) + 1;
-            app.taskProgress[tid] = newProgress;
-            if (newProgress >= limit) {
-                app.taskLastCompleted[tid] = new Date().toDateString();
-            }
-            app.balance += rw;
-            app.xpPoints += rw * 2;
-            userRef.update({ 
-                balance: app.balance, 
-                taskLastCompleted: app.taskLastCompleted, 
-                taskProgress: app.taskProgress,
-                xpPoints: app.xpPoints 
-            });
-            document.getElementById('rewardText').textContent = `+${rw} Coins`;
-            document.getElementById('successModal').classList.add('active');
-            updateUI();
-            updateLevelUI();
-            renderTasks();
-            showToast(`🎉 +${rw} Coins!`);
-        }
-
-        function loadReferralConfigFromDB() { db.ref('referralConfig').on('value', s => { referralConfigCache = s.val() || { perReferralCoins: 50, xpPerReferral: 100 }; updateReferUI(); }); }
-        function updateReferUI() { 
-            const t = app.referralCount || 0; 
-            const perRef = referralConfigCache.perReferralCoins || 50; 
-            document.getElementById('referTotal').textContent = t; 
-            document.getElementById('referEarned').textContent = t * perRef; 
-            document.getElementById('referBonus').textContent = Math.floor(t / 10) * 50; 
-            const tiers = [{ l: 1, c: referralConfigCache.tier1?.count || 10, b: referralConfigCache.tier1?.bonus || 50, n: '🥉 Bronze' }, { l: 2, c: referralConfigCache.tier2?.count || 25, b: referralConfigCache.tier2?.bonus || 150, n: '🥈 Silver' }, { l: 3, c: referralConfigCache.tier3?.count || 50, b: referralConfigCache.tier3?.bonus || 300, n: '🥇 Gold' }, { l: 4, c: referralConfigCache.tier4?.count || 100, b: referralConfigCache.tier4?.bonus || 500, n: '💎 Platinum' }, { l: 5, c: referralConfigCache.tier5?.count || 200, b: referralConfigCache.tier5?.bonus || 1000, n: '👑 Diamond' }]; 
-            document.getElementById('referTierList').innerHTML = tiers.map(r => { const cl = app.referTiers?.[r.l] === 1, av = t >= r.c && !cl; return `<div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;"><div><div style="font-size:13px;">${r.n}</div><div style="font-size:10px;color:#94a3b8;">${r.c} refs • +${r.b} 🪙</div></div><span style="color:${av ? '#fbbf24' : '#64748b'};cursor:${av ? 'pointer' : 'default'};" ${av ? `onclick="claimTier(${r.l},${r.b})"` : ''}>${cl ? '✅' : av ? '🎁' : '🔒'}</span></div>`; }).join(''); 
-        }
-        function claimTier(l, b) { if (app.referTiers?.[l] === 1) return; app.balance += b; app.xpPoints += b * 2; if (!app.referTiers) app.referTiers = {}; app.referTiers[l] = 1; userRef.update({ balance: app.balance, xpPoints: app.xpPoints, referTiers: app.referTiers }); updateUI(); updateLevelUI(); updateReferUI(); showToast(`🎁 +${b} Coins!`); }
-        function genRefCode() { return Array(8).fill(0).map(() => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random() * 36)]).join(''); }
-        
-        function submitReferCode() { 
-            if (!isOnline) { showToast('No internet!', 'error'); return; }
-            const code = document.getElementById('referCodeInput').value.trim(); 
-            if (!code) { showToast('Enter code!', 'error'); return; } 
-            userRef.once('value', s => { 
-                if ((s.val() || {}).referCodeSubmitted) { showToast('Already submitted!', 'error'); return; } 
-                db.ref('users').orderByChild('referCode').equalTo(code).once('value', sn => { 
-                    if (!sn.exists()) { showToast('Invalid!', 'error'); return; } 
-                    sn.forEach(c => { 
-                        if (c.key === userId) { showToast('Own code!', 'error'); return; } 
-                        const bonus = referralConfigCache.perReferralCoins || 50; 
-                        const xpBonus = referralConfigCache.xpPerReferral || 100; 
-                        db.ref('referrals/' + userId).set({ referredBy: c.key, referredAt: Date.now(), username: displayName, bonus: bonus, userId }).then(() => { 
-                            db.ref('users/' + c.key).transaction(cur => ({ ...(cur || {}), referCount: (cur?.referCount || 0) + 1 })); 
-                            app.balance += bonus; 
-                            app.xpPoints += xpBonus; 
-                            userRef.update({ balance: app.balance, xpPoints: app.xpPoints, referCodeSubmitted: true }); 
-                            document.getElementById('referCodeSubmitBtn').disabled = true; 
-                            document.getElementById('referCodeInput').disabled = true; 
-                            updateUI(); 
-                            updateLevelUI(); 
-                            showToast(`🎉 +${bonus} Coins!`); 
-                        }); 
-                    }); 
-                }); 
-            }); 
-        }
-        function copyReferLink() { 
-            const link = document.getElementById('referLinkHome').textContent; 
-            if (link && link !== 'Loading...') {
-                navigator.clipboard.writeText(link).then(() => showToast('📋 Copied!')).catch(() => showToast('Copy manually', 'error')); 
+        function updateLevelUI() {
+            const d = calculateLevel(app.xpPoints);
+            if (d.level === 0) {
+                document.getElementById('levelTitle').textContent = '🔒 Unlocking';
+                document.getElementById('levelNumber').textContent = 'Level 0';
+                document.getElementById('levelProgressFill').style.width = d.progress + '%';
+                document.getElementById('levelCurrentPoints').textContent = `${d.xp} XP`;
+                document.getElementById('levelNextPoints').textContent = `/ ${d.xpForLevel} XP`;
+                document.getElementById('userLevelBadge').textContent = '🔒 Unlocking';
             } else {
-                showToast('Loading referral link...', 'error');
+                document.getElementById('levelTitle').textContent = `${d.tierEmoji} ${d.tierName}`;
+                document.getElementById('levelNumber').textContent = `Level ${d.level}`;
+                document.getElementById('levelProgressFill').style.width = d.progress + '%';
+                document.getElementById('levelCurrentPoints').textContent = `${d.xp} XP`;
+                document.getElementById('levelNextPoints').textContent = d.isMaxLevel ? '⭐ MAX' : `/ ${d.xpForLevel} XP`;
+                document.getElementById('userLevelBadge').textContent = `${d.tierEmoji} Lv.${d.level}`;
             }
         }
 
-        function loadAirdrop() { 
-            db.ref('airdropConfig').on('value', snap => { 
-                const c = snap.val() || {}; 
-                document.getElementById('airdropPoolDisplay').textContent = `$${(c.poolAmount || 50).toFixed(2)}`; 
-                if (c.startTime) startAirdropCountdown(c.startTime, c.endTime); 
-            }); 
+        // ================== LEVEL PAGE ==============================
+        function openLevelPage() { document.getElementById('levelOverlay').classList.add('show'); updateLevelPageUI(); renderLevelGrid(); }
+        function closeLevelPage() { document.getElementById('levelOverlay').classList.remove('show'); }
+        function updateLevelPageUI() { 
+            const d = calculateLevel(app.xpPoints); 
+            document.getElementById('lvlEmoji').textContent = d.tierEmoji; 
+            document.getElementById('lvlNumber').textContent = d.level === 0 ? 'Level 0' : `Level ${d.level}`; 
+            document.getElementById('lvlName').textContent = d.tierName; 
+            document.getElementById('lvlXP').textContent = d.level === 0 ? `${d.xp} / ${d.xpForLevel} XP` : `${d.xp} XP (${d.progress}%)`; 
+            document.getElementById('lvlProgressFill').style.width = d.progress + '%'; 
+            document.getElementById('lvlBonus').textContent = `Mining Bonus: +${d.bonusPercent}%`; 
         }
-        function startAirdropCountdown(st, et) { 
-            if (airdropTimer) clearInterval(airdropTimer); 
-            const endTime = et || st + 300000; 
-            airdropTimer = setInterval(() => { 
-                const r = Math.max(0, endTime - Date.now()), h = Math.floor(r / 3600000), m = Math.floor((r % 3600000) / 60000), s = Math.floor((r % 60000) / 1000); 
-                document.getElementById('airdropCountdown').textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`; 
-                const btn = document.getElementById('airdropClaimBtn'); 
-                if (r > 0 && !app.airdropClaimed) { btn.disabled = false; btn.textContent = '🎁 Claim'; } 
-                else { btn.disabled = true; btn.textContent = app.airdropClaimed ? '✅ Claimed' : '⛔ Ended'; } 
-                if (r <= 0) { clearInterval(airdropTimer); airdropTimer = null; } 
-            }, 1000); 
-        }
-        function openAirdropPage() { document.getElementById('airdropOverlay').classList.add('show'); db.ref('airdropVisitors/' + userId).set(true); db.ref('airdropVisitors/' + userId).onDisconnect().remove(); }
-        function closeAirdropPage() { document.getElementById('airdropOverlay').classList.remove('show'); db.ref('airdropVisitors/' + userId).remove(); }
-        function claimAirdrop() { 
-            if (!isOnline) { showToast('No internet!', 'error'); return; }
-            if (app.airdropClaimed) { showToast('Already claimed!', 'error'); return; } 
-            const btn = document.getElementById('airdropClaimBtn');
-            showAirdropAd(() => { 
-                const amt = Math.random() * 1.5 + 0.5, coins = Math.floor(amt * app.conversionRate); 
-                app.balance += coins; 
-                app.airdropClaimed = true; 
-                app.xpPoints += coins; 
-                db.ref('airdropList/' + Date.now()).set({ userId, username: displayName, amount: amt, coins, timestamp: Date.now() }); 
-                userRef.update({ balance: app.balance, airdropClaimed: true, xpPoints: app.xpPoints }); 
-                document.getElementById('airdropModalText').textContent = `+${coins} Coins!`; 
-                document.getElementById('airdropModal').classList.add('active'); 
-                updateUI(); 
-                updateLevelUI(); 
-                showToast(`🎉 +${coins} Coins!`); 
-            }, 'airdropClaimBtn');
-        }
-
-        function updateWithdrawUI() {
-            const b = app.usdBalance || 0, m = app.minWithdraw || 10;
-            document.getElementById('withdrawInfo').textContent = `Min: $${m.toFixed(2)}`;
-            document.getElementById('withdrawStatus').textContent = `You have: $${b.toFixed(2)}`;
-            
-            const container = document.getElementById('methodSelector');
-            const methods = app.withdrawMethods || ['Nagad', 'Rocket'];
-            if (!methods.includes(app.selectedMethod)) {
-                app.selectedMethod = methods[0] || 'Nagad';
-            }
-            container.innerHTML = methods.map(m => {
-                const activeClass = m === app.selectedMethod ? 'active' : '';
-                const icon = m.toLowerCase() === 'nagad' ? 'fa-mobile-alt' : 
-                             m.toLowerCase() === 'rocket' ? 'fa-rocket' : 
-                             m.toLowerCase() === 'bkash' ? 'fa-money-bill-wave' : 'fa-wallet';
-                return `<button class="method-btn ${activeClass}" onclick="selectMethod('${m}')"><i class="fas ${icon}"></i> ${m}</button>`;
-            }).join('');
-            
-            const btn = document.getElementById('withdrawBtn');
-            btn.disabled = b < m || !isOnline;
-            btn.textContent = !isOnline ? 'No Internet' : (b < m ? `Need $${(m - b).toFixed(2)} more` : 'Withdraw Now');
-        }
-
-        function selectMethod(method) {
-            app.selectedMethod = method;
-            updateWithdrawUI();
-        }
-
-        function withdraw() { 
-            if (!isOnline) { showToast('No internet!', 'error'); return; }
-            const b = app.usdBalance || 0; 
-            if (b < (app.minWithdraw || 10)) { showToast('Insufficient!', 'error'); return; } 
-            const mt = app.selectedMethod; 
-            const ac = document.getElementById('withdrawAccount').value.trim(); 
-            if (!ac) { showToast('Enter account number!', 'error'); return; } 
-            const id = Date.now().toString(); 
-            db.ref('withdrawRequests/' + id).set({ 
-                userId, username: displayName, amount: b, 
-                method: mt, account: ac, 
-                status: 'pending', requestedAt: new Date().toISOString() 
-            }); 
-            app.usdBalance = 0; 
-            app.withdrawHistory = [...(app.withdrawHistory || []), { 
-                id, amount: b, method: mt, account: ac, 
-                status: 'pending', date: new Date().toISOString() 
-            }]; 
-            userRef.update({ usdBalance: 0, withdrawHistory: app.withdrawHistory }); 
-            document.getElementById('withdrawModalTitle').textContent = 'Sent!'; 
-            document.getElementById('withdrawModalText').textContent = `$${b.toFixed(2)} via ${mt}`; 
-            document.getElementById('withdrawModal').classList.add('active'); 
-            document.getElementById('withdrawAccount').value = ''; 
-            updateUI(); 
-            updateWithdrawUI(); 
-            updateWithdrawHistoryUI(); 
-            showToast(`$${b.toFixed(2)} requested!`); 
-        }
-
-        function updateWithdrawHistoryUI() { 
-            const c = document.getElementById('withdrawHistoryList'), h = app.withdrawHistory || []; 
-            if (!h.length) { 
-                c.innerHTML = '<span style="color:#94a3b8;font-size:11px;">No history</span>'; 
-                return; 
+        function renderLevelGrid() { 
+            const grid = document.getElementById('levelGrid'), cl = calculateLevel(app.xpPoints); 
+            let html = ''; 
+            for (let i = 0; i <= 100; i++) { 
+                if (currentLevelFilter !== 'all') { 
+                    const r = { bronze: [1, 20], silver: [21, 40], gold: [41, 60], platinum: [61, 80], diamond: [81, 100] }; 
+                    const ra = r[currentLevelFilter]; 
+                    if (i > 0 && (i < ra[0] || i > ra[1])) continue; 
+                    if (i === 0 && currentLevelFilter !== 'bronze') continue; 
+                } 
+                let c = getLevelConfig(i); 
+                let isC = cl.level === i, isU = cl.level >= i; 
+                html += `<div class="level-card ${isC ? 'current' : isU ? 'unlocked' : 'locked'}"><div style="font-size:18px;font-weight:900;color:#fbbf24;">${c.tierEmoji} ${i}</div><div style="font-size:11px;color:#94a3b8;">${c.tierName}</div><div style="font-size:12px;color:#10b981;">+${c.bonusPercent}%</div><div style="font-size:10px;color:#94a3b8;">${isC ? '👈' : isU ? '✅' : '🔒'}</div></div>`; 
             } 
-            c.innerHTML = h.slice(-20).reverse().map(h => `<div class="history-item"><div><b>$${h.amount?.toFixed(2) || '0'}</b> <small>${h.method || ''}</small>${h.status === 'cancelled' && h.cancelReason ? `<div style="color:#ef4444;font-size:10px;">⚠️ ${h.cancelReason}</div>` : ''}</div><div style="text-align:right;"><span>${h.status === 'approved' ? '✅' : h.status === 'cancelled' ? '❌' : '⏳'} ${h.status}</span><div style="font-size:9px;">${h.date ? new Date(h.date).toLocaleDateString() : ''}</div></div></div>`).join(''); 
+            grid.innerHTML = html; 
         }
+        function filterLevels(f, b) { currentLevelFilter = f; document.querySelectorAll('.lvl-filter-btn').forEach(x => x.classList.remove('active')); if (b) b.classList.add('active'); renderLevelGrid(); }
 
-        let conversionTimerInterval = null;
-
-        function performConversion() { 
-            if (app.balance > 0) { 
-                const earned = app.balance / app.conversionRate; 
-                app.usdBalance += earned; 
-                const coins = app.balance; 
-                app.balance = 0; 
-                app.lastConversion = Date.now(); 
-                userRef.update({ balance: 0, usdBalance: app.usdBalance, lastConversion: app.lastConversion }); 
-                document.getElementById('conversionText').textContent = `${coins.toLocaleString()} Coins → $${earned.toFixed(4)} USD`; 
-                document.getElementById('conversionModal').classList.add('active'); 
-                updateUI(); 
-                showToast(`💰 Converted ${coins} Coins to $${earned.toFixed(2)} USD!`); 
-            } else { 
-                app.lastConversion = Date.now(); 
-                userRef.update({ lastConversion: app.lastConversion }); 
-            } 
-            startConversionTimer(); 
-        }
-
-        function startConversionTimer() { 
-            if (conversionTimerInterval) {
-                clearInterval(conversionTimerInterval);
-                conversionTimerInterval = null;
-            }
-            
-            const updateDisplay = () => { 
-                const now = Date.now();
-                const last = app.lastConversion || now;
-                const nextConversion = last + 86400000;
-                const remaining = Math.max(0, nextConversion - now);
-                
-                if (remaining <= 0) {
-                    if (conversionTimerInterval) {
-                        clearInterval(conversionTimerInterval);
-                        conversionTimerInterval = null;
-                    }
-                    performConversion();
-                    return;
-                }
-                
-                const hours = Math.floor(remaining / 3600000);
-                const minutes = Math.floor((remaining % 3600000) / 60000);
-                const seconds = Math.floor((remaining % 60000) / 1000);
-                
-                document.getElementById('conversionCountdown').textContent = 
-                    `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-            };
-            
-            updateDisplay();
-            conversionTimerInterval = setInterval(updateDisplay, 1000);
-        }
-
-        function updateUI() { 
-            document.getElementById('balance').textContent = app.balance.toLocaleString(); 
-            document.getElementById('walletBalance').textContent = app.balance.toLocaleString(); 
-            const usdDisplay = (app.balance / app.conversionRate).toFixed(2); 
-            document.getElementById('usdValue').textContent = `≈ $${usdDisplay} USD`; 
-            document.getElementById('walletUsd').textContent = `≈ $${usdDisplay} USD`; 
-            document.getElementById('walletTotalUsd').textContent = `$${app.usdBalance.toFixed(2)}`; 
-            document.getElementById('rateInfo').textContent = `1 USD = ${app.conversionRate} Coins`; 
-            updateWithdrawUI(); 
-            updateSpeedBoostUI(); 
-            startConversionTimer();
-        }
-
+        // ================== NAVIGATION ==============================
         function switchPage(p, el) { 
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active')); 
             if (el) el.classList.add('active'); 
@@ -1710,12 +1189,10 @@
             if (t) t.classList.add('active'); 
             if (p === 'tasks') renderTasks(); 
             if (p === 'refer') updateReferUI(); 
-            if (p === 'wallet') { 
-                updateWithdrawUI(); 
-                updateWithdrawHistoryUI(); 
-            } 
+            if (p === 'wallet') { updateWithdrawUI(); updateWithdrawHistoryUI(); } 
         }
 
+        // ================== TOAST & MODAL ===========================
         function showToast(m, ty = 'success') { 
             const t = document.getElementById('toast'); 
             t.textContent = m; 
@@ -1723,10 +1200,71 @@
             clearTimeout(t._t); 
             t._t = setTimeout(() => t.classList.remove('show'), 3000); 
         }
-
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-        // ==================== INIT ====================
+        // ================== BAN SYSTEM ==============================
+        function checkBanStatus() { 
+            userRef.child('banned').on('value', s => { 
+                const b = s.val() === true; 
+                app.isBanned = b; 
+                if (b) { 
+                    document.getElementById('bannedOverlay').classList.add('show'); 
+                    document.getElementById('mainContent').style.display = 'none'; 
+                    document.querySelector('.bottom-nav').style.display = 'none'; 
+                    document.querySelector('.video-watch-container').style.display = 'none'; 
+                    userRef.child('banReason').once('value', rs => { 
+                        app.banReason = rs.val() || 'Violation'; 
+                        document.getElementById('banReason').textContent = `Reason: ${app.banReason}`; 
+                    }); 
+                    userRef.child('banAppealSubmitted').once('value', as => { 
+                        app.banAppealSubmitted = as.val() || false; 
+                        const btn = document.getElementById('appealBtn'), st = document.getElementById('appealStatus'); 
+                        if (app.banAppealSubmitted) { 
+                            btn.disabled = true; btn.textContent = '✅ Submitted'; 
+                            st.style.display = 'block'; st.textContent = 'Under review.'; 
+                        } else { 
+                            btn.disabled = false; btn.textContent = '📩 Submit Appeal'; 
+                            st.style.display = 'none'; 
+                        } 
+                    }); 
+                } else { 
+                    document.getElementById('bannedOverlay').classList.remove('show'); 
+                    document.getElementById('mainContent').style.display = 'block'; 
+                    document.querySelector('.bottom-nav').style.display = 'flex'; 
+                    document.querySelector('.video-watch-container').style.display = 'flex'; 
+                } 
+            }); 
+        }
+
+        function submitBanAppeal() { 
+            if (app.banAppealSubmitted) { showToast('Already submitted!', 'error'); return; } 
+            const msg = prompt('📩 Write your appeal:'); 
+            if (!msg || msg.trim().length < 5) { showToast('Write proper message!', 'error'); return; } 
+            db.ref('banAppeals/' + userId).set({ userId, username: displayName, message: msg.trim(), banReason: app.banReason, status: 'pending', createdAt: Date.now() }, () => { 
+                userRef.update({ banAppealSubmitted: true }); 
+                app.banAppealSubmitted = true; 
+                document.getElementById('appealBtn').disabled = true; 
+                document.getElementById('appealBtn').textContent = '✅ Submitted'; 
+                document.getElementById('appealStatus').style.display = 'block'; 
+                document.getElementById('appealStatus').textContent = 'Submitted!'; 
+                showToast('📩 Appeal submitted!'); 
+            }); 
+        }
+
+        // ================== RULES ===================================
+        function loadRules() {
+            db.ref('rules').on('value', snap => {
+                const rules = snap.val() || {};
+                document.getElementById('miningRulesText').textContent = rules.mining || 'No rules set.';
+                document.getElementById('taskRulesText').textContent = rules.tasks || 'No rules set.';
+                document.getElementById('referRulesText').textContent = rules.referral || 'No rules set.';
+                document.getElementById('withdrawRulesText').textContent = rules.withdraw || 'No rules set.';
+                document.getElementById('levelRulesText').textContent = rules.level || 'No rules set.';
+                document.getElementById('airdropRulesText').textContent = rules.airdrop || 'No rules set.';
+            });
+        }
+
+        // ================== INIT ====================================
         function initApp() {
             if (!navigator.onLine) {
                 document.getElementById('networkOverlay').classList.add('show');
@@ -1741,17 +1279,12 @@
             loadVideoWatchConfig();
             loadRefillConfig();
             
-            db.ref('conversionRate').on('value', s => { 
-                app.conversionRate = s.val() || 1000;
-                updateUI(); 
-            });
-            
+            db.ref('conversionRate').on('value', s => { app.conversionRate = s.val() || 1000; updateUI(); });
             loadLevelConfigFromDB();
             
             userRef.on('value', snap => {
                 const d = snap.val() || {};
                 if (d.banned) return;
-                
                 app.balance = d.balance || 0;
                 app.usdBalance = d.usdBalance || 0;
                 app.referralCount = d.referCount || 0;
@@ -1772,16 +1305,19 @@
                 
                 document.getElementById('referLinkHome').textContent = `https://t.me/CoinQuist_bot?start=ref_${app.referCode}`;
                 
-                if (miningStartedManually && !miningInterval && isOnline && app.progressCoins > 0 && !document.hidden && !isAdShowing) {
-                    startMining();
-                }
-                
                 const savedName = d.fullName || d.firstName || d.username || displayName;
                 document.getElementById('userName').textContent = savedName;
                 if (d.lastLogin) document.getElementById('lastLoginDisplay').textContent = `📅 ${new Date(d.lastLogin).toLocaleString()}`;
                 
                 if (!d.balance && d.xpPoints === undefined) {
-                    userRef.update({ balance: 0, usdBalance: 0, referCode: app.referCode, progressCoins: TOTAL_COINS, xpPoints: NEGATIVE_XP, lastConversion: Date.now(), lastLogin: new Date().toISOString(), airdropClaimed: false, isCurrentlyMining: false, username: tgUsername, firstName: tgFirstName, lastName: tgLastName, fullName: displayName });
+                    userRef.update({ 
+                        balance: 0, usdBalance: 0, referCode: app.referCode, 
+                        progressCoins: TOTAL_COINS, xpPoints: NEGATIVE_XP, 
+                        lastConversion: Date.now(), lastLogin: new Date().toISOString(), 
+                        airdropClaimed: false, isCurrentlyMining: false, 
+                        username: tgUsername, firstName: tgFirstName, 
+                        lastName: tgLastName, fullName: displayName 
+                    });
                 }
                 
                 updateUI();
@@ -1795,9 +1331,7 @@
                 document.getElementById('loadingPage').classList.add('hidden');
             });
 
-            setTimeout(() => {
-                document.getElementById('loadingPage').classList.add('hidden');
-            }, 5000);
+            setTimeout(() => { document.getElementById('loadingPage').classList.add('hidden'); }, 5000);
 
             db.ref('withdrawSettings').on('value', s => { 
                 if (s.exists()) { 
@@ -1825,8 +1359,7 @@
                             showToast(`⚠️ Cancelled: ${d.cancelReason || 'No reason'}. Refunded $${(d.amount || 0).toFixed(2)}`, 'error'); 
                         } 
                         userRef.update({ withdrawHistory: app.withdrawHistory }); 
-                        updateUI(); 
-                        updateWithdrawHistoryUI(); 
+                        updateUI(); updateWithdrawHistoryUI(); 
                     } 
                 } 
             });
@@ -1842,11 +1375,9 @@
                                 const xpBonus = referralConfigCache.xpPerReferral || 100; 
                                 db.ref('referrals/' + userId).set({ referredBy: c.key, referredAt: Date.now(), username: displayName, bonus: bonus, userId }).then(() => { 
                                     db.ref('users/' + c.key).transaction(cur => ({ ...(cur || {}), referCount: (cur?.referCount || 0) + 1 })); 
-                                    app.balance += bonus; 
-                                    app.xpPoints += xpBonus; 
+                                    app.balance += bonus; app.xpPoints += xpBonus; 
                                     userRef.update({ balance: app.balance, xpPoints: app.xpPoints }); 
-                                    updateUI(); 
-                                    updateLevelUI(); 
+                                    updateUI(); updateLevelUI(); 
                                 }); 
                             } 
                         }); 
@@ -1856,6 +1387,19 @@
             
             setTimeout(() => showToast('👋 Welcome ' + displayName + '!'), 1500);
         }
+
+        // ================== LEVEL CONFIG DB =========================
+        function loadLevelConfigFromDB() {
+            db.ref('levelConfig').on('value', snap => {
+                if (snap.exists()) {
+                    levelConfigCache = {};
+                    snap.forEach(c => { levelConfigCache[parseInt(c.key)] = c.val(); });
+                }
+                updateLevelUI();
+                if (document.getElementById('levelOverlay').classList.contains('show')) { updateLevelPageUI(); renderLevelGrid(); }
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
