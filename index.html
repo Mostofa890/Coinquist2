@@ -587,67 +587,79 @@
             currentRotation += totalRotation;
             canvas.style.transform = `rotate(${currentRotation}deg)`;
 
-            // Show Rewarded Ad
-            showRewardedAd(() => {
-                // Determine prize based on where wheel stopped
-                const angleInRadians = currentRotation * (Math.PI / 180);
-                const prize = getPrizeByAngle(angleInRadians);
-                let rewardCoins = 0;
-                let rewardUsd = 0;
+            // ✅ Correct Ad SDK call with .then()
+            show_11197472('pop')
+                .then(() => {
+                    // ✅ Ad দেখার পর এই ব্লকটি চলবে
+                    isAdShowing = false;
+                    
+                    // Determine prize based on where wheel stopped
+                    const angleInRadians = currentRotation * (Math.PI / 180);
+                    const prize = getPrizeByAngle(angleInRadians);
+                    let rewardCoins = 0;
+                    let rewardUsd = 0;
 
-                if (prize.type === 'coins') {
-                    rewardCoins = prize.value;
-                    // Check if mining coins will exceed 1000
-                    const newCoins = app.progressCoins + rewardCoins;
-                    if (newCoins > TOTAL_COINS) {
-                        rewardCoins = Math.max(0, TOTAL_COINS - app.progressCoins);
+                    if (prize.type === 'coins') {
+                        rewardCoins = prize.value;
+                        // Check if mining coins will exceed 1000
+                        const newCoins = app.progressCoins + rewardCoins;
+                        if (newCoins > TOTAL_COINS) {
+                            rewardCoins = Math.max(0, TOTAL_COINS - app.progressCoins);
+                        }
+                    } else if (prize.type === 'usd') {
+                        rewardUsd = prize.value;
                     }
-                } else if (prize.type === 'usd') {
-                    rewardUsd = prize.value;
-                }
 
-                // Apply rewards
-                if (rewardCoins > 0) {
-                    app.progressCoins += rewardCoins;
-                }
-                if (rewardUsd > 0) {
-                    app.usdBalance += rewardUsd;
-                }
+                    // Apply rewards
+                    if (rewardCoins > 0) {
+                        app.progressCoins += rewardCoins;
+                    }
+                    if (rewardUsd > 0) {
+                        app.usdBalance += rewardUsd;
+                    }
 
-                // Update spin count
-                spinCount--;
-                document.getElementById('spinCountDisplay').textContent = `Spins: ${spinCount}/${SPIN_COUNT_LIMIT}`;
-                document.getElementById('spinResult').textContent = `🎉 You won ${prize.label}!`;
+                    // Update spin count
+                    spinCount--;
+                    document.getElementById('spinCountDisplay').textContent = `Spins: ${spinCount}/${SPIN_COUNT_LIMIT}`;
+                    document.getElementById('spinResult').textContent = `🎉 You won ${prize.label}!`;
 
-                // Show result in modal
-                let resultText = '';
-                if (rewardCoins > 0) {
-                    resultText += `+${rewardCoins} Coins!`;
-                }
-                if (rewardUsd > 0) {
-                    resultText += `+$${rewardUsd.toFixed(2)} USD!`;
-                }
-                if (resultText === '') {
-                    resultText = 'Better luck next time!';
-                }
-                document.getElementById('rewardText').textContent = resultText;
-                document.getElementById('successModal').classList.add('active');
+                    // Show result in modal
+                    let resultText = '';
+                    if (rewardCoins > 0) {
+                        resultText += `+${rewardCoins} Coins!`;
+                    }
+                    if (rewardUsd > 0) {
+                        resultText += `+$${rewardUsd.toFixed(2)} USD!`;
+                    }
+                    if (resultText === '') {
+                        resultText = 'Better luck next time!';
+                    }
+                    document.getElementById('rewardText').textContent = resultText;
+                    document.getElementById('successModal').classList.add('active');
 
-                // Save to Firebase
-                userRef.update({
-                    progressCoins: app.progressCoins,
-                    usdBalance: app.usdBalance,
-                    spinCount: spinCount,
-                    spinResetTime: spinResetTime
+                    // Save to Firebase
+                    userRef.update({
+                        progressCoins: app.progressCoins,
+                        usdBalance: app.usdBalance,
+                        spinCount: spinCount,
+                        spinResetTime: spinResetTime
+                    });
+
+                    updateUI();
+                    updateProgressUI();
+                    updateLevelUI();
+
+                    isSpinning = false;
+                    showToast(`🎰 Spin result: ${prize.label}`);
+                })
+                .catch((error) => {
+                    // ❌ Ad লোড করতে ব্যর্থ হলে
+                    isAdShowing = false;
+                    btn.disabled = false;
+                    btn.textContent = '🎡 Spin Now';
+                    isSpinning = false;
+                    showToast('⚠️ Ad failed, please try again!', 'error');
                 });
-
-                updateUI();
-                updateProgressUI();
-                updateLevelUI();
-
-                isSpinning = false;
-                showToast(`🎰 Spin result: ${prize.label}`);
-            }, 'spinBtn');
         }
 
         function loadSpinData() {
@@ -702,85 +714,6 @@
         function checkNetworkAndReload() {
             if (navigator.onLine) { location.reload(); }
             else { showToast('❌ Still offline!', 'error'); }
-        }
-
-        // ================== AD HANDLER ======================
-        function showRewardedAd(cb, btnId) {
-            if (!isOnline) { showToast('No internet!', 'error'); return; }
-            if (typeof show_11197472 !== 'function') { 
-                if (cb) cb(); 
-                return; 
-            }
-            
-            isAdShowing = true;
-            const btn = document.getElementById(btnId);
-            if (btn) {
-                btn.disabled = true;
-                btn.textContent = '⏳ Loading...';
-            }
-            
-            try {
-                // Ad শেষ হলে callback চালাবে
-                show_11197472('pop', function() {
-                    isAdShowing = false;
-                    if (btn) { 
-                        btn.disabled = false; 
-                        btn.textContent = btn.dataset.originalText || '🎡 Spin Now'; 
-                    }
-                    if (cb) cb();
-                });
-            } catch (error) {
-                isAdShowing = false;
-                if (btn) { 
-                    btn.disabled = false; 
-                    btn.textContent = btn.dataset.originalText || '🎡 Spin Now'; 
-                }
-                if (cb) cb();
-                showToast('⚠️ Ad failed, but reward given!');
-            }
-        }
-
-        function showInterstitialAd(cb, btnId) {
-            if (!isOnline) { showToast('No internet!', 'error'); return; }
-            if (typeof show_11197472 !== 'function') { if (cb) cb(); return; }
-            
-            isAdShowing = true;
-            const btn = document.getElementById(btnId);
-            if (btn) {
-                btn.disabled = true;
-                btn.textContent = '⏳ Loading...';
-            }
-            
-            try {
-                show_11197472(function() {
-                    isAdShowing = false;
-                    if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || 'Speed Boost'; }
-                    if (cb) cb();
-                });
-            } catch (error) {
-                isAdShowing = false;
-                if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || 'Speed Boost'; }
-                if (cb) cb();
-            }
-        }
-
-        function showAirdropAd(cb, btnId) {
-            if (!isOnline) { showToast('No internet!', 'error'); return; }
-            if (typeof show_11197472 !== 'function') { if (cb) cb(); return; }
-            isAdShowing = true;
-            const btn = document.getElementById(btnId);
-            if (btn) { btn.disabled = true; btn.textContent = '⏳ Loading...'; }
-            try {
-                show_11197472('pop', function() {
-                    isAdShowing = false;
-                    if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || '🎁 Claim'; }
-                    if (cb) cb();
-                });
-            } catch (error) {
-                isAdShowing = false;
-                if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || '🎁 Claim'; }
-                if (cb) cb();
-            }
         }
 
         // ================== USER LEVEL ==============================
