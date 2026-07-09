@@ -634,6 +634,22 @@
             const btn = document.getElementById('mainRefillBtn');
             btn.dataset.originalText = 'Refill Coins';
             
+            // Ad দেখার আগে বাটন ইনঅ্যাক্টিভ এবং কাউন্টডাউন শুরু
+            btn.disabled = true;
+            let countdown = 15;
+            btn.textContent = `⏳ ${countdown}s`;
+            
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                if (countdown > 0) {
+                    btn.textContent = `⏳ ${countdown}s`;
+                } else {
+                    clearInterval(countdownInterval);
+                    btn.textContent = '▶ Watch Ad';
+                    btn.disabled = false;
+                }
+            }, 1000);
+            
             showRewardedAd(() => {
                 // ✅ Ad দেখার পর কয়েন যোগ হবে
                 refillProgress++;
@@ -718,10 +734,26 @@
                 showToast('🎉 All videos watched!', 'error');
                 return;
             }
+            
             isVideoWatching = true;
             const btn = document.getElementById('videoWatchBtn');
             btn.dataset.originalText = '▶ Watch Video';
-            btn.disabled = true; btn.textContent = '⏳ Loading Ad...';
+            
+            // Ad দেখার আগে বাটন ইনঅ্যাক্টিভ এবং কাউন্টডাউন শুরু
+            btn.disabled = true;
+            let countdown = 15;
+            btn.textContent = `⏳ ${countdown}s`;
+            
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                if (countdown > 0) {
+                    btn.textContent = `⏳ ${countdown}s`;
+                } else {
+                    clearInterval(countdownInterval);
+                    btn.textContent = '▶ Watch Video';
+                    btn.disabled = false;
+                }
+            }, 1000);
             
             showRewardedAd(() => {
                 isVideoWatching = false;
