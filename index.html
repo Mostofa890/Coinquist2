@@ -186,16 +186,26 @@
             cursor: pointer;
             z-index: 999;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
             transition: all 0.3s ease;
-            animation: spinFloat 4s linear infinite;
+            position: relative;
         }
         .floating-spin-btn:disabled {
-            opacity: 0.5;
+            opacity: 0.6;
             cursor: not-allowed;
+        }
+        .floating-spin-btn .spin-icon {
+            font-size: 28px;
+            animation: spinFloat 4s linear infinite;
+        }
+        .floating-spin-btn:disabled .spin-icon {
             animation: none;
+        }
+        @keyframes spinFloat {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         .floating-spin-btn .spin-badge {
             position: absolute;
@@ -208,32 +218,33 @@
             font-size: 12px;
             font-weight: 700;
         }
-        @keyframes spinFloat {
-            0% { transform: rotate(0deg) scale(1); }
-            25% { transform: rotate(90deg) scale(1.05); }
-            50% { transform: rotate(180deg) scale(1); }
-            75% { transform: rotate(270deg) scale(1.05); }
-            100% { transform: rotate(360deg) scale(1); }
-        }
         .floating-spin-btn .timer-overlay {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: rgba(0,0,0,0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: 700;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
             color: #fbbf24;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+            display: none;
+            border: 1px solid rgba(251,191,36,0.3);
         }
         .floating-spin-btn .timer-overlay.show {
-            opacity: 1;
+            display: block;
+        }
+        .floating-spin-btn .timer-overlay .timer-label {
+            font-size: 9px;
+            color: #94a3b8;
+            display: block;
+            text-align: center;
+        }
+        .floating-spin-btn .timer-overlay .timer-time {
+            display: block;
+            text-align: center;
         }
 
         /* ================== SPIN WHEEL MODAL ================== */
@@ -258,6 +269,7 @@
             max-width: 400px;
             text-align: center;
             border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
         }
         .spin-modal-content .close-modal-btn {
             position: absolute;
@@ -273,6 +285,86 @@
         }
         .spin-modal-content .spin-wheel-container {
             margin-top: 10px;
+        }
+        .spin-modal-content .wheel-wrapper {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+        }
+        .spin-modal-content .wheel-pointer {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-top: 20px solid #fbbf24;
+            z-index: 10;
+        }
+        .spin-modal-content .wheel-canvas {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            box-shadow: 0 0 40px rgba(251,191,36,0.2);
+            transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+        .spin-modal-content .wheel-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #0f172a;
+            font-weight: 900;
+            box-shadow: 0 0 20px rgba(251,191,36,0.3);
+            z-index: 5;
+        }
+        .spin-modal-content .spin-btn {
+            background: linear-gradient(135deg, #f97316, #f59e0b);
+            color: #fff;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 200px;
+            margin-top: 15px;
+        }
+        .spin-modal-content .spin-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .spin-modal-content .spin-timer-box {
+            display: none;
+            background: rgba(249,115,22,0.15);
+            border: 2px solid rgba(249,115,22,0.3);
+            border-radius: 15px;
+            padding: 12px;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .spin-modal-content .spin-timer-box.show { display: block; }
+        .spin-modal-content .spin-timer-box .timer-label { font-size: 12px; color: #94a3b8; }
+        .spin-modal-content .spin-timer-box .timer-time { font-size: 24px; font-weight: 700; color: #fbbf24; }
+        .spin-modal-content .spin-result {
+            margin-top: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #10b981;
+            min-height: 30px;
         }
     </style>
 </head>
@@ -375,33 +467,34 @@
         </div>
     </div>
 
-    <!-- ✅ FLOATING SPIN WHEEL BUTTON -->
+    <!-- ✅ FLOATING SPIN WHEEL BUTTON with Timer -->
     <button class="floating-spin-btn" id="floatingSpinBtn" onclick="openSpinModal()">
-        <i class="fas fa-spinner"></i>
+        <span class="spin-icon">🎰</span>
         <span class="spin-badge" id="spinBadge">20</span>
         <div class="timer-overlay" id="spinTimerOverlay">
-            <span id="spinTimerText">12h</span>
+            <span class="timer-label">⏳ Reset in</span>
+            <span class="timer-time" id="spinTimerText">12h 0m</span>
         </div>
     </button>
 
     <!-- ✅ SPIN WHEEL MODAL -->
     <div class="spin-modal-overlay" id="spinModal">
-        <div class="spin-modal-content" style="position:relative;">
+        <div class="spin-modal-content">
             <button class="close-modal-btn" onclick="closeSpinModal()"><i class="fas fa-times"></i></button>
             <h3 style="color:#fbbf24; margin-bottom:5px;">🎰 Lucky Spin</h3>
             <div style="color:#94a3b8; font-size:13px; margin-bottom:10px;" id="modalSpinCount">Spins: 20/20</div>
             <div class="spin-wheel-container">
-                <div class="wheel-wrapper" style="position:relative; width:200px; height:200px; margin:0 auto;">
-                    <div class="wheel-pointer" style="top:-10px; border-left:12px solid transparent; border-right:12px solid transparent; border-top:20px solid #fbbf24;"></div>
-                    <canvas id="modalWheelCanvas" class="wheel-canvas" width="400" height="400" style="width:200px; height:200px; transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);"></canvas>
-                    <div class="wheel-center" style="width:40px; height:40px; font-size:18px;">🎯</div>
+                <div class="wheel-wrapper">
+                    <div class="wheel-pointer"></div>
+                    <canvas id="modalWheelCanvas" class="wheel-canvas" width="400" height="400"></canvas>
+                    <div class="wheel-center">🎯</div>
                 </div>
-                <button class="spin-btn" id="modalSpinBtn" onclick="spinWheelFromModal()" style="margin-top:15px;">🎡 Spin Now</button>
-                <div class="spin-timer-box" id="modalSpinTimerBox" style="margin-top:10px;">
+                <button class="spin-btn" id="modalSpinBtn" onclick="spinWheelFromModal()">🎡 Spin Now</button>
+                <div class="spin-timer-box" id="modalSpinTimerBox">
                     <div class="timer-label">⏳ Cooldown</div>
                     <div class="timer-time" id="modalSpinTimerDisplay">00:15</div>
                 </div>
-                <div class="spin-result" id="modalSpinResult" style="margin-top:8px; font-size:16px;"></div>
+                <div class="spin-result" id="modalSpinResult"></div>
             </div>
         </div>
     </div>
