@@ -250,7 +250,7 @@
             <div class="video-icon">📺</div>
             <div class="video-title" id="videoTitle">Watch Video</div>
             <div class="video-reward" id="videoRewardText">+0 Coins</div>
-            <div class="video-progress">Watched: <span id="videoProgressCount">0</span> / <span id="videoTotalCount">5</span></div>
+            <div class="video-progress">Watched: <span id="videoProgressCount">0</span> / <span id="videoTotalCount">25</span></div>
             <button class="watch-btn" id="videoWatchBtn" onclick="watchVideoAd()">▶ Watch Video</button>
             <div class="video-status" id="videoStatus"></div>
         </div>
@@ -281,7 +281,7 @@
         </div>
         <div class="page active" id="pageHome">
             <div class="mining-circle-wrapper"><div class="mining-circle" id="miningCircle"><div class="circle-start-overlay" id="circleStartOverlay" onclick="startMining()"><div class="start-icon">⚡</div><div class="start-text">START<br>MINING</div><div class="start-subtext">Tap to earn coins</div></div><div class="inner-circle"><span class="coin-icon">🪙</span><span class="coin-count" id="progressCoinCount">1000</span><div class="circle-status" id="progressStatus">Ready</div><div class="circle-progress-text" id="progressPercent">100%</div><button class="refill-circle-btn hidden" id="refillCircleBtn" onclick="watchRefillAd()">📺 Refill (0/10)</button></div></div></div>
-            <div style="display:flex;justify-content:center;"><button class="circle-watch-btn hidden" id="progressWatchBtn" onclick="openVideoWatch()">📺 Watch Ads (0/5)</button></div>
+            <div style="display:flex;justify-content:center;"><button class="circle-watch-btn hidden" id="progressWatchBtn" onclick="openVideoWatch()">📺 Watch Ads (0/25)</button></div>
             <div class="speed-btn-container"><button class="speed-boost-btn" id="speedBoostBtn" onclick="activateSpeedBoost()"><i class="fas fa-rocket"></i> Speed Boost</button><div class="boost-countdown-box" id="boostCountdownBox"><div class="countdown-label">⏳ Cooldown</div><div class="countdown-time" id="boostCountdownTime">00:00</div></div></div>
             <div class="rules-text"><div class="rule-title">📋 Mining Rules</div><div id="miningRulesText">Loading rules...</div></div>
         </div>
@@ -370,7 +370,7 @@
         };
         let tasks = [], conversionTimer = null, miningInterval = null, boostTimer = null, airdropTimer = null, 
             currentFilter = 'all', currentLevelFilter = 'all', levelConfigCache = {}, referralConfigCache = {};
-        let videoWatchConfig = { enabled: true, totalVideos: 5, rewardPerVideo: 10, title: 'Watch Video & Earn' };
+        let videoWatchConfig = { enabled: true, totalVideos: 25, rewardPerVideo: 10, title: 'Watch Video & Earn' };
         let videoWatchProgress = 0, isVideoWatching = false;
         let refillConfig = { enabled: true, totalRefills: 10, rewardCoins: 1000 };
         let refillProgress = 0;
@@ -657,7 +657,7 @@
         function loadVideoWatchConfig() {
             db.ref('videoWatchConfig').on('value', snap => {
                 const cfg = snap.val() || {};
-                videoWatchConfig.totalVideos = cfg.totalVideos || 5;
+                videoWatchConfig.totalVideos = cfg.totalVideos || 25; // ২৫টি ভিডিও
                 videoWatchConfig.rewardPerVideo = cfg.rewardPerVideo || 10;
                 videoWatchConfig.title = cfg.title || 'Watch Video & Earn';
                 videoWatchConfig.enabled = cfg.enabled !== false;
