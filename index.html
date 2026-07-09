@@ -10,10 +10,12 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* আপনার দেওয়া CSS (শুধু রিমুভ করা বাটনগুলোর CSS সরানো হয়েছে) */
+        /* ================== GLOBAL ================== */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', -apple-system, sans-serif; }
         body { background: #0f172a; color: #e2e8f0; padding-bottom: 80px; min-height: 100vh; background: radial-gradient(circle at 20% 30%, #1e293b, #0f172a); }
         .container { max-width: 500px; margin: 0 auto; padding: 12px; }
+        
+        /* ================== HEADER ================== */
         .header { background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); padding: 14px 18px; border-radius: 20px; margin-bottom: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
         .user-info { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
         .avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #3b82f6); display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; color: #fff; }
@@ -31,6 +33,114 @@
         .conversion-timer { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.15); border-radius: 12px; padding: 10px; margin-top: 10px; }
         .conversion-timer .label { font-size: 10px; color: #94a3b8; }
         .conversion-timer .time { font-size: 16px; font-weight: bold; color: #10b981; }
+
+        /* ================== SPIN WHEEL ================== */
+        .spin-wheel-container {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+        .spin-wheel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .spin-wheel-header h3 { font-size: 18px; color: #fbbf24; }
+        .spin-wheel-header .spin-count {
+            background: rgba(251,191,36,0.15);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #fbbf24;
+            border: 1px solid rgba(251,191,36,0.3);
+        }
+        .wheel-wrapper {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            margin: 0 auto 15px;
+        }
+        .wheel-canvas {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            box-shadow: 0 0 40px rgba(251,191,36,0.2);
+            transition: transform 3s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+        .wheel-pointer {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 16px solid transparent;
+            border-right: 16px solid transparent;
+            border-top: 24px solid #fbbf24;
+            z-index: 10;
+            filter: drop-shadow(0 4px 10px rgba(251,191,36,0.5));
+        }
+        .wheel-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #0f172a;
+            font-weight: 900;
+            box-shadow: 0 0 20px rgba(251,191,36,0.3);
+            z-index: 5;
+        }
+        .spin-btn {
+            background: linear-gradient(135deg, #f97316, #f59e0b);
+            color: #fff;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 200px;
+            margin-top: 5px;
+        }
+        .spin-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .spin-timer-box {
+            display: none;
+            background: rgba(249,115,22,0.15);
+            border: 2px solid rgba(249,115,22,0.3);
+            border-radius: 15px;
+            padding: 12px;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .spin-timer-box.show { display: block; }
+        .spin-timer-box .timer-label { font-size: 12px; color: #94a3b8; }
+        .spin-timer-box .timer-time { font-size: 24px; font-weight: 700; color: #fbbf24; }
+        .spin-result {
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #10b981;
+            min-height: 30px;
+        }
+
+        /* ================== MINING CIRCLE ================== */
         .mining-circle-wrapper { display: flex; justify-content: center; align-items: center; margin: 15px 0; position: relative; }
         .mining-circle { position: relative; width: 250px; height: 250px; border-radius: 50%; background: conic-gradient(#fbbf24 100%, #1e293b 100%); display: flex; justify-content: center; align-items: center; box-shadow: 0 0 50px rgba(251,191,36,0.2); transition: background 0.5s ease; cursor: pointer; }
         .mining-circle.mining-active { box-shadow: 0 0 60px rgba(251,191,36,0.4); animation: miningPulse 2s infinite; }
@@ -49,6 +159,8 @@
         .speed-boost-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .boost-countdown-box { display: none; background: rgba(249,115,22,0.15); border: 2px solid rgba(249,115,22,0.3); border-radius: 15px; padding: 14px 20px; text-align: center; width: 100%; max-width: 280px; }
         .boost-countdown-box.show { display: block; }
+
+        /* ================== PAGES ================== */
         .page { display: none; min-height: 60vh; padding-top: 8px; }
         .page.active { display: block; }
         .page-header { font-size: 20px; font-weight: 800; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -70,18 +182,26 @@
         .withdraw-section .form-group input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #fff; font-size: 14px; outline: none; }
         .withdraw-section .withdraw-btn { margin-top: 8px; padding: 12px 20px; background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; width: 100%; font-size: 15px; transition: all 0.3s ease; }
         .withdraw-section .withdraw-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ================== BOTTOM NAV ================== */
         .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; background: rgba(15,23,42,0.95); backdrop-filter: blur(24px); display: flex; justify-content: space-around; padding: 10px 4px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
         .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; color: #64748b; font-size: 10px; cursor: pointer; flex: 1; }
         .nav-item.active { color: #fbbf24; }
         .nav-item i { font-size: 20px; }
+
+        /* ================== MODALS ================== */
         .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 9999; align-items: center; justify-content: center; }
         .modal.active { display: flex; }
         .modal-content { background: rgba(30,41,59,0.95); padding: 25px; border-radius: 20px; width: 90%; max-width: 350px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
         .modal-content button { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; padding: 12px 30px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; margin-top: 15px; }
+
+        /* ================== TOAST ================== */
         .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #10b981; color: #fff; padding: 12px 24px; border-radius: 14px; font-weight: 700; z-index: 99999; display: none; font-size: 14px; }
         .toast.show { display: block; animation: slideDown 0.4s ease; }
         .toast.error { background: #ef4444; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-80px) translateX(-50%); } to { opacity: 1; transform: translateY(0) translateX(-50%); } }
+
+        /* ================== OVERLAYS ================== */
         .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9998; display: none; overflow-y: auto; padding-bottom: 70px; }
         .overlay.show { display: block; }
         .overlay-header { background: rgba(15,23,42,0.95); padding: 15px 20px; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 10px; }
@@ -148,60 +268,14 @@
         .security-overlay h1 { color: #ef4444; font-size: 28px; margin-bottom: 12px; }
         .security-overlay p { color: #94a3b8; font-size: 16px; margin-bottom: 20px; }
         .security-overlay button { padding: 12px 30px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none; border-radius: 12px; color: #fff; font-weight: 700; font-size: 16px; cursor: pointer; }
-        
-        #loadingPage {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #0f172a;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 99999999;
-            transition: opacity 0.5s ease;
-        }
-        #loadingPage.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-        .loader-container {
-            text-align: center;
-        }
-        .loader-ring {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 8px solid transparent;
-            border-top-color: #fbbf24;
-            border-right-color: #f59e0b;
-            border-bottom-color: #3b82f6;
-            border-left-color: #8b5cf6;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .loader-text {
-            color: #fbbf24;
-            font-size: 18px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            animation: pulseText 1.5s ease-in-out infinite;
-        }
-        @keyframes pulseText {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-        .loader-sub {
-            color: #94a3b8;
-            font-size: 13px;
-            margin-top: 8px;
-        }
+        #loadingPage { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 99999999; transition: opacity 0.5s ease; }
+        #loadingPage.hidden { opacity: 0; pointer-events: none; }
+        .loader-container { text-align: center; }
+        .loader-ring { width: 80px; height: 80px; border-radius: 50%; border: 8px solid transparent; border-top-color: #fbbf24; border-right-color: #f59e0b; border-bottom-color: #3b82f6; border-left-color: #8b5cf6; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loader-text { color: #fbbf24; font-size: 18px; font-weight: 700; letter-spacing: 2px; animation: pulseText 1.5s ease-in-out infinite; }
+        @keyframes pulseText { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .loader-sub { color: #94a3b8; font-size: 13px; margin-top: 8px; }
     </style>
 </head>
 <body>
@@ -256,6 +330,27 @@
                 <div class="conversion-timer"><div class="label">⏰ Next Conversion</div><div class="time" id="conversionCountdown">--:--:--</div><div style="font-size:9px;color:#94a3b8;" id="rateInfo">1 USD = 1000 Coins</div></div>
             </div>
         </div>
+
+        <!-- ✅ SPIN WHEEL SECTION (Navigation Bar এর ঠিক উপরে) -->
+        <div class="spin-wheel-container">
+            <div class="spin-wheel-header">
+                <h3>🎰 Lucky Spin</h3>
+                <span class="spin-count" id="spinCountDisplay">Spins: 20/20</span>
+            </div>
+            <div class="wheel-wrapper">
+                <div class="wheel-pointer"></div>
+                <canvas id="wheelCanvas" class="wheel-canvas" width="440" height="440"></canvas>
+                <div class="wheel-center">🎯</div>
+            </div>
+            <button class="spin-btn" id="spinBtn" onclick="spinWheel()">🎡 Spin Now</button>
+            <div class="spin-timer-box" id="spinTimerBox">
+                <div class="timer-label">⏳ Cooldown</div>
+                <div class="timer-time" id="spinTimerDisplay">00:15</div>
+            </div>
+            <div class="spin-result" id="spinResult"></div>
+        </div>
+
+        <!-- ================== PAGES ================== -->
         <div class="page active" id="pageHome">
             <div class="mining-circle-wrapper"><div class="mining-circle" id="miningCircle"><div class="circle-start-overlay" id="circleStartOverlay" onclick="startMining()"><div class="start-icon">⚡</div><div class="start-text">START<br>MINING</div><div class="start-subtext">Tap to earn coins</div></div><div class="inner-circle"><span class="coin-icon">🪙</span><span class="coin-count" id="progressCoinCount">1000</span><div class="circle-status" id="progressStatus">Ready</div><div class="circle-progress-text" id="progressPercent">100%</div></div></div></div>
             <div class="speed-btn-container"><button class="speed-boost-btn" id="speedBoostBtn" onclick="activateSpeedBoost()"><i class="fas fa-rocket"></i> Speed Boost</button><div class="boost-countdown-box" id="boostCountdownBox"><div class="countdown-label">⏳ Cooldown</div><div class="countdown-time" id="boostCountdownTime">00:00</div></div></div>
@@ -340,7 +435,247 @@
         let isAppHidden = false;
         let isAdShowing = false;
 
+        // ============================================================
+        // ================== SPIN WHEEL SYSTEM =======================
+        // ============================================================
+        const SPIN_COUNT_LIMIT = 20;
+        const SPIN_COOLDOWN_HOURS = 12;
+        const SPIN_COOLDOWN_MS = SPIN_COOLDOWN_HOURS * 60 * 60 * 1000;
+        const SPIN_BUTTON_COOLDOWN_SECONDS = 15;
+
+        let spinCount = SPIN_COUNT_LIMIT;
+        let spinResetTime = 0;
+        let spinTimerInterval = null;
+        let spinBtnCooldownInterval = null;
+        let isSpinning = false;
+
+        // Wheel Prize Data
+        const prizeData = [
+            { label: '10 🪙', value: 10, type: 'coins', weight: 10 },
+            { label: '20 🪙', value: 20, type: 'coins', weight: 8 },
+            { label: '50 🪙', value: 50, type: 'coins', weight: 7 },
+            { label: '70 🪙', value: 70, type: 'coins', weight: 6 },
+            { label: '90 🪙', value: 90, type: 'coins', weight: 5 },
+            { label: '100 🪙', value: 100, type: 'coins', weight: 5 },
+            { label: '150 🪙', value: 150, type: 'coins', weight: 4 },
+            { label: '200 🪙', value: 200, type: 'coins', weight: 4 },
+            { label: '500 🪙', value: 500, type: 'coins', weight: 2 },
+            { label: '0 🪙', value: 0, type: 'coins', weight: 15 },
+            { label: '$0.01', value: 0.01, type: 'usd', weight: 10 },
+            { label: '$0.02', value: 0.02, type: 'usd', weight: 8 },
+            { label: '$0.05', value: 0.05, type: 'usd', weight: 5 },
+            { label: '$0.08', value: 0.08, type: 'usd', weight: 4 },
+            { label: '$0', value: 0, type: 'usd', weight: 15 },
+        ];
+
+        // Generate weighted prize list
+        let prizeList = [];
+        prizeData.forEach(p => {
+            for (let i = 0; i < p.weight; i++) {
+                prizeList.push(p);
+            }
+        });
+
+        let wheelSegments = prizeList.length;
+        let currentRotation = 0;
+        let canvas = document.getElementById('wheelCanvas');
+        let ctx = canvas.getContext('2d');
+
+        // Colors for wheel segments
+        const segmentColors = [
+            '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+            '#DDA0DD', '#FF9FF3', '#54A0FF', '#5F27CD', '#FF6B6B',
+            '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD',
+            '#FF9FF3', '#54A0FF', '#5F27CD', '#FF6B6B', '#4ECDC4'
+        ];
+
+        function drawWheel() {
+            const numSegments = prizeList.length;
+            const angleStep = (2 * Math.PI) / numSegments;
+            const radius = 220;
+
+            ctx.clearRect(0, 0, 440, 440);
+            ctx.save();
+            ctx.translate(220, 220);
+
+            for (let i = 0; i < numSegments; i++) {
+                const startAngle = i * angleStep;
+                const endAngle = startAngle + angleStep;
+                const color = segmentColors[i % segmentColors.length];
+
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.arc(0, 0, radius, startAngle, endAngle);
+                ctx.closePath();
+                ctx.fillStyle = color;
+                ctx.fill();
+                ctx.strokeStyle = '#0f172a';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Draw text
+                ctx.save();
+                ctx.rotate(startAngle + angleStep / 2);
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = '#0f172a';
+                ctx.font = 'bold 12px Segoe UI';
+                const prize = prizeList[i];
+                const label = prize.label;
+                ctx.fillText(label, radius * 0.65, 0);
+                ctx.restore();
+            }
+
+            ctx.restore();
+        }
+
+        function getRandomPrize() {
+            // Weighted random selection
+            const randomIndex = Math.floor(Math.random() * prizeList.length);
+            return prizeList[randomIndex];
+        }
+
+        function spinWheel() {
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            if (isSpinning) return;
+            if (spinCount <= 0) {
+                showToast('🎯 No spins left! Wait 12 hours.', 'error');
+                return;
+            }
+            if (Date.now() < spinResetTime) {
+                showToast('⏳ Cooldown active!', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('spinBtn');
+            btn.disabled = true;
+            isSpinning = true;
+            document.getElementById('spinResult').textContent = '';
+
+            // Start button cooldown (15 seconds)
+            let cooldown = SPIN_BUTTON_COOLDOWN_SECONDS;
+            document.getElementById('spinTimerBox').classList.add('show');
+            document.getElementById('spinTimerDisplay').textContent = `00:${String(cooldown).padStart(2, '0')}`;
+            
+            if (spinBtnCooldownInterval) clearInterval(spinBtnCooldownInterval);
+            spinBtnCooldownInterval = setInterval(() => {
+                cooldown--;
+                if (cooldown > 0) {
+                    document.getElementById('spinTimerDisplay').textContent = `00:${String(cooldown).padStart(2, '0')}`;
+                } else {
+                    clearInterval(spinBtnCooldownInterval);
+                    spinBtnCooldownInterval = null;
+                    document.getElementById('spinTimerBox').classList.remove('show');
+                    btn.disabled = false;
+                }
+            }, 1000);
+
+            // Show Rewarded Ad
+            showRewardedAd(() => {
+                // Determine prize
+                const prize = getRandomPrize();
+                let rewardCoins = 0;
+                let rewardUsd = 0;
+
+                if (prize.type === 'coins') {
+                    rewardCoins = prize.value;
+                    // Check if mining coins will exceed 1000
+                    const newCoins = app.progressCoins + rewardCoins;
+                    if (newCoins > TOTAL_COINS) {
+                        rewardCoins = Math.max(0, TOTAL_COINS - app.progressCoins);
+                    }
+                } else if (prize.type === 'usd') {
+                    rewardUsd = prize.value;
+                }
+
+                // Apply rewards
+                if (rewardCoins > 0) {
+                    app.progressCoins += rewardCoins;
+                }
+                if (rewardUsd > 0) {
+                    app.usdBalance += rewardUsd;
+                }
+
+                // Update spin count
+                spinCount--;
+                document.getElementById('spinCountDisplay').textContent = `Spins: ${spinCount}/${SPIN_COUNT_LIMIT}`;
+                document.getElementById('spinResult').textContent = `🎉 You won ${prize.label}!`;
+
+                // Show result in modal
+                let resultText = '';
+                if (rewardCoins > 0) {
+                    resultText += `+${rewardCoins} Coins!`;
+                }
+                if (rewardUsd > 0) {
+                    resultText += `+$${rewardUsd.toFixed(2)} USD!`;
+                }
+                if (resultText === '') {
+                    resultText = 'Better luck next time!';
+                }
+                document.getElementById('rewardText').textContent = resultText;
+                document.getElementById('successModal').classList.add('active');
+
+                // Save to Firebase
+                userRef.update({
+                    progressCoins: app.progressCoins,
+                    usdBalance: app.usdBalance,
+                    spinCount: spinCount,
+                    spinResetTime: spinResetTime
+                });
+
+                updateUI();
+                updateProgressUI();
+                updateLevelUI();
+
+                // Animation: Spin wheel
+                const randomSpins = 5 + Math.floor(Math.random() * 5);
+                const randomAngle = Math.floor(Math.random() * 360);
+                const totalRotation = randomSpins * 360 + randomAngle;
+                currentRotation += totalRotation;
+                canvas.style.transform = `rotate(${currentRotation}deg)`;
+
+                isSpinning = false;
+                showToast(`🎰 Spin result: ${prize.label}`);
+            }, 'spinBtn');
+        }
+
+        function loadSpinData() {
+            db.ref('users/' + userId + '/spinCount').on('value', snap => {
+                spinCount = snap.val() !== null ? snap.val() : SPIN_COUNT_LIMIT;
+                document.getElementById('spinCountDisplay').textContent = `Spins: ${spinCount}/${SPIN_COUNT_LIMIT}`;
+            });
+            db.ref('users/' + userId + '/spinResetTime').on('value', snap => {
+                spinResetTime = snap.val() || 0;
+                updateSpinResetTimer();
+            });
+        }
+
+        function updateSpinResetTimer() {
+            const now = Date.now();
+            if (spinResetTime > 0 && now >= spinResetTime) {
+                // Reset spins
+                spinCount = SPIN_COUNT_LIMIT;
+                spinResetTime = 0;
+                userRef.update({ spinCount: spinCount, spinResetTime: 0 });
+                document.getElementById('spinCountDisplay').textContent = `Spins: ${spinCount}/${SPIN_COUNT_LIMIT}`;
+                showToast('🔄 Spins reset! You have 20 spins!');
+            } else if (spinResetTime > 0) {
+                // Show countdown timer
+                const remaining = spinResetTime - now;
+                if (remaining > 0) {
+                    const hours = Math.floor(remaining / 3600000);
+                    const minutes = Math.floor((remaining % 3600000) / 60000);
+                    document.getElementById('spinCountDisplay').textContent = `⏳ ${hours}h ${minutes}m`;
+                }
+            }
+        }
+
+        // Check spin reset every minute
+        setInterval(updateSpinResetTimer, 60000);
+
+        // ============================================================
         // ================== NETWORK & SECURITY ======================
+        // ============================================================
         window.addEventListener('online', () => { isOnline = true; document.getElementById('networkOverlay').classList.remove('show'); });
         window.addEventListener('offline', () => { isOnline = false; document.getElementById('networkOverlay').classList.add('show'); });
         document.addEventListener('visibilitychange', function() {
@@ -358,8 +693,7 @@
             else { showToast('❌ Still offline!', 'error'); }
         }
 
-        // ================== AD HANDLER (FIXED) ======================
-        // ✅ এই ফাংশনটি সঠিকভাবে Ad দেখার পর callback চালাবে
+        // ================== AD HANDLER ======================
         function showRewardedAd(cb, btnId) {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
             if (typeof show_11197472 !== 'function') { 
@@ -375,24 +709,21 @@
             }
             
             try {
-                // Ad SDK-তে callback পাস করা হচ্ছে
                 show_11197472('pop', function() {
-                    // ✅ Ad সফলভাবে শেষ হলে এই ফাংশন চলবে
                     isAdShowing = false;
                     if (btn) { 
                         btn.disabled = false; 
                         btn.textContent = btn.dataset.originalText || '▶ Watch'; 
                     }
-                    if (cb) cb(); // এখানে coins যোগ হবে
+                    if (cb) cb();
                 });
             } catch (error) {
-                // ❌ Ad লোড করতে ব্যর্থ হলে
                 isAdShowing = false;
                 if (btn) { 
                     btn.disabled = false; 
                     btn.textContent = btn.dataset.originalText || '▶ Watch'; 
                 }
-                if (cb) cb(); // তবুও coins যোগ করবে (টেস্টের জন্য)
+                if (cb) cb();
                 showToast('⚠️ Ad failed, but reward given!');
             }
         }
@@ -540,9 +871,6 @@
             userRef.update({ isCurrentlyMining: false });
             updateProgressUI();
         }
-
-        // ================== VIDEO WATCH & REFILL REMOVED ==============
-        // Watch & Earn এবং Refill Coins সম্পর্কিত সব ফাংশন রিমুভ করা হয়েছে
 
         // ================== TASKS ===================================
         function loadTasks() { 
@@ -1101,6 +1429,7 @@
             checkBanStatus();
             loadReferralConfigFromDB();
             loadRules();
+            loadSpinData();
             
             db.ref('conversionRate').on('value', s => { app.conversionRate = s.val() || 1000; updateUI(); });
             loadLevelConfigFromDB();
@@ -1217,7 +1546,11 @@
             });
         }
 
-        document.addEventListener('DOMContentLoaded', initApp);
+        // Draw wheel on load
+        document.addEventListener('DOMContentLoaded', () => {
+            drawWheel();
+            initApp();
+        });
     </script>
 </body>
 </html>
