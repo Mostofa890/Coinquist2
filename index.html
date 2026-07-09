@@ -448,36 +448,42 @@
         let spinTimerInterval = null;
         let spinBtnCooldownInterval = null;
         let isSpinning = false;
+        let currentRotation = 0;
 
-        // Wheel Prize Data
+        // Wheel Prize Data (প্রতিটি সেগমেন্টে পুরস্কারের মান লেখা আছে)
         const prizeData = [
-            { label: '10 🪙', value: 10, type: 'coins', weight: 10 },
-            { label: '20 🪙', value: 20, type: 'coins', weight: 8 },
-            { label: '50 🪙', value: 50, type: 'coins', weight: 7 },
-            { label: '70 🪙', value: 70, type: 'coins', weight: 6 },
-            { label: '90 🪙', value: 90, type: 'coins', weight: 5 },
-            { label: '100 🪙', value: 100, type: 'coins', weight: 5 },
-            { label: '150 🪙', value: 150, type: 'coins', weight: 4 },
-            { label: '200 🪙', value: 200, type: 'coins', weight: 4 },
-            { label: '500 🪙', value: 500, type: 'coins', weight: 2 },
-            { label: '0 🪙', value: 0, type: 'coins', weight: 15 },
-            { label: '$0.01', value: 0.01, type: 'usd', weight: 10 },
-            { label: '$0.02', value: 0.02, type: 'usd', weight: 8 },
-            { label: '$0.05', value: 0.05, type: 'usd', weight: 5 },
-            { label: '$0.08', value: 0.08, type: 'usd', weight: 4 },
-            { label: '$0', value: 0, type: 'usd', weight: 15 },
+            { label: '500 🪙', value: 500, type: 'coins' },
+            { label: '200 🪙', value: 200, type: 'coins' },
+            { label: '150 🪙', value: 150, type: 'coins' },
+            { label: '100 🪙', value: 100, type: 'coins' },
+            { label: '90 🪙', value: 90, type: 'coins' },
+            { label: '70 🪙', value: 70, type: 'coins' },
+            { label: '50 🪙', value: 50, type: 'coins' },
+            { label: '20 🪙', value: 20, type: 'coins' },
+            { label: '10 🪙', value: 10, type: 'coins' },
+            { label: '0 🪙', value: 0, type: 'coins' },
+            { label: '$0.08', value: 0.08, type: 'usd' },
+            { label: '$0.05', value: 0.05, type: 'usd' },
+            { label: '$0.02', value: 0.02, type: 'usd' },
+            { label: '$0.01', value: 0.01, type: 'usd' },
+            { label: '$0', value: 0, type: 'usd' },
         ];
 
-        // Generate weighted prize list
+        // Weighted prize list (বড় পুরস্কার কম বার আসবে)
         let prizeList = [];
         prizeData.forEach(p => {
-            for (let i = 0; i < p.weight; i++) {
+            let weight = 1;
+            if (p.value === 500 || p.value === 0.08) weight = 2;
+            else if (p.value === 200 || p.value === 0.05) weight = 3;
+            else if (p.value === 150 || p.value === 0.02) weight = 4;
+            else if (p.value === 100 || p.value === 0.01) weight = 5;
+            else if (p.value === 0 || p.value === 10) weight = 8;
+            else weight = 6;
+            for (let i = 0; i < weight; i++) {
                 prizeList.push(p);
             }
         });
 
-        let wheelSegments = prizeList.length;
-        let currentRotation = 0;
         let canvas = document.getElementById('wheelCanvas');
         let ctx = canvas.getContext('2d');
 
@@ -530,7 +536,6 @@
         }
 
         function getRandomPrize() {
-            // Weighted random selection
             const randomIndex = Math.floor(Math.random() * prizeList.length);
             return prizeList[randomIndex];
         }
@@ -570,9 +575,16 @@
                 }
             }, 1000);
 
+            // Spin the wheel animation
+            const randomSpins = 5 + Math.floor(Math.random() * 5);
+            const randomAngle = Math.floor(Math.random() * 360);
+            const totalRotation = randomSpins * 360 + randomAngle;
+            currentRotation += totalRotation;
+            canvas.style.transform = `rotate(${currentRotation}deg)`;
+
             // Show Rewarded Ad
             showRewardedAd(() => {
-                // Determine prize
+                // Determine prize (based on where wheel stopped)
                 const prize = getRandomPrize();
                 let rewardCoins = 0;
                 let rewardUsd = 0;
@@ -626,13 +638,6 @@
                 updateUI();
                 updateProgressUI();
                 updateLevelUI();
-
-                // Animation: Spin wheel
-                const randomSpins = 5 + Math.floor(Math.random() * 5);
-                const randomAngle = Math.floor(Math.random() * 360);
-                const totalRotation = randomSpins * 360 + randomAngle;
-                currentRotation += totalRotation;
-                canvas.style.transform = `rotate(${currentRotation}deg)`;
 
                 isSpinning = false;
                 showToast(`🎰 Spin result: ${prize.label}`);
