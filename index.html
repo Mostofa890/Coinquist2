@@ -325,7 +325,19 @@
         <div class="header">
             <div class="user-info"><div class="avatar">👤</div><div class="user-details"><h3 id="userName">User</h3><div class="last-login" id="lastLoginDisplay">📅 --</div><span class="level-badge" onclick="openLevelPage()" id="userLevelBadge">🔒 Unlocking</span></div></div>
             <div class="balance-card">
-                <div class="balance-label">💰 Coins Balance</div><div class="balance-amount" id="balance">0</div><div class="usd-value" id="usdValue">≈ $0.00 USD</div>
+                <div class="balance-label">💰 Coins Balance</div><div class="balance-amount" id="balance">0</div>
+                <div class="usd-value" id="usdValue">≈ $0.00 USD</div>
+                <!-- ✅ USD Balance and Total Balance added below coins -->
+                <div style="margin-top:8px; border-top: 1px solid rgba(255,255,255,0.1); padding-top:8px;">
+                    <div style="display:flex; justify-content:space-between; font-size:14px; color:#94a3b8;">
+                        <span>💵 USD Balance</span>
+                        <span id="usdBalanceDisplay" style="color:#10b981; font-weight:bold;">$0.00</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:14px; color:#94a3b8; margin-top:4px;">
+                        <span>💰 Total Balance</span>
+                        <span id="totalBalanceDisplay" style="color:#fbbf24; font-weight:bold;">0</span>
+                    </div>
+                </div>
                 <div class="level-section" onclick="openLevelPage()"><div class="level-row"><span class="level-title" id="levelTitle">🔒 Unlocking</span><span class="level-number" id="levelNumber">Level 0</span></div><div class="level-progress"><div class="fill" id="levelProgressFill" style="width:0%;"></div></div><div style="font-size:9px;color:#94a3b8;display:flex;justify-content:space-between;"><span id="levelCurrentPoints">-5000 XP</span><span id="levelNextPoints">/ 5000 XP</span></div></div>
                 <div class="conversion-timer"><div class="label">⏰ Next Conversion</div><div class="time" id="conversionCountdown">--:--:--</div><div style="font-size:9px;color:#94a3b8;" id="rateInfo">1 USD = 1000 Coins</div></div>
             </div>
@@ -519,13 +531,13 @@
                 ctx.lineWidth = 2;
                 ctx.stroke();
 
-                // Draw text
+                // Draw text (font size increased for better visibility)
                 ctx.save();
                 ctx.rotate(startAngle + angleStep / 2);
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillStyle = '#0f172a';
-                ctx.font = 'bold 12px Segoe UI';
+                ctx.font = 'bold 16px Segoe UI'; // বড় ফন্ট
                 const prize = prizeList[i];
                 const label = prize.label;
                 ctx.fillText(label, radius * 0.65, 0);
@@ -1205,6 +1217,11 @@
             document.getElementById('walletUsd').textContent = `≈ $${usdDisplay} USD`; 
             document.getElementById('walletTotalUsd').textContent = `$${app.usdBalance.toFixed(2)}`; 
             document.getElementById('rateInfo').textContent = `1 USD = ${app.conversionRate} Coins`; 
+            
+            // ✅ Update new balance displays
+            document.getElementById('usdBalanceDisplay').textContent = `$${app.usdBalance.toFixed(2)}`;
+            document.getElementById('totalBalanceDisplay').textContent = `${app.balance.toLocaleString()} + $${app.usdBalance.toFixed(2)}`;
+            
             updateWithdrawUI(); updateSpeedBoostUI(); startConversionTimer();
         }
 
