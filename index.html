@@ -34,112 +34,6 @@
         .conversion-timer .label { font-size: 10px; color: #94a3b8; }
         .conversion-timer .time { font-size: 16px; font-weight: bold; color: #10b981; }
 
-        /* ================== SPIN WHEEL ================== */
-        .spin-wheel-container {
-            background: rgba(255,255,255,0.05);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 16px;
-            border: 1px solid rgba(255,255,255,0.1);
-            text-align: center;
-        }
-        .spin-wheel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .spin-wheel-header h3 { font-size: 18px; color: #fbbf24; }
-        .spin-wheel-header .spin-count {
-            background: rgba(251,191,36,0.15);
-            padding: 4px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            color: #fbbf24;
-            border: 1px solid rgba(251,191,36,0.3);
-        }
-        .wheel-wrapper {
-            position: relative;
-            width: 220px;
-            height: 220px;
-            margin: 0 auto 15px;
-        }
-        .wheel-canvas {
-            width: 220px;
-            height: 220px;
-            border-radius: 50%;
-            box-shadow: 0 0 40px rgba(251,191,36,0.2);
-            transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
-        }
-        .wheel-pointer {
-            position: absolute;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 16px solid transparent;
-            border-right: 16px solid transparent;
-            border-top: 24px solid #fbbf24;
-            z-index: 10;
-            filter: drop-shadow(0 4px 10px rgba(251,191,36,0.5));
-        }
-        .wheel-center {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: #0f172a;
-            font-weight: 900;
-            box-shadow: 0 0 20px rgba(251,191,36,0.3);
-            z-index: 5;
-        }
-        .spin-btn {
-            background: linear-gradient(135deg, #f97316, #f59e0b);
-            color: #fff;
-            padding: 12px 30px;
-            border: none;
-            border-radius: 25px;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-            max-width: 200px;
-            margin-top: 5px;
-        }
-        .spin-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .spin-timer-box {
-            display: none;
-            background: rgba(249,115,22,0.15);
-            border: 2px solid rgba(249,115,22,0.3);
-            border-radius: 15px;
-            padding: 12px;
-            margin-top: 10px;
-            text-align: center;
-        }
-        .spin-timer-box.show { display: block; }
-        .spin-timer-box .timer-label { font-size: 12px; color: #94a3b8; }
-        .spin-timer-box .timer-time { font-size: 24px; font-weight: 700; color: #fbbf24; }
-        .spin-result {
-            margin-top: 10px;
-            font-size: 18px;
-            font-weight: 700;
-            color: #10b981;
-            min-height: 30px;
-        }
-
         /* ================== MINING CIRCLE ================== */
         .mining-circle-wrapper { display: flex; justify-content: center; align-items: center; margin: 15px 0; position: relative; }
         .mining-circle { position: relative; width: 250px; height: 250px; border-radius: 50%; background: conic-gradient(#fbbf24 100%, #1e293b 100%); display: flex; justify-content: center; align-items: center; box-shadow: 0 0 50px rgba(251,191,36,0.2); transition: background 0.5s ease; cursor: pointer; }
@@ -276,6 +170,110 @@
         .loader-text { color: #fbbf24; font-size: 18px; font-weight: 700; letter-spacing: 2px; animation: pulseText 1.5s ease-in-out infinite; }
         @keyframes pulseText { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         .loader-sub { color: #94a3b8; font-size: 13px; margin-top: 8px; }
+
+        /* ================== FLOATING SPIN WHEEL BUTTON ================== */
+        .floating-spin-btn {
+            position: fixed;
+            right: 20px;
+            bottom: 120px;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f97316, #f59e0b);
+            color: #fff;
+            border: none;
+            box-shadow: 0 4px 20px rgba(249,115,22,0.4);
+            cursor: pointer;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            transition: all 0.3s ease;
+            animation: spinFloat 4s linear infinite;
+        }
+        .floating-spin-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            animation: none;
+        }
+        .floating-spin-btn .spin-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: #fff;
+            border-radius: 50%;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        @keyframes spinFloat {
+            0% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(90deg) scale(1.05); }
+            50% { transform: rotate(180deg) scale(1); }
+            75% { transform: rotate(270deg) scale(1.05); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+        .floating-spin-btn .timer-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fbbf24;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .floating-spin-btn .timer-overlay.show {
+            opacity: 1;
+        }
+
+        /* ================== SPIN WHEEL MODAL ================== */
+        .spin-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 99999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .spin-modal-overlay.show { display: flex; }
+        .spin-modal-content {
+            background: rgba(30,41,59,0.95);
+            padding: 25px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .spin-modal-content .close-modal-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .spin-modal-content .spin-wheel-container {
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -343,26 +341,7 @@
             </div>
         </div>
 
-        <!-- ✅ SPIN WHEEL SECTION (Navigation Bar এর ঠিক উপরে) -->
-        <div class="spin-wheel-container">
-            <div class="spin-wheel-header">
-                <h3>🎰 Lucky Spin</h3>
-                <span class="spin-count" id="spinCountDisplay">Spins: 20/20</span>
-            </div>
-            <div class="wheel-wrapper">
-                <div class="wheel-pointer"></div>
-                <canvas id="wheelCanvas" class="wheel-canvas" width="440" height="440"></canvas>
-                <div class="wheel-center">🎯</div>
-            </div>
-            <button class="spin-btn" id="spinBtn" onclick="spinWheel()">🎡 Spin Now</button>
-            <div class="spin-timer-box" id="spinTimerBox">
-                <div class="timer-label">⏳ Cooldown</div>
-                <div class="timer-time" id="spinTimerDisplay">00:15</div>
-            </div>
-            <div class="spin-result" id="spinResult"></div>
-        </div>
-
-        <!-- ================== PAGES ================== -->
+        <!-- ✅ MINING CIRCLE (যেখানে spin wheel ছিল) -->
         <div class="page active" id="pageHome">
             <div class="mining-circle-wrapper"><div class="mining-circle" id="miningCircle"><div class="circle-start-overlay" id="circleStartOverlay" onclick="startMining()"><div class="start-icon">⚡</div><div class="start-text">START<br>MINING</div><div class="start-subtext">Tap to earn coins</div></div><div class="inner-circle"><span class="coin-icon">🪙</span><span class="coin-count" id="progressCoinCount">1000</span><div class="circle-status" id="progressStatus">Ready</div><div class="circle-progress-text" id="progressPercent">100%</div></div></div></div>
             <div class="speed-btn-container"><button class="speed-boost-btn" id="speedBoostBtn" onclick="activateSpeedBoost()"><i class="fas fa-rocket"></i> Speed Boost</button><div class="boost-countdown-box" id="boostCountdownBox"><div class="countdown-label">⏳ Cooldown</div><div class="countdown-time" id="boostCountdownTime">00:00</div></div></div>
@@ -392,6 +371,37 @@
                     <div id="withdrawHistoryList"></div>
                 </div>
                 <div class="rules-text"><div class="rule-title">📋 Withdraw Rules</div><div id="withdrawRulesText">Loading rules...</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ FLOATING SPIN WHEEL BUTTON -->
+    <button class="floating-spin-btn" id="floatingSpinBtn" onclick="openSpinModal()">
+        <i class="fas fa-spinner"></i>
+        <span class="spin-badge" id="spinBadge">20</span>
+        <div class="timer-overlay" id="spinTimerOverlay">
+            <span id="spinTimerText">12h</span>
+        </div>
+    </button>
+
+    <!-- ✅ SPIN WHEEL MODAL -->
+    <div class="spin-modal-overlay" id="spinModal">
+        <div class="spin-modal-content" style="position:relative;">
+            <button class="close-modal-btn" onclick="closeSpinModal()"><i class="fas fa-times"></i></button>
+            <h3 style="color:#fbbf24; margin-bottom:5px;">🎰 Lucky Spin</h3>
+            <div style="color:#94a3b8; font-size:13px; margin-bottom:10px;" id="modalSpinCount">Spins: 20/20</div>
+            <div class="spin-wheel-container">
+                <div class="wheel-wrapper" style="position:relative; width:200px; height:200px; margin:0 auto;">
+                    <div class="wheel-pointer" style="top:-10px; border-left:12px solid transparent; border-right:12px solid transparent; border-top:20px solid #fbbf24;"></div>
+                    <canvas id="modalWheelCanvas" class="wheel-canvas" width="400" height="400" style="width:200px; height:200px; transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);"></canvas>
+                    <div class="wheel-center" style="width:40px; height:40px; font-size:18px;">🎯</div>
+                </div>
+                <button class="spin-btn" id="modalSpinBtn" onclick="spinWheelFromModal()" style="margin-top:15px;">🎡 Spin Now</button>
+                <div class="spin-timer-box" id="modalSpinTimerBox" style="margin-top:10px;">
+                    <div class="timer-label">⏳ Cooldown</div>
+                    <div class="timer-time" id="modalSpinTimerDisplay">00:15</div>
+                </div>
+                <div class="spin-result" id="modalSpinResult" style="margin-top:8px; font-size:16px;"></div>
             </div>
         </div>
     </div>
@@ -462,7 +472,7 @@
         let isSpinning = false;
         let currentRotation = 0;
 
-        // Wheel Prize Data (প্রতিটি সেগমেন্টে পুরস্কারের মান লেখা আছে)
+        // Wheel Prize Data
         const prizeData = [
             { label: '500 🪙', value: 500, type: 'coins' },
             { label: '200 🪙', value: 200, type: 'coins' },
@@ -481,7 +491,7 @@
             { label: '$0', value: 0, type: 'usd' },
         ];
 
-        // Weighted prize list (বড় পুরস্কার কম বার আসবে)
+        // Weighted prize list
         let prizeList = [];
         prizeData.forEach(p => {
             let weight = 1;
@@ -496,10 +506,9 @@
             }
         });
 
-        let canvas = document.getElementById('wheelCanvas');
-        let ctx = canvas.getContext('2d');
-
-        // Colors for wheel segments
+        // Draw wheel (modal version)
+        let modalCanvas = document.getElementById('modalWheelCanvas');
+        let modalCtx = modalCanvas.getContext('2d');
         const segmentColors = [
             '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
             '#DDA0DD', '#FF9FF3', '#54A0FF', '#5F27CD', '#FF6B6B',
@@ -507,57 +516,84 @@
             '#FF9FF3', '#54A0FF', '#5F27CD', '#FF6B6B', '#4ECDC4'
         ];
 
-        function drawWheel() {
+        function drawModalWheel() {
             const numSegments = prizeList.length;
             const angleStep = (2 * Math.PI) / numSegments;
-            const radius = 220;
+            const radius = 200;
 
-            ctx.clearRect(0, 0, 440, 440);
-            ctx.save();
-            ctx.translate(220, 220);
+            modalCtx.clearRect(0, 0, 400, 400);
+            modalCtx.save();
+            modalCtx.translate(200, 200);
 
             for (let i = 0; i < numSegments; i++) {
                 const startAngle = i * angleStep;
                 const endAngle = startAngle + angleStep;
                 const color = segmentColors[i % segmentColors.length];
 
-                ctx.beginPath();
-                ctx.moveTo(0, 0);
-                ctx.arc(0, 0, radius, startAngle, endAngle);
-                ctx.closePath();
-                ctx.fillStyle = color;
-                ctx.fill();
-                ctx.strokeStyle = '#0f172a';
-                ctx.lineWidth = 2;
-                ctx.stroke();
+                modalCtx.beginPath();
+                modalCtx.moveTo(0, 0);
+                modalCtx.arc(0, 0, radius, startAngle, endAngle);
+                modalCtx.closePath();
+                modalCtx.fillStyle = color;
+                modalCtx.fill();
+                modalCtx.strokeStyle = '#0f172a';
+                modalCtx.lineWidth = 2;
+                modalCtx.stroke();
 
-                // Draw text (font size increased for better visibility)
-                ctx.save();
-                ctx.rotate(startAngle + angleStep / 2);
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillStyle = '#0f172a';
-                ctx.font = 'bold 16px Segoe UI'; // বড় ফন্ট
+                modalCtx.save();
+                modalCtx.rotate(startAngle + angleStep / 2);
+                modalCtx.textAlign = 'center';
+                modalCtx.textBaseline = 'middle';
+                modalCtx.fillStyle = '#0f172a';
+                modalCtx.font = 'bold 14px Segoe UI';
                 const prize = prizeList[i];
                 const label = prize.label;
-                ctx.fillText(label, radius * 0.65, 0);
-                ctx.restore();
+                modalCtx.fillText(label, radius * 0.65, 0);
+                modalCtx.restore();
             }
 
-            ctx.restore();
+            modalCtx.restore();
         }
 
         function getPrizeByAngle(angle) {
             const numSegments = prizeList.length;
             const angleStep = (2 * Math.PI) / numSegments;
-            // Normalize angle to 0-2PI
             let normalized = angle % (2 * Math.PI);
             if (normalized < 0) normalized += 2 * Math.PI;
             const index = Math.floor(normalized / angleStep);
             return prizeList[index % numSegments];
         }
 
-        function spinWheel() {
+        function openSpinModal() {
+            if (spinCount <= 0 && Date.now() < spinResetTime) {
+                showToast('⏳ No spins! Wait 12 hours.', 'error');
+                return;
+            }
+            document.getElementById('spinModal').classList.add('show');
+            drawModalWheel();
+            updateSpinModalUI();
+        }
+
+        function closeSpinModal() {
+            document.getElementById('spinModal').classList.remove('show');
+        }
+
+        function updateSpinModalUI() {
+            document.getElementById('modalSpinCount').textContent = `Spins: ${spinCount}/${SPIN_COUNT_LIMIT}`;
+            if (spinCount <= 0 && Date.now() < spinResetTime) {
+                const remaining = spinResetTime - Date.now();
+                if (remaining > 0) {
+                    const hours = Math.floor(remaining / 3600000);
+                    const minutes = Math.floor((remaining % 3600000) / 60000);
+                    document.getElementById('modalSpinCount').textContent = `⏳ ${hours}h ${minutes}m`;
+                    document.getElementById('modalSpinBtn').disabled = true;
+                }
+            } else {
+                document.getElementById('modalSpinBtn').disabled = false;
+            }
+        }
+
+        function spinWheelFromModal() {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
             if (isSpinning) return;
             if (spinCount <= 0) {
@@ -569,25 +605,25 @@
                 return;
             }
 
-            const btn = document.getElementById('spinBtn');
+            const btn = document.getElementById('modalSpinBtn');
             btn.disabled = true;
             isSpinning = true;
-            document.getElementById('spinResult').textContent = '';
+            document.getElementById('modalSpinResult').textContent = '';
 
             // Start button cooldown (15 seconds)
             let cooldown = SPIN_BUTTON_COOLDOWN_SECONDS;
-            document.getElementById('spinTimerBox').classList.add('show');
-            document.getElementById('spinTimerDisplay').textContent = `00:${String(cooldown).padStart(2, '0')}`;
+            document.getElementById('modalSpinTimerBox').classList.add('show');
+            document.getElementById('modalSpinTimerDisplay').textContent = `00:${String(cooldown).padStart(2, '0')}`;
             
             if (spinBtnCooldownInterval) clearInterval(spinBtnCooldownInterval);
             spinBtnCooldownInterval = setInterval(() => {
                 cooldown--;
                 if (cooldown > 0) {
-                    document.getElementById('spinTimerDisplay').textContent = `00:${String(cooldown).padStart(2, '0')}`;
+                    document.getElementById('modalSpinTimerDisplay').textContent = `00:${String(cooldown).padStart(2, '0')}`;
                 } else {
                     clearInterval(spinBtnCooldownInterval);
                     spinBtnCooldownInterval = null;
-                    document.getElementById('spinTimerBox').classList.remove('show');
+                    document.getElementById('modalSpinTimerBox').classList.remove('show');
                     btn.disabled = false;
                 }
             }, 1000);
@@ -597,15 +633,13 @@
             const randomAngle = Math.floor(Math.random() * 360);
             const totalRotation = randomSpins * 360 + randomAngle;
             currentRotation += totalRotation;
-            canvas.style.transform = `rotate(${currentRotation}deg)`;
+            modalCanvas.style.transform = `rotate(${currentRotation}deg)`;
 
-            // ✅ Correct Ad SDK call with .then()
+            // ✅ Ad SDK call with .then()
             show_11197472('pop')
                 .then(() => {
-                    // ✅ Ad দেখার পর এই ব্লকটি চলবে
                     isAdShowing = false;
                     
-                    // Determine prize based on where wheel stopped
                     const angleInRadians = currentRotation * (Math.PI / 180);
                     const prize = getPrizeByAngle(angleInRadians);
                     let rewardCoins = 0;
@@ -613,7 +647,6 @@
 
                     if (prize.type === 'coins') {
                         rewardCoins = prize.value;
-                        // Check if mining coins will exceed 1000
                         const newCoins = app.progressCoins + rewardCoins;
                         if (newCoins > TOTAL_COINS) {
                             rewardCoins = Math.max(0, TOTAL_COINS - app.progressCoins);
@@ -622,7 +655,6 @@
                         rewardUsd = prize.value;
                     }
 
-                    // Apply rewards
                     if (rewardCoins > 0) {
                         app.progressCoins += rewardCoins;
                     }
@@ -630,12 +662,11 @@
                         app.usdBalance += rewardUsd;
                     }
 
-                    // Update spin count
                     spinCount--;
-                    document.getElementById('spinCountDisplay').textContent = `Spins: ${spinCount}/${SPIN_COUNT_LIMIT}`;
-                    document.getElementById('spinResult').textContent = `🎉 You won ${prize.label}!`;
+                    document.getElementById('spinBadge').textContent = spinCount;
+                    document.getElementById('modalSpinResult').textContent = `🎉 You won ${prize.label}!`;
+                    updateSpinModalUI();
 
-                    // Show result in modal
                     let resultText = '';
                     if (rewardCoins > 0) {
                         resultText += `+${rewardCoins} Coins!`;
@@ -649,7 +680,6 @@
                     document.getElementById('rewardText').textContent = resultText;
                     document.getElementById('successModal').classList.add('active');
 
-                    // Save to Firebase
                     userRef.update({
                         progressCoins: app.progressCoins,
                         usdBalance: app.usdBalance,
@@ -665,7 +695,6 @@
                     showToast(`🎰 Spin result: ${prize.label}`);
                 })
                 .catch((error) => {
-                    // ❌ Ad লোড করতে ব্যর্থ হলে
                     isAdShowing = false;
                     btn.disabled = false;
                     btn.textContent = '🎡 Spin Now';
@@ -677,36 +706,44 @@
         function loadSpinData() {
             db.ref('users/' + userId + '/spinCount').on('value', snap => {
                 spinCount = snap.val() !== null ? snap.val() : SPIN_COUNT_LIMIT;
-                document.getElementById('spinCountDisplay').textContent = `Spins: ${spinCount}/${SPIN_COUNT_LIMIT}`;
+                document.getElementById('spinBadge').textContent = spinCount;
+                updateSpinModalUI();
             });
             db.ref('users/' + userId + '/spinResetTime').on('value', snap => {
                 spinResetTime = snap.val() || 0;
-                updateSpinResetTimer();
+                updateSpinTimerUI();
             });
         }
 
-        function updateSpinResetTimer() {
+        function updateSpinTimerUI() {
             const now = Date.now();
-            if (spinResetTime > 0 && now >= spinResetTime) {
-                // Reset spins
+            const btn = document.getElementById('floatingSpinBtn');
+            const overlay = document.getElementById('spinTimerOverlay');
+            const timerText = document.getElementById('spinTimerText');
+
+            if (spinResetTime > 0 && now < spinResetTime) {
+                const remaining = spinResetTime - now;
+                const hours = Math.floor(remaining / 3600000);
+                const minutes = Math.floor((remaining % 3600000) / 60000);
+                overlay.classList.add('show');
+                timerText.textContent = `${hours}h ${minutes}m`;
+                btn.disabled = true;
+            } else if (spinResetTime > 0 && now >= spinResetTime) {
                 spinCount = SPIN_COUNT_LIMIT;
                 spinResetTime = 0;
                 userRef.update({ spinCount: spinCount, spinResetTime: 0 });
-                document.getElementById('spinCountDisplay').textContent = `Spins: ${spinCount}/${SPIN_COUNT_LIMIT}`;
+                document.getElementById('spinBadge').textContent = spinCount;
+                overlay.classList.remove('show');
+                btn.disabled = false;
                 showToast('🔄 Spins reset! You have 20 spins!');
-            } else if (spinResetTime > 0) {
-                // Show countdown timer
-                const remaining = spinResetTime - now;
-                if (remaining > 0) {
-                    const hours = Math.floor(remaining / 3600000);
-                    const minutes = Math.floor((remaining % 3600000) / 60000);
-                    document.getElementById('spinCountDisplay').textContent = `⏳ ${hours}h ${minutes}m`;
-                }
+            } else {
+                overlay.classList.remove('show');
+                btn.disabled = false;
             }
         }
 
-        // Check spin reset every minute
-        setInterval(updateSpinResetTimer, 60000);
+        // Check spin reset every 10 seconds
+        setInterval(updateSpinTimerUI, 10000);
 
         // ============================================================
         // ================== NETWORK & SECURITY ======================
@@ -726,6 +763,106 @@
         function checkNetworkAndReload() {
             if (navigator.onLine) { location.reload(); }
             else { showToast('❌ Still offline!', 'error'); }
+        }
+
+        // ================== AD HANDLER ======================
+        function showRewardedAd(cb, btnId) {
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            if (typeof show_11197472 !== 'function') { 
+                if (cb) cb(); 
+                return; 
+            }
+            
+            isAdShowing = true;
+            const btn = document.getElementById(btnId);
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = '⏳ Loading...';
+            }
+            
+            try {
+                show_11197472('pop')
+                    .then(() => {
+                        isAdShowing = false;
+                        if (btn) { 
+                            btn.disabled = false; 
+                            btn.textContent = btn.dataset.originalText || '▶ Watch'; 
+                        }
+                        if (cb) cb();
+                    })
+                    .catch(() => {
+                        isAdShowing = false;
+                        if (btn) { 
+                            btn.disabled = false; 
+                            btn.textContent = btn.dataset.originalText || '▶ Watch'; 
+                        }
+                        if (cb) cb();
+                        showToast('⚠️ Ad failed, but reward given!');
+                    });
+            } catch (error) {
+                isAdShowing = false;
+                if (btn) { 
+                    btn.disabled = false; 
+                    btn.textContent = btn.dataset.originalText || '▶ Watch'; 
+                }
+                if (cb) cb();
+                showToast('⚠️ Ad failed, but reward given!');
+            }
+        }
+
+        function showInterstitialAd(cb, btnId) {
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            if (typeof show_11197472 !== 'function') { if (cb) cb(); return; }
+            
+            isAdShowing = true;
+            const btn = document.getElementById(btnId);
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = '⏳ Loading...';
+            }
+            
+            try {
+                show_11197472()
+                    .then(() => {
+                        isAdShowing = false;
+                        if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || 'Speed Boost'; }
+                        if (cb) cb();
+                    })
+                    .catch(() => {
+                        isAdShowing = false;
+                        if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || 'Speed Boost'; }
+                        if (cb) cb();
+                    });
+            } catch (error) {
+                isAdShowing = false;
+                if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || 'Speed Boost'; }
+                if (cb) cb();
+            }
+        }
+
+        function showAirdropAd(cb, btnId) {
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            if (typeof show_11197472 !== 'function') { if (cb) cb(); return; }
+            isAdShowing = true;
+            const btn = document.getElementById(btnId);
+            if (btn) { btn.disabled = true; btn.textContent = '⏳ Loading...'; }
+            try {
+                show_11197472('pop')
+                    .then(() => {
+                        isAdShowing = false;
+                        if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || '🎁 Claim'; }
+                        if (cb) cb();
+                    })
+                    .catch(() => {
+                        isAdShowing = false;
+                        if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || '🎁 Claim'; }
+                        if (cb) cb();
+                    });
+            } catch (error) {
+                isAdShowing = false;
+                if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || '🎁 Claim'; }
+                if (cb) cb();
+            }
         }
 
         // ================== USER LEVEL ==============================
@@ -1106,7 +1243,8 @@
             c.innerHTML = h.slice(-20).reverse().map(h => `<div class="history-item"><div><b>$${h.amount?.toFixed(2) || '0'}</b> <small>${h.method || ''}</small>${h.status === 'cancelled' && h.cancelReason ? `<div style="color:#ef4444;font-size:10px;">⚠️ ${h.cancelReason}</div>` : ''}</div><div style="text-align:right;"><span>${h.status === 'approved' ? '✅' : h.status === 'cancelled' ? '❌' : '⏳'} ${h.status}</span><div style="font-size:9px;">${h.date ? new Date(h.date).toLocaleDateString() : ''}</div></div></div>`).join(''); 
         }
 
-        // ================== SPEED BOOST =============================
+        // ================== SPEED BOOST (NEW) ======================
+        // Speed Boost now gives 50-60 coins in 3 seconds
         function updateSpeedBoostUI() { 
             const bb = document.getElementById('speedBoostBtn'); 
             const cb = document.getElementById('boostCountdownBox'); 
@@ -1126,6 +1264,7 @@
                 bb.disabled = false; bb.style.opacity = '1'; bb.title = 'Activate Speed Boost (once per hour)';
             } 
         }
+
         function activateSpeedBoost() { 
             if (!isOnline) { showToast('No internet!', 'error'); return; }
             if (app.speedBoostCooldown > Date.now()) { showToast('⏳ Cooldown active!', 'error'); return; }
@@ -1134,28 +1273,37 @@
             btn.dataset.originalText = 'Speed Boost';
             showInterstitialAd(() => { 
                 const st = Date.now(); 
-                const totalBoostTime = 3000;
-                const intervalTime = 500;
+                const totalBoostTime = 3000; // 3 seconds
+                const intervalTime = 100; // 100ms intervals
                 let boostCount = 0;
-                const maxCoins = 6;
+                const maxCoins = 60; // Max coins to add
+                const minCoins = 50; // Min coins to add
+                let totalAdded = 0;
+                const targetCoins = Math.floor(Math.random() * (maxCoins - minCoins + 1)) + minCoins;
+
                 const bm = setInterval(() => { 
                     if (!isOnline) { clearInterval(bm); showToast('⚠️ Network lost!', 'error'); return; }
                     if (isAdShowing) return;
-                    if (Date.now() - st >= totalBoostTime || app.progressCoins <= 0 || boostCount >= maxCoins) { 
+                    if (Date.now() - st >= totalBoostTime || totalAdded >= targetCoins) { 
                         clearInterval(bm); 
                         app.speedBoostCooldown = Date.now() + 3600000; 
                         userRef.update({ speedBoostCooldown: app.speedBoostCooldown }); 
                         updateSpeedBoostUI(); 
-                        showToast('🚀 Speed Boost Done! (1 hour cooldown)'); 
+                        showToast(`🚀 Speed Boost Done! +${totalAdded} coins (1 hour cooldown)`); 
                         return; 
                     } 
-                    app.progressCoins -= 1; app.balance += 2; app.xpPoints += 3; 
+                    const addAmount = Math.min(3, targetCoins - totalAdded);
+                    if (addAmount <= 0) { clearInterval(bm); return; }
+                    app.progressCoins -= 1;
+                    app.balance += addAmount;
+                    app.xpPoints += addAmount * 2;
+                    totalAdded += addAmount;
                     boostCount++;
                     userRef.update({ balance: app.balance, progressCoins: app.progressCoins, xpPoints: app.xpPoints, lastMiningActivity: Date.now() }); 
                     updateProgressUI(); updateUI(); updateLevelUI(); 
                     const coin = document.createElement('div'); 
                     coin.className = 'floating-coin'; 
-                    coin.textContent = '+2 🪙'; 
+                    coin.textContent = `+${addAmount} 🪙`; 
                     coin.style.left = (Math.random() * 80 + 10) + '%'; 
                     coin.style.top = '35%'; 
                     document.body.appendChild(coin); 
@@ -1218,7 +1366,6 @@
             document.getElementById('walletTotalUsd').textContent = `$${app.usdBalance.toFixed(2)}`; 
             document.getElementById('rateInfo').textContent = `1 USD = ${app.conversionRate} Coins`; 
             
-            // ✅ Update new balance displays
             document.getElementById('usdBalanceDisplay').textContent = `$${app.usdBalance.toFixed(2)}`;
             document.getElementById('totalBalanceDisplay').textContent = `${app.balance.toLocaleString()} + $${app.usdBalance.toFixed(2)}`;
             
@@ -1510,7 +1657,7 @@
 
         // Draw wheel on load
         document.addEventListener('DOMContentLoaded', () => {
-            drawWheel();
+            drawModalWheel();
             initApp();
         });
     </script>
