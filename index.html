@@ -69,7 +69,7 @@
             height: 220px;
             border-radius: 50%;
             box-shadow: 0 0 40px rgba(251,191,36,0.2);
-            transition: transform 3s cubic-bezier(0.25, 0.1, 0.25, 1);
+            transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
         .wheel-pointer {
             position: absolute;
@@ -473,12 +473,12 @@
         let prizeList = [];
         prizeData.forEach(p => {
             let weight = 1;
-            if (p.value === 500 || p.value === 0.08) weight = 2;
-            else if (p.value === 200 || p.value === 0.05) weight = 3;
-            else if (p.value === 150 || p.value === 0.02) weight = 4;
-            else if (p.value === 100 || p.value === 0.01) weight = 5;
+            if (p.value === 500 || p.value === 0.08) weight = 1;
+            else if (p.value === 200 || p.value === 0.05) weight = 2;
+            else if (p.value === 150 || p.value === 0.02) weight = 3;
+            else if (p.value === 100 || p.value === 0.01) weight = 4;
             else if (p.value === 0 || p.value === 10) weight = 8;
-            else weight = 6;
+            else weight = 5;
             for (let i = 0; i < weight; i++) {
                 prizeList.push(p);
             }
@@ -535,9 +535,14 @@
             ctx.restore();
         }
 
-        function getRandomPrize() {
-            const randomIndex = Math.floor(Math.random() * prizeList.length);
-            return prizeList[randomIndex];
+        function getPrizeByAngle(angle) {
+            const numSegments = prizeList.length;
+            const angleStep = (2 * Math.PI) / numSegments;
+            // Normalize angle to 0-2PI
+            let normalized = angle % (2 * Math.PI);
+            if (normalized < 0) normalized += 2 * Math.PI;
+            const index = Math.floor(normalized / angleStep);
+            return prizeList[index % numSegments];
         }
 
         function spinWheel() {
@@ -584,8 +589,9 @@
 
             // Show Rewarded Ad
             showRewardedAd(() => {
-                // Determine prize (based on where wheel stopped)
-                const prize = getRandomPrize();
+                // Determine prize based on where wheel stopped
+                const angleInRadians = currentRotation * (Math.PI / 180);
+                const prize = getPrizeByAngle(angleInRadians);
                 let rewardCoins = 0;
                 let rewardUsd = 0;
 
@@ -714,11 +720,12 @@
             }
             
             try {
+                // Ad শেষ হলে callback চালাবে
                 show_11197472('pop', function() {
                     isAdShowing = false;
                     if (btn) { 
                         btn.disabled = false; 
-                        btn.textContent = btn.dataset.originalText || '▶ Watch'; 
+                        btn.textContent = btn.dataset.originalText || '🎡 Spin Now'; 
                     }
                     if (cb) cb();
                 });
@@ -726,7 +733,7 @@
                 isAdShowing = false;
                 if (btn) { 
                     btn.disabled = false; 
-                    btn.textContent = btn.dataset.originalText || '▶ Watch'; 
+                    btn.textContent = btn.dataset.originalText || '🎡 Spin Now'; 
                 }
                 if (cb) cb();
                 showToast('⚠️ Ad failed, but reward given!');
