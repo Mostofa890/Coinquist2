@@ -247,7 +247,7 @@
             text-align: center;
         }
 
-        /* ================== SPIN WHEEL MODAL ================== */
+        /* ================== SPIN WHEEL MODAL (NEW DESIGN) ================== */
         .spin-modal-overlay {
             position: fixed;
             top: 0;
@@ -270,6 +270,7 @@
             text-align: center;
             border: 1px solid rgba(255,255,255,0.1);
             position: relative;
+            overflow: hidden;
         }
         .spin-modal-content .close-modal-btn {
             position: absolute;
@@ -282,72 +283,137 @@
             border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
+            z-index: 20;
         }
-        .spin-modal-content .spin-wheel-container {
-            margin-top: 10px;
-        }
-        .spin-modal-content .wheel-wrapper {
+
+        /* ================== NEW SPIN WHEEL DESIGN ================== */
+        .wheel-wrapper-new {
             position: relative;
-            width: 200px;
-            height: 200px;
-            margin: 0 auto;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        .spin-modal-content .wheel-pointer {
+        .wheel-outer-rim {
             position: absolute;
-            top: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 12px solid transparent;
-            border-right: 12px solid transparent;
-            border-top: 20px solid #fbbf24;
-            z-index: 10;
-        }
-        .spin-modal-content .wheel-canvas {
-            width: 200px;
-            height: 200px;
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
-            box-shadow: 0 0 40px rgba(251,191,36,0.2);
+            background: conic-gradient(from 0deg, #7c3aed, #6d28d9, #7c3aed, #6d28d9, #7c3aed);
+            padding: 12px;
+            box-shadow: 0 0 30px rgba(124,58,237,0.3);
+        }
+        .wheel-bulbs {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            top: 0;
+            left: 0;
+        }
+        .wheel-bulb {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 0 10px #fff, 0 0 20px #fff;
+            animation: bulbBlink 1s infinite alternate;
+        }
+        .wheel-bulb:nth-child(odd) { animation-delay: 0.5s; }
+        @keyframes bulbBlink {
+            0% { opacity: 0.3; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+        .wheel-inner {
+            position: absolute;
+            width: calc(100% - 24px);
+            height: calc(100% - 24px);
+            border-radius: 50%;
+            overflow: hidden;
+            background: #1a1a2e;
+        }
+        .wheel-segments {
+            width: 100%;
+            height: 100%;
+            position: relative;
             transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
-        .spin-modal-content .wheel-center {
+        .wheel-segment {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            top: 0;
+            left: 50%;
+            transform-origin: 0% 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding-left: 20%;
+            font-size: 12px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .wheel-segment span {
+            background: rgba(255,255,255,0.7);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        .wheel-center-logo {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 40px;
-            height: 40px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             background: linear-gradient(135deg, #fbbf24, #f59e0b);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 30px;
             color: #0f172a;
             font-weight: 900;
-            box-shadow: 0 0 20px rgba(251,191,36,0.3);
-            z-index: 5;
+            box-shadow: 0 0 30px rgba(251,191,36,0.3);
+            z-index: 10;
+            border: 3px solid #7c3aed;
         }
-        .spin-modal-content .spin-btn {
-            background: linear-gradient(135deg, #f97316, #f59e0b);
-            color: #fff;
-            padding: 12px 30px;
+        .wheel-pointer-new {
+            position: absolute;
+            top: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 18px solid transparent;
+            border-right: 18px solid transparent;
+            border-top: 30px solid #fbbf24;
+            z-index: 15;
+            filter: drop-shadow(0 4px 10px rgba(251,191,36,0.5));
+        }
+        .spin-btn-new {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #0f172a;
+            padding: 14px 40px;
             border: none;
-            border-radius: 25px;
-            font-weight: 700;
-            font-size: 16px;
+            border-radius: 30px;
+            font-weight: 900;
+            font-size: 18px;
             cursor: pointer;
             transition: all 0.3s ease;
             width: 100%;
-            max-width: 200px;
-            margin-top: 15px;
+            max-width: 220px;
+            margin-top: 5px;
+            box-shadow: 0 4px 15px rgba(251,191,36,0.3);
         }
-        .spin-modal-content .spin-btn:disabled {
+        .spin-btn-new:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
-        .spin-modal-content .spin-timer-box {
+        .spin-timer-box-new {
             display: none;
             background: rgba(249,115,22,0.15);
             border: 2px solid rgba(249,115,22,0.3);
@@ -356,12 +422,12 @@
             margin-top: 10px;
             text-align: center;
         }
-        .spin-modal-content .spin-timer-box.show { display: block; }
-        .spin-modal-content .spin-timer-box .timer-label { font-size: 12px; color: #94a3b8; }
-        .spin-modal-content .spin-timer-box .timer-time { font-size: 24px; font-weight: 700; color: #fbbf24; }
-        .spin-modal-content .spin-result {
-            margin-top: 8px;
-            font-size: 16px;
+        .spin-timer-box-new.show { display: block; }
+        .spin-timer-box-new .timer-label { font-size: 12px; color: #94a3b8; }
+        .spin-timer-box-new .timer-time { font-size: 24px; font-weight: 700; color: #fbbf24; }
+        .spin-result-new {
+            margin-top: 10px;
+            font-size: 18px;
             font-weight: 700;
             color: #10b981;
             min-height: 30px;
@@ -433,7 +499,7 @@
             </div>
         </div>
 
-        <!-- ✅ MINING CIRCLE (যেখানে spin wheel ছিল) -->
+        <!-- ✅ MINING CIRCLE -->
         <div class="page active" id="pageHome">
             <div class="mining-circle-wrapper"><div class="mining-circle" id="miningCircle"><div class="circle-start-overlay" id="circleStartOverlay" onclick="startMining()"><div class="start-icon">⚡</div><div class="start-text">START<br>MINING</div><div class="start-subtext">Tap to earn coins</div></div><div class="inner-circle"><span class="coin-icon">🪙</span><span class="coin-count" id="progressCoinCount">1000</span><div class="circle-status" id="progressStatus">Ready</div><div class="circle-progress-text" id="progressPercent">100%</div></div></div></div>
             <div class="speed-btn-container"><button class="speed-boost-btn" id="speedBoostBtn" onclick="activateSpeedBoost()"><i class="fas fa-rocket"></i> Speed Boost</button><div class="boost-countdown-box" id="boostCountdownBox"><div class="countdown-label">⏳ Cooldown</div><div class="countdown-time" id="boostCountdownTime">00:00</div></div></div>
@@ -477,25 +543,30 @@
         </div>
     </button>
 
-    <!-- ✅ SPIN WHEEL MODAL -->
+    <!-- ✅ NEW SPIN WHEEL MODAL -->
     <div class="spin-modal-overlay" id="spinModal">
         <div class="spin-modal-content">
             <button class="close-modal-btn" onclick="closeSpinModal()"><i class="fas fa-times"></i></button>
             <h3 style="color:#fbbf24; margin-bottom:5px;">🎰 Lucky Spin</h3>
             <div style="color:#94a3b8; font-size:13px; margin-bottom:10px;" id="modalSpinCount">Spins: 20/20</div>
-            <div class="spin-wheel-container">
-                <div class="wheel-wrapper">
-                    <div class="wheel-pointer"></div>
-                    <canvas id="modalWheelCanvas" class="wheel-canvas" width="400" height="400"></canvas>
-                    <div class="wheel-center">🎯</div>
+            
+            <!-- NEW SPIN WHEEL DESIGN -->
+            <div class="wheel-wrapper-new">
+                <div class="wheel-outer-rim"></div>
+                <div class="wheel-bulbs" id="wheelBulbs"></div>
+                <div class="wheel-inner">
+                    <div class="wheel-segments" id="wheelSegments"></div>
                 </div>
-                <button class="spin-btn" id="modalSpinBtn" onclick="spinWheelFromModal()">🎡 Spin Now</button>
-                <div class="spin-timer-box" id="modalSpinTimerBox">
-                    <div class="timer-label">⏳ Cooldown</div>
-                    <div class="timer-time" id="modalSpinTimerDisplay">00:15</div>
-                </div>
-                <div class="spin-result" id="modalSpinResult"></div>
+                <div class="wheel-center-logo">🎯</div>
+                <div class="wheel-pointer-new"></div>
             </div>
+
+            <button class="spin-btn-new" id="modalSpinBtn" onclick="spinWheelFromModal()">🎡 SPIN</button>
+            <div class="spin-timer-box-new" id="modalSpinTimerBox">
+                <div class="timer-label">⏳ Cooldown</div>
+                <div class="timer-time" id="modalSpinTimerDisplay">00:15</div>
+            </div>
+            <div class="spin-result-new" id="modalSpinResult"></div>
         </div>
     </div>
 
@@ -565,96 +636,67 @@
         let isSpinning = false;
         let currentRotation = 0;
 
-        // Wheel Prize Data
+        // Your prize data
         const prizeData = [
-            { label: '500 🪙', value: 500, type: 'coins' },
-            { label: '200 🪙', value: 200, type: 'coins' },
-            { label: '150 🪙', value: 150, type: 'coins' },
-            { label: '100 🪙', value: 100, type: 'coins' },
-            { label: '90 🪙', value: 90, type: 'coins' },
-            { label: '70 🪙', value: 70, type: 'coins' },
-            { label: '50 🪙', value: 50, type: 'coins' },
-            { label: '20 🪙', value: 20, type: 'coins' },
-            { label: '10 🪙', value: 10, type: 'coins' },
-            { label: '0 🪙', value: 0, type: 'coins' },
-            { label: '$0.08', value: 0.08, type: 'usd' },
-            { label: '$0.05', value: 0.05, type: 'usd' },
-            { label: '$0.02', value: 0.02, type: 'usd' },
-            { label: '$0.01', value: 0.01, type: 'usd' },
-            { label: '$0', value: 0, type: 'usd' },
+            { label: '500', value: 500, type: 'coins', color: '#FF6B6B' },
+            { label: '200', value: 200, type: 'coins', color: '#4ECDC4' },
+            { label: '150', value: 150, type: 'coins', color: '#45B7D1' },
+            { label: '100', value: 100, type: 'coins', color: '#96CEB4' },
+            { label: '90', value: 90, type: 'coins', color: '#FFEAA7' },
+            { label: '70', value: 70, type: 'coins', color: '#DDA0DD' },
+            { label: '50', value: 50, type: 'coins', color: '#FF9FF3' },
+            { label: '20', value: 20, type: 'coins', color: '#54A0FF' },
+            { label: '10', value: 10, type: 'coins', color: '#5F27CD' },
+            { label: '0', value: 0, type: 'coins', color: '#FF6B6B' },
+            { label: '$0.08', value: 0.08, type: 'usd', color: '#4ECDC4' },
+            { label: '$0.05', value: 0.05, type: 'usd', color: '#45B7D1' },
+            { label: '$0.02', value: 0.02, type: 'usd', color: '#96CEB4' },
+            { label: '$0.01', value: 0.01, type: 'usd', color: '#FFEAA7' },
+            { label: '$0', value: 0, type: 'usd', color: '#DDA0DD' },
         ];
 
-        // Weighted prize list
-        let prizeList = [];
-        prizeData.forEach(p => {
-            let weight = 1;
-            if (p.value === 500 || p.value === 0.08) weight = 1;
-            else if (p.value === 200 || p.value === 0.05) weight = 2;
-            else if (p.value === 150 || p.value === 0.02) weight = 3;
-            else if (p.value === 100 || p.value === 0.01) weight = 4;
-            else if (p.value === 0 || p.value === 10) weight = 8;
-            else weight = 5;
-            for (let i = 0; i < weight; i++) {
-                prizeList.push(p);
+        // Build the wheel
+        function buildWheel() {
+            const segmentsContainer = document.getElementById('wheelSegments');
+            const numSegments = prizeData.length;
+            const angleStep = 360 / numSegments;
+            
+            segmentsContainer.innerHTML = '';
+            
+            prizeData.forEach((prize, index) => {
+                const segment = document.createElement('div');
+                segment.className = 'wheel-segment';
+                segment.style.transform = `rotate(${index * angleStep}deg)`;
+                segment.style.backgroundColor = prize.color;
+                segment.style.borderRight = '2px solid #0f172a';
+                segment.innerHTML = `<span>${prize.label}</span>`;
+                segmentsContainer.appendChild(segment);
+            });
+
+            // Build bulbs
+            const bulbsContainer = document.getElementById('wheelBulbs');
+            bulbsContainer.innerHTML = '';
+            const numBulbs = 20;
+            for (let i = 0; i < numBulbs; i++) {
+                const bulb = document.createElement('div');
+                bulb.className = 'wheel-bulb';
+                const angle = (i / numBulbs) * 360;
+                const radius = 140;
+                const x = 140 + radius * Math.cos(angle * Math.PI / 180);
+                const y = 140 + radius * Math.sin(angle * Math.PI / 180);
+                bulb.style.left = (x - 6) + 'px';
+                bulb.style.top = (y - 6) + 'px';
+                bulbsContainer.appendChild(bulb);
             }
-        });
-
-        // Draw wheel (modal version)
-        let modalCanvas = document.getElementById('modalWheelCanvas');
-        let modalCtx = modalCanvas.getContext('2d');
-        const segmentColors = [
-            '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
-            '#DDA0DD', '#FF9FF3', '#54A0FF', '#5F27CD', '#FF6B6B',
-            '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD',
-            '#FF9FF3', '#54A0FF', '#5F27CD', '#FF6B6B', '#4ECDC4'
-        ];
-
-        function drawModalWheel() {
-            const numSegments = prizeList.length;
-            const angleStep = (2 * Math.PI) / numSegments;
-            const radius = 200;
-
-            modalCtx.clearRect(0, 0, 400, 400);
-            modalCtx.save();
-            modalCtx.translate(200, 200);
-
-            for (let i = 0; i < numSegments; i++) {
-                const startAngle = i * angleStep;
-                const endAngle = startAngle + angleStep;
-                const color = segmentColors[i % segmentColors.length];
-
-                modalCtx.beginPath();
-                modalCtx.moveTo(0, 0);
-                modalCtx.arc(0, 0, radius, startAngle, endAngle);
-                modalCtx.closePath();
-                modalCtx.fillStyle = color;
-                modalCtx.fill();
-                modalCtx.strokeStyle = '#0f172a';
-                modalCtx.lineWidth = 2;
-                modalCtx.stroke();
-
-                modalCtx.save();
-                modalCtx.rotate(startAngle + angleStep / 2);
-                modalCtx.textAlign = 'center';
-                modalCtx.textBaseline = 'middle';
-                modalCtx.fillStyle = '#0f172a';
-                modalCtx.font = 'bold 14px Segoe UI';
-                const prize = prizeList[i];
-                const label = prize.label;
-                modalCtx.fillText(label, radius * 0.65, 0);
-                modalCtx.restore();
-            }
-
-            modalCtx.restore();
         }
 
         function getPrizeByAngle(angle) {
-            const numSegments = prizeList.length;
-            const angleStep = (2 * Math.PI) / numSegments;
-            let normalized = angle % (2 * Math.PI);
-            if (normalized < 0) normalized += 2 * Math.PI;
+            const numSegments = prizeData.length;
+            const angleStep = 360 / numSegments;
+            let normalized = angle % 360;
+            if (normalized < 0) normalized += 360;
             const index = Math.floor(normalized / angleStep);
-            return prizeList[index % numSegments];
+            return prizeData[index % numSegments];
         }
 
         function openSpinModal() {
@@ -663,7 +705,6 @@
                 return;
             }
             document.getElementById('spinModal').classList.add('show');
-            drawModalWheel();
             updateSpinModalUI();
         }
 
@@ -726,15 +767,15 @@
             const randomAngle = Math.floor(Math.random() * 360);
             const totalRotation = randomSpins * 360 + randomAngle;
             currentRotation += totalRotation;
-            modalCanvas.style.transform = `rotate(${currentRotation}deg)`;
+            const segmentsContainer = document.getElementById('wheelSegments');
+            segmentsContainer.style.transform = `rotate(${currentRotation}deg)`;
 
             // ✅ Ad SDK call with .then()
             show_11197472('pop')
                 .then(() => {
                     isAdShowing = false;
                     
-                    const angleInRadians = currentRotation * (Math.PI / 180);
-                    const prize = getPrizeByAngle(angleInRadians);
+                    const prize = getPrizeByAngle(currentRotation);
                     let rewardCoins = 0;
                     let rewardUsd = 0;
 
@@ -790,7 +831,7 @@
                 .catch((error) => {
                     isAdShowing = false;
                     btn.disabled = false;
-                    btn.textContent = '🎡 Spin Now';
+                    btn.textContent = '🎡 SPIN';
                     isSpinning = false;
                     showToast('⚠️ Ad failed, please try again!', 'error');
                 });
@@ -1336,8 +1377,7 @@
             c.innerHTML = h.slice(-20).reverse().map(h => `<div class="history-item"><div><b>$${h.amount?.toFixed(2) || '0'}</b> <small>${h.method || ''}</small>${h.status === 'cancelled' && h.cancelReason ? `<div style="color:#ef4444;font-size:10px;">⚠️ ${h.cancelReason}</div>` : ''}</div><div style="text-align:right;"><span>${h.status === 'approved' ? '✅' : h.status === 'cancelled' ? '❌' : '⏳'} ${h.status}</span><div style="font-size:9px;">${h.date ? new Date(h.date).toLocaleDateString() : ''}</div></div></div>`).join(''); 
         }
 
-        // ================== SPEED BOOST (NEW) ======================
-        // Speed Boost now gives 50-60 coins in 3 seconds
+        // ================== SPEED BOOST ======================
         function updateSpeedBoostUI() { 
             const bb = document.getElementById('speedBoostBtn'); 
             const cb = document.getElementById('boostCountdownBox'); 
@@ -1632,6 +1672,7 @@
             loadReferralConfigFromDB();
             loadRules();
             loadSpinData();
+            buildWheel();
             
             db.ref('conversionRate').on('value', s => { app.conversionRate = s.val() || 1000; updateUI(); });
             loadLevelConfigFromDB();
@@ -1748,11 +1789,7 @@
             });
         }
 
-        // Draw wheel on load
-        document.addEventListener('DOMContentLoaded', () => {
-            drawModalWheel();
-            initApp();
-        });
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
