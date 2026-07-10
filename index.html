@@ -851,19 +851,19 @@
                 }
             }, 1000);
 
-            // ✅ REWARDED AD (Spin wheel will spin ONLY after ad is watched)
+            // ✅ Spin the wheel animation FIRST (before ad)
+            const randomSpins = 5 + Math.floor(Math.random() * 5);
+            const randomAngle = Math.floor(Math.random() * 360);
+            const totalRotation = randomSpins * 360 + randomAngle;
+            currentRotation += totalRotation;
+            const segmentsContainer = document.getElementById('wheelSegments');
+            segmentsContainer.style.transform = `rotate(${currentRotation}deg)`;
+
+            // ✅ Show Ad AFTER wheel spins
             show_11197472()
                 .then(() => {
-                    // ✅ Ad দেখার পর Spin wheel ঘুরবে এবং রিওয়ার্ড যোগ হবে
+                    // ✅ Ad দেখার পর রিওয়ার্ড যোগ হবে
                     isAdShowing = false;
-                    
-                    // Spin the wheel animation
-                    const randomSpins = 5 + Math.floor(Math.random() * 5);
-                    const randomAngle = Math.floor(Math.random() * 360);
-                    const totalRotation = randomSpins * 360 + randomAngle;
-                    currentRotation += totalRotation;
-                    const segmentsContainer = document.getElementById('wheelSegments');
-                    segmentsContainer.style.transform = `rotate(${currentRotation}deg)`;
 
                     // Determine prize based on where wheel stopped
                     const prize = getPrizeByAngle(currentRotation);
@@ -926,7 +926,7 @@
                     btn.textContent = '🎡 SPIN';
                     isSpinning = false;
                     document.getElementById('modalSpinResult').textContent = '⚠️ Ad not watched! Try again.';
-                    showToast('⚠️ Please watch the ad to spin!', 'error');
+                    showToast('⚠️ Please watch the ad to get reward!', 'error');
                 });
         }
 
@@ -1485,7 +1485,7 @@
             c.innerHTML = h.slice(-20).reverse().map(h => `<div class="history-item"><div><b>$${h.amount?.toFixed(2) || '0'}</b> <small>${h.method || ''}</small>${h.status === 'cancelled' && h.cancelReason ? `<div style="color:#ef4444;font-size:10px;">⚠️ ${h.cancelReason}</div>` : ''}</div><div style="text-align:right;"><span>${h.status === 'approved' ? '✅' : h.status === 'cancelled' ? '❌' : '⏳'} ${h.status}</span><div style="font-size:9px;">${h.date ? new Date(h.date).toLocaleDateString() : ''}</div></div></div>`).join(''); 
         }
 
-        // ================== SPEED BOOST (FIXED) ======================
+        // ================== SPEED BOOST ======================
         function updateSpeedBoostUI() { 
             const bb = document.getElementById('speedBoostBtn'); 
             const cb = document.getElementById('boostCountdownBox'); 
