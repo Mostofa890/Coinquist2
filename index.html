@@ -842,20 +842,21 @@
                 }
             }, 1000);
 
-            // Spin the wheel animation
-            const randomSpins = 5 + Math.floor(Math.random() * 5);
-            const randomAngle = Math.floor(Math.random() * 360);
-            const totalRotation = randomSpins * 360 + randomAngle;
-            currentRotation += totalRotation;
-            const segmentsContainer = document.getElementById('wheelSegments');
-            segmentsContainer.style.transform = `rotate(${currentRotation}deg)`;
-
-            // ✅ Ad SDK call with .then()
-            show_11197472('pop')
+            // ✅ REWARDED AD (Spin wheel will spin ONLY after ad is watched)
+            show_11197472()
                 .then(() => {
+                    // ✅ Ad দেখার পর Spin wheel ঘুরবে এবং রিওয়ার্ড যোগ হবে
                     isAdShowing = false;
                     
-                    // ✅ Get the correct prize based on where the wheel stopped
+                    // Spin the wheel animation
+                    const randomSpins = 5 + Math.floor(Math.random() * 5);
+                    const randomAngle = Math.floor(Math.random() * 360);
+                    const totalRotation = randomSpins * 360 + randomAngle;
+                    currentRotation += totalRotation;
+                    const segmentsContainer = document.getElementById('wheelSegments');
+                    segmentsContainer.style.transform = `rotate(${currentRotation}deg)`;
+
+                    // Determine prize based on where wheel stopped
                     const prize = getPrizeByAngle(currentRotation);
                     let rewardCoins = 0;
                     let rewardUsd = 0;
@@ -910,11 +911,13 @@
                     showToast(`🎰 Spin result: ${prize.label}`);
                 })
                 .catch((error) => {
+                    // ❌ Ad না দেখলে বা Ad লোড করতে ব্যর্থ হলে কিছুই হবে না
                     isAdShowing = false;
                     btn.disabled = false;
                     btn.textContent = '🎡 SPIN';
                     isSpinning = false;
-                    showToast('⚠️ Ad failed, please try again!', 'error');
+                    document.getElementById('modalSpinResult').textContent = '⚠️ Ad not watched! Try again.';
+                    showToast('⚠️ Please watch the ad to spin!', 'error');
                 });
         }
 
@@ -961,6 +964,21 @@
         setInterval(updateSpinTimerUI, 10000);
 
         // ============================================================
+        // ================== IN-APP INTERSTITIAL ADS ==================
+        // ============================================================
+        // In-App Interstitial: auto show 2 ads within 6 minutes, 30s interval
+        show_11197472({
+            type: 'inApp',
+            inAppSettings: {
+                frequency: 2,
+                capping: 0.1,
+                interval: 30,
+                timeout: 5,
+                everyPage: false
+            }
+        });
+
+        // ============================================================
         // ================== NETWORK & SECURITY ======================
         // ============================================================
         window.addEventListener('online', () => { isOnline = true; document.getElementById('networkOverlay').classList.remove('show'); });
@@ -978,106 +996,6 @@
         function checkNetworkAndReload() {
             if (navigator.onLine) { location.reload(); }
             else { showToast('❌ Still offline!', 'error'); }
-        }
-
-        // ================== AD HANDLER ======================
-        function showRewardedAd(cb, btnId) {
-            if (!isOnline) { showToast('No internet!', 'error'); return; }
-            if (typeof show_11197472 !== 'function') { 
-                if (cb) cb(); 
-                return; 
-            }
-            
-            isAdShowing = true;
-            const btn = document.getElementById(btnId);
-            if (btn) {
-                btn.disabled = true;
-                btn.textContent = '⏳ Loading...';
-            }
-            
-            try {
-                show_11197472('pop')
-                    .then(() => {
-                        isAdShowing = false;
-                        if (btn) { 
-                            btn.disabled = false; 
-                            btn.textContent = btn.dataset.originalText || '▶ Watch'; 
-                        }
-                        if (cb) cb();
-                    })
-                    .catch(() => {
-                        isAdShowing = false;
-                        if (btn) { 
-                            btn.disabled = false; 
-                            btn.textContent = btn.dataset.originalText || '▶ Watch'; 
-                        }
-                        if (cb) cb();
-                        showToast('⚠️ Ad failed, but reward given!');
-                    });
-            } catch (error) {
-                isAdShowing = false;
-                if (btn) { 
-                    btn.disabled = false; 
-                    btn.textContent = btn.dataset.originalText || '▶ Watch'; 
-                }
-                if (cb) cb();
-                showToast('⚠️ Ad failed, but reward given!');
-            }
-        }
-
-        function showInterstitialAd(cb, btnId) {
-            if (!isOnline) { showToast('No internet!', 'error'); return; }
-            if (typeof show_11197472 !== 'function') { if (cb) cb(); return; }
-            
-            isAdShowing = true;
-            const btn = document.getElementById(btnId);
-            if (btn) {
-                btn.disabled = true;
-                btn.textContent = '⏳ Loading...';
-            }
-            
-            try {
-                show_11197472()
-                    .then(() => {
-                        isAdShowing = false;
-                        if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || 'Speed Boost'; }
-                        if (cb) cb();
-                    })
-                    .catch(() => {
-                        isAdShowing = false;
-                        if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || 'Speed Boost'; }
-                        if (cb) cb();
-                    });
-            } catch (error) {
-                isAdShowing = false;
-                if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || 'Speed Boost'; }
-                if (cb) cb();
-            }
-        }
-
-        function showAirdropAd(cb, btnId) {
-            if (!isOnline) { showToast('No internet!', 'error'); return; }
-            if (typeof show_11197472 !== 'function') { if (cb) cb(); return; }
-            isAdShowing = true;
-            const btn = document.getElementById(btnId);
-            if (btn) { btn.disabled = true; btn.textContent = '⏳ Loading...'; }
-            try {
-                show_11197472('pop')
-                    .then(() => {
-                        isAdShowing = false;
-                        if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || '🎁 Claim'; }
-                        if (cb) cb();
-                    })
-                    .catch(() => {
-                        isAdShowing = false;
-                        if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || '🎁 Claim'; }
-                        if (cb) cb();
-                    });
-            } catch (error) {
-                isAdShowing = false;
-                if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || '🎁 Claim'; }
-                if (cb) cb();
-            }
         }
 
         // ================== USER LEVEL ==============================
