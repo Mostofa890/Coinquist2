@@ -1164,7 +1164,7 @@
                     if (t.type === 'video') {
                         btnHtml = `<button class="task-btn" id="taskBtn_${t.id}" data-original-text="📺 Watch" onclick="completeTask('${t.id}',${t.reward},'${t.type}')">📺 Watch (${remaining} left)</button>`;
                     } else if (t.type === 'link') {
-                        btnHtml = `<button class="task-btn" id="taskBtn_${t.id}" onclick="openWebViewTask('${t.id}','${t.link || '#'}',${t.reward},${t.waitTime || 10})">🔗 Open (${remaining} left)</button>`;
+                        btnHtml = `<button class="task-btn" id="taskBtn_${t.id}" onclick="openWebViewTask('${t.id}','${t.link || '#'}',${t.reward},${t.waitTime || 60})">🔗 Open (${remaining} left)</button>`;
                     } else {
                         btnHtml = `<button class="task-btn" id="taskBtn_${t.id}" onclick="completeTask('${t.id}',${t.reward},'${t.type}')">🔗 Open (${remaining} left)</button>`;
                     }
@@ -1181,7 +1181,10 @@
             if (!isOnline) { showToast('No internet!', 'error'); return; }
             if (app.taskProgress[taskId] >= (tasks.find(t => t.id === taskId)?.limit || 1)) { showToast('Task already completed!', 'error'); return; }
             if (app.taskLastCompleted[taskId] === new Date().toDateString()) { showToast('Already done today!', 'error'); return; }
-            webViewTaskId = taskId; webViewTaskReward = reward; webViewRequiredTime = waitTime || 60; webViewSeconds = 0;
+            webViewTaskId = taskId;
+            webViewTaskReward = reward;
+            webViewRequiredTime = waitTime || 60; // ✅ 1 minute (60 seconds)
+            webViewSeconds = 0;
             const overlay = document.getElementById('webviewOverlay');
             document.getElementById('webviewIframe').src = url;
             document.getElementById('webviewUrlText').textContent = url;
@@ -1192,7 +1195,8 @@
                 const remaining = Math.max(0, webViewRequiredTime - webViewSeconds);
                 document.getElementById('webviewTimer').textContent = `⏱ ${remaining}s`;
                 if (remaining <= 0) {
-                    clearInterval(webViewTimerInterval); webViewTimerInterval = null;
+                    clearInterval(webViewTimerInterval);
+                    webViewTimerInterval = null;
                     document.getElementById('webviewClaimBtn').disabled = false;
                     document.getElementById('webviewClaimBtn').textContent = '✅ Claim Reward';
                 } else {
@@ -1284,28 +1288,66 @@
         function genRefCode() { return Array(8).fill(0).map(() => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random() * 36)]).join(''); }
         function submitReferCode() { 
             if (!isOnline) { showToast('No internet!', 'error'); return; }
-            const code = document.getElementById('referCodeInput').value.trim(); 
-            if (!code) { showToast('Enter code!', 'error'); return; } 
-            userRef.once('value', s => { 
-                if ((s.val() || {}).referCodeSubmitted) { showToast('Already submitted!', 'error'); return; } 
-                db.ref('users').orderByChild('referCode').equalTo(code).once('value', sn => { 
-                    if (!sn.exists()) { showToast('Invalid!', 'error'); return; } 
-                    sn.forEach(c => { 
-                        if (c.key === userId) { showToast('Own code!', 'error'); return; } 
-                        const bonus = referralConfigCache.perReferralCoins || 50; 
-                        const xpBonus = referralConfigCache.xpPerReferral || 100; 
-                        db.ref('referrals/' + userId).set({ referredBy: c.key, referredAt: Date.now(), username: displayName, bonus: bonus, userId }).then(() => { 
-                            db.ref('users/' + c.key).transaction(cur => ({ ...(cur || {}), referCount: (cur?.referCount || 0) + 1 })); 
-                            app.balance += bonus; app.xpPoints += xpBonus; 
-                            userRef.update({ balance: app.balance, xpPoints: app.xpPoints, referCodeSubmitted: true }); 
-                            document.getElementById('referCodeSubmitBtn').disabled = true; 
-                            document.getElementById('referCodeInput').disabled = true; 
-                            updateUI(); updateLevelUI(); 
-                            showToast(`🎉 +${bonus} Coins!`); 
-                        }); 
-                    }); 
-                }); 
-            }); 
+            const code = document.getElementById('referCodeInput').value.trim().toUpperCase();
+            if (!code) { showToast('Enter code!', 'error'); return; }
+
+            userRef.once('value', s => {
+                const userData = s.val() || {};
+                if (userData.referCodeSubmitted) {
+                    showToast('You already used a referral code!', 'error');
+                    return;
+                }
+
+                db.ref('users').orderByChild('referCode').equalTo(code).once('value', sn => {
+                    if (!sn.exists()) {
+                        showToast('Invalid referral code!', 'error');
+                        return;
+                    }
+
+                    let found = false;
+                    sn.forEach(c => {
+                        if (c.key === userId) {
+                            showToast('You cannot use your own code!', 'error');
+                            found = true;
+                            return;
+                        }
+                        found = true;
+                        const bonus = referralConfigCache.perReferralCoins || 50;
+                        const xpBonus = referralConfigCache.xpPerReferral || 100;
+
+                        db.ref('referrals/' + userId).set({
+                            referredBy: c.key,
+                            referredAt: Date.now(),
+                            username: displayName,
+                            bonus: bonus,
+                            userId
+                        }).then(() => {
+                            db.ref('users/' + c.key).transaction(cur => ({
+                                ...(cur || {}),
+                                referCount: (cur?.referCount || 0) + 1
+                            }));
+
+                            app.balance += bonus;
+                            app.xpPoints += xpBonus;
+                            userRef.update({
+                                balance: app.balance,
+                                xpPoints: app.xpPoints,
+                                referCodeSubmitted: true
+                            });
+
+                            document.getElementById('referCodeSubmitBtn').disabled = true;
+                            document.getElementById('referCodeInput').disabled = true;
+                            updateUI();
+                            updateLevelUI();
+                            showToast(`🎉 +${bonus} Coins!`);
+                        });
+                    });
+
+                    if (!found) {
+                        showToast('Invalid referral code!', 'error');
+                    }
+                });
+            });
         }
         function copyReferLink() { 
             const link = document.getElementById('referLinkHome').textContent; 
@@ -1735,6 +1777,12 @@
                 app.xpPoints = d.xpPoints !== undefined ? d.xpPoints : NEGATIVE_XP;
                 app.withdrawHistory = d.withdrawHistory || [];
                 app.airdropClaimed = d.airdropClaimed || false;
+
+                // ✅ রেফার লিংক শুধুমাত্র referCode পরিবর্তন হলে আপডেট হবে
+                if (!window._lastReferCode || window._lastReferCode !== app.referCode) {
+                    window._lastReferCode = app.referCode;
+                    document.getElementById('referLinkHome').textContent = `https://t.me/CoinQuist_bot?start=ref_${app.referCode}`;
+                }
                 
                 document.getElementById('referLinkHome').textContent = `https://t.me/CoinQuist_bot?start=ref_${app.referCode}`;
                 
