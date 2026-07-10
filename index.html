@@ -222,34 +222,6 @@
             font-size: 12px;
             font-weight: 700;
         }
-        #floatingSpinBtn .timer-overlay {
-            position: absolute;
-            top: -40px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.8);
-            color: #fbbf24;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            white-space: nowrap;
-            display: none;
-            border: 1px solid rgba(251,191,36,0.3);
-        }
-        #floatingSpinBtn .timer-overlay.show {
-            display: block;
-        }
-        #floatingSpinBtn .timer-overlay .timer-label {
-            font-size: 9px;
-            color: #94a3b8;
-            display: block;
-            text-align: center;
-        }
-        #floatingSpinBtn .timer-overlay .timer-time {
-            display: block;
-            text-align: center;
-        }
 
         /* ================== SPIN WHEEL MODAL ================== */
         .spin-modal-overlay {
@@ -548,10 +520,6 @@
     <div id="floatingSpinBtn" onclick="openSpinModal()">
         <span class="spin-icon">🎰</span>
         <span class="spin-badge" id="spinBadge">20</span>
-        <div class="timer-overlay" id="spinTimerOverlay">
-            <span class="timer-label">⏳ Reset in</span>
-            <span class="timer-time" id="spinTimerText">12h 0m</span>
-        </div>
     </div>
 
     <!-- ✅ SPIN WHEEL MODAL -->
@@ -707,13 +675,9 @@
         // ================== SPIN WHEEL SYSTEM =======================
         // ============================================================
         const SPIN_COUNT_LIMIT = 20;
-        const SPIN_COOLDOWN_HOURS = 12;
-        const SPIN_COOLDOWN_MS = SPIN_COOLDOWN_HOURS * 60 * 60 * 1000;
         const SPIN_BUTTON_COOLDOWN_SECONDS = 15;
 
         let spinCount = SPIN_COUNT_LIMIT;
-        let spinResetTime = 0;
-        let spinTimerInterval = null;
         let spinBtnCooldownInterval = null;
         let isSpinning = false;
         let currentRotation = 0;
@@ -789,8 +753,8 @@
         }
 
         function openSpinModal() {
-            if (spinCount <= 0 && Date.now() < spinResetTime) {
-                showToast('⏳ No spins! Wait 12 hours.', 'error');
+            if (spinCount <= 0) {
+                showToast('🎯 No spins left!', 'error');
                 return;
             }
             document.getElementById('spinModal').classList.add('show');
@@ -803,28 +767,13 @@
 
         function updateSpinModalUI() {
             document.getElementById('modalSpinCount').textContent = `Spins: ${spinCount}/${SPIN_COUNT_LIMIT}`;
-            if (spinCount <= 0 && Date.now() < spinResetTime) {
-                const remaining = spinResetTime - Date.now();
-                if (remaining > 0) {
-                    const hours = Math.floor(remaining / 3600000);
-                    const minutes = Math.floor((remaining % 3600000) / 60000);
-                    document.getElementById('modalSpinCount').textContent = `⏳ ${hours}h ${minutes}m`;
-                    document.getElementById('modalSpinBtn').disabled = true;
-                }
-            } else {
-                document.getElementById('modalSpinBtn').disabled = false;
-            }
         }
 
         function spinWheelFromModal() {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
             if (isSpinning) return;
             if (spinCount <= 0) {
-                showToast('🎯 No spins left! Wait 12 hours.', 'error');
-                return;
-            }
-            if (Date.now() < spinResetTime) {
-                showToast('⏳ Cooldown active!', 'error');
+                showToast('🎯 No spins left!', 'error');
                 return;
             }
 
@@ -887,10 +836,19 @@
                         app.usdBalance += rewardUsd;
                     }
 
+                    // ✅ Spin count কমবে
                     spinCount--;
                     document.getElementById('spinBadge').textContent = spinCount;
                     document.getElementById('modalSpinResult').textContent = `🎉 You won ${prize.label}!`;
                     updateSpinModalUI();
+
+                    // ✅ Check if mining coins became 0 → reset spins
+                    if (app.progressCoins === 0) {
+                        spinCount = SPIN_COUNT_LIMIT;
+                        document.getElementById('spinBadge').textContent = spinCount;
+                        updateSpinModalUI();
+                        showToast('🔄 Spins reset! You have 20 spins again!');
+                    }
 
                     let resultText = '';
                     if (rewardCoins > 0) {
@@ -908,8 +866,7 @@
                     userRef.update({
                         progressCoins: app.progressCoins,
                         usdBalance: app.usdBalance,
-                        spinCount: spinCount,
-                        spinResetTime: spinResetTime
+                        spinCount: spinCount
                     });
 
                     updateUI();
@@ -936,41 +893,7 @@
                 document.getElementById('spinBadge').textContent = spinCount;
                 updateSpinModalUI();
             });
-            db.ref('users/' + userId + '/spinResetTime').on('value', snap => {
-                spinResetTime = snap.val() || 0;
-                updateSpinTimerUI();
-            });
         }
-
-        function updateSpinTimerUI() {
-            const now = Date.now();
-            const btn = document.getElementById('floatingSpinBtn');
-            const overlay = document.getElementById('spinTimerOverlay');
-            const timerText = document.getElementById('spinTimerText');
-
-            if (spinResetTime > 0 && now < spinResetTime) {
-                const remaining = spinResetTime - now;
-                const hours = Math.floor(remaining / 3600000);
-                const minutes = Math.floor((remaining % 3600000) / 60000);
-                overlay.classList.add('show');
-                timerText.textContent = `${hours}h ${minutes}m`;
-                btn.disabled = true;
-            } else if (spinResetTime > 0 && now >= spinResetTime) {
-                spinCount = SPIN_COUNT_LIMIT;
-                spinResetTime = 0;
-                userRef.update({ spinCount: spinCount, spinResetTime: 0 });
-                document.getElementById('spinBadge').textContent = spinCount;
-                overlay.classList.remove('show');
-                btn.disabled = false;
-                showToast('🔄 Spins reset! You have 20 spins!');
-            } else {
-                overlay.classList.remove('show');
-                btn.disabled = false;
-            }
-        }
-
-        // Check spin reset every 10 seconds
-        setInterval(updateSpinTimerUI, 10000);
 
         // ============================================================
         // ================== IN-APP INTERSTITIAL ADS ==================
