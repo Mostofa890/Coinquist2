@@ -808,8 +808,7 @@
             const segmentsContainer = document.getElementById('wheelSegments');
             segmentsContainer.style.transform = `rotate(${currentRotation}deg)`;
 
-            // ✅ Show Ad AFTER wheel spins
-            show_11197472()
+            // ✅ Show Ad AFTER wheel spins            show_11197472()
                 .then(() => {
                     // ✅ Ad দেখার পর রিওয়ার্ড যোগ হবে
                     isAdShowing = false;
@@ -1111,7 +1110,27 @@
                 app.balance += ca;
                 app.xpPoints += 1;
                 
-                userRef.update({ balance: app.balance, progressCoins: app.progressCoins, xpPoints: app.xpPoints, lastMiningActivity: Date.now() });
+                // ✅ FIXED: transaction ব্যবহার করা হয়েছে যাতে কয়েন গায়েব না হয়
+                userRef.transaction((currentData) => {
+                    if (currentData === null) return null;
+                    return {
+                        ...currentData,
+                        balance: (currentData.balance || 0) + ca,
+                        progressCoins: Math.max(0, (currentData.progressCoins || 0) - 1),
+                        xpPoints: (currentData.xpPoints || 0) + 1,
+                        lastMiningActivity: Date.now()
+                    };
+                }, (error, committed, snapshot) => {
+                    if (error) {
+                        console.error('Transaction failed:', error);
+                        showToast('⚠️ Mining error!', 'error');
+                        return;
+                    }
+                    if (!committed) {
+                        showToast('⚠️ Data conflict! Retrying...', 'error');
+                        return;
+                    }
+                }, false);
                 
                 const coin = document.createElement('div');
                 coin.className = 'floating-coin';
