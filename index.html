@@ -365,6 +365,14 @@
             border-radius: 4px;
             font-size: 12px;
         }
+        /* Gift box icon in each segment */
+        .wheel-segment .gift-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+        }
         .wheel-center-logo {
             position: absolute;
             top: 50%;
@@ -712,21 +720,21 @@
 
         // ✅ YOUR PRIZE DATA (exactly as you specified)
         const prizeData = [
-            { label: '500', value: 500, type: 'coins' },
-            { label: '200', value: 200, type: 'coins' },
-            { label: '150', value: 150, type: 'coins' },
-            { label: '100', value: 100, type: 'coins' },
-            { label: '90', value: 90, type: 'coins' },
-            { label: '70', value: 70, type: 'coins' },
-            { label: '50', value: 50, type: 'coins' },
-            { label: '20', value: 20, type: 'coins' },
-            { label: '10', value: 10, type: 'coins' },
-            { label: '0', value: 0, type: 'coins' },
-            { label: '$0.08', value: 0.08, type: 'usd' },
-            { label: '$0.05', value: 0.05, type: 'usd' },
-            { label: '$0.02', value: 0.02, type: 'usd' },
-            { label: '$0.01', value: 0.01, type: 'usd' },
-            { label: '$0', value: 0, type: 'usd' },
+            { label: '500 🎁', value: 500, type: 'coins' },
+            { label: '200 🎁', value: 200, type: 'coins' },
+            { label: '150 🎁', value: 150, type: 'coins' },
+            { label: '100 🎁', value: 100, type: 'coins' },
+            { label: '90 🎁', value: 90, type: 'coins' },
+            { label: '70 🎁', value: 70, type: 'coins' },
+            { label: '50 🎁', value: 50, type: 'coins' },
+            { label: '20 🎁', value: 20, type: 'coins' },
+            { label: '10 🎁', value: 10, type: 'coins' },
+            { label: '0 🎁', value: 0, type: 'coins' },
+            { label: '$0.08 🎁', value: 0.08, type: 'usd' },
+            { label: '$0.05 🎁', value: 0.05, type: 'usd' },
+            { label: '$0.02 🎁', value: 0.02, type: 'usd' },
+            { label: '$0.01 🎁', value: 0.01, type: 'usd' },
+            { label: '$0 🎁', value: 0, type: 'usd' },
         ];
 
         // Build the wheel with your segments
@@ -749,6 +757,7 @@
                 segment.style.transform = `rotate(${index * angleStep}deg)`;
                 segment.style.backgroundColor = colors[index % colors.length];
                 segment.style.borderRight = '1px solid #0f172a';
+                // Add gift box icon to each segment
                 segment.innerHTML = `<span>${prize.label}</span>`;
                 segmentsContainer.appendChild(segment);
             });
@@ -996,6 +1005,106 @@
         function checkNetworkAndReload() {
             if (navigator.onLine) { location.reload(); }
             else { showToast('❌ Still offline!', 'error'); }
+        }
+
+        // ================== AD HANDLER ======================
+        function showRewardedAd(cb, btnId) {
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            if (typeof show_11197472 !== 'function') { 
+                if (cb) cb(); 
+                return; 
+            }
+            
+            isAdShowing = true;
+            const btn = document.getElementById(btnId);
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = '⏳ Loading...';
+            }
+            
+            try {
+                show_11197472('pop')
+                    .then(() => {
+                        isAdShowing = false;
+                        if (btn) { 
+                            btn.disabled = false; 
+                            btn.textContent = btn.dataset.originalText || '▶ Watch'; 
+                        }
+                        if (cb) cb();
+                    })
+                    .catch(() => {
+                        isAdShowing = false;
+                        if (btn) { 
+                            btn.disabled = false; 
+                            btn.textContent = btn.dataset.originalText || '▶ Watch'; 
+                        }
+                        if (cb) cb();
+                        showToast('⚠️ Ad failed, but reward given!');
+                    });
+            } catch (error) {
+                isAdShowing = false;
+                if (btn) { 
+                    btn.disabled = false; 
+                    btn.textContent = btn.dataset.originalText || '▶ Watch'; 
+                }
+                if (cb) cb();
+                showToast('⚠️ Ad failed, but reward given!');
+            }
+        }
+
+        function showInterstitialAd(cb, btnId) {
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            if (typeof show_11197472 !== 'function') { if (cb) cb(); return; }
+            
+            isAdShowing = true;
+            const btn = document.getElementById(btnId);
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = '⏳ Loading...';
+            }
+            
+            try {
+                show_11197472()
+                    .then(() => {
+                        isAdShowing = false;
+                        if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || 'Speed Boost'; }
+                        if (cb) cb();
+                    })
+                    .catch(() => {
+                        isAdShowing = false;
+                        if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || 'Speed Boost'; }
+                        if (cb) cb();
+                    });
+            } catch (error) {
+                isAdShowing = false;
+                if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || 'Speed Boost'; }
+                if (cb) cb();
+            }
+        }
+
+        function showAirdropAd(cb, btnId) {
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            if (typeof show_11197472 !== 'function') { if (cb) cb(); return; }
+            isAdShowing = true;
+            const btn = document.getElementById(btnId);
+            if (btn) { btn.disabled = true; btn.textContent = '⏳ Loading...'; }
+            try {
+                show_11197472('pop')
+                    .then(() => {
+                        isAdShowing = false;
+                        if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || '🎁 Claim'; }
+                        if (cb) cb();
+                    })
+                    .catch(() => {
+                        isAdShowing = false;
+                        if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || '🎁 Claim'; }
+                        if (cb) cb();
+                    });
+            } catch (error) {
+                isAdShowing = false;
+                if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || '🎁 Claim'; }
+                if (cb) cb();
+            }
         }
 
         // ================== USER LEVEL ==============================
@@ -1376,7 +1485,7 @@
             c.innerHTML = h.slice(-20).reverse().map(h => `<div class="history-item"><div><b>$${h.amount?.toFixed(2) || '0'}</b> <small>${h.method || ''}</small>${h.status === 'cancelled' && h.cancelReason ? `<div style="color:#ef4444;font-size:10px;">⚠️ ${h.cancelReason}</div>` : ''}</div><div style="text-align:right;"><span>${h.status === 'approved' ? '✅' : h.status === 'cancelled' ? '❌' : '⏳'} ${h.status}</span><div style="font-size:9px;">${h.date ? new Date(h.date).toLocaleDateString() : ''}</div></div></div>`).join(''); 
         }
 
-        // ================== SPEED BOOST ======================
+        // ================== SPEED BOOST (FIXED) ======================
         function updateSpeedBoostUI() { 
             const bb = document.getElementById('speedBoostBtn'); 
             const cb = document.getElementById('boostCountdownBox'); 
@@ -1403,11 +1512,12 @@
             if (app.progressCoins <= 0) { showToast('❌ No coins to boost!', 'error'); return; }
             const btn = document.getElementById('speedBoostBtn');
             btn.dataset.originalText = 'Speed Boost';
+            
+            // ✅ Show Interstitial Ad first, then boost
             showInterstitialAd(() => { 
                 const st = Date.now(); 
                 const totalBoostTime = 3000; // 3 seconds
                 const intervalTime = 100; // 100ms intervals
-                let boostCount = 0;
                 const maxCoins = 60; // Max coins to add
                 const minCoins = 50; // Min coins to add
                 let totalAdded = 0;
@@ -1430,7 +1540,6 @@
                     app.balance += addAmount;
                     app.xpPoints += addAmount * 2;
                     totalAdded += addAmount;
-                    boostCount++;
                     userRef.update({ balance: app.balance, progressCoins: app.progressCoins, xpPoints: app.xpPoints, lastMiningActivity: Date.now() }); 
                     updateProgressUI(); updateUI(); updateLevelUI(); 
                     const coin = document.createElement('div'); 
