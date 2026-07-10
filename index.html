@@ -465,12 +465,12 @@
             <div class="user-info"><div class="avatar">👤</div><div class="user-details"><h3 id="userName">User</h3><div class="last-login" id="lastLoginDisplay">📅 --</div><span class="level-badge" onclick="openLevelPage()" id="userLevelBadge">🔒 Unlocking</span></div></div>
             <div class="balance-card">
                 <div class="balance-label">💰 Coins Balance</div><div class="balance-amount" id="balance">0</div>
-                <div class="usd-value" id="usdValue">≈ $0.00 USD</div>
+                <div class="usd-value" id="usdValue">≈ $0.000 USD</div>
                 <!-- ✅ USD Balance and Total Balance added below coins -->
                 <div style="margin-top:8px; border-top: 1px solid rgba(255,255,255,0.1); padding-top:8px;">
                     <div style="display:flex; justify-content:space-between; font-size:14px; color:#94a3b8;">
                         <span>💵 USD Balance</span>
-                        <span id="usdBalanceDisplay" style="color:#10b981; font-weight:bold;">$0.00</span>
+                        <span id="usdBalanceDisplay" style="color:#10b981; font-weight:bold;">$0.000</span>
                     </div>
                     <div style="display:flex; justify-content:space-between; font-size:14px; color:#94a3b8; margin-top:4px;">
                         <span>💰 Total Balance</span>
@@ -495,16 +495,16 @@
             <div class="wallet-card">
                 <p>Coins Balance</p>
                 <div class="wallet-balance" id="walletBalance">0</div>
-                <div id="walletUsd" style="color:#10b981;font-size:18px;font-weight:bold;">≈ $0.00</div>
+                <div id="walletUsd" style="color:#10b981;font-size:18px;font-weight:bold;">≈ $0.000</div>
                 <div style="background:rgba(16,185,129,0.1);border-radius:10px;padding:10px;margin-top:15px;">
                     <div>💵 Total USD</div>
-                    <div id="walletTotalUsd" style="font-size:18px;font-weight:bold;color:#10b981;">$0.00</div>
+                    <div id="walletTotalUsd" style="font-size:18px;font-weight:bold;color:#10b981;">$0.000</div>
                 </div>
                 <div class="withdraw-section">
-                    <p id="withdrawInfo" style="font-weight:bold;color:#fbbf24;">Min: $10.00</p>
+                    <p id="withdrawInfo" style="font-weight:bold;color:#fbbf24;">Min: $10.000</p>
                     <div class="form-group"><label>Payment Method</label><div class="method-selector" id="methodSelector"></div></div>
                     <div class="form-group"><label>Account Number</label><input type="text" id="withdrawAccount" placeholder="Enter your account number..."></div>
-                    <p id="withdrawStatus" style="font-size:11px;color:#94a3b8;">You have: $0.00</p>
+                    <p id="withdrawStatus" style="font-size:11px;color:#94a3b8;">You have: $0.000</p>
                     <button class="withdraw-btn" id="withdrawBtn" onclick="withdraw()">Withdraw Now</button>
                 </div>
                 <div class="history-card">
@@ -847,7 +847,7 @@
                         resultText += `+${rewardCoins} Coins!`;
                     }
                     if (rewardUsd > 0) {
-                        resultText += `+$${rewardUsd.toFixed(2)} USD!`;
+                        resultText += `+$${rewardUsd.toFixed(3)} USD!`;
                     }
                     if (resultText === '') {
                         resultText = 'Better luck next time!';
@@ -1320,7 +1320,7 @@
         function loadAirdrop() { 
             db.ref('airdropConfig').on('value', snap => { 
                 const c = snap.val() || {}; 
-                document.getElementById('airdropPoolDisplay').textContent = `$${(c.poolAmount || 50).toFixed(2)}`; 
+                document.getElementById('airdropPoolDisplay').textContent = `$${(c.poolAmount || 50).toFixed(3)}`; 
                 if (c.startTime) startAirdropCountdown(c.startTime, c.endTime); 
             }); 
         }
@@ -1365,8 +1365,8 @@
         // ================== WITHDRAW ================================
         function updateWithdrawUI() {
             const b = app.usdBalance || 0, m = app.minWithdraw || 10;
-            document.getElementById('withdrawInfo').textContent = `Min: $${m.toFixed(2)}`;
-            document.getElementById('withdrawStatus').textContent = `You have: $${b.toFixed(2)}`;
+            document.getElementById('withdrawInfo').textContent = `Min: $${m.toFixed(3)}`;
+            document.getElementById('withdrawStatus').textContent = `You have: $${b.toFixed(3)}`;
             const container = document.getElementById('methodSelector');
             const methods = app.withdrawMethods || ['Nagad', 'Rocket'];
             if (!methods.includes(app.selectedMethod)) app.selectedMethod = methods[0] || 'Nagad';
@@ -1379,7 +1379,7 @@
             }).join('');
             const btn = document.getElementById('withdrawBtn');
             btn.disabled = b < m || !isOnline;
-            btn.textContent = !isOnline ? 'No Internet' : (b < m ? `Need $${(m - b).toFixed(2)} more` : 'Withdraw Now');
+            btn.textContent = !isOnline ? 'No Internet' : (b < m ? `Need $${(m - b).toFixed(3)} more` : 'Withdraw Now');
         }
 
         function selectMethod(method) { app.selectedMethod = method; updateWithdrawUI(); }
@@ -1403,17 +1403,17 @@
             }]; 
             userRef.update({ usdBalance: 0, withdrawHistory: app.withdrawHistory }); 
             document.getElementById('withdrawModalTitle').textContent = 'Sent!'; 
-            document.getElementById('withdrawModalText').textContent = `$${b.toFixed(2)} via ${mt}`; 
+            document.getElementById('withdrawModalText').textContent = `$${b.toFixed(3)} via ${mt}`; 
             document.getElementById('withdrawModal').classList.add('active'); 
             document.getElementById('withdrawAccount').value = ''; 
             updateUI(); updateWithdrawUI(); updateWithdrawHistoryUI(); 
-            showToast(`$${b.toFixed(2)} requested!`); 
+            showToast(`$${b.toFixed(3)} requested!`); 
         }
 
         function updateWithdrawHistoryUI() { 
             const c = document.getElementById('withdrawHistoryList'), h = app.withdrawHistory || []; 
             if (!h.length) { c.innerHTML = '<span style="color:#94a3b8;font-size:11px;">No history</span>'; return; } 
-            c.innerHTML = h.slice(-20).reverse().map(h => `<div class="history-item"><div><b>$${h.amount?.toFixed(2) || '0'}</b> <small>${h.method || ''}</small>${h.status === 'cancelled' && h.cancelReason ? `<div style="color:#ef4444;font-size:10px;">⚠️ ${h.cancelReason}</div>` : ''}</div><div style="text-align:right;"><span>${h.status === 'approved' ? '✅' : h.status === 'cancelled' ? '❌' : '⏳'} ${h.status}</span><div style="font-size:9px;">${h.date ? new Date(h.date).toLocaleDateString() : ''}</div></div></div>`).join(''); 
+            c.innerHTML = h.slice(-20).reverse().map(h => `<div class="history-item"><div><b>$${h.amount?.toFixed(3) || '0'}</b> <small>${h.method || ''}</small>${h.status === 'cancelled' && h.cancelReason ? `<div style="color:#ef4444;font-size:10px;">⚠️ ${h.cancelReason}</div>` : ''}</div><div style="text-align:right;"><span>${h.status === 'approved' ? '✅' : h.status === 'cancelled' ? '❌' : '⏳'} ${h.status}</span><div style="font-size:9px;">${h.date ? new Date(h.date).toLocaleDateString() : ''}</div></div></div>`).join(''); 
         }
 
         // ================== SPEED BOOST ======================
@@ -1495,10 +1495,10 @@
                 app.balance = 0; 
                 app.lastConversion = Date.now(); 
                 userRef.update({ balance: 0, usdBalance: app.usdBalance, lastConversion: app.lastConversion }); 
-                document.getElementById('conversionText').textContent = `${coins.toLocaleString()} Coins → $${earned.toFixed(4)} USD`; 
+                document.getElementById('conversionText').textContent = `${coins.toLocaleString()} Coins → $${earned.toFixed(3)} USD`; 
                 document.getElementById('conversionModal').classList.add('active'); 
                 updateUI(); 
-                showToast(`💰 Converted ${coins} Coins to $${earned.toFixed(2)} USD!`); 
+                showToast(`💰 Converted ${coins} Coins to $${earned.toFixed(3)} USD!`); 
             } else { 
                 app.lastConversion = Date.now(); 
                 userRef.update({ lastConversion: app.lastConversion }); 
@@ -1532,14 +1532,16 @@
         function updateUI() { 
             document.getElementById('balance').textContent = app.balance.toLocaleString(); 
             document.getElementById('walletBalance').textContent = app.balance.toLocaleString(); 
-            const usdDisplay = (app.balance / app.conversionRate).toFixed(2); 
+            
+            // ✅ ৩ দশমিক পর্যন্ত দেখানোর জন্য toFixed(3) ব্যবহার করা হয়েছে
+            const usdDisplay = (app.balance / app.conversionRate).toFixed(3); 
             document.getElementById('usdValue').textContent = `≈ $${usdDisplay} USD`; 
             document.getElementById('walletUsd').textContent = `≈ $${usdDisplay} USD`; 
-            document.getElementById('walletTotalUsd').textContent = `$${app.usdBalance.toFixed(2)}`; 
+            document.getElementById('walletTotalUsd').textContent = `$${app.usdBalance.toFixed(3)}`; 
             document.getElementById('rateInfo').textContent = `1 USD = ${app.conversionRate} Coins`; 
             
-            document.getElementById('usdBalanceDisplay').textContent = `$${app.usdBalance.toFixed(2)}`;
-            document.getElementById('totalBalanceDisplay').textContent = `${app.balance.toLocaleString()} + $${app.usdBalance.toFixed(2)}`;
+            document.getElementById('usdBalanceDisplay').textContent = `$${app.usdBalance.toFixed(3)}`;
+            document.getElementById('totalBalanceDisplay').textContent = `${app.balance.toLocaleString()} + $${app.usdBalance.toFixed(3)}`;
             
             updateWithdrawUI(); updateSpeedBoostUI(); startConversionTimer();
         }
@@ -1785,7 +1787,7 @@
                         if (d.status === 'cancelled') { 
                             app.usdBalance += (d.amount || 0); 
                             userRef.update({ usdBalance: app.usdBalance }); 
-                            showToast(`⚠️ Cancelled: ${d.cancelReason || 'No reason'}. Refunded $${(d.amount || 0).toFixed(2)}`, 'error'); 
+                            showToast(`⚠️ Cancelled: ${d.cancelReason || 'No reason'}. Refunded $${(d.amount || 0).toFixed(3)}`, 'error'); 
                         } 
                         userRef.update({ withdrawHistory: app.withdrawHistory }); 
                         updateUI(); updateWithdrawHistoryUI(); 
