@@ -1176,12 +1176,12 @@
         function filterTasks(f, b) { currentFilter = f; document.querySelectorAll('.task-filters .filter-btn').forEach(x => x.classList.remove('active')); if (b) b.classList.add('active'); renderTasks(); }
 
         // === Webview Task Functions ===
-        let webViewTaskId = null, webViewTimerInterval = null, webViewSeconds = 0, webViewRequiredTime = 10, webViewTaskReward = 0;
+        let webViewTaskId = null, webViewTimerInterval = null, webViewSeconds = 0, webViewRequiredTime = 60, webViewTaskReward = 0;
         function openWebViewTask(taskId, url, reward, waitTime) {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
             if (app.taskProgress[taskId] >= (tasks.find(t => t.id === taskId)?.limit || 1)) { showToast('Task already completed!', 'error'); return; }
             if (app.taskLastCompleted[taskId] === new Date().toDateString()) { showToast('Already done today!', 'error'); return; }
-            webViewTaskId = taskId; webViewTaskReward = reward; webViewRequiredTime = waitTime || 10; webViewSeconds = 0;
+            webViewTaskId = taskId; webViewTaskReward = reward; webViewRequiredTime = waitTime || 60; webViewSeconds = 0;
             const overlay = document.getElementById('webviewOverlay');
             document.getElementById('webviewIframe').src = url;
             document.getElementById('webviewUrlText').textContent = url;
