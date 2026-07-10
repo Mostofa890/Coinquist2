@@ -842,14 +842,6 @@
                     document.getElementById('modalSpinResult').textContent = `🎉 You won ${prize.label}!`;
                     updateSpinModalUI();
 
-                    // ✅ Check if mining coins became 0 → reset spins
-                    if (app.progressCoins === 0) {
-                        spinCount = SPIN_COUNT_LIMIT;
-                        document.getElementById('spinBadge').textContent = spinCount;
-                        updateSpinModalUI();
-                        showToast('🔄 Spins reset! You have 20 spins again!');
-                    }
-
                     let resultText = '';
                     if (rewardCoins > 0) {
                         resultText += `+${rewardCoins} Coins!`;
@@ -892,6 +884,22 @@
                 spinCount = snap.val() !== null ? snap.val() : SPIN_COUNT_LIMIT;
                 document.getElementById('spinBadge').textContent = spinCount;
                 updateSpinModalUI();
+            });
+        }
+
+        // ✅ Watch for mining coins reaching 0 and reset spins
+        function watchMiningCoins() {
+            db.ref('users/' + userId + '/progressCoins').on('value', snap => {
+                const coins = snap.val();
+                if (coins !== null && coins === 0) {
+                    // ✅ Reset spins when mining coins become 0
+                    spinCount = SPIN_COUNT_LIMIT;
+                    document.getElementById('spinBadge').textContent = spinCount;
+                    updateSpinModalUI();
+                    // Save to Firebase
+                    userRef.update({ spinCount: spinCount });
+                    showToast('🔄 Spins reset! You have 20 spins again!');
+                }
             });
         }
 
@@ -1704,6 +1712,7 @@
             loadRules();
             loadSpinData();
             buildWheel();
+            watchMiningCoins();
             
             db.ref('conversionRate').on('value', s => { app.conversionRate = s.val() || 1000; updateUI(); });
             loadLevelConfigFromDB();
