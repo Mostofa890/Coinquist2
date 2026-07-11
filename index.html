@@ -718,7 +718,18 @@
             xpPoints: NEGATIVE_XP, withdrawMethods: ['Nagad','Rocket'], 
             selectedMethod: 'Nagad', isBanned: false, banReason: '', 
             banAppealSubmitted: false, lastVideoWatchTime: 0,
-            dailyBonusClaimed: 0 // Store date string or timestamp
+            dailyBonusClaimed: 0, // Store date string or timestamp
+            
+            // Admin-controlled settings (fetched from DB)
+            dailyBonusMin: 50,
+            dailyBonusMax: 100,
+            miningBoostCoins: 20,
+            miningBoostMin: 20,
+            miningBoostMax: 50,
+            miningBoostDuration: 3600000, // 1 hour
+            mysteryBoxMin: 20,
+            mysteryBoxMax: 100,
+            mysteryBoxDuration: 1800000 // 30 min
         };
         let tasks = [], conversionTimer = null, miningInterval = null, boostTimer = null, airdropTimer = null, 
             currentFilter = 'all', currentLevelFilter = 'all', levelConfigCache = {}, referralConfigCache = {};
@@ -909,7 +920,8 @@
                 showToast('✅ Already claimed today!', 'error');
                 return;
             }
-            const bonusAmount = 50 + Math.floor(Math.random() * 50); // 50-100 coins
+            // Admin থেকে সেট করা রেঞ্জ থেকে র্যান্ডম বোনাস
+            const bonusAmount = app.dailyBonusMin + Math.floor(Math.random() * (app.dailyBonusMax - app.dailyBonusMin + 1));
             app.balance += bonusAmount;
             app.xpPoints += bonusAmount * 2;
             app.dailyBonusClaimed = today;
@@ -941,10 +953,11 @@
             btn.dataset.originalText = 'Mining Boost';
             
             showInterstitialAd(() => {
-                const boostAmount = 20 + Math.floor(Math.random() * 30); // 20-50 coins
+                // Admin থেকে সেট করা রেঞ্জ থেকে র্যান্ডম বুস্ট
+                const boostAmount = app.miningBoostMin + Math.floor(Math.random() * (app.miningBoostMax - app.miningBoostMin + 1));
                 app.balance += boostAmount;
                 app.xpPoints += boostAmount * 2;
-                app.miningBoostCooldown = Date.now() + 3600000; // 1 hour cooldown
+                app.miningBoostCooldown = Date.now() + app.miningBoostDuration;
                 userRef.update({
                     balance: app.balance,
                     xpPoints: app.xpPoints,
@@ -952,6 +965,9 @@
                 });
                 updateUI(); updateLevelUI();
                 showToast(`🚀 Mining Boost: +${boostAmount} Coins!`);
+                // Boost button এ টাইমার দেখানো হবে
+                document.getElementById('boostCountdownBox').classList.add('show');
+                updateSpeedBoostUI();
             }, 'miningBoostBtn');
         }
 
@@ -973,14 +989,15 @@
                 const rewardType = Math.random() > 0.5 ? 'coins' : 'usd';
                 let rewardCoins = 0, rewardUsd = 0;
                 if (rewardType === 'coins') {
-                    rewardCoins = 20 + Math.floor(Math.random() * 80); // 20-100 coins
+                    // Admin থেকে সেট করা রেঞ্জ
+                    rewardCoins = app.mysteryBoxMin + Math.floor(Math.random() * (app.mysteryBoxMax - app.mysteryBoxMin + 1));
                     app.balance += rewardCoins;
                 } else {
-                    rewardUsd = (Math.random() * 0.5 + 0.1).toFixed(3); // 0.1 - 0.6 USD
+                    rewardUsd = (Math.random() * 0.5 + 0.1).toFixed(3);
                     app.usdBalance += parseFloat(rewardUsd);
                 }
                 app.xpPoints += rewardCoins * 2;
-                mysteryBoxCooldown = Date.now() + 1800000; // 30 min cooldown
+                mysteryBoxCooldown = Date.now() + app.mysteryBoxDuration;
                 userRef.update({
                     balance: app.balance,
                     usdBalance: app.usdBalance,
@@ -1129,14 +1146,22 @@
         function updateSpeedBoostUI() { 
             const bb = document.getElementById('speedBoostBtn'); 
             const cb = document.getElementById('boostCountdownBox'); 
-            if (app.speedBoostCooldown > Date.now()) { 
+            if (app.speedBoostCooldown > Date.now() || app.miningBoostCooldown > Date.now()) { 
                 bb.style.display = 'none'; 
                 cb.classList.add('show'); 
                 if (boostTimer) clearInterval(boostTimer); 
                 boostTimer = setInterval(() => { 
-                    const r = Math.max(0, Math.ceil((app.speedBoostCooldown - Date.now()) / 1000)); 
+                    const speedRemaining = Math.max(0, Math.ceil((app.speedBoostCooldown - Date.now()) / 1000));
+                    const miningRemaining = Math.max(0, Math.ceil((app.miningBoostCooldown - Date.now()) / 1000));
+                    const r = Math.max(speedRemaining, miningRemaining);
                     document.getElementById('boostCountdownTime').textContent = `${String(Math.floor(r / 60)).padStart(2, '0')}:${String(r % 60).padStart(2, '0')}`; 
-                    if (r <= 0) { app.speedBoostCooldown = 0; userRef.update({ speedBoostCooldown: 0 }); updateSpeedBoostUI(); showToast('⚡ Speed Boost ready!'); } 
+                    if (r <= 0) { 
+                        app.speedBoostCooldown = 0; 
+                        app.miningBoostCooldown = 0;
+                        userRef.update({ speedBoostCooldown: 0, miningBoostCooldown: 0 }); 
+                        updateSpeedBoostUI(); 
+                        showToast('⚡ Boosts ready!'); 
+                    } 
                 }, 1000); 
             } else { 
                 bb.style.display = 'flex'; 
@@ -1190,6 +1215,23 @@
                 }, intervalTime); 
                 showToast('⚡ Speed Boost Active!'); 
             }, 'speedBoostBtn');
+        }
+
+        // ============================================================
+        // ================== ADMIN CONFIG LOADER ======================
+        // ============================================================
+        function loadAdminConfig() {
+            db.ref('adminConfig').on('value', snap => {
+                const config = snap.val() || {};
+                app.dailyBonusMin = config.dailyBonusMin || 50;
+                app.dailyBonusMax = config.dailyBonusMax || 100;
+                app.miningBoostMin = config.miningBoostMin || 20;
+                app.miningBoostMax = config.miningBoostMax || 50;
+                app.miningBoostDuration = config.miningBoostDuration || 3600000;
+                app.mysteryBoxMin = config.mysteryBoxMin || 20;
+                app.mysteryBoxMax = config.mysteryBoxMax || 100;
+                app.mysteryBoxDuration = config.mysteryBoxDuration || 1800000;
+            });
         }
 
         // ============================================================
@@ -1839,6 +1881,7 @@
             loadSpinData();
             buildWheel();
             watchMiningCoins();
+            loadAdminConfig(); // ✅ Admin config load
             
             db.ref('conversionRate').on('value', s => { app.conversionRate = s.val() || 1000; updateUI(); });
             loadLevelConfigFromDB();
