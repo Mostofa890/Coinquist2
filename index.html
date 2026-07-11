@@ -34,6 +34,24 @@
         .conversion-timer .label { font-size: 10px; color: #94a3b8; }
         .conversion-timer .time { font-size: 16px; font-weight: bold; color: #10b981; }
 
+        /* ================== DAILY BONUS ================== */
+        .daily-bonus {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #0f172a;
+            padding: 14px 18px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 15px rgba(251,191,36,0.3);
+            font-weight: 700;
+            border: 2px solid rgba(251,191,36,0.5);
+        }
+        .daily-bonus .bonus-left { display: flex; align-items: center; gap: 8px; font-size: 16px; }
+        .daily-bonus .bonus-status { background: rgba(15,23,42,0.2); padding: 4px 14px; border-radius: 20px; font-size: 14px; }
+
         /* ================== MINING CIRCLE ================== */
         .mining-circle-wrapper { display: flex; justify-content: center; align-items: center; margin: 15px 0; position: relative; }
         .mining-circle { position: relative; width: 250px; height: 250px; border-radius: 50%; background: conic-gradient(#fbbf24 100%, #1e293b 100%); display: flex; justify-content: center; align-items: center; box-shadow: 0 0 50px rgba(251,191,36,0.2); transition: background 0.5s ease; cursor: pointer; }
@@ -48,11 +66,38 @@
         .mining-circle .coin-icon { font-size: 32px; margin-bottom: 5px; animation: coinSpin 3s linear infinite; }
         @keyframes coinSpin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
         .mining-circle .coin-count { font-size: 30px; font-weight: 900; color: #fbbf24; }
-        .speed-btn-container { margin-top: 12px; width: 100%; display: flex; justify-content: center; flex-direction: column; align-items: center; }
-        .speed-boost-btn { background: linear-gradient(135deg, #f97316, #f59e0b); color: #fff; padding: 10px 20px; border: none; border-radius: 25px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; }
-        .speed-boost-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* ================== BOOST BUTTONS ================== */
+        .speed-btn-container { margin-top: 12px; width: 100%; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
+        .speed-boost-btn, .mining-boost-btn {
+            color: #fff; padding: 10px 20px; border: none; border-radius: 25px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; flex: 1; max-width: 180px; justify-content: center;
+        }
+        .speed-boost-btn { background: linear-gradient(135deg, #f97316, #f59e0b); }
+        .mining-boost-btn { background: linear-gradient(135deg, #8b5cf6, #3b82f6); }
+        .speed-boost-btn:disabled, .mining-boost-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .boost-countdown-box { display: none; background: rgba(249,115,22,0.15); border: 2px solid rgba(249,115,22,0.3); border-radius: 15px; padding: 14px 20px; text-align: center; width: 100%; max-width: 280px; }
         .boost-countdown-box.show { display: block; }
+
+        /* ================== MYSTERY BOX ================== */
+        .mystery-box {
+            background: linear-gradient(135deg, #f472b6, #ec4899);
+            color: #fff;
+            padding: 16px 20px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            margin: 16px 0;
+            border: 2px solid rgba(244,114,182,0.4);
+            box-shadow: 0 4px 15px rgba(236,72,153,0.3);
+        }
+        .mystery-box .box-left { display: flex; align-items: center; gap: 12px; }
+        .mystery-box .box-icon { font-size: 36px; animation: pulseBox 1.5s infinite; }
+        @keyframes pulseBox { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        .mystery-box .box-text { font-weight: 700; font-size: 16px; }
+        .mystery-box .box-sub { font-size: 12px; opacity: 0.8; }
+        .mystery-box .box-status { background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 20px; font-size: 14px; font-weight: 700; }
 
         /* ================== PAGES ================== */
         .page { display: none; min-height: 60vh; padding-top: 8px; }
@@ -76,6 +121,49 @@
         .withdraw-section .form-group input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #fff; font-size: 14px; outline: none; }
         .withdraw-section .withdraw-btn { margin-top: 8px; padding: 12px 20px; background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; width: 100%; font-size: 15px; transition: all 0.3s ease; }
         .withdraw-section .withdraw-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ================== BUY COINS (In-App Purchase) ================== */
+        .buy-coins-section {
+            background: rgba(251,191,36,0.08);
+            border: 2px solid rgba(251,191,36,0.2);
+            border-radius: 16px;
+            padding: 16px;
+            margin: 16px 0;
+            text-align: center;
+        }
+        .buy-coins-section .buy-title { font-size: 14px; font-weight: 700; color: #fbbf24; margin-bottom: 10px; }
+        .buy-coins-btn {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #0f172a;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 900;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(251,191,36,0.3);
+        }
+        .buy-coins-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ================== LEADERBOARD PAGE ================== */
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .leaderboard-item .rank { font-weight: 900; color: #fbbf24; min-width: 30px; }
+        .leaderboard-item .user { display: flex; align-items: center; gap: 10px; flex: 1; }
+        .leaderboard-item .user .avatar-small { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #3b82f6); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff; }
+        .leaderboard-item .score { color: #10b981; font-weight: 700; }
+        .leaderboard-item.top1 { background: rgba(251,191,36,0.15); border-color: #fbbf24; }
+        .leaderboard-item.top2 { background: rgba(192,192,192,0.1); border-color: #94a3b8; }
+        .leaderboard-item.top3 { background: rgba(205,127,50,0.1); border-color: #cd7f32; }
 
         /* ================== BOTTOM NAV ================== */
         .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; background: rgba(15,23,42,0.95); backdrop-filter: blur(24px); display: flex; justify-content: space-around; padding: 10px 4px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
@@ -171,250 +259,42 @@
         @keyframes pulseText { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         .loader-sub { color: #94a3b8; font-size: 13px; margin-top: 8px; }
 
-        /* ================== FLOATING SPIN BUTTON (Draggable) ================== */
+        /* ================== FLOATING SPIN BUTTON ================== */
         #floatingSpinBtn {
-            position: fixed;
-            right: 20px;
-            bottom: 120px;
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #f97316, #f59e0b);
-            color: #fff;
-            border: none;
-            box-shadow: 0 4px 20px rgba(249,115,22,0.4);
-            cursor: grab;
-            z-index: 999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            position: fixed;
-            touch-action: none;
+            position: fixed; right: 20px; bottom: 120px; width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #f59e0b); color: #fff; border: none; box-shadow: 0 4px 20px rgba(249,115,22,0.4); cursor: grab; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.3s ease; touch-action: none;
         }
-        #floatingSpinBtn:active {
-            cursor: grabbing;
-        }
-        #floatingSpinBtn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        #floatingSpinBtn .spin-icon {
-            font-size: 28px;
-            animation: spinFloat 4s linear infinite;
-        }
-        #floatingSpinBtn:disabled .spin-icon {
-            animation: none;
-        }
-        @keyframes spinFloat {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        #floatingSpinBtn .spin-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #ef4444;
-            color: #fff;
-            border-radius: 50%;
-            padding: 2px 8px;
-            font-size: 12px;
-            font-weight: 700;
-        }
+        #floatingSpinBtn:active { cursor: grabbing; }
+        #floatingSpinBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+        #floatingSpinBtn .spin-icon { font-size: 28px; animation: spinFloat 4s linear infinite; }
+        #floatingSpinBtn:disabled .spin-icon { animation: none; }
+        @keyframes spinFloat { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #floatingSpinBtn .spin-badge { position: absolute; top: -5px; right: -5px; background: #ef4444; color: #fff; border-radius: 50%; padding: 2px 8px; font-size: 12px; font-weight: 700; }
 
         /* ================== SPIN WHEEL MODAL ================== */
-        .spin-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.85);
-            z-index: 99999;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
+        .spin-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 99999; display: none; align-items: center; justify-content: center; }
         .spin-modal-overlay.show { display: flex; }
-        .spin-modal-content {
-            background: rgba(30,41,59,0.95);
-            padding: 25px;
-            border-radius: 24px;
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.1);
-            position: relative;
-        }
-        .spin-modal-content .close-modal-btn {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: #fff;
-            padding: 6px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            z-index: 20;
-        }
-
-        /* ================== SPIN WHEEL DESIGN ================== */
-        .wheel-wrapper-new {
-            position: relative;
-            width: 280px;
-            height: 280px;
-            margin: 0 auto 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .wheel-outer-rim {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: conic-gradient(from 0deg, #7c3aed, #6d28d9, #7c3aed, #6d28d9, #7c3aed);
-            padding: 12px;
-            box-shadow: 0 0 30px rgba(124,58,237,0.3);
-        }
-        .wheel-bulbs {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            top: 0;
-            left: 0;
-        }
-        .wheel-bulb {
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #fff;
-            box-shadow: 0 0 10px #fff, 0 0 20px #fff;
-            animation: bulbBlink 1s infinite alternate;
-        }
+        .spin-modal-content { background: rgba(30,41,59,0.95); padding: 25px; border-radius: 24px; width: 90%; max-width: 400px; text-align: center; border: 1px solid rgba(255,255,255,0.1); position: relative; }
+        .spin-modal-content .close-modal-btn { position: absolute; top: 10px; right: 15px; background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; z-index: 20; }
+        .wheel-wrapper-new { position: relative; width: 280px; height: 280px; margin: 0 auto 15px; display: flex; justify-content: center; align-items: center; }
+        .wheel-outer-rim { position: absolute; width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(from 0deg, #7c3aed, #6d28d9, #7c3aed, #6d28d9, #7c3aed); padding: 12px; box-shadow: 0 0 30px rgba(124,58,237,0.3); }
+        .wheel-bulbs { position: absolute; width: 100%; height: 100%; border-radius: 50%; top: 0; left: 0; }
+        .wheel-bulb { position: absolute; width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 0 10px #fff, 0 0 20px #fff; animation: bulbBlink 1s infinite alternate; }
         .wheel-bulb:nth-child(odd) { animation-delay: 0.5s; }
-        @keyframes bulbBlink {
-            0% { opacity: 0.3; transform: scale(0.8); }
-            100% { opacity: 1; transform: scale(1.2); }
-        }
-        .wheel-inner {
-            position: absolute;
-            width: calc(100% - 24px);
-            height: calc(100% - 24px);
-            border-radius: 50%;
-            overflow: hidden;
-            background: #1a1a2e;
-        }
-        .wheel-segments {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
-        }
-        .wheel-segment {
-            position: absolute;
-            width: 50%;
-            height: 50%;
-            top: 0;
-            left: 50%;
-            transform-origin: 0% 100%;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            padding-left: 20%;
-            font-size: 12px;
-            font-weight: 700;
-            color: #0f172a;
-        }
-        .wheel-segment span {
-            background: rgba(255,255,255,0.7);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 12px;
-        }
-        /* Gift box icon in each segment */
-        .wheel-segment .gift-icon {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 20px;
-        }
-        .wheel-center-logo {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 30px;
-            color: #0f172a;
-            font-weight: 900;
-            box-shadow: 0 0 30px rgba(251,191,36,0.3);
-            z-index: 10;
-            border: 3px solid #7c3aed;
-        }
-        .wheel-pointer-new {
-            position: absolute;
-            top: -18px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 18px solid transparent;
-            border-right: 18px solid transparent;
-            border-top: 30px solid #fbbf24;
-            z-index: 15;
-            filter: drop-shadow(0 4px 10px rgba(251,191,36,0.5));
-        }
-        .spin-btn-new {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #0f172a;
-            padding: 14px 40px;
-            border: none;
-            border-radius: 30px;
-            font-weight: 900;
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-            max-width: 220px;
-            margin-top: 5px;
-            box-shadow: 0 4px 15px rgba(251,191,36,0.3);
-        }
-        .spin-btn-new:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .spin-timer-box-new {
-            display: none;
-            background: rgba(249,115,22,0.15);
-            border: 2px solid rgba(249,115,22,0.3);
-            border-radius: 15px;
-            padding: 12px;
-            margin-top: 10px;
-            text-align: center;
-        }
+        @keyframes bulbBlink { 0% { opacity: 0.3; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); } }
+        .wheel-inner { position: absolute; width: calc(100% - 24px); height: calc(100% - 24px); border-radius: 50%; overflow: hidden; background: #1a1a2e; }
+        .wheel-segments { width: 100%; height: 100%; position: relative; transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1); }
+        .wheel-segment { position: absolute; width: 50%; height: 50%; top: 0; left: 50%; transform-origin: 0% 100%; display: flex; align-items: center; justify-content: flex-start; padding-left: 20%; font-size: 12px; font-weight: 700; color: #0f172a; }
+        .wheel-segment span { background: rgba(255,255,255,0.7); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+        .wheel-segment .gift-icon { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 20px; }
+        .wheel-center-logo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #fbbf24, #f59e0b); display: flex; align-items: center; justify-content: center; font-size: 30px; color: #0f172a; font-weight: 900; box-shadow: 0 0 30px rgba(251,191,36,0.3); z-index: 10; border: 3px solid #7c3aed; }
+        .wheel-pointer-new { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 18px solid transparent; border-right: 18px solid transparent; border-top: 30px solid #fbbf24; z-index: 15; filter: drop-shadow(0 4px 10px rgba(251,191,36,0.5)); }
+        .spin-btn-new { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; padding: 14px 40px; border: none; border-radius: 30px; font-weight: 900; font-size: 18px; cursor: pointer; transition: all 0.3s ease; width: 100%; max-width: 220px; margin-top: 5px; box-shadow: 0 4px 15px rgba(251,191,36,0.3); }
+        .spin-btn-new:disabled { opacity: 0.5; cursor: not-allowed; }
+        .spin-timer-box-new { display: none; background: rgba(249,115,22,0.15); border: 2px solid rgba(249,115,22,0.3); border-radius: 15px; padding: 12px; margin-top: 10px; text-align: center; }
         .spin-timer-box-new.show { display: block; }
         .spin-timer-box-new .timer-label { font-size: 12px; color: #94a3b8; }
         .spin-timer-box-new .timer-time { font-size: 24px; font-weight: 700; color: #fbbf24; }
-        .spin-result-new {
-            margin-top: 10px;
-            font-size: 18px;
-            font-weight: 700;
-            color: #10b981;
-            min-height: 30px;
-        }
+        .spin-result-new { margin-top: 10px; font-size: 18px; font-weight: 700; color: #10b981; min-height: 30px; }
     </style>
 </head>
 <body>
@@ -426,26 +306,65 @@
         </div>
     </div>
 
-    <!-- Security & Network Overlays -->
+    <!-- Overlays -->
     <div class="security-overlay" id="securityOverlay">
         <h1>🚫 Security Alert</h1>
         <p>Unauthorized access detected! Please close Developer Tools to continue.</p>
         <button onclick="location.reload()">🔄 Reload Page</button>
     </div>
-
     <div class="network-overlay" id="networkOverlay">
         <div class="icon"><i class="fas fa-wifi"></i></div>
         <h2>🔌 No Internet Connection</h2>
         <p>Please check your network connection and try again.</p>
         <button class="retry-btn" onclick="checkNetworkAndReload()"><i class="fas fa-sync"></i> Retry</button>
     </div>
-
-    <div class="banned-overlay" id="bannedOverlay"><h1>🚫 Account Banned</h1><p>Your account has been suspended.</p><div class="ban-reason" id="banReason"></div><button class="appeal-btn" id="appealBtn" onclick="submitBanAppeal()">📩 Submit Appeal</button><p id="appealStatus" style="display:none;"></p></div>
-
-    <div class="overlay" id="levelOverlay"><div class="overlay-header"><button class="back-btn" onclick="closeLevelPage()"><i class="fas fa-arrow-left"></i> Back</button><h2 style="color:#fff;">🏆 Level System</h2></div><div class="level-overlay-content"><div class="current-level-card"><div class="level-emoji" id="lvlEmoji">🔒</div><div class="level-number" id="lvlNumber">Level 0</div><div class="level-name" id="lvlName">Unlocking</div><div style="margin-top:8px;"><span id="lvlXP">-5000 / 0 XP</span></div><div class="level-progress" style="margin-top:10px;"><div class="fill" id="lvlProgressFill" style="width:0%;"></div></div><div class="level-bonus" id="lvlBonus">Mining Bonus: +0%</div></div><div class="level-filters"><button class="lvl-filter-btn active" onclick="filterLevels('all',this)">All</button><button class="lvl-filter-btn" onclick="filterLevels('bronze',this)">🥉 Bronze</button><button class="lvl-filter-btn" onclick="filterLevels('silver',this)">🥈 Silver</button><button class="lvl-filter-btn" onclick="filterLevels('gold',this)">🥇 Gold</button><button class="lvl-filter-btn" onclick="filterLevels('platinum',this)">💎 Platinum</button><button class="lvl-filter-btn" onclick="filterLevels('diamond',this)">👑 Diamond</button></div><div class="level-grid" id="levelGrid"></div><div class="rules-text" style="margin-top:15px;"><div class="rule-title">📋 Level Rules</div><div id="levelRulesText">Loading rules...</div></div></div></div>
-
-    <div class="overlay" id="airdropOverlay"><div class="overlay-header"><button class="back-btn" onclick="closeAirdropPage()"><i class="fas fa-arrow-left"></i> Back</button><h2 style="color:#fff;">📢 Live AirDrop</h2></div><div style="padding:15px;"><div style="background:rgba(255,255,255,0.05);border-radius:20px;padding:25px;text-align:center;border:2px solid rgba(251,191,36,0.3);"><div id="airdropPoolDisplay" style="font-size:42px;font-weight:900;color:#fbbf24;">$50.00</div><div id="airdropCountdown" style="font-size:36px;font-weight:bold;color:#fbbf24;margin:15px 0;">--:--:--</div><button id="airdropClaimBtn" onclick="claimAirdrop()" disabled style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:14px 30px;border:none;border-radius:30px;font-weight:700;font-size:16px;cursor:pointer;width:100%;transition:all 0.3s ease;">🎁 Claim</button></div><div class="rules-text" style="margin-top:15px;"><div class="rule-title">📋 Airdrop Rules</div><div id="airdropRulesText">Loading rules...</div></div></div></div>
-
+    <div class="banned-overlay" id="bannedOverlay">
+        <h1>🚫 Account Banned</h1>
+        <p>Your account has been suspended.</p>
+        <div class="ban-reason" id="banReason"></div>
+        <button class="appeal-btn" id="appealBtn" onclick="submitBanAppeal()">📩 Submit Appeal</button>
+        <p id="appealStatus" style="display:none;"></p>
+    </div>
+    <div class="overlay" id="levelOverlay">
+        <div class="overlay-header">
+            <button class="back-btn" onclick="closeLevelPage()"><i class="fas fa-arrow-left"></i> Back</button>
+            <h2 style="color:#fff;">🏆 Level System</h2>
+        </div>
+        <div class="level-overlay-content">
+            <div class="current-level-card">
+                <div class="level-emoji" id="lvlEmoji">🔒</div>
+                <div class="level-number" id="lvlNumber">Level 0</div>
+                <div class="level-name" id="lvlName">Unlocking</div>
+                <div style="margin-top:8px;"><span id="lvlXP">-5000 / 0 XP</span></div>
+                <div class="level-progress" style="margin-top:10px;"><div class="fill" id="lvlProgressFill" style="width:0%;"></div></div>
+                <div class="level-bonus" id="lvlBonus">Mining Bonus: +0%</div>
+            </div>
+            <div class="level-filters">
+                <button class="lvl-filter-btn active" onclick="filterLevels('all',this)">All</button>
+                <button class="lvl-filter-btn" onclick="filterLevels('bronze',this)">🥉 Bronze</button>
+                <button class="lvl-filter-btn" onclick="filterLevels('silver',this)">🥈 Silver</button>
+                <button class="lvl-filter-btn" onclick="filterLevels('gold',this)">🥇 Gold</button>
+                <button class="lvl-filter-btn" onclick="filterLevels('platinum',this)">💎 Platinum</button>
+                <button class="lvl-filter-btn" onclick="filterLevels('diamond',this)">👑 Diamond</button>
+            </div>
+            <div class="level-grid" id="levelGrid"></div>
+            <div class="rules-text" style="margin-top:15px;"><div class="rule-title">📋 Level Rules</div><div id="levelRulesText">Loading rules...</div></div>
+        </div>
+    </div>
+    <div class="overlay" id="airdropOverlay">
+        <div class="overlay-header">
+            <button class="back-btn" onclick="closeAirdropPage()"><i class="fas fa-arrow-left"></i> Back</button>
+            <h2 style="color:#fff;">📢 Live AirDrop</h2>
+        </div>
+        <div style="padding:15px;">
+            <div style="background:rgba(255,255,255,0.05);border-radius:20px;padding:25px;text-align:center;border:2px solid rgba(251,191,36,0.3);">
+                <div id="airdropPoolDisplay" style="font-size:42px;font-weight:900;color:#fbbf24;">$50.00</div>
+                <div id="airdropCountdown" style="font-size:36px;font-weight:bold;color:#fbbf24;margin:15px 0;">--:--:--</div>
+                <button id="airdropClaimBtn" onclick="claimAirdrop()" disabled style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:14px 30px;border:none;border-radius:30px;font-weight:700;font-size:16px;cursor:pointer;width:100%;transition:all 0.3s ease;">🎁 Claim</button>
+            </div>
+            <div class="rules-text" style="margin-top:15px;"><div class="rule-title">📋 Airdrop Rules</div><div id="airdropRulesText">Loading rules...</div></div>
+        </div>
+    </div>
     <div class="webview-overlay" id="webviewOverlay">
         <div class="webview-header">
             <button class="back-btn" onclick="closeWebView()"><i class="fas fa-arrow-left"></i> Back</button>
@@ -460,13 +379,25 @@
         </div>
     </div>
 
+    <!-- ============================================================ -->
+    <!-- ================== MAIN CONTENT ============================= -->
+    <!-- ============================================================ -->
     <div class="container main-content" id="mainContent">
+        
+        <!-- ========== HEADER ========== -->
         <div class="header">
-            <div class="user-info"><div class="avatar">👤</div><div class="user-details"><h3 id="userName">User</h3><div class="last-login" id="lastLoginDisplay">📅 --</div><span class="level-badge" onclick="openLevelPage()" id="userLevelBadge">🔒 Unlocking</span></div></div>
+            <div class="user-info">
+                <div class="avatar">👤</div>
+                <div class="user-details">
+                    <h3 id="userName">User</h3>
+                    <div class="last-login" id="lastLoginDisplay">📅 --</div>
+                    <span class="level-badge" onclick="openLevelPage()" id="userLevelBadge">🔒 Unlocking</span>
+                </div>
+            </div>
             <div class="balance-card">
-                <div class="balance-label">💰 Coins Balance</div><div class="balance-amount" id="balance">0</div>
+                <div class="balance-label">💰 Coins Balance</div>
+                <div class="balance-amount" id="balance">0</div>
                 <div class="usd-value" id="usdValue">≈ $0.000 USD</div>
-                <!-- ✅ USD Balance and Total Balance added below coins -->
                 <div style="margin-top:8px; border-top: 1px solid rgba(255,255,255,0.1); padding-top:8px;">
                     <div style="display:flex; justify-content:space-between; font-size:14px; color:#94a3b8;">
                         <span>💵 USD Balance</span>
@@ -477,19 +408,113 @@
                         <span id="totalBalanceDisplay" style="color:#fbbf24; font-weight:bold;">0</span>
                     </div>
                 </div>
-                <div class="level-section" onclick="openLevelPage()"><div class="level-row"><span class="level-title" id="levelTitle">🔒 Unlocking</span><span class="level-number" id="levelNumber">Level 0</span></div><div class="level-progress"><div class="fill" id="levelProgressFill" style="width:0%;"></div></div><div style="font-size:9px;color:#94a3b8;display:flex;justify-content:space-between;"><span id="levelCurrentPoints">-5000 XP</span><span id="levelNextPoints">/ 5000 XP</span></div></div>
+                <div class="level-section" onclick="openLevelPage()">
+                    <div class="level-row"><span class="level-title" id="levelTitle">🔒 Unlocking</span><span class="level-number" id="levelNumber">Level 0</span></div>
+                    <div class="level-progress"><div class="fill" id="levelProgressFill" style="width:0%;"></div></div>
+                    <div style="font-size:9px;color:#94a3b8;display:flex;justify-content:space-between;"><span id="levelCurrentPoints">-5000 XP</span><span id="levelNextPoints">/ 5000 XP</span></div>
+                </div>
                 <div class="conversion-timer"><div class="label">⏰ Next Conversion</div><div class="time" id="conversionCountdown">--:--:--</div><div style="font-size:9px;color:#94a3b8;" id="rateInfo">1 USD = 1000 Coins</div></div>
             </div>
         </div>
 
-        <!-- ✅ MINING CIRCLE -->
-        <div class="page active" id="pageHome">
-            <div class="mining-circle-wrapper"><div class="mining-circle" id="miningCircle"><div class="circle-start-overlay" id="circleStartOverlay" onclick="startMining()"><div class="start-icon">⚡</div><div class="start-text">START<br>MINING</div><div class="start-subtext">Tap to earn coins</div></div><div class="inner-circle"><span class="coin-icon">🪙</span><span class="coin-count" id="progressCoinCount">1000</span><div class="circle-status" id="progressStatus">Ready</div><div class="circle-progress-text" id="progressPercent">100%</div></div></div></div>
-            <div class="speed-btn-container"><button class="speed-boost-btn" id="speedBoostBtn" onclick="activateSpeedBoost()"><i class="fas fa-rocket"></i> Speed Boost</button><div class="boost-countdown-box" id="boostCountdownBox"><div class="countdown-label">⏳ Cooldown</div><div class="countdown-time" id="boostCountdownTime">00:00</div></div></div>
-            <div class="rules-text"><div class="rule-title">📋 Mining Rules</div><div id="miningRulesText">Loading rules...</div></div>
+        <!-- ✅ DAILY BONUS (Header এর ঠিক নিচে) -->
+        <div class="daily-bonus" onclick="claimDailyBonus()">
+            <div class="bonus-left">
+                <span>🎁</span>
+                <span>Daily Bonus</span>
+            </div>
+            <div class="bonus-status" id="dailyBonusStatus">🎯 Claim Now</div>
         </div>
-        <div class="page" id="pageTasks"><h2 class="page-header">📋 Tasks</h2><div class="task-filters"><button class="filter-btn active" onclick="filterTasks('all',this)">All</button><button class="filter-btn" onclick="filterTasks('link',this)">🔗 Link</button><button class="filter-btn" onclick="filterTasks('video',this)">📺 Video</button></div><div id="tasksContainer"></div><div class="rules-text"><div class="rule-title">📋 Task Rules</div><div id="taskRulesText">Loading rules...</div></div></div>
-        <div class="page" id="pageRefer"><h2 class="page-header">👥 Refer & Earn</h2><div style="background:rgba(255,255,255,0.03);border-radius:14px;padding:14px;margin-bottom:14px;text-align:center;"><p>Your Referral Link</p><div id="referLinkHome" style="background:rgba(255,255,255,0.05);padding:10px;border-radius:10px;font-size:12px;color:#3b82f6;word-break:break-all;">Loading...</div><button onclick="copyReferLink()" style="background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;padding:8px 20px;border-radius:10px;border:none;font-weight:700;cursor:pointer;">📋 Copy</button></div><div style="background:rgba(255,255,255,0.03);border-radius:14px;padding:14px;margin-bottom:14px;text-align:center;"><input type="text" id="referCodeInput" placeholder="Enter code..." style="width:100%;padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;margin-bottom:8px;outline:none;"><button id="referCodeSubmitBtn" onclick="submitReferCode()" style="background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;padding:8px 20px;border-radius:10px;border:none;font-weight:700;cursor:pointer;">Submit</button></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;"><div style="background:rgba(255,255,255,0.03);padding:12px;border-radius:12px;text-align:center;"><div id="referTotal" style="font-size:20px;font-weight:900;color:#fbbf24;">0</div><div style="font-size:10px;color:#94a3b8;">Refs</div></div><div style="background:rgba(255,255,255,0.03);padding:12px;border-radius:12px;text-align:center;"><div id="referEarned" style="font-size:20px;font-weight:900;color:#fbbf24;">0</div><div style="font-size:10px;color:#94a3b8;">Coins</div></div><div style="background:rgba(255,255,255,0.03);padding:12px;border-radius:12px;text-align:center;"><div id="referBonus" style="font-size:20px;font-weight:900;color:#fbbf24;">0</div><div style="font-size:10px;color:#94a3b8;">Bonus</div></div></div><div id="referTierList"></div><div class="rules-text"><div class="rule-title">📋 Referral Rules</div><div id="referRulesText">Loading rules...</div></div></div>
+
+        <!-- ========== HOME PAGE ========== -->
+        <div class="page active" id="pageHome">
+            <div class="mining-circle-wrapper">
+                <div class="mining-circle" id="miningCircle">
+                    <div class="circle-start-overlay" id="circleStartOverlay" onclick="startMining()">
+                        <div class="start-icon">⚡</div>
+                        <div class="start-text">START<br>MINING</div>
+                        <div class="start-subtext">Tap to earn coins</div>
+                    </div>
+                    <div class="inner-circle">
+                        <span class="coin-icon">🪙</span>
+                        <span class="coin-count" id="progressCoinCount">1000</span>
+                        <div class="circle-status" id="progressStatus">Ready</div>
+                        <div class="circle-progress-text" id="progressPercent">100%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ✅ MINING BOOST (Speed Boost এর পাশে) -->
+            <div class="speed-btn-container">
+                <button class="speed-boost-btn" id="speedBoostBtn" onclick="activateSpeedBoost()"><i class="fas fa-rocket"></i> Speed Boost</button>
+                <button class="mining-boost-btn" id="miningBoostBtn" onclick="activateMiningBoost()"><i class="fas fa-bolt"></i> Mining Boost</button>
+                <div class="boost-countdown-box" id="boostCountdownBox">
+                    <div class="countdown-label">⏳ Cooldown</div>
+                    <div class="countdown-time" id="boostCountdownTime">00:00</div>
+                </div>
+            </div>
+
+            <div class="rules-text">
+                <div class="rule-title">📋 Mining Rules</div>
+                <div id="miningRulesText">Loading rules...</div>
+            </div>
+
+            <!-- ✅ MYSTERY BOX (Home পেজের নিচে, Rules এর উপরে) -->
+            <div class="mystery-box" onclick="openMysteryBox()">
+                <div class="box-left">
+                    <span class="box-icon">🎁</span>
+                    <div>
+                        <div class="box-text">Mystery Box</div>
+                        <div class="box-sub">Watch ad to open</div>
+                    </div>
+                </div>
+                <div class="box-status" id="mysteryBoxStatus">🔒</div>
+            </div>
+        </div>
+
+        <!-- ========== TASKS PAGE ========== -->
+        <div class="page" id="pageTasks">
+            <h2 class="page-header">📋 Tasks</h2>
+            <div class="task-filters">
+                <button class="filter-btn active" onclick="filterTasks('all',this)">All</button>
+                <button class="filter-btn" onclick="filterTasks('link',this)">🔗 Link</button>
+                <button class="filter-btn" onclick="filterTasks('video',this)">📺 Video</button>
+            </div>
+            <div id="tasksContainer"></div>
+            <div class="rules-text"><div class="rule-title">📋 Task Rules</div><div id="taskRulesText">Loading rules...</div></div>
+        </div>
+
+        <!-- ========== REFER PAGE ========== -->
+        <div class="page" id="pageRefer">
+            <h2 class="page-header">👥 Refer & Earn</h2>
+            <div style="background:rgba(255,255,255,0.03);border-radius:14px;padding:14px;margin-bottom:14px;text-align:center;">
+                <p>Your Referral Link</p>
+                <div id="referLinkHome" style="background:rgba(255,255,255,0.05);padding:10px;border-radius:10px;font-size:12px;color:#3b82f6;word-break:break-all;">Loading...</div>
+                <button onclick="copyReferLink()" style="background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;padding:8px 20px;border-radius:10px;border:none;font-weight:700;cursor:pointer;">📋 Copy</button>
+            </div>
+            <div style="background:rgba(255,255,255,0.03);border-radius:14px;padding:14px;margin-bottom:14px;text-align:center;">
+                <input type="text" id="referCodeInput" placeholder="Enter code..." style="width:100%;padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;margin-bottom:8px;outline:none;">
+                <button id="referCodeSubmitBtn" onclick="submitReferCode()" style="background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;padding:8px 20px;border-radius:10px;border:none;font-weight:700;cursor:pointer;">Submit</button>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
+                <div style="background:rgba(255,255,255,0.03);padding:12px;border-radius:12px;text-align:center;">
+                    <div id="referTotal" style="font-size:20px;font-weight:900;color:#fbbf24;">0</div>
+                    <div style="font-size:10px;color:#94a3b8;">Refs</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.03);padding:12px;border-radius:12px;text-align:center;">
+                    <div id="referEarned" style="font-size:20px;font-weight:900;color:#fbbf24;">0</div>
+                    <div style="font-size:10px;color:#94a3b8;">Coins</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.03);padding:12px;border-radius:12px;text-align:center;">
+                    <div id="referBonus" style="font-size:20px;font-weight:900;color:#fbbf24;">0</div>
+                    <div style="font-size:10px;color:#94a3b8;">Bonus</div>
+                </div>
+            </div>
+            <div id="referTierList"></div>
+            <div class="rules-text"><div class="rule-title">📋 Referral Rules</div><div id="referRulesText">Loading rules...</div></div>
+        </div>
+
+        <!-- ========== WALLET PAGE ========== -->
         <div class="page" id="pageWallet">
             <h2 class="page-header">💰 Wallet</h2>
             <div class="wallet-card">
@@ -500,6 +525,14 @@
                     <div>💵 Total USD</div>
                     <div id="walletTotalUsd" style="font-size:18px;font-weight:bold;color:#10b981;">$0.000</div>
                 </div>
+
+                <!-- ✅ IN-APP PURCHASE (Withdraw এর উপরে) -->
+                <div class="buy-coins-section">
+                    <div class="buy-title">💳 Buy Coins</div>
+                    <button class="buy-coins-btn" onclick="buyCoins(1000)">🪙 Buy 1000 Coins ($0.99)</button>
+                    <button class="buy-coins-btn" onclick="buyCoins(5000)" style="margin-top:8px;">🪙 Buy 5000 Coins ($4.99)</button>
+                </div>
+
                 <div class="withdraw-section">
                     <p id="withdrawInfo" style="font-weight:bold;color:#fbbf24;">Min: $10.000</p>
                     <div class="form-group"><label>Payment Method</label><div class="method-selector" id="methodSelector"></div></div>
@@ -512,6 +545,18 @@
                     <div id="withdrawHistoryList"></div>
                 </div>
                 <div class="rules-text"><div class="rule-title">📋 Withdraw Rules</div><div id="withdrawRulesText">Loading rules...</div></div>
+            </div>
+        </div>
+
+        <!-- ========== LEADERBOARD PAGE (NEW TAB) ========== -->
+        <div class="page" id="pageLeaderboard">
+            <h2 class="page-header">🏆 Leaderboard</h2>
+            <div style="display:flex; gap:10px; margin-bottom:12px;">
+                <button class="filter-btn active" onclick="loadLeaderboard('coins',this)">💰 Coins</button>
+                <button class="filter-btn" onclick="loadLeaderboard('usd',this)">💵 USD</button>
+            </div>
+            <div id="leaderboardContainer">
+                <p style="color:#94a3b8;text-align:center;">Loading leaderboard...</p>
             </div>
         </div>
     </div>
@@ -548,7 +593,18 @@
         </div>
     </div>
 
-    <div class="bottom-nav"><div class="nav-item active" onclick="switchPage('home',this)"><i class="fas fa-home"></i><span>Home</span></div><div class="nav-item" onclick="switchPage('tasks',this)"><i class="fas fa-tasks"></i><span>Tasks</span></div><div class="nav-item" onclick="switchPage('refer',this)"><i class="fas fa-users"></i><span>Refer</span></div><div class="nav-item" onclick="switchPage('wallet',this)"><i class="fas fa-wallet"></i><span>Wallet</span></div></div>
+    <!-- ============================================================ -->
+    <!-- ================== BOTTOM NAV =============================== -->
+    <!-- ============================================================ -->
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchPage('home',this)"><i class="fas fa-home"></i><span>Home</span></div>
+        <div class="nav-item" onclick="switchPage('tasks',this)"><i class="fas fa-tasks"></i><span>Tasks</span></div>
+        <div class="nav-item" onclick="switchPage('refer',this)"><i class="fas fa-users"></i><span>Refer</span></div>
+        <div class="nav-item" onclick="switchPage('wallet',this)"><i class="fas fa-wallet"></i><span>Wallet</span></div>
+        <div class="nav-item" onclick="switchPage('leaderboard',this)"><i class="fas fa-trophy"></i><span>Leaderboard</span></div>
+    </div>
+
+    <!-- Modals -->
     <div class="modal" id="successModal"><div class="modal-content"><div style="font-size:50px;">🎉</div><h3>Done!</h3><p id="rewardText"></p><button onclick="closeModal('successModal')">OK</button></div></div>
     <div class="modal" id="conversionModal"><div class="modal-content"><div style="font-size:50px;">💰</div><h3>Converted!</h3><p id="conversionText"></p><button onclick="closeModal('conversionModal')">OK</button></div></div>
     <div class="modal" id="withdrawModal"><div class="modal-content"><div style="font-size:50px;">💳</div><h3 id="withdrawModalTitle"></h3><p id="withdrawModalText"></p><button onclick="closeModal('withdrawModal')">OK</button></div></div>
@@ -585,7 +641,6 @@
                 document.removeEventListener('mousemove', onMouseMove);
                 document.removeEventListener('mouseup', onMouseUp);
                 if (!isDragging) {
-                    // It was a click, open modal
                     openSpinModal();
                 }
                 isDragging = false;
@@ -658,11 +713,12 @@
             balance: 0, usdBalance: 0, referralCount: 0, lastConversion: null, 
             conversionRate: 1000, minWithdraw: 10, withdrawHistory: [], 
             referCode: '', referTiers: {}, progressCoins: TOTAL_COINS, 
-            videoWatchedCount: 0, speedBoostCooldown: 0, 
+            videoWatchedCount: 0, speedBoostCooldown: 0, miningBoostCooldown: 0,
             taskLastCompleted: {}, taskProgress: {}, airdropClaimed: false, 
             xpPoints: NEGATIVE_XP, withdrawMethods: ['Nagad','Rocket'], 
             selectedMethod: 'Nagad', isBanned: false, banReason: '', 
-            banAppealSubmitted: false, lastVideoWatchTime: 0 
+            banAppealSubmitted: false, lastVideoWatchTime: 0,
+            dailyBonusClaimed: 0 // Store date string or timestamp
         };
         let tasks = [], conversionTimer = null, miningInterval = null, boostTimer = null, airdropTimer = null, 
             currentFilter = 'all', currentLevelFilter = 'all', levelConfigCache = {}, referralConfigCache = {};
@@ -682,7 +738,6 @@
         let isSpinning = false;
         let currentRotation = 0;
 
-        // ✅ YOUR PRIZE DATA (exactly as you specified)
         const prizeData = [
             { label: '500 🎁', value: 500, type: 'coins' },
             { label: '200 🎁', value: 200, type: 'coins' },
@@ -701,32 +756,21 @@
             { label: '$0 🎁', value: 0, type: 'usd' },
         ];
 
-        // Build the wheel with your segments
         function buildWheel() {
             const segmentsContainer = document.getElementById('wheelSegments');
             const numSegments = prizeData.length;
             const angleStep = 360 / numSegments;
-            
             segmentsContainer.innerHTML = '';
-            
-            const colors = [
-                '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
-                '#DDA0DD', '#FF9FF3', '#54A0FF', '#5F27CD', '#FF6B6B',
-                '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD'
-            ];
-            
+            const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#FF9FF3', '#54A0FF', '#5F27CD', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD'];
             prizeData.forEach((prize, index) => {
                 const segment = document.createElement('div');
                 segment.className = 'wheel-segment';
                 segment.style.transform = `rotate(${index * angleStep}deg)`;
                 segment.style.backgroundColor = colors[index % colors.length];
                 segment.style.borderRight = '1px solid #0f172a';
-                // Add gift box icon to each segment
                 segment.innerHTML = `<span>${prize.label}</span>`;
                 segmentsContainer.appendChild(segment);
             });
-
-            // Build bulbs
             const bulbsContainer = document.getElementById('wheelBulbs');
             bulbsContainer.innerHTML = '';
             const numBulbs = 20;
@@ -753,40 +797,26 @@
         }
 
         function openSpinModal() {
-            if (spinCount <= 0) {
-                showToast('🎯 No spins left!', 'error');
-                return;
-            }
+            if (spinCount <= 0) { showToast('🎯 No spins left!', 'error'); return; }
             document.getElementById('spinModal').classList.add('show');
             updateSpinModalUI();
         }
-
-        function closeSpinModal() {
-            document.getElementById('spinModal').classList.remove('show');
-        }
-
-        function updateSpinModalUI() {
-            document.getElementById('modalSpinCount').textContent = `Spins: ${spinCount}/${SPIN_COUNT_LIMIT}`;
-        }
+        function closeSpinModal() { document.getElementById('spinModal').classList.remove('show'); }
+        function updateSpinModalUI() { document.getElementById('modalSpinCount').textContent = `Spins: ${spinCount}/${SPIN_COUNT_LIMIT}`; }
 
         function spinWheelFromModal() {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
             if (isSpinning) return;
-            if (spinCount <= 0) {
-                showToast('🎯 No spins left!', 'error');
-                return;
-            }
+            if (spinCount <= 0) { showToast('🎯 No spins left!', 'error'); return; }
 
             const btn = document.getElementById('modalSpinBtn');
             btn.disabled = true;
             isSpinning = true;
             document.getElementById('modalSpinResult').textContent = '';
 
-            // Start button cooldown (15 seconds)
             let cooldown = SPIN_BUTTON_COOLDOWN_SECONDS;
             document.getElementById('modalSpinTimerBox').classList.add('show');
             document.getElementById('modalSpinTimerDisplay').textContent = `00:${String(cooldown).padStart(2, '0')}`;
-            
             if (spinBtnCooldownInterval) clearInterval(spinBtnCooldownInterval);
             spinBtnCooldownInterval = setInterval(() => {
                 cooldown--;
@@ -800,7 +830,6 @@
                 }
             }, 1000);
 
-            // ✅ Spin the wheel animation FIRST (before ad)
             const randomSpins = 5 + Math.floor(Math.random() * 5);
             const randomAngle = Math.floor(Math.random() * 360);
             const totalRotation = randomSpins * 360 + randomAngle;
@@ -808,68 +837,39 @@
             const segmentsContainer = document.getElementById('wheelSegments');
             segmentsContainer.style.transform = `rotate(${currentRotation}deg)`;
 
-            // ✅ Show Ad AFTER wheel spins
             show_11197472()
                 .then(() => {
-                    // ✅ Ad দেখার পর রিওয়ার্ড যোগ হবে
                     isAdShowing = false;
-
-                    // Determine prize based on where wheel stopped
                     const prize = getPrizeByAngle(currentRotation);
-                    let rewardCoins = 0;
-                    let rewardUsd = 0;
-
+                    let rewardCoins = 0, rewardUsd = 0;
                     if (prize.type === 'coins') {
                         rewardCoins = prize.value;
                         const newCoins = app.progressCoins + rewardCoins;
-                        if (newCoins > TOTAL_COINS) {
-                            rewardCoins = Math.max(0, TOTAL_COINS - app.progressCoins);
-                        }
+                        if (newCoins > TOTAL_COINS) rewardCoins = Math.max(0, TOTAL_COINS - app.progressCoins);
                     } else if (prize.type === 'usd') {
                         rewardUsd = prize.value;
                     }
+                    if (rewardCoins > 0) app.progressCoins += rewardCoins;
+                    if (rewardUsd > 0) app.usdBalance += rewardUsd;
 
-                    if (rewardCoins > 0) {
-                        app.progressCoins += rewardCoins;
-                    }
-                    if (rewardUsd > 0) {
-                        app.usdBalance += rewardUsd;
-                    }
-
-                    // ✅ Spin count কমবে
                     spinCount--;
                     document.getElementById('spinBadge').textContent = spinCount;
                     document.getElementById('modalSpinResult').textContent = `🎉 You won ${prize.label}!`;
                     updateSpinModalUI();
 
                     let resultText = '';
-                    if (rewardCoins > 0) {
-                        resultText += `+${rewardCoins} Coins!`;
-                    }
-                    if (rewardUsd > 0) {
-                        resultText += `+$${rewardUsd.toFixed(3)} USD!`;
-                    }
-                    if (resultText === '') {
-                        resultText = 'Better luck next time!';
-                    }
+                    if (rewardCoins > 0) resultText += `+${rewardCoins} Coins!`;
+                    if (rewardUsd > 0) resultText += `+$${rewardUsd.toFixed(3)} USD!`;
+                    if (resultText === '') resultText = 'Better luck next time!';
                     document.getElementById('rewardText').textContent = resultText;
                     document.getElementById('successModal').classList.add('active');
 
-                    userRef.update({
-                        progressCoins: app.progressCoins,
-                        usdBalance: app.usdBalance,
-                        spinCount: spinCount
-                    });
-
-                    updateUI();
-                    updateProgressUI();
-                    updateLevelUI();
-
+                    userRef.update({ progressCoins: app.progressCoins, usdBalance: app.usdBalance, spinCount: spinCount });
+                    updateUI(); updateProgressUI(); updateLevelUI();
                     isSpinning = false;
                     showToast(`🎰 Spin result: ${prize.label}`);
                 })
-                .catch((error) => {
-                    // ❌ Ad না দেখলে বা Ad লোড করতে ব্যর্থ হলে কিছুই হবে না
+                .catch(() => {
                     isAdShowing = false;
                     btn.disabled = false;
                     btn.textContent = '🎡 SPIN';
@@ -886,17 +886,13 @@
                 updateSpinModalUI();
             });
         }
-
-        // ✅ Watch for mining coins reaching 0 and reset spins
         function watchMiningCoins() {
             db.ref('users/' + userId + '/progressCoins').on('value', snap => {
                 const coins = snap.val();
                 if (coins !== null && coins === 0) {
-                    // ✅ Reset spins when mining coins become 0
                     spinCount = SPIN_COUNT_LIMIT;
                     document.getElementById('spinBadge').textContent = spinCount;
                     updateSpinModalUI();
-                    // Save to Firebase
                     userRef.update({ spinCount: spinCount });
                     showToast('🔄 Spins reset! You have 20 spins again!');
                 }
@@ -904,19 +900,297 @@
         }
 
         // ============================================================
-        // ================== IN-APP INTERSTITIAL ADS ==================
+        // ================== DAILY BONUS ==============================
         // ============================================================
-        // In-App Interstitial: auto show 2 ads within 6 minutes, 30s interval
-        show_11197472({
-            type: 'inApp',
-            inAppSettings: {
-                frequency: 2,
-                capping: 0.1,
-                interval: 30,
-                timeout: 5,
-                everyPage: false
+        function claimDailyBonus() {
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            const today = new Date().toDateString();
+            if (app.dailyBonusClaimed === today) {
+                showToast('✅ Already claimed today!', 'error');
+                return;
             }
-        });
+            const bonusAmount = 50 + Math.floor(Math.random() * 50); // 50-100 coins
+            app.balance += bonusAmount;
+            app.xpPoints += bonusAmount * 2;
+            app.dailyBonusClaimed = today;
+            userRef.update({
+                balance: app.balance,
+                xpPoints: app.xpPoints,
+                dailyBonusClaimed: today
+            });
+            document.getElementById('dailyBonusStatus').textContent = '✅ Claimed';
+            updateUI();
+            updateLevelUI();
+            showToast(`🎁 Daily Bonus: +${bonusAmount} Coins!`);
+            document.getElementById('rewardText').textContent = `+${bonusAmount} Coins!`;
+            document.getElementById('successModal').classList.add('active');
+        }
+
+        // ============================================================
+        // ================== MINING BOOST =============================
+        // ============================================================
+        function activateMiningBoost() {
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            if (app.miningBoostCooldown > Date.now()) {
+                const remaining = Math.ceil((app.miningBoostCooldown - Date.now()) / 1000);
+                showToast(`⏳ Cooldown: ${remaining}s`, 'error');
+                return;
+            }
+            if (app.progressCoins <= 0) { showToast('❌ No coins to boost!', 'error'); return; }
+            const btn = document.getElementById('miningBoostBtn');
+            btn.dataset.originalText = 'Mining Boost';
+            
+            showInterstitialAd(() => {
+                const boostAmount = 20 + Math.floor(Math.random() * 30); // 20-50 coins
+                app.balance += boostAmount;
+                app.xpPoints += boostAmount * 2;
+                app.miningBoostCooldown = Date.now() + 3600000; // 1 hour cooldown
+                userRef.update({
+                    balance: app.balance,
+                    xpPoints: app.xpPoints,
+                    miningBoostCooldown: app.miningBoostCooldown
+                });
+                updateUI(); updateLevelUI();
+                showToast(`🚀 Mining Boost: +${boostAmount} Coins!`);
+            }, 'miningBoostBtn');
+        }
+
+        // ============================================================
+        // ================== MYSTERY BOX ==============================
+        // ============================================================
+        let mysteryBoxCooldown = 0;
+        function openMysteryBox() {
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            if (mysteryBoxCooldown > Date.now()) {
+                const remaining = Math.ceil((mysteryBoxCooldown - Date.now()) / 1000);
+                showToast(`⏳ Cooldown: ${remaining}s`, 'error');
+                return;
+            }
+            const btn = document.getElementById('mysteryBoxStatus');
+            btn.textContent = '⏳ Loading...';
+            
+            showRewardedAd(() => {
+                const rewardType = Math.random() > 0.5 ? 'coins' : 'usd';
+                let rewardCoins = 0, rewardUsd = 0;
+                if (rewardType === 'coins') {
+                    rewardCoins = 20 + Math.floor(Math.random() * 80); // 20-100 coins
+                    app.balance += rewardCoins;
+                } else {
+                    rewardUsd = (Math.random() * 0.5 + 0.1).toFixed(3); // 0.1 - 0.6 USD
+                    app.usdBalance += parseFloat(rewardUsd);
+                }
+                app.xpPoints += rewardCoins * 2;
+                mysteryBoxCooldown = Date.now() + 1800000; // 30 min cooldown
+                userRef.update({
+                    balance: app.balance,
+                    usdBalance: app.usdBalance,
+                    xpPoints: app.xpPoints
+                });
+                const rewardText = rewardType === 'coins' ? `+${rewardCoins} Coins` : `+$${rewardUsd} USD`;
+                showToast(`🎁 Mystery Box: ${rewardText}!`);
+                document.getElementById('rewardText').textContent = rewardText;
+                document.getElementById('successModal').classList.add('active');
+                updateUI(); updateLevelUI();
+                btn.textContent = '✅ Opened';
+                setTimeout(() => { btn.textContent = '🎁'; }, 3000);
+            }, 'mysteryBoxStatus');
+        }
+
+        // ============================================================
+        // ================== LEADERBOARD ==============================
+        // ============================================================
+        function loadLeaderboard(type = 'coins', btn = null) {
+            if (btn) {
+                document.querySelectorAll('#pageLeaderboard .filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+            const container = document.getElementById('leaderboardContainer');
+            container.innerHTML = '<p style="color:#94a3b8;text-align:center;">Loading leaderboard...</p>';
+            
+            db.ref('users').orderByChild(type === 'coins' ? 'balance' : 'usdBalance').limitToLast(50).once('value', snap => {
+                if (!snap.exists()) {
+                    container.innerHTML = '<p style="color:#94a3b8;text-align:center;">No users found.</p>';
+                    return;
+                }
+                let users = [];
+                snap.forEach(child => {
+                    const data = child.val();
+                    users.push({
+                        userId: child.key,
+                        name: data.fullName || data.firstName || data.username || 'User',
+                        score: type === 'coins' ? (data.balance || 0) : (data.usdBalance || 0),
+                        avatar: data.avatar || '👤'
+                    });
+                });
+                users.sort((a, b) => b.score - a.score);
+                users = users.slice(0, 50);
+
+                const top = ['🥇', '🥈', '🥉'];
+                container.innerHTML = users.map((u, i) => {
+                    let className = 'leaderboard-item';
+                    if (i === 0) className += ' top1';
+                    if (i === 1) className += ' top2';
+                    if (i === 2) className += ' top3';
+                    return `<div class="${className}">
+                        <div class="rank">${i < 3 ? top[i] : `#${i+1}`}</div>
+                        <div class="user">
+                            <div class="avatar-small">${u.avatar}</div>
+                            <span style="font-size:14px;">${u.name}</span>
+                        </div>
+                        <div class="score">${type === 'coins' ? u.score.toLocaleString() : '$' + u.score.toFixed(3)}</div>
+                    </div>`;
+                }).join('');
+            }).catch(() => {
+                container.innerHTML = '<p style="color:#ef4444;text-align:center;">Failed to load leaderboard.</p>';
+            });
+        }
+
+        // ============================================================
+        // ================== IN-APP PURCHASE ==========================
+        // ============================================================
+        function buyCoins(amount) {
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            // এখানে আপনি আপনার পেমেন্ট গেটওয়ে ইন্টিগ্রেট করতে পারেন (যেমন: Stripe, Paypal)
+            // বর্তমানে এটি ডেমো হিসেবে কাজ করছে
+            const cost = amount === 1000 ? 0.99 : 4.99;
+            if (confirm(`💳 Buy ${amount} Coins for $${cost}?`)) {
+                // সিমুলেট পেমেন্ট
+                app.balance += amount;
+                app.xpPoints += amount * 2;
+                userRef.update({ balance: app.balance, xpPoints: app.xpPoints });
+                updateUI(); updateLevelUI();
+                showToast(`🪙 +${amount} Coins!`);
+                document.getElementById('rewardText').textContent = `+${amount} Coins!`;
+                document.getElementById('successModal').classList.add('active');
+            }
+        }
+
+        // ============================================================
+        // ================== MINING CORE ==============================
+        // ============================================================
+        function startMining() {
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            if (miningInterval) return;
+            if (app.progressCoins <= 0) { showToast('❌ No coins!', 'error'); updateProgressUI(); return; }
+            document.getElementById('circleStartOverlay').classList.add('hidden');
+            userRef.update({ isCurrentlyMining: true, lastMiningActivity: Date.now() });
+            wasMiningBeforeOffline = true;
+            
+            function mineNextCoin() {
+                if (!isOnline) { stopMining(); showToast('⚠️ Network lost!', 'error'); return; }
+                if (isAdShowing) { setTimeout(mineNextCoin, 1000); return; }
+                if (app.progressCoins <= 0) { stopMining(); showToast('🎉 Coins finished!', 'success'); updateProgressUI(); return; }
+                const d = calculateLevel(app.xpPoints);
+                const ca = 1 + (d.bonusPercent / 100);
+                
+                app.progressCoins -= 1;
+                app.balance += ca;
+                app.xpPoints += 1;
+                
+                userRef.transaction((currentData) => {
+                    if (currentData === null) return null;
+                    return {
+                        ...currentData,
+                        balance: (currentData.balance || 0) + ca,
+                        progressCoins: Math.max(0, (currentData.progressCoins || 0) - 1),
+                        xpPoints: (currentData.xpPoints || 0) + 1,
+                        lastMiningActivity: Date.now()
+                    };
+                }, (error, committed) => {
+                    if (error) { showToast('⚠️ Mining error!', 'error'); return; }
+                }, false);
+                
+                const coin = document.createElement('div');
+                coin.className = 'floating-coin';
+                coin.textContent = `+${ca.toFixed(2)} 🪙`;
+                coin.style.left = (Math.random() * 80 + 10) + '%';
+                coin.style.top = '35%';
+                document.body.appendChild(coin);
+                setTimeout(() => coin.remove(), 1000);
+                
+                updateProgressUI(); updateUI(); updateLevelUI();
+                miningInterval = setTimeout(mineNextCoin, 5000);
+            }
+            mineNextCoin();
+            updateProgressUI();
+            showToast('⛏️ Mining!');
+        }
+
+        function stopMining() {
+            if (miningInterval) { clearTimeout(miningInterval); miningInterval = null; }
+            wasMiningBeforeOffline = false;
+            userRef.update({ isCurrentlyMining: false });
+            updateProgressUI();
+        }
+
+        // ============================================================
+        // ================== SPEED BOOST ==============================
+        // ============================================================
+        function updateSpeedBoostUI() { 
+            const bb = document.getElementById('speedBoostBtn'); 
+            const cb = document.getElementById('boostCountdownBox'); 
+            if (app.speedBoostCooldown > Date.now()) { 
+                bb.style.display = 'none'; 
+                cb.classList.add('show'); 
+                if (boostTimer) clearInterval(boostTimer); 
+                boostTimer = setInterval(() => { 
+                    const r = Math.max(0, Math.ceil((app.speedBoostCooldown - Date.now()) / 1000)); 
+                    document.getElementById('boostCountdownTime').textContent = `${String(Math.floor(r / 60)).padStart(2, '0')}:${String(r % 60).padStart(2, '0')}`; 
+                    if (r <= 0) { app.speedBoostCooldown = 0; userRef.update({ speedBoostCooldown: 0 }); updateSpeedBoostUI(); showToast('⚡ Speed Boost ready!'); } 
+                }, 1000); 
+            } else { 
+                bb.style.display = 'flex'; 
+                cb.classList.remove('show'); 
+                if (boostTimer) { clearInterval(boostTimer); boostTimer = null; } 
+                bb.disabled = false; bb.style.opacity = '1'; bb.title = 'Activate Speed Boost (once per hour)';
+            } 
+        }
+
+        function activateSpeedBoost() { 
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            if (app.speedBoostCooldown > Date.now()) { showToast('⏳ Cooldown active!', 'error'); return; }
+            if (app.progressCoins <= 0) { showToast('❌ No coins to boost!', 'error'); return; }
+            const btn = document.getElementById('speedBoostBtn');
+            btn.dataset.originalText = 'Speed Boost';
+            
+            showInterstitialAd(() => { 
+                const st = Date.now(); 
+                const totalBoostTime = 3000; // 3 seconds
+                const intervalTime = 100; 
+                const maxCoins = 60, minCoins = 50;
+                let totalAdded = 0;
+                const targetCoins = Math.floor(Math.random() * (maxCoins - minCoins + 1)) + minCoins;
+
+                const bm = setInterval(() => { 
+                    if (!isOnline) { clearInterval(bm); showToast('⚠️ Network lost!', 'error'); return; }
+                    if (isAdShowing) return;
+                    if (Date.now() - st >= totalBoostTime || totalAdded >= targetCoins) { 
+                        clearInterval(bm); 
+                        app.speedBoostCooldown = Date.now() + 3600000; 
+                        userRef.update({ speedBoostCooldown: app.speedBoostCooldown }); 
+                        updateSpeedBoostUI(); 
+                        showToast(`🚀 Speed Boost Done! +${totalAdded} coins (1 hour cooldown)`); 
+                        return; 
+                    } 
+                    const addAmount = Math.min(3, targetCoins - totalAdded);
+                    if (addAmount <= 0) { clearInterval(bm); return; }
+                    app.progressCoins -= 1;
+                    app.balance += addAmount;
+                    app.xpPoints += addAmount * 2;
+                    totalAdded += addAmount;
+                    userRef.update({ balance: app.balance, progressCoins: app.progressCoins, xpPoints: app.xpPoints, lastMiningActivity: Date.now() }); 
+                    updateProgressUI(); updateUI(); updateLevelUI(); 
+                    const coin = document.createElement('div'); 
+                    coin.className = 'floating-coin'; 
+                    coin.textContent = `+${addAmount} 🪙`; 
+                    coin.style.left = (Math.random() * 80 + 10) + '%'; 
+                    coin.style.top = '35%'; 
+                    document.body.appendChild(coin); 
+                    setTimeout(() => coin.remove(), 800); 
+                }, intervalTime); 
+                showToast('⚡ Speed Boost Active!'); 
+            }, 'speedBoostBtn');
+        }
 
         // ============================================================
         // ================== NETWORK & SECURITY ======================
@@ -941,43 +1215,26 @@
         // ================== AD HANDLER ======================
         function showRewardedAd(cb, btnId) {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
-            if (typeof show_11197472 !== 'function') { 
-                if (cb) cb(); 
-                return; 
-            }
-            
+            if (typeof show_11197472 !== 'function') { if (cb) cb(); return; }
             isAdShowing = true;
             const btn = document.getElementById(btnId);
-            if (btn) {
-                btn.disabled = true;
-                btn.textContent = '⏳ Loading...';
-            }
-            
+            if (btn) { btn.disabled = true; btn.textContent = '⏳ Loading...'; }
             try {
                 show_11197472('pop')
                     .then(() => {
                         isAdShowing = false;
-                        if (btn) { 
-                            btn.disabled = false; 
-                            btn.textContent = btn.dataset.originalText || '▶ Watch'; 
-                        }
+                        if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || '▶ Watch'; }
                         if (cb) cb();
                     })
                     .catch(() => {
                         isAdShowing = false;
-                        if (btn) { 
-                            btn.disabled = false; 
-                            btn.textContent = btn.dataset.originalText || '▶ Watch'; 
-                        }
+                        if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || '▶ Watch'; }
                         if (cb) cb();
                         showToast('⚠️ Ad failed, but reward given!');
                     });
             } catch (error) {
                 isAdShowing = false;
-                if (btn) { 
-                    btn.disabled = false; 
-                    btn.textContent = btn.dataset.originalText || '▶ Watch'; 
-                }
+                if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || '▶ Watch'; }
                 if (cb) cb();
                 showToast('⚠️ Ad failed, but reward given!');
             }
@@ -986,14 +1243,9 @@
         function showInterstitialAd(cb, btnId) {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
             if (typeof show_11197472 !== 'function') { if (cb) cb(); return; }
-            
             isAdShowing = true;
             const btn = document.getElementById(btnId);
-            if (btn) {
-                btn.disabled = true;
-                btn.textContent = '⏳ Loading...';
-            }
-            
+            if (btn) { btn.disabled = true; btn.textContent = '⏳ Loading...'; }
             try {
                 show_11197472()
                     .then(() => {
@@ -1080,85 +1332,6 @@
             };
         }
 
-        // ================== MINING CORE =============================
-        function startMining() {
-            if (!isOnline) { showToast('No internet!', 'error'); return; }
-            if (miningInterval) return;
-            if (app.progressCoins <= 0) { 
-                showToast('❌ No coins!', 'error');
-                updateProgressUI();
-                return; 
-            }
-            
-            document.getElementById('circleStartOverlay').classList.add('hidden');
-            userRef.update({ isCurrentlyMining: true, lastMiningActivity: Date.now() });
-            wasMiningBeforeOffline = true;
-            
-            function mineNextCoin() {
-                if (!isOnline) { stopMining(); showToast('⚠️ Network lost!', 'error'); return; }
-                if (isAdShowing) { setTimeout(mineNextCoin, 1000); return; }
-                if (app.progressCoins <= 0) { 
-                    stopMining(); 
-                    showToast('🎉 Coins finished!', 'success');
-                    updateProgressUI();
-                    return; 
-                }
-                
-                const d = calculateLevel(app.xpPoints);
-                const ca = 1 + (d.bonusPercent / 100);
-                
-                app.progressCoins -= 1;
-                app.balance += ca;
-                app.xpPoints += 1;
-                
-                // ✅ FIXED: transaction ব্যবহার করা হয়েছে যাতে কয়েন গায়েব না হয়
-                userRef.transaction((currentData) => {
-                    if (currentData === null) return null;
-                    return {
-                        ...currentData,
-                        balance: (currentData.balance || 0) + ca,
-                        progressCoins: Math.max(0, (currentData.progressCoins || 0) - 1),
-                        xpPoints: (currentData.xpPoints || 0) + 1,
-                        lastMiningActivity: Date.now()
-                    };
-                }, (error, committed, snapshot) => {
-                    if (error) {
-                        console.error('Transaction failed:', error);
-                        showToast('⚠️ Mining error!', 'error');
-                        return;
-                    }
-                    if (!committed) {
-                        showToast('⚠️ Data conflict! Retrying...', 'error');
-                        return;
-                    }
-                }, false);
-                
-                const coin = document.createElement('div');
-                coin.className = 'floating-coin';
-                coin.textContent = `+${ca.toFixed(2)} 🪙`;
-                coin.style.left = (Math.random() * 80 + 10) + '%';
-                coin.style.top = '35%';
-                document.body.appendChild(coin);
-                setTimeout(() => coin.remove(), 1000);
-                
-                updateProgressUI();
-                updateUI();
-                updateLevelUI();
-                
-                miningInterval = setTimeout(mineNextCoin, 5000);
-            }
-            mineNextCoin();
-            updateProgressUI();
-            showToast('⛏️ Mining!');
-        }
-
-        function stopMining() {
-            if (miningInterval) { clearTimeout(miningInterval); miningInterval = null; }
-            wasMiningBeforeOffline = false;
-            userRef.update({ isCurrentlyMining: false });
-            updateProgressUI();
-        }
-
         // ================== TASKS ===================================
         function loadTasks() { 
             db.ref('tasks').on('value', s => { 
@@ -1195,15 +1368,13 @@
 
         function filterTasks(f, b) { currentFilter = f; document.querySelectorAll('.task-filters .filter-btn').forEach(x => x.classList.remove('active')); if (b) b.classList.add('active'); renderTasks(); }
 
-        // === Webview Task Functions ===
-        let webViewTaskId = null, webViewTimerInterval = null, webViewSeconds = 0, webViewRequiredTime = 60, webViewTaskReward = 0;
         function openWebViewTask(taskId, url, reward, waitTime) {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
             if (app.taskProgress[taskId] >= (tasks.find(t => t.id === taskId)?.limit || 1)) { showToast('Task already completed!', 'error'); return; }
             if (app.taskLastCompleted[taskId] === new Date().toDateString()) { showToast('Already done today!', 'error'); return; }
             webViewTaskId = taskId;
             webViewTaskReward = reward;
-            webViewRequiredTime = waitTime || 60; // ✅ 1 minute (60 seconds)
+            webViewRequiredTime = waitTime || 60;
             webViewSeconds = 0;
             const overlay = document.getElementById('webviewOverlay');
             document.getElementById('webviewIframe').src = url;
@@ -1224,12 +1395,14 @@
                 }
             }, 1000);
         }
+
         function closeWebView() {
             document.getElementById('webviewOverlay').classList.remove('show');
             if (webViewTimerInterval) { clearInterval(webViewTimerInterval); webViewTimerInterval = null; }
             document.getElementById('webviewIframe').src = 'about:blank';
             webViewTaskId = null;
         }
+
         function claimWebViewTask() {
             if (!webViewTaskId) return;
             const task = tasks.find(t => t.id === webViewTaskId);
@@ -1310,62 +1483,28 @@
             if (!isOnline) { showToast('No internet!', 'error'); return; }
             const code = document.getElementById('referCodeInput').value.trim().toUpperCase();
             if (!code) { showToast('Enter code!', 'error'); return; }
-
             userRef.once('value', s => {
                 const userData = s.val() || {};
-                if (userData.referCodeSubmitted) {
-                    showToast('You already used a referral code!', 'error');
-                    return;
-                }
-
+                if (userData.referCodeSubmitted) { showToast('You already used a referral code!', 'error'); return; }
                 db.ref('users').orderByChild('referCode').equalTo(code).once('value', sn => {
-                    if (!sn.exists()) {
-                        showToast('Invalid referral code!', 'error');
-                        return;
-                    }
-
+                    if (!sn.exists()) { showToast('Invalid referral code!', 'error'); return; }
                     let found = false;
                     sn.forEach(c => {
-                        if (c.key === userId) {
-                            showToast('You cannot use your own code!', 'error');
-                            found = true;
-                            return;
-                        }
+                        if (c.key === userId) { showToast('You cannot use your own code!', 'error'); found = true; return; }
                         found = true;
                         const bonus = referralConfigCache.perReferralCoins || 50;
                         const xpBonus = referralConfigCache.xpPerReferral || 100;
-
-                        db.ref('referrals/' + userId).set({
-                            referredBy: c.key,
-                            referredAt: Date.now(),
-                            username: displayName,
-                            bonus: bonus,
-                            userId
-                        }).then(() => {
-                            db.ref('users/' + c.key).transaction(cur => ({
-                                ...(cur || {}),
-                                referCount: (cur?.referCount || 0) + 1
-                            }));
-
-                            app.balance += bonus;
-                            app.xpPoints += xpBonus;
-                            userRef.update({
-                                balance: app.balance,
-                                xpPoints: app.xpPoints,
-                                referCodeSubmitted: true
-                            });
-
+                        db.ref('referrals/' + userId).set({ referredBy: c.key, referredAt: Date.now(), username: displayName, bonus: bonus, userId }).then(() => {
+                            db.ref('users/' + c.key).transaction(cur => ({ ...(cur || {}), referCount: (cur?.referCount || 0) + 1 }));
+                            app.balance += bonus; app.xpPoints += xpBonus;
+                            userRef.update({ balance: app.balance, xpPoints: app.xpPoints, referCodeSubmitted: true });
                             document.getElementById('referCodeSubmitBtn').disabled = true;
                             document.getElementById('referCodeInput').disabled = true;
-                            updateUI();
-                            updateLevelUI();
+                            updateUI(); updateLevelUI();
                             showToast(`🎉 +${bonus} Coins!`);
                         });
                     });
-
-                    if (!found) {
-                        showToast('Invalid referral code!', 'error');
-                    }
+                    if (!found) { showToast('Invalid referral code!', 'error'); }
                 });
             });
         }
@@ -1478,75 +1617,6 @@
             c.innerHTML = h.slice(-20).reverse().map(h => `<div class="history-item"><div><b>$${h.amount?.toFixed(3) || '0'}</b> <small>${h.method || ''}</small>${h.status === 'cancelled' && h.cancelReason ? `<div style="color:#ef4444;font-size:10px;">⚠️ ${h.cancelReason}</div>` : ''}</div><div style="text-align:right;"><span>${h.status === 'approved' ? '✅' : h.status === 'cancelled' ? '❌' : '⏳'} ${h.status}</span><div style="font-size:9px;">${h.date ? new Date(h.date).toLocaleDateString() : ''}</div></div></div>`).join(''); 
         }
 
-        // ================== SPEED BOOST ======================
-        function updateSpeedBoostUI() { 
-            const bb = document.getElementById('speedBoostBtn'); 
-            const cb = document.getElementById('boostCountdownBox'); 
-            if (app.speedBoostCooldown > Date.now()) { 
-                bb.style.display = 'none'; 
-                cb.classList.add('show'); 
-                if (boostTimer) clearInterval(boostTimer); 
-                boostTimer = setInterval(() => { 
-                    const r = Math.max(0, Math.ceil((app.speedBoostCooldown - Date.now()) / 1000)); 
-                    document.getElementById('boostCountdownTime').textContent = `${String(Math.floor(r / 60)).padStart(2, '0')}:${String(r % 60).padStart(2, '0')}`; 
-                    if (r <= 0) { app.speedBoostCooldown = 0; userRef.update({ speedBoostCooldown: 0 }); updateSpeedBoostUI(); showToast('⚡ Speed Boost ready!'); } 
-                }, 1000); 
-            } else { 
-                bb.style.display = 'flex'; 
-                cb.classList.remove('show'); 
-                if (boostTimer) { clearInterval(boostTimer); boostTimer = null; } 
-                bb.disabled = false; bb.style.opacity = '1'; bb.title = 'Activate Speed Boost (once per hour)';
-            } 
-        }
-
-        function activateSpeedBoost() { 
-            if (!isOnline) { showToast('No internet!', 'error'); return; }
-            if (app.speedBoostCooldown > Date.now()) { showToast('⏳ Cooldown active!', 'error'); return; }
-            if (app.progressCoins <= 0) { showToast('❌ No coins to boost!', 'error'); return; }
-            const btn = document.getElementById('speedBoostBtn');
-            btn.dataset.originalText = 'Speed Boost';
-            
-            // ✅ Show Interstitial Ad first, then boost
-            showInterstitialAd(() => { 
-                const st = Date.now(); 
-                const totalBoostTime = 3000; // 3 seconds
-                const intervalTime = 100; // 100ms intervals
-                const maxCoins = 60; // Max coins to add
-                const minCoins = 50; // Min coins to add
-                let totalAdded = 0;
-                const targetCoins = Math.floor(Math.random() * (maxCoins - minCoins + 1)) + minCoins;
-
-                const bm = setInterval(() => { 
-                    if (!isOnline) { clearInterval(bm); showToast('⚠️ Network lost!', 'error'); return; }
-                    if (isAdShowing) return;
-                    if (Date.now() - st >= totalBoostTime || totalAdded >= targetCoins) { 
-                        clearInterval(bm); 
-                        app.speedBoostCooldown = Date.now() + 3600000; 
-                        userRef.update({ speedBoostCooldown: app.speedBoostCooldown }); 
-                        updateSpeedBoostUI(); 
-                        showToast(`🚀 Speed Boost Done! +${totalAdded} coins (1 hour cooldown)`); 
-                        return; 
-                    } 
-                    const addAmount = Math.min(3, targetCoins - totalAdded);
-                    if (addAmount <= 0) { clearInterval(bm); return; }
-                    app.progressCoins -= 1;
-                    app.balance += addAmount;
-                    app.xpPoints += addAmount * 2;
-                    totalAdded += addAmount;
-                    userRef.update({ balance: app.balance, progressCoins: app.progressCoins, xpPoints: app.xpPoints, lastMiningActivity: Date.now() }); 
-                    updateProgressUI(); updateUI(); updateLevelUI(); 
-                    const coin = document.createElement('div'); 
-                    coin.className = 'floating-coin'; 
-                    coin.textContent = `+${addAmount} 🪙`; 
-                    coin.style.left = (Math.random() * 80 + 10) + '%'; 
-                    coin.style.top = '35%'; 
-                    document.body.appendChild(coin); 
-                    setTimeout(() => coin.remove(), 800); 
-                }, intervalTime); 
-                showToast('⚡ Speed Boost Active!'); 
-            }, 'speedBoostBtn');
-        }
-
         // ================== CONVERSION ==============================
         let conversionTimerInterval = null;
         function performConversion() { 
@@ -1594,17 +1664,13 @@
         function updateUI() { 
             document.getElementById('balance').textContent = app.balance.toLocaleString(); 
             document.getElementById('walletBalance').textContent = app.balance.toLocaleString(); 
-            
-            // ✅ ৩ দশমিক পর্যন্ত দেখানোর জন্য toFixed(3) ব্যবহার করা হয়েছে
             const usdDisplay = (app.balance / app.conversionRate).toFixed(3); 
             document.getElementById('usdValue').textContent = `≈ $${usdDisplay} USD`; 
             document.getElementById('walletUsd').textContent = `≈ $${usdDisplay} USD`; 
             document.getElementById('walletTotalUsd').textContent = `$${app.usdBalance.toFixed(3)}`; 
             document.getElementById('rateInfo').textContent = `1 USD = ${app.conversionRate} Coins`; 
-            
             document.getElementById('usdBalanceDisplay').textContent = `$${app.usdBalance.toFixed(3)}`;
             document.getElementById('totalBalanceDisplay').textContent = `${app.balance.toLocaleString()} + $${app.usdBalance.toFixed(3)}`;
-            
             updateWithdrawUI(); updateSpeedBoostUI(); startConversionTimer();
         }
 
@@ -1613,7 +1679,6 @@
             circle.style.background = `conic-gradient(#fbbf24 ${pct}%, #1e293b ${pct}%)`; 
             count.textContent = app.progressCoins; 
             document.getElementById('progressPercent').textContent = Math.round(pct) + '%'; 
-            
             if (app.progressCoins === 0) { 
                 status.textContent = '🎯 Empty!'; 
                 overlay.classList.remove('hidden'); 
@@ -1690,6 +1755,7 @@
             if (p === 'tasks') renderTasks(); 
             if (p === 'refer') updateReferUI(); 
             if (p === 'wallet') { updateWithdrawUI(); updateWithdrawHistoryUI(); } 
+            if (p === 'leaderboard') { loadLeaderboard('coins'); } 
         }
 
         // ================== TOAST & MODAL ===========================
@@ -1764,11 +1830,7 @@
 
         // ================== INIT ====================================
         function initApp() {
-            if (!navigator.onLine) {
-                document.getElementById('networkOverlay').classList.add('show');
-                isOnline = false;
-            }
-
+            if (!navigator.onLine) { document.getElementById('networkOverlay').classList.add('show'); isOnline = false; }
             userRef.update({ username: tgUsername, firstName: tgFirstName, lastName: tgLastName, fullName: displayName, lastLogin: new Date().toISOString() });
             document.getElementById('userName').textContent = displayName;
             checkBanStatus();
@@ -1781,16 +1843,11 @@
             db.ref('conversionRate').on('value', s => { app.conversionRate = s.val() || 1000; updateUI(); });
             loadLevelConfigFromDB();
 
-            // ✅ লোডিং পেজ হাইড করার টাইমআউট
-            let loadingTimeout = setTimeout(() => {
-                document.getElementById('loadingPage').classList.add('hidden');
-            }, 15000); // ১৫ সেকেন্ড পর জোর করে হাইড করবে
+            let loadingTimeout = setTimeout(() => { document.getElementById('loadingPage').classList.add('hidden'); }, 15000);
             
             userRef.on('value', snap => {
-                // ✅ লোডিং পেজ হাইড করবে
                 clearTimeout(loadingTimeout);
                 document.getElementById('loadingPage').classList.add('hidden');
-
                 const d = snap.val() || {};
                 if (d.banned) return;
                 app.balance = d.balance || 0;
@@ -1801,13 +1858,14 @@
                 app.referTiers = d.referTiers || {};
                 app.progressCoins = d.progressCoins !== undefined ? d.progressCoins : TOTAL_COINS;
                 app.speedBoostCooldown = d.speedBoostCooldown || 0;
+                app.miningBoostCooldown = d.miningBoostCooldown || 0;
                 app.taskLastCompleted = d.taskLastCompleted || {};
                 app.taskProgress = d.taskProgress || {};
                 app.xpPoints = d.xpPoints !== undefined ? d.xpPoints : NEGATIVE_XP;
                 app.withdrawHistory = d.withdrawHistory || [];
                 app.airdropClaimed = d.airdropClaimed || false;
+                app.dailyBonusClaimed = d.dailyBonusClaimed || '';
 
-                // ✅ রেফার লিংক শুধুমাত্র referCode পরিবর্তন হলে আপডেট হবে
                 if (!window._lastReferCode || window._lastReferCode !== app.referCode) {
                     window._lastReferCode = app.referCode;
                     document.getElementById('referLinkHome').textContent = `https://t.me/CoinQuist_bot?start=ref_${app.referCode}`;
@@ -1816,6 +1874,10 @@
                 const savedName = d.fullName || d.firstName || d.username || displayName;
                 document.getElementById('userName').textContent = savedName;
                 if (d.lastLogin) document.getElementById('lastLoginDisplay').textContent = `📅 ${new Date(d.lastLogin).toLocaleString()}`;
+                
+                // Update Daily Bonus status
+                const today = new Date().toDateString();
+                document.getElementById('dailyBonusStatus').textContent = app.dailyBonusClaimed === today ? '✅ Claimed' : '🎯 Claim Now';
                 
                 if (!d.balance && d.xpPoints === undefined) {
                     userRef.update({ 
@@ -1833,7 +1895,6 @@
                 updateProgressUI();
                 updateSpeedBoostUI();
                 startConversionTimer();
-
                 document.getElementById('loadingPage').classList.add('hidden');
             });
 
@@ -1892,7 +1953,6 @@
             setTimeout(() => showToast('👋 Welcome ' + displayName + '!'), 1500);
         }
 
-        // ================== LEVEL CONFIG DB =========================
         function loadLevelConfigFromDB() {
             db.ref('levelConfig').on('value', snap => {
                 if (snap.exists()) {
