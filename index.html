@@ -808,7 +808,8 @@
             const segmentsContainer = document.getElementById('wheelSegments');
             segmentsContainer.style.transform = `rotate(${currentRotation}deg)`;
 
-            // ✅ Show Ad AFTER wheel spins            show_11197472()
+            // ✅ Show Ad AFTER wheel spins
+            show_11197472()
                 .then(() => {
                     // ✅ Ad দেখার পর রিওয়ার্ড যোগ হবে
                     isAdShowing = false;
@@ -1779,8 +1780,17 @@
             
             db.ref('conversionRate').on('value', s => { app.conversionRate = s.val() || 1000; updateUI(); });
             loadLevelConfigFromDB();
+
+            // ✅ লোডিং পেজ হাইড করার টাইমআউট
+            let loadingTimeout = setTimeout(() => {
+                document.getElementById('loadingPage').classList.add('hidden');
+            }, 15000); // ১৫ সেকেন্ড পর জোর করে হাইড করবে
             
             userRef.on('value', snap => {
+                // ✅ লোডিং পেজ হাইড করবে
+                clearTimeout(loadingTimeout);
+                document.getElementById('loadingPage').classList.add('hidden');
+
                 const d = snap.val() || {};
                 if (d.banned) return;
                 app.balance = d.balance || 0;
@@ -1826,8 +1836,6 @@
 
                 document.getElementById('loadingPage').classList.add('hidden');
             });
-
-            setTimeout(() => { document.getElementById('loadingPage').classList.add('hidden'); }, 5000);
 
             db.ref('withdrawSettings').on('value', s => { 
                 if (s.exists()) { 
