@@ -4,11 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>CoinQuest - Tap & Earn</title>
+    
     <script src='//libtl.com/sdk.js' data-zone='11197472' data-sdk='show_11197472'></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+    <script src="https://js.stripe.com/v3/"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         /* ================== GLOBAL ================== */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', -apple-system, sans-serif; }
@@ -26,10 +29,6 @@
         .balance-label { font-size: 11px; color: #94a3b8; }
         .balance-amount { font-size: 32px; font-weight: 900; background: linear-gradient(to right, #fcd34d, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .usd-value { color: #10b981; font-size: 15px; font-weight: bold; }
-        .level-section { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 14px; margin-top: 8px; cursor: pointer; }
-        .level-section .level-row { display: flex; justify-content: space-between; align-items: center; }
-        .level-progress { width: 100%; height: 5px; background: rgba(255,255,255,0.1); border-radius: 5px; margin-top: 6px; overflow: hidden; }
-        .level-progress .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 5px; transition: width 0.5s ease; }
         .conversion-timer { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.15); border-radius: 12px; padding: 10px; margin-top: 10px; }
         .conversion-timer .label { font-size: 10px; color: #94a3b8; }
         .conversion-timer .time { font-size: 16px; font-weight: bold; color: #10b981; }
@@ -66,7 +65,7 @@
         .mining-circle .coin-icon { font-size: 32px; margin-bottom: 5px; animation: coinSpin 3s linear infinite; }
         @keyframes coinSpin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
         .mining-circle .coin-count { font-size: 30px; font-weight: 900; color: #fbbf24; }
-        
+
         /* ================== BOOST BUTTONS ================== */
         .speed-btn-container { margin-top: 12px; width: 100%; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
         .speed-boost-btn, .mining-boost-btn {
@@ -132,21 +131,19 @@
             text-align: center;
         }
         .buy-coins-section .buy-title { font-size: 14px; font-weight: 700; color: #fbbf24; margin-bottom: 10px; }
-        .buy-coins-btn {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #0f172a;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 30px;
-            font-weight: 900;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(251,191,36,0.3);
-        }
-        .buy-coins-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .payment-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .payment-card { background: rgba(255,255,255,0.05); padding: 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); text-align: center; cursor: pointer; transition: 0.3s; }
+        .payment-card:hover { background: rgba(255,255,255,0.08); transform: translateY(-2px); }
+        .payment-card .icon { font-size: 28px; margin-bottom: 4px; }
+        .payment-card .name { font-size: 13px; font-weight: 700; color: #fff; }
+        .payment-card .desc { font-size: 10px; color: #94a3b8; }
+        .payment-card.visa { border-color: #1a1f71; }
+        .payment-card.stars { border-color: #fbbf24; }
+        .payment-card.bkash { border-color: #d92b3a; }
+        .payment-card.nagad { border-color: #f05a28; }
+        .payment-card.rocket { border-color: #c5262c; }
 
-        /* ================== LEADERBOARD PAGE ================== */
+        /* ================== LEADERBOARD ================== */
         .leaderboard-item {
             display: flex;
             align-items: center;
@@ -209,26 +206,12 @@
         .webview-overlay.show { display: flex; }
         .webview-header { background: #1e293b; padding: 12px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #334155; }
         .webview-header .back-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 14px; }
-        .webview-header .url-text { color: #94a3b8; font-size: 12px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .webview-header .timer-badge { background: rgba(251,191,36,0.2); color: #fbbf24; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 700; }
         .webview-iframe { flex: 1; border: none; background: #fff; }
         .webview-iframe iframe { width: 100%; height: 100%; border: none; }
         .webview-footer { background: #1e293b; padding: 10px 16px; text-align: center; border-top: 1px solid #334155; }
         .webview-footer .claim-btn { background: linear-gradient(135deg, #10b981, #059669); color: #fff; padding: 10px 30px; border: none; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; width: 100%; max-width: 300px; transition: all 0.3s ease; }
         .webview-footer .claim-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .video-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 99999; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .video-overlay.show { display: flex; }
-        .video-overlay .close-btn { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.1); border: none; color: #fff; font-size: 24px; padding: 10px 16px; border-radius: 10px; cursor: pointer; }
-        .video-overlay .video-container { width: 100%; max-width: 400px; background: #1e293b; border-radius: 20px; padding: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
-        .video-overlay .video-container .video-icon { font-size: 80px; color: #fbbf24; margin-bottom: 15px; }
-        .video-overlay .video-container .video-title { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 8px; }
-        .video-overlay .video-container .video-reward { font-size: 16px; color: #10b981; font-weight: 600; margin-bottom: 15px; }
-        .video-overlay .video-container .video-progress { font-size: 14px; color: #94a3b8; margin-bottom: 15px; }
-        .video-overlay .video-container .video-progress span { color: #fbbf24; font-weight: 700; }
-        .video-overlay .video-container .watch-btn { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; padding: 14px 40px; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; width: 100%; transition: all 0.3s ease; }
-        .video-overlay .video-container .watch-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .video-overlay .video-container .video-status { margin-top: 10px; font-size: 13px; color: #94a3b8; }
-        .video-overlay .video-container .video-status .done { color: #10b981; }
         .rules-text { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; font-size: 12px; color: #94a3b8; border: 1px solid rgba(255,255,255,0.05); }
         .rules-text strong { color: #fbbf24; }
         .rules-text .rule-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
@@ -243,8 +226,6 @@
         .network-overlay h2 { color: #fff; font-size: 22px; margin-bottom: 8px; }
         .network-overlay p { color: #94a3b8; font-size: 14px; }
         .network-overlay .retry-btn { margin-top: 20px; padding: 12px 30px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none; border-radius: 12px; color: #fff; font-weight: 700; font-size: 16px; cursor: pointer; }
-        .ad-cooldown { font-size: 12px; color: #94a3b8; margin-left: 6px; }
-        .mining-active-indicator { display: none; }
         .security-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9999999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; }
         .security-overlay.show { display: flex; }
         .security-overlay h1 { color: #ef4444; font-size: 28px; margin-bottom: 12px; }
@@ -417,7 +398,7 @@
             </div>
         </div>
 
-        <!-- ✅ DAILY BONUS (Header এর ঠিক নিচে) -->
+        <!-- ✅ DAILY BONUS -->
         <div class="daily-bonus" onclick="claimDailyBonus()">
             <div class="bonus-left">
                 <span>🎁</span>
@@ -444,7 +425,7 @@
                 </div>
             </div>
 
-            <!-- ✅ MINING BOOST (Speed Boost এর পাশে) -->
+            <!-- ✅ BOOST BUTTONS -->
             <div class="speed-btn-container">
                 <button class="speed-boost-btn" id="speedBoostBtn" onclick="activateSpeedBoost()"><i class="fas fa-rocket"></i> Speed Boost</button>
                 <button class="mining-boost-btn" id="miningBoostBtn" onclick="activateMiningBoost()"><i class="fas fa-bolt"></i> Mining Boost</button>
@@ -459,7 +440,7 @@
                 <div id="miningRulesText">Loading rules...</div>
             </div>
 
-            <!-- ✅ MYSTERY BOX (Home পেজের নিচে, Rules এর উপরে) -->
+            <!-- ✅ MYSTERY BOX -->
             <div class="mystery-box" onclick="openMysteryBox()">
                 <div class="box-left">
                     <span class="box-icon">🎁</span>
@@ -526,13 +507,58 @@
                     <div id="walletTotalUsd" style="font-size:18px;font-weight:bold;color:#10b981;">$0.000</div>
                 </div>
 
-                <!-- ✅ IN-APP PURCHASE (Withdraw এর উপরে) -->
+                <!-- ✅ ALL PAYMENT GATEWAYS -->
                 <div class="buy-coins-section">
                     <div class="buy-title">💳 Buy Coins</div>
-                    <button class="buy-coins-btn" onclick="buyCoins(1000)">🪙 Buy 1000 Coins ($0.99)</button>
-                    <button class="buy-coins-btn" onclick="buyCoins(5000)" style="margin-top:8px;">🪙 Buy 5000 Coins ($4.99)</button>
+                    <div class="payment-grid">
+                        <!-- Visa (Stripe Checkout) -->
+                        <div class="payment-card visa" onclick="buyWithVisa(1000, 0.99)">
+                            <div class="icon"><i class="fab fa-cc-visa"></i></div>
+                            <div class="name">Visa</div>
+                            <div class="desc">1000 Coins • $0.99</div>
+                        </div>
+                        <div class="payment-card visa" onclick="buyWithVisa(5000, 4.99)">
+                            <div class="icon"><i class="fab fa-cc-visa"></i></div>
+                            <div class="name">Visa</div>
+                            <div class="desc">5000 Coins • $4.99</div>
+                        </div>
+                        
+                        <!-- Telegram Stars (tg.openInvoice) -->
+                        <div class="payment-card stars" onclick="buyWithStars(1000, 1)">
+                            <div class="icon"><i class="fab fa-telegram"></i></div>
+                            <div class="name">⭐ Stars</div>
+                            <div class="desc">1000 Coins • 1⭐</div>
+                        </div>
+                        <div class="payment-card stars" onclick="buyWithStars(5000, 5)">
+                            <div class="icon"><i class="fab fa-telegram"></i></div>
+                            <div class="name">⭐ Stars</div>
+                            <div class="desc">5000 Coins • 5⭐</div>
+                        </div>
+                        
+                        <!-- bKash (Manual) -->
+                        <div class="payment-card bkash" onclick="buyManual('bKash')">
+                            <div class="icon"><i class="fas fa-mobile-alt"></i></div>
+                            <div class="name">bKash</div>
+                            <div class="desc">Manual Payment</div>
+                        </div>
+                        
+                        <!-- Nagad (Manual) -->
+                        <div class="payment-card nagad" onclick="buyManual('Nagad')">
+                            <div class="icon"><i class="fas fa-mobile-alt"></i></div>
+                            <div class="name">Nagad</div>
+                            <div class="desc">Manual Payment</div>
+                        </div>
+                        
+                        <!-- Rocket (Manual) -->
+                        <div class="payment-card rocket" onclick="buyManual('Rocket')">
+                            <div class="icon"><i class="fas fa-rocket"></i></div>
+                            <div class="name">Rocket</div>
+                            <div class="desc">Manual Payment</div>
+                        </div>
+                    </div>
                 </div>
 
+                <!-- WITHDRAW SECTION -->
                 <div class="withdraw-section">
                     <p id="withdrawInfo" style="font-weight:bold;color:#fbbf24;">Min: $10.000</p>
                     <div class="form-group"><label>Payment Method</label><div class="method-selector" id="methodSelector"></div></div>
@@ -548,7 +574,7 @@
             </div>
         </div>
 
-        <!-- ========== LEADERBOARD PAGE (NEW TAB) ========== -->
+        <!-- ========== LEADERBOARD PAGE ========== -->
         <div class="page" id="pageLeaderboard">
             <h2 class="page-header">🏆 Leaderboard</h2>
             <div style="display:flex; gap:10px; margin-bottom:12px;">
@@ -718,18 +744,17 @@
             xpPoints: NEGATIVE_XP, withdrawMethods: ['Nagad','Rocket'], 
             selectedMethod: 'Nagad', isBanned: false, banReason: '', 
             banAppealSubmitted: false, lastVideoWatchTime: 0,
-            dailyBonusClaimed: 0, // Store date string or timestamp
+            dailyBonusClaimed: 0,
             
             // Admin-controlled settings (fetched from DB)
             dailyBonusMin: 50,
             dailyBonusMax: 100,
-            miningBoostCoins: 20,
             miningBoostMin: 20,
             miningBoostMax: 50,
-            miningBoostDuration: 3600000, // 1 hour
+            miningBoostDuration: 3600000,
             mysteryBoxMin: 20,
             mysteryBoxMax: 100,
-            mysteryBoxDuration: 1800000 // 30 min
+            mysteryBoxDuration: 1800000
         };
         let tasks = [], conversionTimer = null, miningInterval = null, boostTimer = null, airdropTimer = null, 
             currentFilter = 'all', currentLevelFilter = 'all', levelConfigCache = {}, referralConfigCache = {};
@@ -1063,15 +1088,12 @@
         }
 
         // ============================================================
-        // ================== IN-APP PURCHASE ==========================
+        // ================== IN-APP PURCHASE (DEMO) ===================
         // ============================================================
         function buyCoins(amount) {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
-            // এখানে আপনি আপনার পেমেন্ট গেটওয়ে ইন্টিগ্রেট করতে পারেন (যেমন: Stripe, Paypal)
-            // বর্তমানে এটি ডেমো হিসেবে কাজ করছে
             const cost = amount === 1000 ? 0.99 : 4.99;
             if (confirm(`💳 Buy ${amount} Coins for $${cost}?`)) {
-                // সিমুলেট পেমেন্ট
                 app.balance += amount;
                 app.xpPoints += amount * 2;
                 userRef.update({ balance: app.balance, xpPoints: app.xpPoints });
@@ -1080,6 +1102,79 @@
                 document.getElementById('rewardText').textContent = `+${amount} Coins!`;
                 document.getElementById('successModal').classList.add('active');
             }
+        }
+
+        // ============================================================
+        // ================== PAYMENT GATEWAYS (ADMIN CONTROLLED) ======
+        // ============================================================
+
+        // ✅ 1. Visa (Stripe Checkout)
+        function buyWithVisa(coins, price) {
+            db.ref('paymentConfig/stripe/publishableKey').once('value', snap => {
+                const key = snap.val();
+                if (!key) {
+                    showToast('⚠️ Stripe not configured!', 'error');
+                    return;
+                }
+                const stripe = Stripe(key);
+                // এখানে আপনার ব্যাকএন্ড থেকে Checkout Session পেতে হবে
+                // ডেমো হিসেবে সরাসরি পেমেন্ট সিমুলেট করছি
+                if (confirm(`💳 Buy ${coins} Coins for $${price} with Visa?`)) {
+                    app.balance += coins;
+                    userRef.update({ balance: app.balance });
+                    updateUI();
+                    showToast(`✅ +${coins} Coins (Visa)`);
+                }
+            });
+        }
+
+        // ✅ 2. Telegram Stars (tg.openInvoice)
+        function buyWithStars(coins, stars) {
+            db.ref('paymentConfig/telegram/invoiceLink').once('value', snap => {
+                const invoiceLink = snap.val();
+                if (!invoiceLink) {
+                    showToast('⚠️ Telegram Stars not configured!', 'error');
+                    return;
+                }
+                if (typeof tg.openInvoice === 'function') {
+                    tg.openInvoice(invoiceLink, (result) => {
+                        if (result === 'paid') {
+                            app.balance += coins;
+                            userRef.update({ balance: app.balance });
+                            updateUI();
+                            showToast(`⭐ +${coins} Coins (Stars)`);
+                        } else {
+                            showToast('❌ Payment cancelled!', 'error');
+                        }
+                    });
+                } else {
+                    showToast('⚠️ Telegram Stars not available!', 'error');
+                }
+            });
+        }
+
+        // ✅ 3. bKash / Nagad / Rocket (Manual)
+        function buyManual(method) {
+            db.ref('paymentConfig/manualNumbers').once('value', snap => {
+                const numbers = snap.val() || {};
+                const number = numbers[method.toLowerCase()] || '017XXXXXXXX';
+                
+                const amount = prompt(`💰 Enter amount in BDT for ${method}:`);
+                if (!amount || isNaN(amount) || amount <= 0) {
+                    showToast('❌ Invalid amount!', 'error');
+                    return;
+                }
+                
+                const msg = `📲 Send ${amount} BDT to ${method}: ${number}\n\nAfter sending, please contact support for confirmation.`;
+                alert(msg);
+                
+                db.ref('manualPayments').push({
+                    userId, method, amount: parseFloat(amount),
+                    coins: Math.floor(parseFloat(amount) * 10),
+                    status: 'pending', timestamp: Date.now()
+                });
+                showToast(`📩 Payment request sent! Wait for admin confirmation.`);
+            });
         }
 
         // ============================================================
@@ -1221,16 +1316,22 @@
         // ================== ADMIN CONFIG LOADER ======================
         // ============================================================
         function loadAdminConfig() {
-            db.ref('adminConfig').on('value', snap => {
-                const config = snap.val() || {};
-                app.dailyBonusMin = config.dailyBonusMin || 50;
-                app.dailyBonusMax = config.dailyBonusMax || 100;
-                app.miningBoostMin = config.miningBoostMin || 20;
-                app.miningBoostMax = config.miningBoostMax || 50;
-                app.miningBoostDuration = config.miningBoostDuration || 3600000;
-                app.mysteryBoxMin = config.mysteryBoxMin || 20;
-                app.mysteryBoxMax = config.mysteryBoxMax || 100;
-                app.mysteryBoxDuration = config.mysteryBoxDuration || 1800000;
+            db.ref('config/dailyBonus').on('value', snap => {
+                const config = snap.val() || { min: 50, max: 100 };
+                app.dailyBonusMin = config.min || 50;
+                app.dailyBonusMax = config.max || 100;
+            });
+            db.ref('config/miningBoost').on('value', snap => {
+                const config = snap.val() || { min: 20, max: 50, duration: 3600000 };
+                app.miningBoostMin = config.min || 20;
+                app.miningBoostMax = config.max || 50;
+                app.miningBoostDuration = config.duration || 3600000;
+            });
+            db.ref('config/mysteryBox').on('value', snap => {
+                const config = snap.val() || { min: 20, max: 100, duration: 1800000 };
+                app.mysteryBoxMin = config.min || 20;
+                app.mysteryBoxMax = config.max || 100;
+                app.mysteryBoxDuration = config.duration || 1800000;
             });
         }
 
