@@ -18,6 +18,47 @@
         body { background: #0f172a; color: #e2e8f0; padding-bottom: 80px; min-height: 100vh; background: radial-gradient(circle at 20% 30%, #1e293b, #0f172a); }
         .container { max-width: 500px; margin: 0 auto; padding: 12px; }
         
+        /* ================== MAINTENANCE OVERLAY ================== */
+        #maintenanceOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 9999999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 24px;
+            text-align: center;
+        }
+        #maintenanceOverlay.show {
+            display: flex;
+        }
+        #maintenanceOverlay .icon {
+            font-size: 80px;
+            color: #fbbf24;
+            margin-bottom: 20px;
+            animation: pulse 1.5s infinite;
+        }
+        #maintenanceOverlay h1 {
+            color: #fbbf24;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        #maintenanceOverlay p {
+            color: #94a3b8;
+            font-size: 16px;
+            max-width: 400px;
+            line-height: 1.6;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
         /* ================== HEADER ================== */
         .header { background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); padding: 14px 18px; border-radius: 20px; margin-bottom: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
         .user-info { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
@@ -279,6 +320,7 @@
     </style>
 </head>
 <body>
+    <!-- ================== LOADING PAGE ================== -->
     <div id="loadingPage">
         <div class="loader-container">
             <div class="loader-ring"></div>
@@ -287,18 +329,29 @@
         </div>
     </div>
 
-    <!-- Overlays -->
+    <!-- ================== MAINTENANCE OVERLAY ================== -->
+    <div id="maintenanceOverlay">
+        <div class="icon"><i class="fas fa-tools"></i></div>
+        <h1>🔧 Under Maintenance</h1>
+        <p id="maintenanceMessage">We are currently updating the app. Please come back later.</p>
+    </div>
+
+    <!-- ================== SECURITY OVERLAY ================== -->
     <div class="security-overlay" id="securityOverlay">
         <h1>🚫 Security Alert</h1>
         <p>Unauthorized access detected! Please close Developer Tools to continue.</p>
         <button onclick="location.reload()">🔄 Reload Page</button>
     </div>
+
+    <!-- ================== NETWORK OVERLAY ================== -->
     <div class="network-overlay" id="networkOverlay">
         <div class="icon"><i class="fas fa-wifi"></i></div>
         <h2>🔌 No Internet Connection</h2>
         <p>Please check your network connection and try again.</p>
         <button class="retry-btn" onclick="checkNetworkAndReload()"><i class="fas fa-sync"></i> Retry</button>
     </div>
+
+    <!-- ================== BANNED OVERLAY ================== -->
     <div class="banned-overlay" id="bannedOverlay">
         <h1>🚫 Account Banned</h1>
         <p>Your account has been suspended.</p>
@@ -306,6 +359,8 @@
         <button class="appeal-btn" id="appealBtn" onclick="submitBanAppeal()">📩 Submit Appeal</button>
         <p id="appealStatus" style="display:none;"></p>
     </div>
+
+    <!-- ================== LEVEL OVERLAY ================== -->
     <div class="overlay" id="levelOverlay">
         <div class="overlay-header">
             <button class="back-btn" onclick="closeLevelPage()"><i class="fas fa-arrow-left"></i> Back</button>
@@ -332,6 +387,8 @@
             <div class="rules-text" style="margin-top:15px;"><div class="rule-title">📋 Level Rules</div><div id="levelRulesText">Loading rules...</div></div>
         </div>
     </div>
+
+    <!-- ================== AIRDROP OVERLAY ================== -->
     <div class="overlay" id="airdropOverlay">
         <div class="overlay-header">
             <button class="back-btn" onclick="closeAirdropPage()"><i class="fas fa-arrow-left"></i> Back</button>
@@ -346,6 +403,8 @@
             <div class="rules-text" style="margin-top:15px;"><div class="rule-title">📋 Airdrop Rules</div><div id="airdropRulesText">Loading rules...</div></div>
         </div>
     </div>
+
+    <!-- ================== WEBVIEW OVERLAY ================== -->
     <div class="webview-overlay" id="webviewOverlay">
         <div class="webview-header">
             <button class="back-btn" onclick="closeWebView()"><i class="fas fa-arrow-left"></i> Back</button>
@@ -764,6 +823,36 @@
         let isAdShowing = false;
 
         // ============================================================
+        // ================== MAINTENANCE MODE =========================
+        // ============================================================
+        function checkMaintenance() {
+            db.ref('maintenance').on('value', snap => {
+                const data = snap.val() || { enabled: false, message: 'We are currently updating the app. Please come back later.' };
+                const overlay = document.getElementById('maintenanceOverlay');
+                const mainContent = document.getElementById('mainContent');
+                const bottomNav = document.querySelector('.bottom-nav');
+                
+                if (data.enabled) {
+                    // Maintenance ON
+                    overlay.classList.add('show');
+                    document.getElementById('maintenanceMessage').textContent = data.message || 'We are currently updating the app. Please come back later.';
+                    mainContent.style.display = 'none';
+                    bottomNav.style.display = 'none';
+                    
+                    // Stop mining if active
+                    if (miningInterval) {
+                        stopMining();
+                    }
+                } else {
+                    // Maintenance OFF
+                    overlay.classList.remove('show');
+                    mainContent.style.display = 'block';
+                    bottomNav.style.display = 'flex';
+                }
+            });
+        }
+
+        // ============================================================
         // ================== SPIN WHEEL SYSTEM =======================
         // ============================================================
         const SPIN_COUNT_LIMIT = 20;
@@ -945,7 +1034,6 @@
                 showToast('✅ Already claimed today!', 'error');
                 return;
             }
-            // Admin থেকে সেট করা রেঞ্জ থেকে র্যান্ডম বোনাস
             const bonusAmount = app.dailyBonusMin + Math.floor(Math.random() * (app.dailyBonusMax - app.dailyBonusMin + 1));
             app.balance += bonusAmount;
             app.xpPoints += bonusAmount * 2;
@@ -978,7 +1066,6 @@
             btn.dataset.originalText = 'Mining Boost';
             
             showInterstitialAd(() => {
-                // Admin থেকে সেট করা রেঞ্জ থেকে র্যান্ডম বুস্ট
                 const boostAmount = app.miningBoostMin + Math.floor(Math.random() * (app.miningBoostMax - app.miningBoostMin + 1));
                 app.balance += boostAmount;
                 app.xpPoints += boostAmount * 2;
@@ -990,7 +1077,6 @@
                 });
                 updateUI(); updateLevelUI();
                 showToast(`🚀 Mining Boost: +${boostAmount} Coins!`);
-                // Boost button এ টাইমার দেখানো হবে
                 document.getElementById('boostCountdownBox').classList.add('show');
                 updateSpeedBoostUI();
             }, 'miningBoostBtn');
@@ -1014,7 +1100,6 @@
                 const rewardType = Math.random() > 0.5 ? 'coins' : 'usd';
                 let rewardCoins = 0, rewardUsd = 0;
                 if (rewardType === 'coins') {
-                    // Admin থেকে সেট করা রেঞ্জ
                     rewardCoins = app.mysteryBoxMin + Math.floor(Math.random() * (app.mysteryBoxMax - app.mysteryBoxMin + 1));
                     app.balance += rewardCoins;
                 } else {
@@ -1088,24 +1173,7 @@
         }
 
         // ============================================================
-        // ================== IN-APP PURCHASE (DEMO) ===================
-        // ============================================================
-        function buyCoins(amount) {
-            if (!isOnline) { showToast('No internet!', 'error'); return; }
-            const cost = amount === 1000 ? 0.99 : 4.99;
-            if (confirm(`💳 Buy ${amount} Coins for $${cost}?`)) {
-                app.balance += amount;
-                app.xpPoints += amount * 2;
-                userRef.update({ balance: app.balance, xpPoints: app.xpPoints });
-                updateUI(); updateLevelUI();
-                showToast(`🪙 +${amount} Coins!`);
-                document.getElementById('rewardText').textContent = `+${amount} Coins!`;
-                document.getElementById('successModal').classList.add('active');
-            }
-        }
-
-        // ============================================================
-        // ================== PAYMENT GATEWAYS (ADMIN CONTROLLED) ======
+        // ================== PAYMENT GATEWAYS ==========================
         // ============================================================
 
         // ✅ 1. Visa (Stripe Checkout)
@@ -1117,8 +1185,6 @@
                     return;
                 }
                 const stripe = Stripe(key);
-                // এখানে আপনার ব্যাকএন্ড থেকে Checkout Session পেতে হবে
-                // ডেমো হিসেবে সরাসরি পেমেন্ট সিমুলেট করছি
                 if (confirm(`💳 Buy ${coins} Coins for $${price} with Visa?`)) {
                     app.balance += coins;
                     userRef.update({ balance: app.balance });
@@ -1983,6 +2049,7 @@
             buildWheel();
             watchMiningCoins();
             loadAdminConfig(); // ✅ Admin config load
+            checkMaintenance(); // ✅ Maintenance Mode check
             
             db.ref('conversionRate').on('value', s => { app.conversionRate = s.val() || 1000; updateUI(); });
             loadLevelConfigFromDB();
@@ -2019,7 +2086,6 @@
                 document.getElementById('userName').textContent = savedName;
                 if (d.lastLogin) document.getElementById('lastLoginDisplay').textContent = `📅 ${new Date(d.lastLogin).toLocaleString()}`;
                 
-                // Update Daily Bonus status
                 const today = new Date().toDateString();
                 document.getElementById('dailyBonusStatus').textContent = app.dailyBonusClaimed === today ? '✅ Claimed' : '🎯 Claim Now';
                 
