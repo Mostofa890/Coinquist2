@@ -194,6 +194,33 @@
             color: #fbbf24;
         }
 
+        /* ================== NOTIFICATION BELL ================== */
+        .notification-bell {
+            position: relative;
+            cursor: pointer;
+            margin-left: auto;
+            color: #94a3b8;
+            transition: color 0.3s ease;
+        }
+        .notification-bell:hover {
+            color: #fbbf24;
+        }
+        .notification-bell .bell-icon {
+            font-size: 22px;
+        }
+        .notification-bell .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: #fff;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: 700;
+            display: none;
+        }
+
         /* ================== PAGES ================== */
         .page { display: none; min-height: 60vh; padding-top: 8px; }
         .page.active { display: block; }
@@ -210,105 +237,288 @@
         .task-card .task-progress { font-size: 11px; color: #94a3b8; margin-top: 4px; }
         .wallet-card { background: rgba(255,255,255,0.03); padding: 20px 16px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.08); }
         .wallet-card .wallet-balance { font-size: 36px; font-weight: 900; background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .withdraw-section { margin-top: 15px; padding: 15px; background: rgba(239,68,68,0.08); border-radius: 14px; border: 1px solid rgba(239,68,68,0.15); text-align: left; }
-        .withdraw-section .form-group { margin-bottom: 12px; }
-        .withdraw-section .form-group label { font-size: 12px; color: #94a3b8; margin-bottom: 5px; display: block; }
-        .withdraw-section .form-group input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #fff; font-size: 14px; outline: none; }
-        .withdraw-section .withdraw-btn { margin-top: 8px; padding: 12px 20px; background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; width: 100%; font-size: 15px; transition: all 0.3s ease; }
-        .withdraw-section .withdraw-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .history-card { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 12px; margin-top: 12px; max-height: 250px; overflow-y: auto; }
+        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px; }
 
-        /* ================== BUY COINS (bKash, Nagad, Rocket) ================== */
-        .buy-coins-section {
-            background: rgba(251,191,36,0.08);
-            border: 2px solid rgba(251,191,36,0.2);
-            border-radius: 16px;
-            padding: 16px;
+        /* ================== BUY COINS & SUBSCRIPTION (NEW DESIGN) ================== */
+        .buy-options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
             margin: 16px 0;
-            text-align: center;
         }
-        .buy-coins-section .buy-title { font-size: 14px; font-weight: 700; color: #fbbf24; margin-bottom: 10px; }
-        .payment-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .payment-card { background: rgba(255,255,255,0.05); padding: 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); text-align: center; cursor: pointer; transition: 0.3s; }
-        .payment-card:hover { background: rgba(255,255,255,0.08); transform: translateY(-2px); }
-        .payment-card .icon { font-size: 28px; margin-bottom: 4px; }
-        .payment-card .name { font-size: 13px; font-weight: 700; color: #fff; }
-        .payment-card .desc { font-size: 10px; color: #94a3b8; }
-        .payment-card.bkash { border-color: #d92b3a; }
-        .payment-card.nagad { border-color: #f05a28; }
-        .payment-card.rocket { border-color: #c5262c; }
-
-        /* ================== SUBSCRIPTION ================== */
-        .subscription-section {
-            background: rgba(16,185,129,0.08);
-            border: 2px solid rgba(16,185,129,0.2);
+        .buy-option-card {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
             border-radius: 16px;
-            padding: 16px;
-            margin: 16px 0;
+            border: 1px solid rgba(255,255,255,0.1);
             text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
-        .subscription-section .sub-title { font-size: 14px; font-weight: 700; color: #10b981; margin-bottom: 10px; }
-        .sub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .sub-card { background: rgba(255,255,255,0.05); padding: 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); text-align: center; cursor: pointer; transition: 0.3s; }
-        .sub-card:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); border-color: #10b981; }
-        .sub-card .sub-icon { font-size: 28px; margin-bottom: 4px; }
-        .sub-card .sub-name { font-size: 14px; font-weight: 700; color: #fff; }
-        .sub-card .sub-price { font-size: 12px; color: #10b981; }
-        .sub-card .sub-features { font-size: 11px; color: #94a3b8; margin-top: 4px; }
-
-        /* ================== LEVEL UPGRADE ================== */
-        .level-upgrade-section {
-            background: rgba(139,92,246,0.08);
-            border: 2px solid rgba(139,92,246,0.2);
-            border-radius: 16px;
-            padding: 16px;
-            margin-top: 16px;
-            text-align: center;
+        .buy-option-card:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-3px);
+            border-color: #fbbf24;
         }
-        .level-upgrade-section .upgrade-title { font-size: 14px; font-weight: 700; color: #8b5cf6; margin-bottom: 10px; }
-        .upgrade-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .upgrade-card { background: rgba(255,255,255,0.05); padding: 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); text-align: center; cursor: pointer; transition: 0.3s; }
-        .upgrade-card:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); border-color: #8b5cf6; }
-        .upgrade-card .upgrade-icon { font-size: 28px; margin-bottom: 4px; }
-        .upgrade-card .upgrade-level { font-size: 14px; font-weight: 700; color: #fff; }
-        .upgrade-card .upgrade-cost { font-size: 12px; color: #fbbf24; }
-        .upgrade-card .upgrade-bonus { font-size: 11px; color: #10b981; margin-top: 4px; }
+        .buy-option-card .option-icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+        .buy-option-card .option-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .buy-option-card .option-desc {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+        .buy-option-card .option-price {
+            font-size: 14px;
+            font-weight: 700;
+            color: #fbbf24;
+            margin-top: 8px;
+        }
+        .buy-option-card.coins {
+            border-color: rgba(251,191,36,0.2);
+        }
+        .buy-option-card.subscription {
+            border-color: rgba(16,185,129,0.2);
+        }
 
-        /* ================== LEADERBOARD ================== */
-        .leaderboard-item {
+        /* ================== PAYMENT MODAL (NEW FULL PAGE) ================== */
+        .payment-page-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 99999;
+            display: none;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .payment-page-overlay.show {
+            display: flex;
+        }
+        .payment-page-header {
+            background: rgba(15,23,42,0.95);
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 12px 16px;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .payment-page-header .back-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .payment-page-content {
+            padding: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .payment-summary {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+        .payment-summary .summary-title {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+        .payment-summary .summary-amount {
+            font-size: 28px;
+            font-weight: 900;
+            color: #fbbf24;
+        }
+        .payment-summary .summary-item {
+            font-size: 13px;
+            color: #10b981;
+            margin-top: 4px;
+        }
+        .payment-methods-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin: 16px 0;
+        }
+        .payment-method-btn {
+            background: rgba(255,255,255,0.05);
+            padding: 16px;
+            border-radius: 12px;
+            border: 2px solid #334155;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #94a3b8;
+        }
+        .payment-method-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .payment-method-btn.active {
+            border-color: #10b981;
+            background: rgba(16,185,129,0.15);
+            color: #10b981;
+        }
+        .payment-method-btn .method-icon {
+            font-size: 28px;
+            margin-bottom: 4px;
+        }
+        .payment-method-btn .method-name {
+            font-size: 13px;
+            font-weight: 700;
+        }
+        .payment-method-btn.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            border-color: #334155;
+        }
+        .payment-form {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-top: 16px;
+        }
+        .payment-form .form-group {
+            margin-bottom: 14px;
+        }
+        .payment-form .form-group label {
+            display: block;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .payment-form .form-group input {
+            width: 100%;
+            padding: 10px 14px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+        }
+        .payment-form .form-group input:focus {
+            border-color: #fbbf24;
+        }
+        .payment-form .form-group .number-display {
+            background: #1e293b;
+            padding: 10px 14px;
+            border-radius: 8px;
+            color: #fbbf24;
+            font-weight: 700;
+            font-size: 14px;
+            border: 1px solid #334155;
+        }
+        .payment-timer {
+            font-size: 28px;
+            font-weight: 900;
+            color: #fbbf24;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .payment-timer-label {
+            font-size: 12px;
+            color: #94a3b8;
+            text-align: center;
+        }
+        .payment-submit-btn {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #0f172a;
+            padding: 14px 30px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 900;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        .payment-submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .payment-history-section {
+            margin-top: 20px;
+        }
+        .payment-history-section h3 {
+            color: #fbbf24;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        /* ================== NOTIFICATION OVERLAY ================== */
+        .notification-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 99998;
+            display: none;
+            overflow-y: auto;
+            padding-bottom: 80px;
+        }
+        .notification-overlay.show {
+            display: block;
+        }
+        .notification-overlay-header {
+            background: rgba(15,23,42,0.95);
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .notification-overlay-header .back-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .notification-item {
             background: rgba(255,255,255,0.03);
             border-radius: 12px;
+            padding: 12px 16px;
             margin-bottom: 8px;
-            border: 1px solid rgba(255,255,255,0.06);
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
-        .leaderboard-item .rank { font-weight: 900; color: #fbbf24; min-width: 30px; }
-        .leaderboard-item .user { display: flex; align-items: center; gap: 10px; flex: 1; }
-        .leaderboard-item .user .avatar-small { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #3b82f6); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff; }
-        .leaderboard-item .score { color: #10b981; font-weight: 700; }
-        .leaderboard-item.top1 { background: rgba(251,191,36,0.15); border-color: #fbbf24; }
-        .leaderboard-item.top2 { background: rgba(192,192,192,0.1); border-color: #94a3b8; }
-        .leaderboard-item.top3 { background: rgba(205,127,50,0.1); border-color: #cd7f32; }
-
-        /* ================== BOTTOM NAV ================== */
-        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; background: rgba(15,23,42,0.95); backdrop-filter: blur(24px); display: flex; justify-content: space-around; padding: 10px 4px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; color: #64748b; font-size: 10px; cursor: pointer; flex: 1; }
-        .nav-item.active { color: #fbbf24; }
-        .nav-item i { font-size: 20px; }
-
-        /* ================== MODALS ================== */
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 9999; align-items: center; justify-content: center; }
-        .modal.active { display: flex; }
-        .modal-content { background: rgba(30,41,59,0.95); padding: 25px; border-radius: 20px; width: 90%; max-width: 350px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
-        .modal-content button { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; padding: 12px 30px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; margin-top: 15px; }
-
-        /* ================== TOAST ================== */
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #10b981; color: #fff; padding: 12px 24px; border-radius: 14px; font-weight: 700; z-index: 99999; display: none; font-size: 14px; }
-        .toast.show { display: block; animation: slideDown 0.4s ease; }
-        .toast.error { background: #ef4444; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-80px) translateX(-50%); } to { opacity: 1; transform: translateY(0) translateX(-50%); } }
+        .notification-item:hover {
+            background: rgba(255,255,255,0.06);
+        }
+        .notification-item.unread {
+            border-left: 3px solid #3b82f6;
+        }
+        .notification-item.read {
+            opacity: 0.7;
+        }
 
         /* ================== OVERLAYS ================== */
         .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9998; display: none; overflow-y: auto; padding-bottom: 70px; }
@@ -322,8 +532,6 @@
         .level-card.current { border: 2px solid #fbbf24; background: rgba(251,191,36,0.08); }
         .level-card.unlocked { border-color: rgba(16,185,129,0.3); }
         .level-card.locked { opacity: 0.4; }
-        .history-card { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 12px; margin-top: 12px; max-height: 250px; overflow-y: auto; }
-        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px; }
         .floating-coin { position: fixed; font-size: 30px; pointer-events: none; z-index: 1000; animation: floatUp 1s ease-out forwards; }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-150px) scale(0.5); } }
         .hidden { display: none !important; }
@@ -464,15 +672,8 @@
                 <div class="level-progress" style="margin-top:10px;"><div class="fill" id="lvlProgressFill" style="width:0%;"></div></div>
                 <div class="level-bonus" id="lvlBonus">Mining Bonus: +0%</div>
             </div>
-            <div class="level-filters">
-                <button class="lvl-filter-btn active" onclick="filterLevels('all',this)">All</button>
-                <button class="lvl-filter-btn" onclick="filterLevels('bronze',this)">🥉 Bronze</button>
-                <button class="lvl-filter-btn" onclick="filterLevels('silver',this)">🥈 Silver</button>
-                <button class="lvl-filter-btn" onclick="filterLevels('gold',this)">🥇 Gold</button>
-                <button class="lvl-filter-btn" onclick="filterLevels('platinum',this)">💎 Platinum</button>
-                <button class="lvl-filter-btn" onclick="filterLevels('diamond',this)">👑 Diamond</button>
-            </div>
-            <div class="level-grid" id="levelGrid"></div>
+            
+            <!-- ✅ LEVEL UPGRADE (উপরে) -->
             <div class="level-upgrade-section">
                 <div class="upgrade-title">🚀 Level Upgrade</div>
                 <div class="upgrade-grid">
@@ -502,6 +703,16 @@
                     </div>
                 </div>
             </div>
+
+            <div class="level-filters">
+                <button class="lvl-filter-btn active" onclick="filterLevels('all',this)">All</button>
+                <button class="lvl-filter-btn" onclick="filterLevels('bronze',this)">🥉 Bronze</button>
+                <button class="lvl-filter-btn" onclick="filterLevels('silver',this)">🥈 Silver</button>
+                <button class="lvl-filter-btn" onclick="filterLevels('gold',this)">🥇 Gold</button>
+                <button class="lvl-filter-btn" onclick="filterLevels('platinum',this)">💎 Platinum</button>
+                <button class="lvl-filter-btn" onclick="filterLevels('diamond',this)">👑 Diamond</button>
+            </div>
+            <div class="level-grid" id="levelGrid"></div>
             <div class="rules-text" style="margin-top:15px;"><div class="rule-title">📋 Level Rules</div><div id="levelRulesText">Loading rules...</div></div>
         </div>
     </div>
@@ -550,6 +761,11 @@
                     <h3 id="userName">User</h3>
                     <div class="last-login" id="lastLoginDisplay">📅 --</div>
                     <span class="level-badge" onclick="openLevelPage()" id="userLevelBadge">🔒 Unlocking</span>
+                </div>
+                <!-- ✅ NOTIFICATION BELL -->
+                <div class="notification-bell" onclick="openNotificationPanel()">
+                    <i class="fas fa-bell bell-icon"></i>
+                    <span class="badge" id="notifBadge">0</span>
                 </div>
             </div>
             <div class="balance-card">
@@ -684,90 +900,19 @@
                     <div id="walletTotalUsd" style="font-size:18px;font-weight:bold;color:#10b981;">$0.000</div>
                 </div>
 
-                <!-- ✅ BUY COINS (bKash, Nagad, Rocket) -->
-                <div class="buy-coins-section">
-                    <div class="buy-title">💳 Buy Coins</div>
-                    <div class="payment-grid">
-                        <div class="payment-card bkash" onclick="openPaymentModal('bKash', 100, 1000)">
-                            <div class="icon"><i class="fas fa-mobile-alt"></i></div>
-                            <div class="name">bKash</div>
-                            <div class="desc">১০০ BDT • ১০০০ Coins</div>
-                        </div>
-                        <div class="payment-card bkash" onclick="openPaymentModal('bKash', 500, 5500)">
-                            <div class="icon"><i class="fas fa-mobile-alt"></i></div>
-                            <div class="name">bKash</div>
-                            <div class="desc">৫০০ BDT • ৫৫০০ Coins</div>
-                        </div>
-                        <div class="payment-card nagad" onclick="openPaymentModal('Nagad', 100, 1000)">
-                            <div class="icon"><i class="fas fa-mobile-alt"></i></div>
-                            <div class="name">Nagad</div>
-                            <div class="desc">১০০ BDT • ১০০০ Coins</div>
-                        </div>
-                        <div class="payment-card nagad" onclick="openPaymentModal('Nagad', 500, 5500)">
-                            <div class="icon"><i class="fas fa-mobile-alt"></i></div>
-                            <div class="name">Nagad</div>
-                            <div class="desc">৫০০ BDT • ৫৫০০ Coins</div>
-                        </div>
-                        <div class="payment-card rocket" onclick="openPaymentModal('Rocket', 100, 1000)">
-                            <div class="icon"><i class="fas fa-rocket"></i></div>
-                            <div class="name">Rocket</div>
-                            <div class="desc">১০০ BDT • ১০০০ Coins</div>
-                        </div>
-                        <div class="payment-card rocket" onclick="openPaymentModal('Rocket', 500, 5500)">
-                            <div class="icon"><i class="fas fa-rocket"></i></div>
-                            <div class="name">Rocket</div>
-                            <div class="desc">৫০০ BDT • ৫৫০০ Coins</div>
-                        </div>
+                <!-- ✅ NEW DESIGN: Buy Coins & Subscription -->
+                <div class="buy-options-grid">
+                    <div class="buy-option-card coins" onclick="openPaymentPage('coins', 'Buy Coins', 100, 1000)">
+                        <div class="option-icon">🪙</div>
+                        <div class="option-title">Buy Coins</div>
+                        <div class="option-desc">Get 1000 Coins</div>
+                        <div class="option-price">১০০ BDT</div>
                     </div>
-                </div>
-
-                <!-- ✅ SUBSCRIPTION (bKash, Nagad, Rocket) -->
-                <div class="subscription-section">
-                    <div class="sub-title">⭐ Premium Subscription</div>
-                    <div class="sub-grid">
-                        <div class="sub-card" onclick="openPaymentModal('bKash', 499, 'subscription_monthly')">
-                            <div class="sub-icon">⭐</div>
-                            <div class="sub-name">মাসিক (bKash)</div>
-                            <div class="sub-price">৪৯৯ BDT/মাস</div>
-                            <div class="sub-features">✅ ২x মাইনিং স্পিড<br>✅ এক্সক্লুসিভ টাস্ক</div>
-                        </div>
-                        <div class="sub-card" onclick="openPaymentModal('Nagad', 499, 'subscription_monthly')">
-                            <div class="sub-icon">⭐</div>
-                            <div class="sub-name">মাসিক (Nagad)</div>
-                            <div class="sub-price">৪৯৯ BDT/মাস</div>
-                            <div class="sub-features">✅ ২x মাইনিং স্পিড<br>✅ এক্সক্লুসিভ টাস্ক</div>
-                        </div>
-                        <div class="sub-card" onclick="openPaymentModal('Rocket', 499, 'subscription_monthly')">
-                            <div class="sub-icon">⭐</div>
-                            <div class="sub-name">মাসিক (Rocket)</div>
-                            <div class="sub-price">৪৯৯ BDT/মাস</div>
-                            <div class="sub-features">✅ ২x মাইনিং স্পিড<br>✅ এক্সক্লুসিভ টাস্ক</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ✅ LEVEL UPGRADE (bKash, Nagad, Rocket) -->
-                <div class="level-upgrade-section" style="margin-top:16px;">
-                    <div class="upgrade-title">🚀 Level Upgrade</div>
-                    <div class="upgrade-grid">
-                        <div class="upgrade-card" onclick="openPaymentModal('bKash', 100, 'level2')">
-                            <div class="upgrade-icon">⬆️</div>
-                            <div class="upgrade-level">Level 2 (bKash)</div>
-                            <div class="upgrade-cost">১০০ BDT</div>
-                            <div class="upgrade-bonus">+৫% মাইনিং স্পিড</div>
-                        </div>
-                        <div class="upgrade-card" onclick="openPaymentModal('Nagad', 100, 'level2')">
-                            <div class="upgrade-icon">⬆️</div>
-                            <div class="upgrade-level">Level 2 (Nagad)</div>
-                            <div class="upgrade-cost">১০০ BDT</div>
-                            <div class="upgrade-bonus">+৫% মাইনিং স্পিড</div>
-                        </div>
-                        <div class="upgrade-card" onclick="openPaymentModal('Rocket', 100, 'level2')">
-                            <div class="upgrade-icon">⬆️</div>
-                            <div class="upgrade-level">Level 2 (Rocket)</div>
-                            <div class="upgrade-cost">১০০ BDT</div>
-                            <div class="upgrade-bonus">+৫% মাইনিং স্পিড</div>
-                        </div>
+                    <div class="buy-option-card subscription" onclick="openPaymentPage('subscription', 'Premium Subscription', 499, 'monthly')">
+                        <div class="option-icon">⭐</div>
+                        <div class="option-title">Premium Subscription</div>
+                        <div class="option-desc">2x Mining Speed</div>
+                        <div class="option-price">৪৯৯ BDT/মাস</div>
                     </div>
                 </div>
 
@@ -832,6 +977,66 @@
         </div>
     </div>
 
+    <!-- ✅ NOTIFICATION OVERLAY -->
+    <div class="notification-overlay" id="notificationOverlay">
+        <div class="notification-overlay-header">
+            <button class="back-btn" onclick="closeNotificationPanel()"><i class="fas fa-arrow-left"></i> Back</button>
+            <h2 style="color:#fff;">📨 Notifications</h2>
+        </div>
+        <div id="notificationList" style="padding:15px;">
+            <p style="color:#94a3b8;text-align:center;">Loading notifications...</p>
+        </div>
+    </div>
+
+    <!-- ✅ PAYMENT PAGE OVERLAY (NEW FULL PAGE) -->
+    <div class="payment-page-overlay" id="paymentPageOverlay">
+        <div class="payment-page-header">
+            <button class="back-btn" onclick="closePaymentPage()"><i class="fas fa-arrow-left"></i> Back</button>
+            <h2 style="color:#fff;" id="paymentPageTitle">🪙 Buy Coins</h2>
+        </div>
+        <div class="payment-page-content">
+            <div class="payment-summary">
+                <div class="summary-title">You are buying</div>
+                <div class="summary-amount" id="paymentPageAmount">১০০ BDT</div>
+                <div class="summary-item" id="paymentPageItem">1000 Coins</div>
+            </div>
+
+            <div class="payment-methods-grid" id="paymentMethodsGrid">
+                <div class="payment-method-btn" data-method="bKash" onclick="selectPaymentMethod('bKash')">
+                    <div class="method-icon"><i class="fas fa-mobile-alt"></i></div>
+                    <div class="method-name">bKash</div>
+                </div>
+                <div class="payment-method-btn" data-method="Nagad" onclick="selectPaymentMethod('Nagad')">
+                    <div class="method-icon"><i class="fas fa-mobile-alt"></i></div>
+                    <div class="method-name">Nagad</div>
+                </div>
+                <div class="payment-method-btn" data-method="Rocket" onclick="selectPaymentMethod('Rocket')">
+                    <div class="method-icon"><i class="fas fa-rocket"></i></div>
+                    <div class="method-name">Rocket</div>
+                </div>
+            </div>
+
+            <div class="payment-form">
+                <div class="form-group">
+                    <label>Send money to this number</label>
+                    <div class="number-display" id="paymentPageNumber">Select a method first</div>
+                </div>
+                <div class="form-group">
+                    <label>Transaction ID</label>
+                    <input type="text" id="paymentPageTxId" placeholder="Enter your transaction ID...">
+                </div>
+                <div class="payment-timer-label">⏳ You have 15 minutes to complete payment</div>
+                <div class="payment-timer" id="paymentPageTimer">15:00</div>
+                <button class="payment-submit-btn" id="paymentPageSubmitBtn" onclick="submitPaymentPage()">📤 Submit Payment</button>
+            </div>
+
+            <div class="payment-history-section">
+                <h3>📜 Payment History</h3>
+                <div id="paymentPageHistoryList"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- ============================================================ -->
     <!-- ================== BOTTOM NAV =============================== -->
     <!-- ============================================================ -->
@@ -848,31 +1053,6 @@
     <div class="modal" id="conversionModal"><div class="modal-content"><div style="font-size:50px;">💰</div><h3>Converted!</h3><p id="conversionText"></p><button onclick="closeModal('conversionModal')">OK</button></div></div>
     <div class="modal" id="withdrawModal"><div class="modal-content"><div style="font-size:50px;">💳</div><h3 id="withdrawModalTitle"></h3><p id="withdrawModalText"></p><button onclick="closeModal('withdrawModal')">OK</button></div></div>
     <div class="modal" id="airdropModal"><div class="modal-content"><div style="font-size:50px;">🎁</div><h3>Airdrop!</h3><p id="airdropModalText"></p><button onclick="closeModal('airdropModal')">OK</button></div></div>
-
-    <!-- ✅ PAYMENT MODAL (bKash, Nagad, Rocket) -->
-    <div class="modal" id="paymentModal">
-        <div class="modal-content">
-            <h3 id="paymentModalTitle">💳 Pay via bKash</h3>
-            <p id="paymentModalDesc" style="color:#94a3b8;font-size:13px;">Send money to: <span id="paymentNumber" style="color:#fbbf24;font-weight:bold;">017XXXXXXXX</span></p>
-            <div style="margin:15px 0;text-align:left;">
-                <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:12px;border:1px solid rgba(255,255,255,0.1);">
-                    <div style="font-size:12px;color:#94a3b8;">Amount to Pay</div>
-                    <div id="paymentAmount" style="font-size:24px;font-weight:900;color:#fbbf24;">১০০ BDT</div>
-                </div>
-                <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:12px;border:1px solid rgba(255,255,255,0.1);margin-top:10px;">
-                    <div style="font-size:12px;color:#94a3b8;">Transaction ID</div>
-                    <input type="text" id="transactionId" placeholder="Enter your transaction ID..." style="width:100%;padding:8px;background:#1e293b;border:1px solid #334155;border-radius:6px;color:#fff;font-size:14px;outline:none;margin-top:4px;">
-                </div>
-            </div>
-            <div id="paymentTimer" style="font-size:28px;font-weight:900;color:#fbbf24;margin:10px 0;">15:00</div>
-            <div style="font-size:12px;color:#94a3b8;">⏳ Please wait for admin approval (max 15 minutes)</div>
-            <div class="modal-buttons" style="margin-top:15px;">
-                <button class="btn btn-primary" onclick="submitTransaction()">📤 Submit</button>
-                <button class="btn btn-info" onclick="closeModal('paymentModal')">Cancel</button>
-            </div>
-        </div>
-    </div>
-
     <div class="toast" id="toast"></div>
 
     <script>
@@ -984,19 +1164,9 @@
             banAppealSubmitted: false, lastVideoWatchTime: 0,
             dailyBonusClaimed: 0,
             mysteryBoxCooldown: 0, 
-            
-            // ✅ New properties for Subscription & Level
-            subscription: null, // 'monthly', 'yearly', or null
-            subscriptionExpiry: 0,
             level: 1,
-            miningSpeed: 0, // Percentage bonus
-            
-            // Admin-controlled settings
-            dailyBonusMin: 50,
-            dailyBonusMax: 100,
-            mysteryBoxMin: 20,
-            mysteryBoxMax: 100,
-            mysteryBoxDuration: 1800000 // 30 minutes
+            miningSpeed: 0,
+            paymentHistory: []
         };
         let tasks = [], conversionTimer = null, miningInterval = null, boostTimer = null, airdropTimer = null, 
             currentFilter = 'all', currentLevelFilter = 'all', levelConfigCache = {}, referralConfigCache = {};
@@ -1004,6 +1174,17 @@
         let wasMiningBeforeOffline = false;
         let isAppHidden = false;
         let isAdShowing = false;
+
+        // Payment page state
+        let paymentPageData = {
+            type: 'coins',
+            amount: 0,
+            item: '',
+            method: '',
+            timerInterval: null,
+            timeout: null,
+            seconds: 15 * 60
+        };
 
         // ============================================================
         // ================== MAINTENANCE MODE =========================
@@ -1202,6 +1383,313 @@
         }
 
         // ============================================================
+        // ================== NOTIFICATION SYSTEM ======================
+        // ============================================================
+        let unreadCount = 0;
+
+        function listenNotifications() {
+            db.ref('notifications').orderByChild('createdAt').limitToLast(50).on('value', snap => {
+                if (!snap.exists()) return;
+                
+                const notifications = [];
+                snap.forEach(child => {
+                    const data = child.val();
+                    if (data.recipient === 'all' || data.recipientUserId === userId) {
+                        notifications.push({ id: child.key, ...data });
+                    }
+                });
+                
+                unreadCount = notifications.filter(n => !n.read).length;
+                updateNotificationBadge();
+                
+                if (document.getElementById('notificationOverlay').classList.contains('show')) {
+                    renderNotifications(notifications);
+                }
+            });
+            
+            // নতুন নোটিফিকেশন আসলে টোস্ট দেখানো
+            db.ref('notifications').orderByChild('createdAt').limitToLast(1).on('child_added', snap => {
+                const data = snap.val();
+                if (data.recipient === 'all' || data.recipientUserId === userId) {
+                    if (data.id !== 'first_load') {
+                        showToast(`${data.title || 'New Notification'}: ${data.message}`, data.type || 'info');
+                    }
+                }
+            });
+        }
+
+        function updateNotificationBadge() {
+            const badge = document.getElementById('notifBadge');
+            if (unreadCount > 0) {
+                badge.style.display = 'inline-block';
+                badge.textContent = unreadCount;
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        function openNotificationPanel() {
+            document.getElementById('notificationOverlay').classList.add('show');
+            loadNotifications();
+        }
+
+        function closeNotificationPanel() {
+            document.getElementById('notificationOverlay').classList.remove('show');
+        }
+
+        function loadNotifications() {
+            db.ref('notifications').orderByChild('createdAt').limitToLast(50).once('value', snap => {
+                if (!snap.exists()) {
+                    document.getElementById('notificationList').innerHTML = '<p style="color:#94a3b8;text-align:center;">No notifications</p>';
+                    return;
+                }
+                
+                const notifications = [];
+                snap.forEach(child => {
+                    const data = child.val();
+                    if (data.recipient === 'all' || data.recipientUserId === userId) {
+                        notifications.push({ id: child.key, ...data });
+                    }
+                });
+                
+                notifications.sort((a, b) => b.createdAt - a.createdAt);
+                renderNotifications(notifications);
+            });
+        }
+
+        function renderNotifications(notifications) {
+            const container = document.getElementById('notificationList');
+            
+            if (!notifications.length) {
+                container.innerHTML = '<p style="color:#94a3b8;text-align:center;">No notifications</p>';
+                return;
+            }
+            
+            container.innerHTML = notifications.map(notif => {
+                const isRead = notif.read || false;
+                const typeIcon = notif.type === 'success' ? '✅' :
+                                notif.type === 'warning' ? '⚠️' :
+                                notif.type === 'error' ? '❌' : 'ℹ️';
+                const time = notif.createdAt ? new Date(notif.createdAt).toLocaleString() : '';
+                
+                return `
+                    <div class="notification-item ${isRead ? 'read' : 'unread'}" onclick="markNotificationRead('${notif.id}')">
+                        <div style="display:flex;align-items:flex-start;gap:10px;">
+                            <div style="font-size:20px;">${typeIcon}</div>
+                            <div style="flex:1;">
+                                <div style="font-weight:600;color:#fff;">${notif.title || 'Notification'}</div>
+                                <div style="font-size:13px;color:#94a3b8;">${notif.message}</div>
+                                <div style="font-size:10px;color:#64748b;">${time}</div>
+                                ${notif.link ? `<a href="${notif.link}" style="color:#3b82f6;font-size:12px;display:inline-block;margin-top:4px;">🔗 View</a>` : ''}
+                            </div>
+                            ${!isRead ? '<span style="background:#3b82f6;width:8px;height:8px;border-radius:50%;display:inline-block;"></span>' : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function markNotificationRead(notifId) {
+            db.ref('notifications/' + notifId).update({ read: true });
+            loadNotifications();
+            listenNotifications();
+        }
+
+        // ============================================================
+        // ================== PAYMENT PAGE SYSTEM ======================
+        // ============================================================
+        function openPaymentPage(type, title, amount, item) {
+            // Load payment config (ON/OFF methods)
+            db.ref('paymentConfig/methods').once('value', snap => {
+                const methods = snap.val() || ['bKash', 'Nagad', 'Rocket'];
+                
+                // Load numbers
+                db.ref('paymentConfig/manualNumbers').once('value', numSnap => {
+                    const numbers = numSnap.val() || {};
+                    
+                    paymentPageData.type = type;
+                    paymentPageData.amount = amount;
+                    paymentPageData.item = item;
+                    paymentPageData.method = '';
+                    
+                    document.getElementById('paymentPageTitle').textContent = title;
+                    document.getElementById('paymentPageAmount').textContent = `${amount} BDT`;
+                    document.getElementById('paymentPageItem').textContent = type === 'coins' ? `${item} Coins` : `Subscription (${item})`;
+                    document.getElementById('paymentPageTxId').value = '';
+                    document.getElementById('paymentPageNumber').textContent = 'Select a method first';
+                    
+                    // Render methods
+                    const grid = document.getElementById('paymentMethodsGrid');
+                    grid.innerHTML = methods.map(m => `
+                        <div class="payment-method-btn ${!numbers[m.toLowerCase()] ? 'disabled' : ''}" data-method="${m}" onclick="${numbers[m.toLowerCase()] ? `selectPaymentMethod('${m}')` : ''}">
+                            <div class="method-icon"><i class="fas ${m === 'bKash' ? 'fa-mobile-alt' : m === 'Nagad' ? 'fa-mobile-alt' : 'fa-rocket'}"></i></div>
+                            <div class="method-name">${m}</div>
+                            ${!numbers[m.toLowerCase()] ? '<div style="font-size:8px;color:#ef4444;">OFF</div>' : ''}
+                        </div>
+                    `).join('');
+                    
+                    // Reset selection
+                    document.querySelectorAll('.payment-method-btn').forEach(el => el.classList.remove('active'));
+                    
+                    document.getElementById('paymentPageOverlay').classList.add('show');
+                    startPaymentPageTimer();
+                });
+            });
+        }
+
+        function closePaymentPage() {
+            document.getElementById('paymentPageOverlay').classList.remove('show');
+            if (paymentPageData.timerInterval) clearInterval(paymentPageData.timerInterval);
+            if (paymentPageData.timeout) clearTimeout(paymentPageData.timeout);
+        }
+
+        function selectPaymentMethod(method) {
+            db.ref('paymentConfig/manualNumbers').once('value', snap => {
+                const numbers = snap.val() || {};
+                const number = numbers[method.toLowerCase()] || 'Not configured';
+                
+                paymentPageData.method = method;
+                
+                document.querySelectorAll('.payment-method-btn').forEach(el => el.classList.remove('active'));
+                document.querySelector(`.payment-method-btn[data-method="${method}"]`).classList.add('active');
+                document.getElementById('paymentPageNumber').textContent = number;
+            });
+        }
+
+        function startPaymentPageTimer() {
+            if (paymentPageData.timerInterval) clearInterval(paymentPageData.timerInterval);
+            if (paymentPageData.timeout) clearTimeout(paymentPageData.timeout);
+            
+            paymentPageData.seconds = 15 * 60;
+            const timerDisplay = document.getElementById('paymentPageTimer');
+            
+            paymentPageData.timerInterval = setInterval(() => {
+                paymentPageData.seconds--;
+                if (paymentPageData.seconds <= 0) {
+                    clearInterval(paymentPageData.timerInterval);
+                    paymentPageData.timerInterval = null;
+                    timerDisplay.textContent = '00:00';
+                    showToast('⏰ Time expired! Please try again.', 'error');
+                    closePaymentPage();
+                    return;
+                }
+                const mins = Math.floor(paymentPageData.seconds / 60);
+                const secs = paymentPageData.seconds % 60;
+                timerDisplay.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            }, 1000);
+            
+            paymentPageData.timeout = setTimeout(() => {
+                clearInterval(paymentPageData.timerInterval);
+                paymentPageData.timerInterval = null;
+                closePaymentPage();
+                showToast('⏰ Time expired! Please try again.', 'error');
+            }, 15 * 60 * 1000);
+        }
+
+        function submitPaymentPage() {
+            const txId = document.getElementById('paymentPageTxId').value.trim();
+            if (!txId) {
+                showToast('⚠️ Please enter transaction ID!', 'error');
+                return;
+            }
+            if (!paymentPageData.method) {
+                showToast('⚠️ Please select a payment method!', 'error');
+                return;
+            }
+            
+            // Stop timer
+            if (paymentPageData.timerInterval) clearInterval(paymentPageData.timerInterval);
+            if (paymentPageData.timeout) clearTimeout(paymentPageData.timeout);
+            
+            // Create transaction request
+            const requestId = Date.now().toString();
+            const requestData = {
+                userId: userId,
+                username: displayName,
+                method: paymentPageData.method,
+                amount: paymentPageData.amount,
+                transactionId: txId,
+                type: paymentPageData.type,
+                coins: paymentPageData.type === 'coins' ? paymentPageData.item : 0,
+                plan: paymentPageData.type === 'subscription' ? paymentPageData.item : '',
+                level: paymentPageData.type === 'level' ? parseInt(paymentPageData.item) : 0,
+                status: 'pending',
+                requestedAt: Date.now(),
+                expiresAt: Date.now() + 15 * 60 * 1000
+            };
+            
+            // Save to Firebase
+            db.ref('paymentRequests/' + requestId).set(requestData);
+            
+            // Add to history
+            const historyEntry = {
+                id: requestId,
+                method: paymentPageData.method,
+                amount: paymentPageData.amount,
+                transactionId: txId,
+                type: paymentPageData.type,
+                item: paymentPageData.item,
+                status: 'pending',
+                requestedAt: Date.now()
+            };
+            
+            if (!app.paymentHistory) app.paymentHistory = [];
+            app.paymentHistory.unshift(historyEntry);
+            userRef.update({ paymentHistory: app.paymentHistory });
+            
+            // Close payment page
+            closePaymentPage();
+            
+            // Show success
+            showToast('📤 Transaction submitted! Waiting for admin approval...');
+            document.getElementById('rewardText').textContent = 'Waiting for admin approval...';
+            document.getElementById('successModal').classList.add('active');
+            
+            // Update history
+            updatePaymentHistoryUI();
+        }
+
+        function updatePaymentHistoryUI() {
+            const container = document.getElementById('paymentPageHistoryList');
+            const history = app.paymentHistory || [];
+            
+            if (!history.length) {
+                container.innerHTML = '<span style="color:#94a3b8;font-size:11px;">No history</span>';
+                return;
+            }
+            
+            container.innerHTML = history.slice(-20).reverse().map(h => {
+                let statusText = '';
+                let statusColor = '';
+                if (h.status === 'approved') {
+                    statusText = '✅ Approved';
+                    statusColor = '#10b981';
+                } else if (h.status === 'cancelled') {
+                    statusText = '❌ Cancelled';
+                    statusColor = '#ef4444';
+                    if (h.cancelReason) {
+                        statusText += `<div style="font-size:10px;color:#ef4444;">Reason: ${h.cancelReason}</div>`;
+                    }
+                } else {
+                    statusText = '⏳ Pending';
+                    statusColor = '#fbbf24';
+                }
+                
+                return `<div class="history-item">
+                    <div>
+                        <b>${h.method}</b> • ${h.amount} BDT
+                        <div style="font-size:10px;color:#94a3b8;">ID: ${h.transactionId}</div>
+                        <div style="font-size:10px;color:#94a3b8;">Type: ${h.type} ${h.item || ''}</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <span style="color:${statusColor};">${statusText}</span>
+                        <div style="font-size:9px;color:#94a3b8;">${new Date(h.requestedAt).toLocaleDateString()}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // ============================================================
         // ================== DAILY BONUS ==============================
         // ============================================================
         function claimDailyBonus() {
@@ -1265,13 +1753,11 @@
             const lid = document.getElementById('boxLid');
             const icon = document.getElementById('giftIcon');
             
-            // Animate box opening
             lid.classList.add('open');
             icon.className = 'gift-icon opened';
             icon.textContent = '✨';
             
             showRewardedAd(() => {
-                // ৫০% USD, ৫০% Coins
                 const rewardType = Math.random() > 0.5 ? 'usd' : 'coins';
                 let rewardCoins = 0, rewardUsd = 0;
                 
@@ -1279,15 +1765,12 @@
                     rewardCoins = app.mysteryBoxMin + Math.floor(Math.random() * (app.mysteryBoxMax - app.mysteryBoxMin + 1));
                     app.balance += rewardCoins;
                 } else {
-                    // ✅ USD: $0.002 - $0.008
                     rewardUsd = (Math.random() * 0.006 + 0.002).toFixed(3);
                     app.usdBalance += parseFloat(rewardUsd);
                 }
                 
                 app.xpPoints += (rewardCoins || parseFloat(rewardUsd) * 1000) * 2;
                 app.mysteryBoxCooldown = Date.now() + app.mysteryBoxDuration;
-                
-                // ✅ Firebase-এ কুলডাউন সেভ
                 userRef.update({
                     balance: app.balance,
                     usdBalance: app.usdBalance,
@@ -1302,7 +1785,6 @@
                 updateUI(); updateLevelUI();
                 updateMysteryBoxUI();
                 
-                // Close lid after 2 seconds
                 setTimeout(() => {
                     lid.classList.remove('open');
                     icon.className = 'gift-icon';
@@ -1335,8 +1817,8 @@
             
             showInterstitialAd(() => { 
                 const st = Date.now(); 
-                const totalBoostTime = 3000; // 3 seconds
-                const intervalTime = 100; 
+                const totalBoostTime = 3000;
+                const intervalTime = 100;
                 const maxCoins = 60, minCoins = 50;
                 let totalAdded = 0;
                 const targetCoins = Math.floor(Math.random() * (maxCoins - minCoins + 1)) + minCoins;
@@ -1383,190 +1865,32 @@
         }
 
         // ============================================================
-        // ================== PAYMENT MODAL (bKash, Nagad, Rocket) =====
+        // ================== LEVEL UPGRADE ============================
         // ============================================================
-        let paymentData = {
-            method: '',
-            amount: 0,
-            coins: 0,
-            type: 'coins', // 'coins', 'subscription', 'level'
-            plan: '',
-            level: 0
-        };
-        let paymentTimerInterval = null;
-        let paymentTimeout = null;
-
-        function openPaymentModal(method, amount, item) {
+        function upgradeLevel(targetLevel, cost) {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
-            
-            // Load admin payment number
-            db.ref('paymentConfig/manualNumbers').once('value', snap => {
-                const numbers = snap.val() || {};
-                let number = '';
-                if (method === 'bKash') number = numbers.bkash || '017XXXXXXXX';
-                else if (method === 'Nagad') number = numbers.nagad || '017XXXXXXXX';
-                else if (method === 'Rocket') number = numbers.rocket || '017XXXXXXXX';
-                
-                document.getElementById('paymentNumber').textContent = number;
-                document.getElementById('paymentModalTitle').textContent = `💳 Pay via ${method}`;
-                document.getElementById('paymentAmount').textContent = `${amount} BDT`;
-                document.getElementById('transactionId').value = '';
-                
-                // Determine what the user is buying
-                let type = 'coins';
-                let coins = 0;
-                let plan = '';
-                let level = 0;
-                
-                if (typeof item === 'number') {
-                    type = 'coins';
-                    coins = item;
-                } else if (item === 'subscription_monthly') {
-                    type = 'subscription';
-                    plan = 'monthly';
-                } else if (item === 'subscription_yearly') {
-                    type = 'subscription';
-                    plan = 'yearly';
-                } else if (item.startsWith('level')) {
-                    type = 'level';
-                    level = parseInt(item.replace('level', ''));
-                }
-                
-                paymentData = { method, amount, coins, type, plan, level };
-                
-                // Show modal
-                document.getElementById('paymentModal').classList.add('active');
-                startPaymentTimer();
-            });
-        }
-
-        function startPaymentTimer() {
-            // Clear any existing timer
-            if (paymentTimerInterval) clearInterval(paymentTimerInterval);
-            if (paymentTimeout) clearTimeout(paymentTimeout);
-            
-            let seconds = 15 * 60; // 15 minutes
-            const timerDisplay = document.getElementById('paymentTimer');
-            
-            paymentTimerInterval = setInterval(() => {
-                seconds--;
-                if (seconds <= 0) {
-                    clearInterval(paymentTimerInterval);
-                    paymentTimerInterval = null;
-                    timerDisplay.textContent = '00:00';
-                    showToast('⏰ Time expired! Please try again.', 'error');
-                    closeModal('paymentModal');
-                    return;
-                }
-                const mins = Math.floor(seconds / 60);
-                const secs = seconds % 60;
-                timerDisplay.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-            }, 1000);
-            
-            // Auto-close after 15 minutes
-            paymentTimeout = setTimeout(() => {
-                clearInterval(paymentTimerInterval);
-                paymentTimerInterval = null;
-                closeModal('paymentModal');
-                showToast('⏰ Time expired! Please try again.', 'error');
-            }, 15 * 60 * 1000);
-        }
-
-        function submitTransaction() {
-            const txId = document.getElementById('transactionId').value.trim();
-            if (!txId) {
-                showToast('⚠️ Please enter transaction ID!', 'error');
+            if (app.balance < cost) {
+                showToast(`❌ Need ${cost} coins!`, 'error');
                 return;
             }
-            
-            // Stop timer
-            if (paymentTimerInterval) clearInterval(paymentTimerInterval);
-            if (paymentTimeout) clearTimeout(paymentTimeout);
-            
-            // Create transaction request
-            const requestId = Date.now().toString();
-            const requestData = {
-                userId: userId,
-                username: displayName,
-                method: paymentData.method,
-                amount: paymentData.amount,
-                transactionId: txId,
-                type: paymentData.type,
-                coins: paymentData.coins,
-                plan: paymentData.plan,
-                level: paymentData.level,
-                status: 'pending',
-                requestedAt: Date.now(),
-                expiresAt: Date.now() + 15 * 60 * 1000 // 15 minutes expiry
-            };
-            
-            // Save to Firebase
-            db.ref('paymentRequests/' + requestId).set(requestData);
-            
-            // Add to user history
-            const historyEntry = {
-                id: requestId,
-                method: paymentData.method,
-                amount: paymentData.amount,
-                transactionId: txId,
-                type: paymentData.type,
-                status: 'pending',
-                requestedAt: Date.now()
-            };
-            
-            if (!app.paymentHistory) app.paymentHistory = [];
-            app.paymentHistory.unshift(historyEntry);
-            userRef.update({ paymentHistory: app.paymentHistory });
-            
-            // Close modal
-            closeModal('paymentModal');
-            
-            // Show waiting message
-            showToast('📤 Transaction submitted! Waiting for admin approval...');
-            document.getElementById('rewardText').textContent = 'Waiting for admin approval...';
-            document.getElementById('successModal').classList.add('active');
-            
-            // Update history UI
-            updatePaymentHistoryUI();
-        }
-
-        function updatePaymentHistoryUI() {
-            const container = document.getElementById('withdrawHistoryList');
-            const history = app.paymentHistory || [];
-            
-            if (!history.length) {
-                container.innerHTML = '<span style="color:#94a3b8;font-size:11px;">No history</span>';
+            if (app.level >= targetLevel) {
+                showToast('✅ Already at this level!', 'error');
                 return;
             }
-            
-            container.innerHTML = history.slice(-20).reverse().map(h => {
-                let statusText = '';
-                let statusColor = '';
-                if (h.status === 'approved') {
-                    statusText = '✅ Approved';
-                    statusColor = '#10b981';
-                } else if (h.status === 'cancelled') {
-                    statusText = '❌ Cancelled';
-                    statusColor = '#ef4444';
-                    if (h.cancelReason) {
-                        statusText += `<div style="font-size:10px;color:#ef4444;">Reason: ${h.cancelReason}</div>`;
-                    }
-                } else {
-                    statusText = '⏳ Pending';
-                    statusColor = '#fbbf24';
-                }
-                
-                return `<div class="history-item">
-                    <div>
-                        <b>${h.method}</b> • ${h.amount} BDT
-                        <div style="font-size:10px;color:#94a3b8;">ID: ${h.transactionId}</div>
-                    </div>
-                    <div style="text-align:right;">
-                        <span style="color:${statusColor};">${statusText}</span>
-                        <div style="font-size:9px;color:#94a3b8;">${new Date(h.requestedAt).toLocaleDateString()}</div>
-                    </div>
-                </div>`;
-            }).join('');
+            if (confirm(`🪙 Spend ${cost} coins to upgrade to Level ${targetLevel}?`)) {
+                app.balance -= cost;
+                app.level = targetLevel;
+                app.miningSpeed += (targetLevel - 1) * 5;
+                userRef.update({
+                    balance: app.balance,
+                    level: app.level,
+                    miningSpeed: app.miningSpeed
+                });
+                showToast(`🎉 Upgraded to Level ${targetLevel}!`);
+                updateUI(); updateLevelUI();
+                document.getElementById('rewardText').textContent = `Level ${targetLevel}!`;
+                document.getElementById('successModal').classList.add('active');
+            }
         }
 
         // ============================================================
@@ -1635,15 +1959,7 @@
                 if (app.progressCoins <= 0) { stopMining(); showToast('🎉 Coins finished!', 'success'); updateProgressUI(); return; }
                 const d = calculateLevel(app.xpPoints);
                 let speedMultiplier = 1 + (d.bonusPercent / 100);
-                
-                // ✅ Check subscription bonus
-                if (app.subscription && app.subscriptionExpiry > Date.now()) {
-                    speedMultiplier *= 2; // 2x speed for premium users
-                }
-                
-                // ✅ Check level bonus
                 speedMultiplier += app.miningSpeed / 100;
-                
                 const ca = speedMultiplier;
                 
                 app.progressCoins -= 1;
@@ -2184,11 +2500,6 @@
             document.getElementById('totalBalanceDisplay').textContent = `${app.balance.toLocaleString()} + $${app.usdBalance.toFixed(3)}`;
             updateWithdrawUI(); updateSpeedBoostUI(); startConversionTimer();
             updatePaymentHistoryUI();
-            
-            // Subscription status
-            if (app.subscription && app.subscriptionExpiry > Date.now()) {
-                document.getElementById('userLevelBadge').textContent += ' ⭐';
-            }
         }
 
         function updateProgressUI() { 
@@ -2385,10 +2696,6 @@
                 app.airdropClaimed = d.airdropClaimed || false;
                 app.dailyBonusClaimed = d.dailyBonusClaimed || '';
                 app.paymentHistory = d.paymentHistory || [];
-                
-                // ✅ Load Subscription & Level data
-                app.subscription = d.subscription || null;
-                app.subscriptionExpiry = d.subscriptionExpiry || 0;
                 app.level = d.level || 1;
                 app.miningSpeed = d.miningSpeed || 0;
 
@@ -2404,7 +2711,6 @@
                 const today = new Date().toDateString();
                 document.getElementById('dailyBonusStatus').textContent = app.dailyBonusClaimed === today ? '✅ Claimed' : '🎯 Claim Now';
                 
-                // ✅ Update Mystery Box UI
                 updateMysteryBoxUI();
                 
                 if (!d.balance && d.xpPoints === undefined) {
@@ -2457,7 +2763,7 @@
                 } 
             });
             
-            // ✅ Listen for payment request updates
+            // Listen for payment request updates
             db.ref('paymentRequests').orderByChild('userId').equalTo(userId).on('child_changed', snap => {
                 const data = snap.val();
                 if (data && app.paymentHistory) {
@@ -2468,13 +2774,11 @@
                             app.paymentHistory[index].cancelReason = data.cancelReason;
                         }
                         if (data.status === 'approved') {
-                            // ✅ Activate the purchase
                             if (data.type === 'coins') {
                                 app.balance += data.coins || 0;
                             } else if (data.type === 'subscription') {
-                                const expiry = data.plan === 'monthly' ? Date.now() + 30*24*60*60*1000 : Date.now() + 365*24*60*60*1000;
-                                app.subscription = data.plan;
-                                app.subscriptionExpiry = expiry;
+                                app.subscription = data.plan || 'monthly';
+                                app.subscriptionExpiry = Date.now() + 30*24*60*60*1000;
                             } else if (data.type === 'level') {
                                 app.level = data.level || 1;
                                 app.miningSpeed += (data.level - 1) * 5;
