@@ -492,7 +492,6 @@
                 <div class="level-bonus" id="lvlBonus">Mining Bonus: +0%</div>
             </div>
             
-            <!-- ✅ LEVEL UPGRADE (উপরে) -->
             <div class="level-upgrade-section">
                 <div class="upgrade-title">🚀 Level Upgrade</div>
                 <div class="upgrade-grid">
@@ -581,7 +580,6 @@
                     <div class="last-login" id="lastLoginDisplay">📅 --</div>
                     <span class="level-badge" onclick="openLevelPage()" id="userLevelBadge">🔒 Unlocking</span>
                 </div>
-                <!-- ✅ NOTIFICATION BELL -->
                 <div class="notification-bell" onclick="openNotificationPanel()">
                     <i class="fas fa-bell bell-icon"></i>
                     <span class="badge" id="notifBadge">0</span>
@@ -1188,15 +1186,18 @@
                     isAdShowing = false;
                     const prize = getPrizeByAngle(currentRotation);
                     let rewardCoins = 0, rewardUsd = 0;
+                    
                     if (prize.type === 'coins') {
                         rewardCoins = prize.value;
+                        // ✅ কয়েন পেলে মাইনিং কয়েনে যোগ হবে (progressCoins)
                         const newCoins = app.progressCoins + rewardCoins;
                         if (newCoins > TOTAL_COINS) rewardCoins = Math.max(0, TOTAL_COINS - app.progressCoins);
+                        if (rewardCoins > 0) app.progressCoins += rewardCoins;
                     } else if (prize.type === 'usd') {
                         rewardUsd = prize.value;
+                        // ✅ USD পেলে USD ব্যালেন্সে যোগ হবে
+                        if (rewardUsd > 0) app.usdBalance += rewardUsd;
                     }
-                    if (rewardCoins > 0) app.progressCoins += rewardCoins;
-                    if (rewardUsd > 0) app.usdBalance += rewardUsd;
 
                     spinCount--;
                     document.getElementById('spinBadge').textContent = spinCount;
@@ -1204,13 +1205,18 @@
                     updateSpinModalUI();
 
                     let resultText = '';
-                    if (rewardCoins > 0) resultText += `+${rewardCoins} Coins!`;
+                    if (rewardCoins > 0) resultText += `+${rewardCoins} Mining Coins!`;
                     if (rewardUsd > 0) resultText += `+$${rewardUsd.toFixed(3)} USD!`;
                     if (resultText === '') resultText = 'Better luck next time!';
                     document.getElementById('rewardText').textContent = resultText;
                     document.getElementById('successModal').classList.add('active');
 
-                    userRef.update({ progressCoins: app.progressCoins, usdBalance: app.usdBalance, spinCount: spinCount });
+                    // ✅ Firebase আপডেট
+                    userRef.update({ 
+                        progressCoins: app.progressCoins, 
+                        usdBalance: app.usdBalance, 
+                        spinCount: spinCount 
+                    });
                     updateUI(); updateProgressUI(); updateLevelUI();
                     isSpinning = false;
                     showToast(`🎰 Spin result: ${prize.label}`);
@@ -1218,7 +1224,6 @@
                 .catch(() => {
                     isAdShowing = false;
                     btn.disabled = false;
-                    btn.textContent = '🎡 SPIN';
                     isSpinning = false;
                     document.getElementById('modalSpinResult').textContent = '⚠️ Ad not watched! Try again.';
                     showToast('⚠️ Please watch the ad to get reward!', 'error');
@@ -1492,40 +1497,27 @@
             let seconds = 15 * 60;
             const timerDisplay = document.getElementById('paymentTimer');
             
-            db.ref('paymentTimers/' + userId).once('value', snap => {
-                const saved = snap.val();
-                if (saved && saved.expiresAt > Date.now()) {
-                    seconds = Math.floor((saved.expiresAt - Date.now()) / 1000);
-                }
-            }).then(() => {
-                paymentTimerInterval = setInterval(() => {
-                    seconds--;
-                    if (seconds <= 0) {
-                        clearInterval(paymentTimerInterval);
-                        paymentTimerInterval = null;
-                        timerDisplay.textContent = '00:00';
-                        showToast('⏰ Time expired! Please try again.', 'error');
-                        closeModal('paymentModal');
-                        db.ref('paymentTimers/' + userId).remove();
-                        return;
-                    }
-                    const mins = Math.floor(seconds / 60);
-                    const secs = seconds % 60;
-                    timerDisplay.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-                    
-                    db.ref('paymentTimers/' + userId).set({
-                        expiresAt: Date.now() + seconds * 1000
-                    });
-                }, 1000);
-                
-                paymentTimeout = setTimeout(() => {
+            paymentTimerInterval = setInterval(() => {
+                seconds--;
+                if (seconds <= 0) {
                     clearInterval(paymentTimerInterval);
                     paymentTimerInterval = null;
-                    closeModal('paymentModal');
-                    db.ref('paymentTimers/' + userId).remove();
+                    timerDisplay.textContent = '00:00';
                     showToast('⏰ Time expired! Please try again.', 'error');
-                }, 15 * 60 * 1000);
-            });
+                    closeModal('paymentModal');
+                    return;
+                }
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                timerDisplay.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            }, 1000);
+            
+            paymentTimeout = setTimeout(() => {
+                clearInterval(paymentTimerInterval);
+                paymentTimerInterval = null;
+                closeModal('paymentModal');
+                showToast('⏰ Time expired! Please try again.', 'error');
+            }, 15 * 60 * 1000);
         }
 
         function submitTransaction() {
@@ -1537,7 +1529,6 @@
             
             if (paymentTimerInterval) clearInterval(paymentTimerInterval);
             if (paymentTimeout) clearTimeout(paymentTimeout);
-            db.ref('paymentTimers/' + userId).remove();
             
             const requestId = Date.now().toString();
             const requestData = {
