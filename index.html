@@ -16,7 +16,11 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', -apple-system, sans-serif; }
         body { background: #0f172a; color: #e2e8f0; padding-bottom: 80px; min-height: 100vh; background: radial-gradient(circle at 20% 30%, #1e293b, #0f172a); }
         .container { max-width: 500px; margin: 0 auto; padding: 12px; }
-        
+        .page { display: none; min-height: 60vh; padding-top: 8px; }
+        .page.active { display: block; }
+        .page-header { font-size: 20px; font-weight: 800; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hidden { display: none !important; }
+
         /* ================== MAINTENANCE OVERLAY ================== */
         #maintenanceOverlay {
             position: fixed;
@@ -50,9 +54,36 @@
         .balance-label { font-size: 11px; color: #94a3b8; }
         .balance-amount { font-size: 32px; font-weight: 900; background: linear-gradient(to right, #fcd34d, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .usd-value { color: #10b981; font-size: 15px; font-weight: bold; }
+        .level-section { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 14px; margin-top: 8px; cursor: pointer; }
+        .level-section .level-row { display: flex; justify-content: space-between; align-items: center; }
+        .level-progress { width: 100%; height: 5px; background: rgba(255,255,255,0.1); border-radius: 5px; margin-top: 6px; overflow: hidden; }
+        .level-progress .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 5px; transition: width 0.5s ease; }
         .conversion-timer { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.15); border-radius: 12px; padding: 10px; margin-top: 10px; }
         .conversion-timer .label { font-size: 10px; color: #94a3b8; }
         .conversion-timer .time { font-size: 16px; font-weight: bold; color: #10b981; }
+
+        /* ================== NOTIFICATION BELL ================== */
+        .notification-bell {
+            position: relative;
+            cursor: pointer;
+            margin-left: auto;
+            color: #94a3b8;
+            transition: color 0.3s ease;
+        }
+        .notification-bell:hover { color: #fbbf24; }
+        .notification-bell .bell-icon { font-size: 22px; }
+        .notification-bell .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: #fff;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: 700;
+            display: none;
+        }
 
         /* ================== DAILY BONUS ================== */
         .daily-bonus {
@@ -106,12 +137,10 @@
         .mystery-box-container {
             position: relative;
             width: 100%;
-            padding-bottom: 100%; /* 1:1 Ratio */
+            padding-bottom: 100%;
             transition: transform 0.3s ease;
         }
-        .mystery-box-container:hover {
-            transform: scale(1.02);
-        }
+        .mystery-box-container:hover { transform: scale(1.02); }
         .mystery-box-container .box-lid {
             position: absolute;
             top: 0;
@@ -130,9 +159,7 @@
             font-size: 40px;
             box-shadow: 0 -4px 15px rgba(236,72,153,0.3);
         }
-        .mystery-box-container .box-lid.open {
-            transform: rotateX(-120deg);
-        }
+        .mystery-box-container .box-lid.open { transform: rotateX(-120deg); }
         .mystery-box-container .box-body {
             position: absolute;
             bottom: 0;
@@ -153,14 +180,8 @@
             font-size: 60px;
             animation: pulseBox 1.5s infinite;
         }
-        @keyframes pulseBox {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        .mystery-box-container .box-body .gift-icon.opened {
-            animation: none;
-            font-size: 40px;
-        }
+        @keyframes pulseBox { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        .mystery-box-container .box-body .gift-icon.opened { animation: none; font-size: 40px; }
         .mystery-box-container .box-shine {
             position: absolute;
             top: -10%;
@@ -172,59 +193,12 @@
             z-index: 3;
             animation: shine 3s infinite;
         }
-        @keyframes shine {
-            0% { opacity: 0.3; transform: scale(0.8); }
-            50% { opacity: 1; transform: scale(1.1); }
-            100% { opacity: 0.3; transform: scale(0.8); }
-        }
-        .mystery-box-wrapper .box-label {
-            margin-top: 12px;
-            font-size: 16px;
-            font-weight: 700;
-            color: #fbbf24;
-        }
-        .mystery-box-wrapper .box-timer {
-            margin-top: 8px;
-            font-size: 20px;
-            font-weight: 900;
-            color: #10b981;
-            min-height: 30px;
-        }
-        .mystery-box-wrapper .box-timer.cooldown {
-            color: #fbbf24;
-        }
+        @keyframes shine { 0% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.3; transform: scale(0.8); } }
+        .mystery-box-wrapper .box-label { margin-top: 12px; font-size: 16px; font-weight: 700; color: #fbbf24; }
+        .mystery-box-wrapper .box-timer { margin-top: 8px; font-size: 20px; font-weight: 900; color: #10b981; min-height: 30px; }
+        .mystery-box-wrapper .box-timer.cooldown { color: #fbbf24; }
 
-        /* ================== NOTIFICATION BELL ================== */
-        .notification-bell {
-            position: relative;
-            cursor: pointer;
-            margin-left: auto;
-            color: #94a3b8;
-            transition: color 0.3s ease;
-        }
-        .notification-bell:hover {
-            color: #fbbf24;
-        }
-        .notification-bell .bell-icon {
-            font-size: 22px;
-        }
-        .notification-bell .badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #ef4444;
-            color: #fff;
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 10px;
-            font-weight: 700;
-            display: none;
-        }
-
-        /* ================== PAGES ================== */
-        .page { display: none; min-height: 60vh; padding-top: 8px; }
-        .page.active { display: block; }
-        .page-header { font-size: 20px; font-weight: 800; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        /* ================== TASKS ================== */
         .task-filters { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; }
         .task-filters .filter-btn { padding: 5px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #94a3b8; cursor: pointer; font-size: 11px; white-space: nowrap; }
         .task-filters .filter-btn.active { background: linear-gradient(135deg, #8b5cf6, #3b82f6); border-color: transparent; color: #fff; }
@@ -235,66 +209,23 @@
         .task-card .task-btn { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; padding: 6px 18px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 12px; transition: all 0.3s ease; }
         .task-card .task-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .task-card .task-progress { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+
+        /* ================== WALLET & PAYMENT ================== */
         .wallet-card { background: rgba(255,255,255,0.03); padding: 20px 16px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.08); }
         .wallet-card .wallet-balance { font-size: 36px; font-weight: 900; background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .withdraw-section { margin-top: 15px; padding: 15px; background: rgba(239,68,68,0.08); border-radius: 14px; border: 1px solid rgba(239,68,68,0.15); text-align: left; }
-        .withdraw-section .form-group { margin-bottom: 12px; }
-        .withdraw-section .form-group label { font-size: 12px; color: #94a3b8; margin-bottom: 5px; display: block; }
-        .withdraw-section .form-group input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #fff; font-size: 14px; outline: none; }
-        .withdraw-section .withdraw-btn { margin-top: 8px; padding: 12px 20px; background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; width: 100%; font-size: 15px; transition: all 0.3s ease; }
-        .withdraw-section .withdraw-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .history-card { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 12px; margin-top: 12px; max-height: 250px; overflow-y: auto; }
         .history-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px; }
+        .buy-options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+        .buy-option-card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); text-align: center; cursor: pointer; transition: all 0.3s ease; }
+        .buy-option-card:hover { background: rgba(255,255,255,0.1); transform: translateY(-3px); border-color: #fbbf24; }
+        .buy-option-card .option-icon { font-size: 40px; margin-bottom: 8px; }
+        .buy-option-card .option-title { font-size: 16px; font-weight: 700; color: #fff; }
+        .buy-option-card .option-desc { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+        .buy-option-card .option-price { font-size: 14px; font-weight: 700; color: #fbbf24; margin-top: 8px; }
+        .buy-option-card.coins { border-color: rgba(251,191,36,0.2); }
+        .buy-option-card.subscription { border-color: rgba(16,185,129,0.2); }
 
-        /* ================== BUY COINS & SUBSCRIPTION (NEW DESIGN) ================== */
-        .buy-options-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin: 16px 0;
-        }
-        .buy-option-card {
-            background: rgba(255,255,255,0.05);
-            padding: 20px;
-            border-radius: 16px;
-            border: 1px solid rgba(255,255,255,0.1);
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .buy-option-card:hover {
-            background: rgba(255,255,255,0.1);
-            transform: translateY(-3px);
-            border-color: #fbbf24;
-        }
-        .buy-option-card .option-icon {
-            font-size: 40px;
-            margin-bottom: 8px;
-        }
-        .buy-option-card .option-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: #fff;
-        }
-        .buy-option-card .option-desc {
-            font-size: 12px;
-            color: #94a3b8;
-            margin-top: 4px;
-        }
-        .buy-option-card .option-price {
-            font-size: 14px;
-            font-weight: 700;
-            color: #fbbf24;
-            margin-top: 8px;
-        }
-        .buy-option-card.coins {
-            border-color: rgba(251,191,36,0.2);
-        }
-        .buy-option-card.subscription {
-            border-color: rgba(16,185,129,0.2);
-        }
-
-        /* ================== PAYMENT MODAL (IMPROVED) ================== */
+        /* ================== PAYMENT MODAL ================== */
         .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 9999; align-items: center; justify-content: center; }
         .modal.active { display: flex; }
         .modal-content { background: rgba(30,41,59,0.95); padding: 25px; border-radius: 20px; width: 90%; max-width: 350px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
@@ -327,14 +258,104 @@
         .upgrade-card .upgrade-level { font-size: 14px; font-weight: 700; color: #fff; }
         .upgrade-card .upgrade-cost { font-size: 12px; color: #fbbf24; }
         .upgrade-card .upgrade-bonus { font-size: 11px; color: #10b981; margin-top: 4px; }
-        .floating-coin { position: fixed; font-size: 30px; pointer-events: none; z-index: 1000; animation: floatUp 1s ease-out forwards; }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-150px) scale(0.5); } }
-        .hidden { display: none !important; }
-        .banned-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 99999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; }
-        .banned-overlay.show { display: flex; }
-        .level-filters { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; }
-        .level-filters .lvl-filter-btn { padding: 5px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #94a3b8; cursor: pointer; font-size: 11px; white-space: nowrap; }
-        .level-filters .lvl-filter-btn.active { background: linear-gradient(135deg, #fbbf24, #f59e0b); border-color: transparent; color: #0f172a; }
+
+        /* ================== LEADERBOARD ================== */
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .leaderboard-item .rank { font-weight: 900; color: #fbbf24; min-width: 30px; }
+        .leaderboard-item .user { display: flex; align-items: center; gap: 10px; flex: 1; }
+        .leaderboard-item .user .avatar-small { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #3b82f6); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff; }
+        .leaderboard-item .score { color: #10b981; font-weight: 700; }
+        .leaderboard-item.top1 { background: rgba(251,191,36,0.15); border-color: #fbbf24; }
+        .leaderboard-item.top2 { background: rgba(192,192,192,0.1); border-color: #94a3b8; }
+        .leaderboard-item.top3 { background: rgba(205,127,50,0.1); border-color: #cd7f32; }
+
+        /* ================== BOTTOM NAV ================== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 500px;
+            background: rgba(15,23,42,0.95);
+            backdrop-filter: blur(24px);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 4px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            z-index: 1000;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            color: #64748b;
+            font-size: 10px;
+            cursor: pointer;
+            flex: 1;
+        }
+        .nav-item.active { color: #fbbf24; }
+        .nav-item i { font-size: 20px; }
+
+        /* ================== NOTIFICATION OVERLAY ================== */
+        .notification-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 99998;
+            display: none;
+            overflow-y: auto;
+            padding-bottom: 80px;
+        }
+        .notification-overlay.show { display: block; }
+        .notification-overlay-header {
+            background: rgba(15,23,42,0.95);
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .notification-overlay-header .back-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 8px 16px; border-radius: 10px; cursor: pointer; }
+        .notification-item {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .notification-item:hover { background: rgba(255,255,255,0.06); }
+        .notification-item.unread { border-left: 3px solid #3b82f6; }
+        .notification-item.read { opacity: 0.7; }
+
+        /* ================== AIRDROP OVERLAY ================== */
+        .airdrop-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9998; display: none; overflow-y: auto; padding-bottom: 70px; }
+        .airdrop-overlay.show { display: block; }
+        .airdrop-overlay-header { background: rgba(15,23,42,0.95); padding: 15px 20px; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 10px; }
+        .airdrop-overlay-header .back-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 8px 16px; border-radius: 10px; cursor: pointer; }
+        .airdrop-content { padding: 15px; }
+        .airdrop-pool { background: rgba(255,255,255,0.05); border-radius: 20px; padding: 25px; text-align: center; border: 2px solid rgba(251,191,36,0.3); }
+        .airdrop-pool .pool-amount { font-size: 42px; font-weight: 900; color: #fbbf24; }
+        .airdrop-pool .countdown { font-size: 36px; font-weight: bold; color: #fbbf24; margin: 15px 0; }
+
+        /* ================== WEBVIEW OVERLAY ================== */
         .webview-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #0f172a; z-index: 99999; display: none; flex-direction: column; }
         .webview-overlay.show { display: flex; }
         .webview-header { background: #1e293b; padding: 12px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #334155; }
@@ -345,66 +366,238 @@
         .webview-footer { background: #1e293b; padding: 10px 16px; text-align: center; border-top: 1px solid #334155; }
         .webview-footer .claim-btn { background: linear-gradient(135deg, #10b981, #059669); color: #fff; padding: 10px 30px; border: none; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; width: 100%; max-width: 300px; transition: all 0.3s ease; }
         .webview-footer .claim-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .rules-text { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; font-size: 12px; color: #94a3b8; border: 1px solid rgba(255,255,255,0.05); }
-        .rules-text strong { color: #fbbf24; }
-        .rules-text .rule-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
-        .method-selector { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-        .method-btn { padding: 8px 16px; border-radius: 10px; border: 2px solid #334155; background: #1e293b; color: #94a3b8; cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.3s ease; flex: 1; min-width: 70px; text-align: center; }
-        .method-btn.active { border-color: #10b981; background: rgba(16,185,129,0.15); color: #10b981; }
-        .method-btn:hover { border-color: #64748b; }
-        .method-btn i { margin-right: 6px; }
-        .network-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 999999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; }
-        .network-overlay.show { display: flex; }
-        .network-overlay .icon { font-size: 60px; color: #ef4444; margin-bottom: 16px; }
-        .network-overlay h2 { color: #fff; font-size: 22px; margin-bottom: 8px; }
-        .network-overlay p { color: #94a3b8; font-size: 14px; }
-        .network-overlay .retry-btn { margin-top: 20px; padding: 12px 30px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none; border-radius: 12px; color: #fff; font-weight: 700; font-size: 16px; cursor: pointer; }
-        .security-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9999999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; }
-        .security-overlay.show { display: flex; }
-        .security-overlay h1 { color: #ef4444; font-size: 28px; margin-bottom: 12px; }
-        .security-overlay p { color: #94a3b8; font-size: 16px; margin-bottom: 20px; }
-        .security-overlay button { padding: 12px 30px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none; border-radius: 12px; color: #fff; font-weight: 700; font-size: 16px; cursor: pointer; }
-        #loadingPage { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 99999999; transition: opacity 0.5s ease; }
+
+        /* ================== LOADING PAGE ================== */
+        #loadingPage {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0f172a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999999;
+            transition: opacity 0.5s ease;
+        }
         #loadingPage.hidden { opacity: 0; pointer-events: none; }
         .loader-container { text-align: center; }
-        .loader-ring { width: 80px; height: 80px; border-radius: 50%; border: 8px solid transparent; border-top-color: #fbbf24; border-right-color: #f59e0b; border-bottom-color: #3b82f6; border-left-color: #8b5cf6; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        .loader-ring {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 8px solid transparent;
+            border-top-color: #fbbf24;
+            border-right-color: #f59e0b;
+            border-bottom-color: #3b82f6;
+            border-left-color: #8b5cf6;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .loader-text { color: #fbbf24; font-size: 18px; font-weight: 700; letter-spacing: 2px; animation: pulseText 1.5s ease-in-out infinite; }
-        @keyframes pulseText { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-        .loader-sub { color: #94a3b8; font-size: 13px; margin-top: 8px; }
+        .loader-text { color: #fbbf24; font-size: 18px; font-weight: 700; }
 
-        /* ================== FLOATING SPIN BUTTON ================== */
+        /* ================== SPIN WHEEL ================== */
         #floatingSpinBtn {
-            position: fixed; right: 20px; bottom: 120px; width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #f59e0b); color: #fff; border: none; box-shadow: 0 4px 20px rgba(249,115,22,0.4); cursor: grab; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.3s ease; touch-action: none;
+            position: fixed;
+            right: 20px;
+            bottom: 120px;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f97316, #f59e0b);
+            color: #fff;
+            border: none;
+            box-shadow: 0 4px 20px rgba(249,115,22,0.4);
+            cursor: grab;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            touch-action: none;
         }
         #floatingSpinBtn:active { cursor: grabbing; }
         #floatingSpinBtn:disabled { opacity: 0.6; cursor: not-allowed; }
         #floatingSpinBtn .spin-icon { font-size: 28px; animation: spinFloat 4s linear infinite; }
-        #floatingSpinBtn:disabled .spin-icon { animation: none; }
+        #floatingSpinBtn .spin-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: #fff;
+            border-radius: 50%;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 700;
+        }
         @keyframes spinFloat { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        #floatingSpinBtn .spin-badge { position: absolute; top: -5px; right: -5px; background: #ef4444; color: #fff; border-radius: 50%; padding: 2px 8px; font-size: 12px; font-weight: 700; }
 
-        /* ================== SPIN WHEEL MODAL ================== */
-        .spin-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 99999; display: none; align-items: center; justify-content: center; }
+        /* ================== SPIN MODAL ================== */
+        .spin-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 99999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
         .spin-modal-overlay.show { display: flex; }
-        .spin-modal-content { background: rgba(30,41,59,0.95); padding: 25px; border-radius: 24px; width: 90%; max-width: 400px; text-align: center; border: 1px solid rgba(255,255,255,0.1); position: relative; }
-        .spin-modal-content .close-modal-btn { position: absolute; top: 10px; right: 15px; background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; z-index: 20; }
-        .wheel-wrapper-new { position: relative; width: 280px; height: 280px; margin: 0 auto 15px; display: flex; justify-content: center; align-items: center; }
-        .wheel-outer-rim { position: absolute; width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(from 0deg, #7c3aed, #6d28d9, #7c3aed, #6d28d9, #7c3aed); padding: 12px; box-shadow: 0 0 30px rgba(124,58,237,0.3); }
-        .wheel-bulbs { position: absolute; width: 100%; height: 100%; border-radius: 50%; top: 0; left: 0; }
-        .wheel-bulb { position: absolute; width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 0 10px #fff, 0 0 20px #fff; animation: bulbBlink 1s infinite alternate; }
+        .spin-modal-content {
+            background: rgba(30,41,59,0.95);
+            padding: 25px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+        }
+        .spin-modal-content .close-modal-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 20;
+        }
+        .wheel-wrapper-new {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .wheel-outer-rim {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, #7c3aed, #6d28d9, #7c3aed, #6d28d9, #7c3aed);
+            padding: 12px;
+            box-shadow: 0 0 30px rgba(124,58,237,0.3);
+        }
+        .wheel-bulbs {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            top: 0;
+            left: 0;
+        }
+        .wheel-bulb {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 0 10px #fff, 0 0 20px #fff;
+            animation: bulbBlink 1s infinite alternate;
+        }
         .wheel-bulb:nth-child(odd) { animation-delay: 0.5s; }
         @keyframes bulbBlink { 0% { opacity: 0.3; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); } }
-        .wheel-inner { position: absolute; width: calc(100% - 24px); height: calc(100% - 24px); border-radius: 50%; overflow: hidden; background: #1a1a2e; }
-        .wheel-segments { width: 100%; height: 100%; position: relative; transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1); }
-        .wheel-segment { position: absolute; width: 50%; height: 50%; top: 0; left: 50%; transform-origin: 0% 100%; display: flex; align-items: center; justify-content: flex-start; padding-left: 20%; font-size: 12px; font-weight: 700; color: #0f172a; }
+        .wheel-inner {
+            position: absolute;
+            width: calc(100% - 24px);
+            height: calc(100% - 24px);
+            border-radius: 50%;
+            overflow: hidden;
+            background: #1a1a2e;
+        }
+        .wheel-segments {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+        .wheel-segment {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            top: 0;
+            left: 50%;
+            transform-origin: 0% 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding-left: 20%;
+            font-size: 12px;
+            font-weight: 700;
+            color: #0f172a;
+        }
         .wheel-segment span { background: rgba(255,255,255,0.7); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
         .wheel-segment .gift-icon { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 20px; }
-        .wheel-center-logo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #fbbf24, #f59e0b); display: flex; align-items: center; justify-content: center; font-size: 30px; color: #0f172a; font-weight: 900; box-shadow: 0 0 30px rgba(251,191,36,0.3); z-index: 10; border: 3px solid #7c3aed; }
-        .wheel-pointer-new { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 18px solid transparent; border-right: 18px solid transparent; border-top: 30px solid #fbbf24; z-index: 15; filter: drop-shadow(0 4px 10px rgba(251,191,36,0.5)); }
-        .spin-btn-new { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; padding: 14px 40px; border: none; border-radius: 30px; font-weight: 900; font-size: 18px; cursor: pointer; transition: all 0.3s ease; width: 100%; max-width: 220px; margin-top: 5px; box-shadow: 0 4px 15px rgba(251,191,36,0.3); }
+        .wheel-center-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: #0f172a;
+            font-weight: 900;
+            box-shadow: 0 0 30px rgba(251,191,36,0.3);
+            z-index: 10;
+            border: 3px solid #7c3aed;
+        }
+        .wheel-pointer-new {
+            position: absolute;
+            top: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 18px solid transparent;
+            border-right: 18px solid transparent;
+            border-top: 30px solid #fbbf24;
+            z-index: 15;
+            filter: drop-shadow(0 4px 10px rgba(251,191,36,0.5));
+        }
+        .spin-btn-new {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #0f172a;
+            padding: 14px 40px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 900;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 220px;
+            margin-top: 5px;
+            box-shadow: 0 4px 15px rgba(251,191,36,0.3);
+        }
         .spin-btn-new:disabled { opacity: 0.5; cursor: not-allowed; }
-        .spin-timer-box-new { display: none; background: rgba(249,115,22,0.15); border: 2px solid rgba(249,115,22,0.3); border-radius: 15px; padding: 12px; margin-top: 10px; text-align: center; }
+        .spin-timer-box-new {
+            display: none;
+            background: rgba(249,115,22,0.15);
+            border: 2px solid rgba(249,115,22,0.3);
+            border-radius: 15px;
+            padding: 12px;
+            margin-top: 10px;
+            text-align: center;
+        }
         .spin-timer-box-new.show { display: block; }
         .spin-timer-box-new .timer-label { font-size: 12px; color: #94a3b8; }
         .spin-timer-box-new .timer-time { font-size: 24px; font-weight: 700; color: #fbbf24; }
@@ -421,21 +614,19 @@
         </div>
     </div>
 
-    <!-- ================== MAINTENANCE OVERLAY ================== -->
+    <!-- ================== OVERLAYS ================== -->
     <div id="maintenanceOverlay">
         <div class="icon"><i class="fas fa-tools"></i></div>
         <h1>🔧 Under Maintenance</h1>
         <p id="maintenanceMessage">We are currently updating the app. Please come back later.</p>
     </div>
 
-    <!-- ================== SECURITY OVERLAY ================== -->
     <div class="security-overlay" id="securityOverlay">
         <h1>🚫 Security Alert</h1>
         <p>Unauthorized access detected! Please close Developer Tools to continue.</p>
         <button onclick="location.reload()">🔄 Reload Page</button>
     </div>
 
-    <!-- ================== NETWORK OVERLAY ================== -->
     <div class="network-overlay" id="networkOverlay">
         <div class="icon"><i class="fas fa-wifi"></i></div>
         <h2>🔌 No Internet Connection</h2>
@@ -443,7 +634,6 @@
         <button class="retry-btn" onclick="checkNetworkAndReload()"><i class="fas fa-sync"></i> Retry</button>
     </div>
 
-    <!-- ================== BANNED OVERLAY ================== -->
     <div class="banned-overlay" id="bannedOverlay">
         <h1>🚫 Account Banned</h1>
         <p>Your account has been suspended.</p>
@@ -452,7 +642,6 @@
         <p id="appealStatus" style="display:none;"></p>
     </div>
 
-    <!-- ================== LEVEL OVERLAY ================== -->
     <div class="overlay" id="levelOverlay">
         <div class="overlay-header">
             <button class="back-btn" onclick="closeLevelPage()"><i class="fas fa-arrow-left"></i> Back</button>
@@ -468,7 +657,7 @@
                 <div class="level-bonus" id="lvlBonus">Mining Bonus: +0%</div>
             </div>
             
-            <!-- ✅ LEVEL UPGRADE (উপরে) -->
+            <!-- LEVEL UPGRADE -->
             <div class="level-upgrade-section">
                 <div class="upgrade-title">🚀 Level Upgrade</div>
                 <div class="upgrade-grid">
@@ -512,14 +701,13 @@
         </div>
     </div>
 
-    <!-- ================== AIRDROP OVERLAY ================== -->
     <div class="overlay" id="airdropOverlay">
-        <div class="overlay-header">
+        <div class="airdrop-overlay-header">
             <button class="back-btn" onclick="closeAirdropPage()"><i class="fas fa-arrow-left"></i> Back</button>
             <h2 style="color:#fff;">📢 Live AirDrop</h2>
         </div>
-        <div style="padding:15px;">
-            <div style="background:rgba(255,255,255,0.05);border-radius:20px;padding:25px;text-align:center;border:2px solid rgba(251,191,36,0.3);">
+        <div class="airdrop-content">
+            <div class="airdrop-pool">
                 <div id="airdropPoolDisplay" style="font-size:42px;font-weight:900;color:#fbbf24;">$50.00</div>
                 <div id="airdropCountdown" style="font-size:36px;font-weight:bold;color:#fbbf24;margin:15px 0;">--:--:--</div>
                 <button id="airdropClaimBtn" onclick="claimAirdrop()" disabled style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:14px 30px;border:none;border-radius:30px;font-weight:700;font-size:16px;cursor:pointer;width:100%;transition:all 0.3s ease;">🎁 Claim</button>
@@ -528,7 +716,6 @@
         </div>
     </div>
 
-    <!-- ================== WEBVIEW OVERLAY ================== -->
     <div class="webview-overlay" id="webviewOverlay">
         <div class="webview-header">
             <button class="back-btn" onclick="closeWebView()"><i class="fas fa-arrow-left"></i> Back</button>
@@ -557,7 +744,7 @@
                     <div class="last-login" id="lastLoginDisplay">📅 --</div>
                     <span class="level-badge" onclick="openLevelPage()" id="userLevelBadge">🔒 Unlocking</span>
                 </div>
-                <!-- ✅ NOTIFICATION BELL -->
+                <!-- NOTIFICATION BELL -->
                 <div class="notification-bell" onclick="openNotificationPanel()">
                     <i class="fas fa-bell bell-icon"></i>
                     <span class="badge" id="notifBadge">0</span>
@@ -586,7 +773,7 @@
             </div>
         </div>
 
-        <!-- ✅ DAILY BONUS -->
+        <!-- DAILY BONUS -->
         <div class="daily-bonus" onclick="claimDailyBonus()">
             <div class="bonus-left">
                 <span>🎁</span>
@@ -613,7 +800,7 @@
                 </div>
             </div>
 
-            <!-- ✅ SPEED BOOST -->
+            <!-- SPEED BOOST -->
             <div class="speed-btn-container">
                 <button class="speed-boost-btn" id="speedBoostBtn" onclick="activateSpeedBoost()">
                     <i class="fas fa-rocket"></i> Speed Boost
@@ -625,7 +812,7 @@
                 <div id="miningRulesText">Loading rules...</div>
             </div>
 
-            <!-- ✅ ANIMATED MYSTERY BOX WITH TIMER -->
+            <!-- MYSTERY BOX -->
             <div class="mystery-box-wrapper" id="mysteryBoxWrapper">
                 <div class="mystery-box-container" id="mysteryBoxContainer" onclick="openMysteryBox()">
                     <div class="box-shine"></div>
@@ -695,7 +882,7 @@
                     <div id="walletTotalUsd" style="font-size:18px;font-weight:bold;color:#10b981;">$0.000</div>
                 </div>
 
-                <!-- ✅ NEW DESIGN: Buy Coins & Subscription -->
+                <!-- BUY COINS & SUBSCRIPTION -->
                 <div class="buy-options-grid">
                     <div class="buy-option-card coins" onclick="openPaymentModal('bKash', 100, 1000)">
                         <div class="option-icon">🪙</div>
@@ -711,7 +898,7 @@
                     </div>
                 </div>
 
-                <!-- WITHDRAW SECTION -->
+                <!-- WITHDRAW -->
                 <div class="withdraw-section">
                     <p id="withdrawInfo" style="font-weight:bold;color:#fbbf24;">Min: $10.000</p>
                     <div class="form-group"><label>Payment Method</label><div class="method-selector" id="methodSelector"></div></div>
@@ -740,13 +927,13 @@
         </div>
     </div>
 
-    <!-- ✅ DRAGGABLE FLOATING SPIN BUTTON -->
+    <!-- DRAGGABLE FLOATING SPIN BUTTON -->
     <div id="floatingSpinBtn" onclick="openSpinModal()">
         <span class="spin-icon">🎰</span>
         <span class="spin-badge" id="spinBadge">20</span>
     </div>
 
-    <!-- ✅ SPIN WHEEL MODAL -->
+    <!-- SPIN WHEEL MODAL -->
     <div class="spin-modal-overlay" id="spinModal">
         <div class="spin-modal-content">
             <button class="close-modal-btn" onclick="closeSpinModal()"><i class="fas fa-times"></i></button>
@@ -772,7 +959,7 @@
         </div>
     </div>
 
-    <!-- ✅ NOTIFICATION OVERLAY (ALWAYS ON TOP, FULL PAGE) -->
+    <!-- NOTIFICATION OVERLAY -->
     <div class="notification-overlay" id="notificationOverlay">
         <div class="notification-overlay-header">
             <button class="back-btn" onclick="closeNotificationPanel()"><i class="fas fa-arrow-left"></i> Back</button>
@@ -780,6 +967,30 @@
         </div>
         <div id="notificationList" style="padding:15px;">
             <p style="color:#94a3b8;text-align:center;">Loading notifications...</p>
+        </div>
+    </div>
+
+    <!-- PAYMENT MODAL -->
+    <div class="modal" id="paymentModal">
+        <div class="modal-content">
+            <h3 id="paymentModalTitle">💳 Pay via bKash</h3>
+            <p id="paymentModalDesc" style="color:#94a3b8;font-size:13px;">Send money to: <span id="paymentNumber" style="color:#fbbf24;font-weight:bold;">017XXXXXXXX</span></p>
+            <div style="margin:15px 0;text-align:left;">
+                <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:12px;border:1px solid rgba(255,255,255,0.1);">
+                    <div style="font-size:12px;color:#94a3b8;">Amount to Pay</div>
+                    <div id="paymentAmount" style="font-size:24px;font-weight:900;color:#fbbf24;">১০০ BDT</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:12px;border:1px solid rgba(255,255,255,0.1);margin-top:10px;">
+                    <div style="font-size:12px;color:#94a3b8;">Transaction ID</div>
+                    <input type="text" id="transactionId" placeholder="Enter your transaction ID..." style="width:100%;padding:8px;background:#1e293b;border:1px solid #334155;border-radius:6px;color:#fff;font-size:14px;outline:none;margin-top:4px;">
+                </div>
+            </div>
+            <div id="paymentTimer" style="font-size:28px;font-weight:900;color:#fbbf24;margin:10px 0;">15:00</div>
+            <div style="font-size:12px;color:#94a3b8;">⏳ Please wait for admin approval (max 15 minutes)</div>
+            <div class="modal-buttons" style="margin-top:15px;">
+                <button class="btn btn-primary" onclick="submitTransaction()">📤 Submit</button>
+                <button class="btn btn-info" onclick="closeModal('paymentModal')">Cancel</button>
+            </div>
         </div>
     </div>
 
@@ -910,19 +1121,9 @@
             banAppealSubmitted: false, lastVideoWatchTime: 0,
             dailyBonusClaimed: 0,
             mysteryBoxCooldown: 0, 
-            
-            // ✅ New properties for Subscription & Level
-            subscription: null, // 'monthly', 'yearly', or null
-            subscriptionExpiry: 0,
             level: 1,
-            miningSpeed: 0, // Percentage bonus
-            
-            // Admin-controlled settings
-            dailyBonusMin: 50,
-            dailyBonusMax: 100,
-            mysteryBoxMin: 20,
-            mysteryBoxMax: 100,
-            mysteryBoxDuration: 1800000 // 30 minutes
+            miningSpeed: 0,
+            paymentHistory: []
         };
         let tasks = [], conversionTimer = null, miningInterval = null, boostTimer = null, airdropTimer = null, 
             currentFilter = 'all', currentLevelFilter = 'all', levelConfigCache = {}, referralConfigCache = {};
@@ -930,6 +1131,17 @@
         let wasMiningBeforeOffline = false;
         let isAppHidden = false;
         let isAdShowing = false;
+
+        let paymentData = {
+            method: '',
+            amount: 0,
+            coins: 0,
+            type: 'coins',
+            plan: '',
+            level: 0
+        };
+        let paymentTimerInterval = null;
+        let paymentTimeout = null;
 
         // ============================================================
         // ================== MAINTENANCE MODE =========================
@@ -956,178 +1168,6 @@
         }
 
         // ============================================================
-        // ================== SPIN WHEEL SYSTEM =======================
-        // ============================================================
-        const SPIN_COUNT_LIMIT = 20;
-        const SPIN_BUTTON_COOLDOWN_SECONDS = 15;
-
-        let spinCount = SPIN_COUNT_LIMIT;
-        let spinBtnCooldownInterval = null;
-        let isSpinning = false;
-        let currentRotation = 0;
-
-        const prizeData = [
-            { label: '500 🎁', value: 500, type: 'coins' },
-            { label: '200 🎁', value: 200, type: 'coins' },
-            { label: '150 🎁', value: 150, type: 'coins' },
-            { label: '100 🎁', value: 100, type: 'coins' },
-            { label: '90 🎁', value: 90, type: 'coins' },
-            { label: '70 🎁', value: 70, type: 'coins' },
-            { label: '50 🎁', value: 50, type: 'coins' },
-            { label: '20 🎁', value: 20, type: 'coins' },
-            { label: '10 🎁', value: 10, type: 'coins' },
-            { label: '0 🎁', value: 0, type: 'coins' },
-            { label: '$0.08 🎁', value: 0.08, type: 'usd' },
-            { label: '$0.05 🎁', value: 0.05, type: 'usd' },
-            { label: '$0.02 🎁', value: 0.02, type: 'usd' },
-            { label: '$0.01 🎁', value: 0.01, type: 'usd' },
-            { label: '$0 🎁', value: 0, type: 'usd' },
-        ];
-
-        function buildWheel() {
-            const segmentsContainer = document.getElementById('wheelSegments');
-            const numSegments = prizeData.length;
-            const angleStep = 360 / numSegments;
-            segmentsContainer.innerHTML = '';
-            const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#FF9FF3', '#54A0FF', '#5F27CD', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD'];
-            prizeData.forEach((prize, index) => {
-                const segment = document.createElement('div');
-                segment.className = 'wheel-segment';
-                segment.style.transform = `rotate(${index * angleStep}deg)`;
-                segment.style.backgroundColor = colors[index % colors.length];
-                segment.style.borderRight = '1px solid #0f172a';
-                segment.innerHTML = `<span>${prize.label}</span>`;
-                segmentsContainer.appendChild(segment);
-            });
-            const bulbsContainer = document.getElementById('wheelBulbs');
-            bulbsContainer.innerHTML = '';
-            const numBulbs = 20;
-            for (let i = 0; i < numBulbs; i++) {
-                const bulb = document.createElement('div');
-                bulb.className = 'wheel-bulb';
-                const angle = (i / numBulbs) * 360;
-                const radius = 140;
-                const x = 140 + radius * Math.cos(angle * Math.PI / 180);
-                const y = 140 + radius * Math.sin(angle * Math.PI / 180);
-                bulb.style.left = (x - 6) + 'px';
-                bulb.style.top = (y - 6) + 'px';
-                bulbsContainer.appendChild(bulb);
-            }
-        }
-
-        function getPrizeByAngle(angle) {
-            const numSegments = prizeData.length;
-            const angleStep = 360 / numSegments;
-            let normalized = angle % 360;
-            if (normalized < 0) normalized += 360;
-            const index = Math.floor(normalized / angleStep);
-            return prizeData[index % numSegments];
-        }
-
-        function openSpinModal() {
-            if (spinCount <= 0) { showToast('🎯 No spins left!', 'error'); return; }
-            document.getElementById('spinModal').classList.add('show');
-            updateSpinModalUI();
-        }
-        function closeSpinModal() { document.getElementById('spinModal').classList.remove('show'); }
-        function updateSpinModalUI() { document.getElementById('modalSpinCount').textContent = `Spins: ${spinCount}/${SPIN_COUNT_LIMIT}`; }
-
-        function spinWheelFromModal() {
-            if (!isOnline) { showToast('No internet!', 'error'); return; }
-            if (isSpinning) return;
-            if (spinCount <= 0) { showToast('🎯 No spins left!', 'error'); return; }
-
-            const btn = document.getElementById('modalSpinBtn');
-            btn.disabled = true;
-            isSpinning = true;
-            document.getElementById('modalSpinResult').textContent = '';
-
-            let cooldown = SPIN_BUTTON_COOLDOWN_SECONDS;
-            document.getElementById('modalSpinTimerBox').classList.add('show');
-            document.getElementById('modalSpinTimerDisplay').textContent = `00:${String(cooldown).padStart(2, '0')}`;
-            if (spinBtnCooldownInterval) clearInterval(spinBtnCooldownInterval);
-            spinBtnCooldownInterval = setInterval(() => {
-                cooldown--;
-                if (cooldown > 0) {
-                    document.getElementById('modalSpinTimerDisplay').textContent = `00:${String(cooldown).padStart(2, '0')}`;
-                } else {
-                    clearInterval(spinBtnCooldownInterval);
-                    spinBtnCooldownInterval = null;
-                    document.getElementById('modalSpinTimerBox').classList.remove('show');
-                    btn.disabled = false;
-                }
-            }, 1000);
-
-            const randomSpins = 5 + Math.floor(Math.random() * 5);
-            const randomAngle = Math.floor(Math.random() * 360);
-            const totalRotation = randomSpins * 360 + randomAngle;
-            currentRotation += totalRotation;
-            const segmentsContainer = document.getElementById('wheelSegments');
-            segmentsContainer.style.transform = `rotate(${currentRotation}deg)`;
-
-            show_11197472()
-                .then(() => {
-                    isAdShowing = false;
-                    const prize = getPrizeByAngle(currentRotation);
-                    let rewardCoins = 0, rewardUsd = 0;
-                    if (prize.type === 'coins') {
-                        rewardCoins = prize.value;
-                        const newCoins = app.progressCoins + rewardCoins;
-                        if (newCoins > TOTAL_COINS) rewardCoins = Math.max(0, TOTAL_COINS - app.progressCoins);
-                    } else if (prize.type === 'usd') {
-                        rewardUsd = prize.value;
-                    }
-                    if (rewardCoins > 0) app.progressCoins += rewardCoins;
-                    if (rewardUsd > 0) app.usdBalance += rewardUsd;
-
-                    spinCount--;
-                    document.getElementById('spinBadge').textContent = spinCount;
-                    document.getElementById('modalSpinResult').textContent = `🎉 You won ${prize.label}!`;
-                    updateSpinModalUI();
-
-                    let resultText = '';
-                    if (rewardCoins > 0) resultText += `+${rewardCoins} Coins!`;
-                    if (rewardUsd > 0) resultText += `+$${rewardUsd.toFixed(3)} USD!`;
-                    if (resultText === '') resultText = 'Better luck next time!';
-                    document.getElementById('rewardText').textContent = resultText;
-                    document.getElementById('successModal').classList.add('active');
-
-                    userRef.update({ progressCoins: app.progressCoins, usdBalance: app.usdBalance, spinCount: spinCount });
-                    updateUI(); updateProgressUI(); updateLevelUI();
-                    isSpinning = false;
-                    showToast(`🎰 Spin result: ${prize.label}`);
-                })
-                .catch(() => {
-                    isAdShowing = false;
-                    btn.disabled = false;
-                    btn.textContent = '🎡 SPIN';
-                    isSpinning = false;
-                    document.getElementById('modalSpinResult').textContent = '⚠️ Ad not watched! Try again.';
-                    showToast('⚠️ Please watch the ad to get reward!', 'error');
-                });
-        }
-
-        function loadSpinData() {
-            db.ref('users/' + userId + '/spinCount').on('value', snap => {
-                spinCount = snap.val() !== null ? snap.val() : SPIN_COUNT_LIMIT;
-                document.getElementById('spinBadge').textContent = spinCount;
-                updateSpinModalUI();
-            });
-        }
-        function watchMiningCoins() {
-            db.ref('users/' + userId + '/progressCoins').on('value', snap => {
-                const coins = snap.val();
-                if (coins !== null && coins === 0) {
-                    spinCount = SPIN_COUNT_LIMIT;
-                    document.getElementById('spinBadge').textContent = spinCount;
-                    updateSpinModalUI();
-                    userRef.update({ spinCount: spinCount });
-                    showToast('🔄 Spins reset! You have 20 spins again!');
-                }
-            });
-        }
-
-        // ============================================================
         // ================== NOTIFICATION SYSTEM ======================
         // ============================================================
         let unreadCount = 0;
@@ -1149,14 +1189,6 @@
                 
                 if (document.getElementById('notificationOverlay').classList.contains('show')) {
                     renderNotifications(notifications);
-                }
-            });
-            
-            // নতুন নোটিফিকেশন আসলে টোস্ট দেখানো
-            db.ref('notifications').orderByChild('createdAt').limitToLast(1).on('child_added', snap => {
-                const data = snap.val();
-                if (data.recipient === 'all' || data.recipientUserId === userId) {
-                    showToast(`${data.title || 'New Notification'}: ${data.message}`, data.type || 'info');
                 }
             });
         }
@@ -1239,23 +1271,11 @@
         }
 
         // ============================================================
-        // ================== PAYMENT MODAL SYSTEM =====================
+        // ================== PAYMENT MODAL ============================
         // ============================================================
-        let paymentData = {
-            method: '',
-            amount: 0,
-            coins: 0,
-            type: 'coins',
-            plan: '',
-            level: 0
-        };
-        let paymentTimerInterval = null;
-        let paymentTimeout = null;
-
         function openPaymentModal(method, amount, item) {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
             
-            // Check if method is enabled
             db.ref('paymentConfig/methodsStatus').once('value', snap => {
                 const status = snap.val() || { bkash: 'on', nagad: 'on', rocket: 'on' };
                 const methodKey = method.toLowerCase();
@@ -1264,7 +1284,6 @@
                     return;
                 }
                 
-                // Load admin payment number
                 db.ref('paymentConfig/manualNumbers').once('value', numSnap => {
                     const numbers = numSnap.val() || {};
                     let number = '';
@@ -1311,7 +1330,6 @@
             let seconds = 15 * 60;
             const timerDisplay = document.getElementById('paymentTimer');
             
-            // Check saved timer
             db.ref('paymentTimers/' + userId).once('value', snap => {
                 const saved = snap.val();
                 if (saved && saved.expiresAt > Date.now()) {
@@ -1468,7 +1486,7 @@
         }
 
         // ============================================================
-        // ================== MYSTERY BOX (ANIMATED + TIMER) ===========
+        // ================== MYSTERY BOX ==============================
         // ============================================================
         function updateMysteryBoxUI() {
             const timerEl = document.getElementById('mysteryBoxTimer');
@@ -1867,6 +1885,7 @@
             }
         }
 
+        // ============================================================
         // ================== USER LEVEL ==============================
         function getLevelConfig(level) {
             if (level === 0) return { tier: 'unlocking', tierName: 'Unlocking', tierEmoji: '🔒', bonusPercent: 0, xpForLevel: 5000 };
@@ -1909,6 +1928,7 @@
             };
         }
 
+        // ============================================================
         // ================== TASKS ===================================
         function loadTasks() { 
             db.ref('tasks').on('value', s => { 
@@ -2027,6 +2047,7 @@
             showToast(`🎉 +${rw} Coins!`);
         }
 
+        // ============================================================
         // ================== REFERRAL ================================
         function loadReferralConfigFromDB() { 
             db.ref('referralConfig').on('value', s => { 
@@ -2094,6 +2115,7 @@
             }
         }
 
+        // ============================================================
         // ================== AIRDROP ================================
         function loadAirdrop() { 
             db.ref('airdropConfig').on('value', snap => { 
@@ -2140,6 +2162,7 @@
             }, 'airdropClaimBtn');
         }
 
+        // ============================================================
         // ================== WITHDRAW ================================
         function updateWithdrawUI() {
             const b = app.usdBalance || 0, m = app.minWithdraw || 10;
@@ -2194,6 +2217,7 @@
             c.innerHTML = h.slice(-20).reverse().map(h => `<div class="history-item"><div><b>$${h.amount?.toFixed(3) || '0'}</b> <small>${h.method || ''}</small>${h.status === 'cancelled' && h.cancelReason ? `<div style="color:#ef4444;font-size:10px;">⚠️ ${h.cancelReason}</div>` : ''}</div><div style="text-align:right;"><span>${h.status === 'approved' ? '✅' : h.status === 'cancelled' ? '❌' : '⏳'} ${h.status}</span><div style="font-size:9px;">${h.date ? new Date(h.date).toLocaleDateString() : ''}</div></div></div>`).join(''); 
         }
 
+        // ============================================================
         // ================== CONVERSION ==============================
         let conversionTimerInterval = null;
         function performConversion() { 
@@ -2237,6 +2261,7 @@
             conversionTimerInterval = setInterval(updateDisplay, 1000);
         }
 
+        // ============================================================
         // ================== UI UPDATES ==============================
         function updateUI() { 
             document.getElementById('balance').textContent = app.balance.toLocaleString(); 
@@ -2250,11 +2275,6 @@
             document.getElementById('totalBalanceDisplay').textContent = `${app.balance.toLocaleString()} + $${app.usdBalance.toFixed(3)}`;
             updateWithdrawUI(); updateSpeedBoostUI(); startConversionTimer();
             updatePaymentHistoryUI();
-            
-            // Subscription status
-            if (app.subscription && app.subscriptionExpiry > Date.now()) {
-                document.getElementById('userLevelBadge').textContent += ' ⭐';
-            }
         }
 
         function updateProgressUI() { 
@@ -2451,10 +2471,6 @@
                 app.airdropClaimed = d.airdropClaimed || false;
                 app.dailyBonusClaimed = d.dailyBonusClaimed || '';
                 app.paymentHistory = d.paymentHistory || [];
-                
-                // ✅ Load Subscription & Level data
-                app.subscription = d.subscription || null;
-                app.subscriptionExpiry = d.subscriptionExpiry || 0;
                 app.level = d.level || 1;
                 app.miningSpeed = d.miningSpeed || 0;
 
@@ -2470,7 +2486,6 @@
                 const today = new Date().toDateString();
                 document.getElementById('dailyBonusStatus').textContent = app.dailyBonusClaimed === today ? '✅ Claimed' : '🎯 Claim Now';
                 
-                // ✅ Update Mystery Box UI
                 updateMysteryBoxUI();
                 
                 if (!d.balance && d.xpPoints === undefined) {
@@ -2523,7 +2538,6 @@
                 } 
             });
             
-            // ✅ Listen for payment request updates
             db.ref('paymentRequests').orderByChild('userId').equalTo(userId).on('child_changed', snap => {
                 const data = snap.val();
                 if (data && app.paymentHistory) {
@@ -2534,13 +2548,11 @@
                             app.paymentHistory[index].cancelReason = data.cancelReason;
                         }
                         if (data.status === 'approved') {
-                            // ✅ Activate the purchase
                             if (data.type === 'coins') {
                                 app.balance += data.coins || 0;
                             } else if (data.type === 'subscription') {
-                                const expiry = data.plan === 'monthly' ? Date.now() + 30*24*60*60*1000 : Date.now() + 365*24*60*60*1000;
-                                app.subscription = data.plan;
-                                app.subscriptionExpiry = expiry;
+                                app.subscription = data.plan || 'monthly';
+                                app.subscriptionExpiry = Date.now() + 30*24*60*60*1000;
                             } else if (data.type === 'level') {
                                 app.level = data.level || 1;
                                 app.miningSpeed += (data.level - 1) * 5;
