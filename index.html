@@ -916,6 +916,26 @@
                     </div>
                 </div>
 
+                <!-- ✅ COIN → USD EXCHANGE -->
+                <div class="buy-coins-section" style="margin-top:16px;">
+                    <div class="buy-title">🪙 Exchange Coins to USD</div>
+                    <div id="exchangeInfo" style="font-size:13px;color:#94a3b8;margin-bottom:10px;">
+                        Rate: 100 Coins = $0.01 USD
+                    </div>
+                    <div class="exchange-controls">
+                        <input type="number" id="exchangeAmount" value="100" min="100" step="100" style="width:100%;padding:10px;border-radius:8px;border:1px solid #334155;background:#1e293b;color:#fff;font-size:16px;text-align:center;">
+                        <div style="display:flex;gap:10px;margin-top:10px;">
+                            <button class="exchange-btn" onclick="exchangeCoins()">🔄 Exchange</button>
+                            <button class="exchange-btn" onclick="setExchangeAmount(100)">100</button>
+                            <button class="exchange-btn" onclick="setExchangeAmount(500)">500</button>
+                            <button class="exchange-btn" onclick="setExchangeAmount(1000)">1000</button>
+                        </div>
+                    </div>
+                    <div id="exchangeStatus" style="margin-top:10px;font-size:12px;color:#94a3b8;">
+                        Today: 0 / 5 exchanges | Total: 0 / 50 exchanges
+                    </div>
+                </div>
+
                 <!-- WITHDRAW SECTION -->
                 <div class="withdraw-section">
                     <p id="withdrawInfo" style="font-weight:bold;color:#fbbf24;">Min: $10.000</p>
@@ -1166,7 +1186,10 @@
             mysteryBoxCooldown: 0, 
             level: 1,
             miningSpeed: 0,
-            paymentHistory: []
+            paymentHistory: [],
+            // Exchange
+            exchangeStats: { today: 0, lifetime: 0, lastExchangeDate: '' },
+            exchangeConfig: { coins: 100, usd: 0.01, dailyLimit: 5, lifetimeLimit: 50 }
         };
         let tasks = [], conversionTimer = null, miningInterval = null, boostTimer = null, airdropTimer = null, 
             currentFilter = 'all', currentLevelFilter = 'all', levelConfigCache = {}, referralConfigCache = {};
@@ -1411,9 +1434,7 @@
             db.ref('notifications').orderByChild('createdAt').limitToLast(1).on('child_added', snap => {
                 const data = snap.val();
                 if (data.recipient === 'all' || data.recipientUserId === userId) {
-                    if (data.id !== 'first_load') {
-                        showToast(`${data.title || 'New Notification'}: ${data.message}`, data.type || 'info');
-                    }
+                    showToast(`${data.title || 'New Notification'}: ${data.message}`, data.type || 'info');
                 }
             });
         }
@@ -1500,8 +1521,8 @@
         // ============================================================
         function openPaymentPage(type, title, amount, item) {
             // Load payment config (ON/OFF methods)
-            db.ref('paymentConfig/methods').once('value', snap => {
-                const methods = snap.val() || ['bKash', 'Nagad', 'Rocket'];
+            db.ref('paymentConfig/methodsStatus').once('value', snap => {
+                const methodsStatus = snap.val() || { bkash: 'on', nagad: 'on', rocket: 'on' };
                 
                 // Load numbers
                 db.ref('paymentConfig/manualNumbers').once('value', numSnap => {
@@ -1518,15 +1539,28 @@
                     document.getElementById('paymentPageTxId').value = '';
                     document.getElementById('paymentPageNumber').textContent = 'Select a method first';
                     
-                    // Render methods
+                    // Render methods (only ON ones)
                     const grid = document.getElementById('paymentMethodsGrid');
-                    grid.innerHTML = methods.map(m => `
-                        <div class="payment-method-btn ${!numbers[m.toLowerCase()] ? 'disabled' : ''}" data-method="${m}" onclick="${numbers[m.toLowerCase()] ? `selectPaymentMethod('${m}')` : ''}">
-                            <div class="method-icon"><i class="fas ${m === 'bKash' ? 'fa-mobile-alt' : m === 'Nagad' ? 'fa-mobile-alt' : 'fa-rocket'}"></i></div>
-                            <div class="method-name">${m}</div>
-                            ${!numbers[m.toLowerCase()] ? '<div style="font-size:8px;color:#ef4444;">OFF</div>' : ''}
-                        </div>
-                    `).join('');
+                    const methodConfigs = {
+                        bKash: { icon: 'fa-mobile-alt', status: methodsStatus.bkash },
+                        Nagad: { icon: 'fa-mobile-alt', status: methodsStatus.nagad },
+                        Rocket: { icon: 'fa-rocket', status: methodsStatus.rocket }
+                    };
+                    
+                    grid.innerHTML = Object.keys(methodConfigs).map(m => {
+                        const config = methodConfigs[m];
+                        const isOn = config.status === 'on';
+                        const hasNumber = numbers[m.toLowerCase()] && numbers[m.toLowerCase()].trim() !== '';
+                        const isDisabled = !isOn || !hasNumber;
+                        
+                        return `
+                            <div class="payment-method-btn ${isDisabled ? 'disabled' : ''}" data-method="${m}" onclick="${isDisabled ? '' : `selectPaymentMethod('${m}')`}">
+                                <div class="method-icon"><i class="fas ${config.icon}"></i></div>
+                                <div class="method-name">${m}</div>
+                                ${isDisabled ? `<div style="font-size:8px;color:#ef4444;">${!isOn ? 'OFF' : 'No Number'}</div>` : ''}
+                            </div>
+                        `;
+                    }).join('');
                     
                     // Reset selection
                     document.querySelectorAll('.payment-method-btn').forEach(el => el.classList.remove('active'));
@@ -1687,6 +1721,96 @@
                     </div>
                 </div>`;
             }).join('');
+        }
+
+        // ============================================================
+        // ================== COIN → USD EXCHANGE ======================
+        // ============================================================
+        function loadExchangeConfig() {
+            db.ref('exchangeConfig').on('value', snap => {
+                if (snap.exists()) {
+                    app.exchangeConfig = snap.val();
+                    updateExchangeUI();
+                }
+            });
+            
+            db.ref('users/' + userId + '/exchangeStats').on('value', snap => {
+                if (snap.exists()) {
+                    app.exchangeStats = snap.val();
+                    updateExchangeUI();
+                }
+            });
+        }
+
+        function updateExchangeUI() {
+            const info = document.getElementById('exchangeInfo');
+            info.textContent = `Rate: ${app.exchangeConfig.coins} Coins = $${app.exchangeConfig.usd.toFixed(3)} USD`;
+            
+            const status = document.getElementById('exchangeStatus');
+            const today = new Date().toDateString();
+            const todayCount = (app.exchangeStats.lastExchangeDate === today) ? app.exchangeStats.today : 0;
+            status.textContent = `Today: ${todayCount} / ${app.exchangeConfig.dailyLimit} exchanges | Total: ${app.exchangeStats.lifetime || 0} / ${app.exchangeConfig.lifetimeLimit} exchanges`;
+        }
+
+        function setExchangeAmount(amount) {
+            document.getElementById('exchangeAmount').value = amount;
+        }
+
+        function exchangeCoins() {
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            
+            const amount = parseInt(document.getElementById('exchangeAmount').value);
+            if (isNaN(amount) || amount < app.exchangeConfig.coins) {
+                showToast(`❌ Minimum exchange: ${app.exchangeConfig.coins} coins`, 'error');
+                return;
+            }
+            
+            const today = new Date().toDateString();
+            const todayCount = (app.exchangeStats.lastExchangeDate === today) ? app.exchangeStats.today : 0;
+            
+            if (todayCount >= app.exchangeConfig.dailyLimit) {
+                showToast('⚠️ Daily limit reached!', 'error');
+                return;
+            }
+            
+            if ((app.exchangeStats.lifetime || 0) >= app.exchangeConfig.lifetimeLimit) {
+                showToast('⚠️ Lifetime limit reached!', 'error');
+                return;
+            }
+            
+            if (app.balance < amount) {
+                showToast(`❌ Not enough coins! Need ${amount}`, 'error');
+                return;
+            }
+            
+            const exchangeCount = Math.floor(amount / app.exchangeConfig.coins);
+            const totalUsd = exchangeCount * app.exchangeConfig.usd;
+            const totalCoinsSpent = exchangeCount * app.exchangeConfig.coins;
+            
+            if (confirm(`🪙 Exchange ${totalCoinsSpent} Coins for $${totalUsd.toFixed(3)} USD?`)) {
+                app.balance -= totalCoinsSpent;
+                app.usdBalance += totalUsd;
+                app.xpPoints += totalCoinsSpent * 2;
+                
+                const newTodayCount = todayCount + exchangeCount;
+                const newLifetimeCount = (app.exchangeStats.lifetime || 0) + exchangeCount;
+                
+                app.exchangeStats.today = newTodayCount;
+                app.exchangeStats.lifetime = newLifetimeCount;
+                app.exchangeStats.lastExchangeDate = today;
+                
+                userRef.update({
+                    balance: app.balance,
+                    usdBalance: app.usdBalance,
+                    xpPoints: app.xpPoints,
+                    exchangeStats: app.exchangeStats
+                });
+                
+                updateUI(); updateLevelUI(); updateExchangeUI();
+                showToast(`✅ +${totalUsd.toFixed(3)} USD!`);
+                document.getElementById('rewardText').textContent = `+${totalUsd.toFixed(3)} USD`;
+                document.getElementById('successModal').classList.add('active');
+            }
         }
 
         // ============================================================
@@ -2669,6 +2793,7 @@
             watchMiningCoins();
             loadAdminConfig();
             checkMaintenance();
+            loadExchangeConfig();
             
             db.ref('conversionRate').on('value', s => { app.conversionRate = s.val() || 1000; updateUI(); });
             loadLevelConfigFromDB();
@@ -2698,6 +2823,7 @@
                 app.paymentHistory = d.paymentHistory || [];
                 app.level = d.level || 1;
                 app.miningSpeed = d.miningSpeed || 0;
+                app.exchangeStats = d.exchangeStats || { today: 0, lifetime: 0, lastExchangeDate: '' };
 
                 if (!window._lastReferCode || window._lastReferCode !== app.referCode) {
                     window._lastReferCode = app.referCode;
