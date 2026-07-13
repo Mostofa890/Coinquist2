@@ -88,39 +88,112 @@
         @keyframes coinSpin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
         .mining-circle .coin-count { font-size: 30px; font-weight: 900; color: #fbbf24; }
 
-        /* ================== BOOST BUTTONS + TIMER ================== */
-        .speed-btn-container { margin-top: 12px; width: 100%; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
-        .speed-boost-btn, .mining-boost-btn {
-            color: #fff; padding: 10px 20px; border: none; border-radius: 25px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; flex: 1; max-width: 180px; justify-content: center;
+        /* ================== SPEED BOOST ================== */
+        .speed-btn-container { margin-top: 12px; width: 100%; display: flex; justify-content: center; }
+        .speed-boost-btn {
+            color: #fff; padding: 10px 20px; border: none; border-radius: 25px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #f97316, #f59e0b); transition: all 0.3s ease; justify-content: center;
         }
-        .speed-boost-btn { background: linear-gradient(135deg, #f97316, #f59e0b); }
-        .mining-boost-btn { background: linear-gradient(135deg, #8b5cf6, #3b82f6); }
-        .speed-boost-btn:disabled, .mining-boost-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .boost-countdown-box { display: none; background: rgba(249,115,22,0.15); border: 2px solid rgba(249,115,22,0.3); border-radius: 15px; padding: 14px 20px; text-align: center; width: 100%; max-width: 280px; }
-        .boost-countdown-box.show { display: block; }
-        .boost-countdown-box .countdown-label { font-size: 12px; color: #94a3b8; }
-        .boost-countdown-box .countdown-time { font-size: 24px; font-weight: 700; color: #fbbf24; }
+        .speed-boost-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* ================== MYSTERY BOX ================== */
-        .mystery-box {
+        /* ================== MYSTERY BOX (ANIMATED) ================== */
+        .mystery-box-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 280px;
+            margin: 20px auto;
+            cursor: pointer;
+            text-align: center;
+        }
+        .mystery-box-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%; /* 1:1 Ratio */
+            transition: transform 0.3s ease;
+        }
+        .mystery-box-container:hover {
+            transform: scale(1.02);
+        }
+        .mystery-box-container .box-lid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
             background: linear-gradient(135deg, #f472b6, #ec4899);
-            color: #fff;
-            padding: 16px 20px;
-            border-radius: 20px;
+            border-radius: 20px 20px 0 0;
+            border: 3px solid rgba(244,114,182,0.4);
+            transform-origin: bottom center;
+            transition: transform 0.6s ease;
+            z-index: 2;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            margin: 16px 0;
-            border: 2px solid rgba(244,114,182,0.4);
+            justify-content: center;
+            font-size: 40px;
+            box-shadow: 0 -4px 15px rgba(236,72,153,0.3);
+        }
+        .mystery-box-container .box-lid.open {
+            transform: rotateX(-120deg);
+        }
+        .mystery-box-container .box-body {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60%;
+            background: linear-gradient(135deg, #f472b6, #ec4899);
+            border-radius: 0 0 20px 20px;
+            border: 3px solid rgba(244,114,182,0.4);
+            border-top: none;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             box-shadow: 0 4px 15px rgba(236,72,153,0.3);
         }
-        .mystery-box .box-left { display: flex; align-items: center; gap: 12px; }
-        .mystery-box .box-icon { font-size: 36px; animation: pulseBox 1.5s infinite; }
-        @keyframes pulseBox { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-        .mystery-box .box-text { font-weight: 700; font-size: 16px; }
-        .mystery-box .box-sub { font-size: 12px; opacity: 0.8; }
-        .mystery-box .box-status { background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 20px; font-size: 14px; font-weight: 700; }
+        .mystery-box-container .box-body .gift-icon {
+            font-size: 60px;
+            animation: pulseBox 1.5s infinite;
+        }
+        @keyframes pulseBox {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .mystery-box-container .box-body .gift-icon.opened {
+            animation: none;
+            font-size: 40px;
+        }
+        .mystery-box-container .box-shine {
+            position: absolute;
+            top: -10%;
+            left: -10%;
+            width: 120%;
+            height: 120%;
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%);
+            pointer-events: none;
+            z-index: 3;
+            animation: shine 3s infinite;
+        }
+        @keyframes shine {
+            0% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: 0.3; transform: scale(0.8); }
+        }
+        .mystery-box-wrapper .box-label {
+            margin-top: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #fbbf24;
+        }
+        .mystery-box-wrapper .box-timer {
+            margin-top: 8px;
+            font-size: 20px;
+            font-weight: 900;
+            color: #10b981;
+            min-height: 30px;
+        }
+        .mystery-box-wrapper .box-timer.cooldown {
+            color: #fbbf24;
+        }
 
         /* ================== PAGES ================== */
         .page { display: none; min-height: 60vh; padding-top: 8px; }
@@ -145,7 +218,7 @@
         .withdraw-section .withdraw-btn { margin-top: 8px; padding: 12px 20px; background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; width: 100%; font-size: 15px; transition: all 0.3s ease; }
         .withdraw-section .withdraw-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* ================== BUY COINS (SSLCOMMERZ + Stripe) ================== */
+        /* ================== BUY COINS ================== */
         .buy-coins-section {
             background: rgba(251,191,36,0.08);
             border: 2px solid rgba(251,191,36,0.2);
@@ -467,19 +540,11 @@
                 </div>
             </div>
 
-            <!-- ✅ BOOST BUTTONS WITH TIMER -->
+            <!-- ✅ SPEED BOOST (Mining Boost রিমুভ করা হয়েছে) -->
             <div class="speed-btn-container">
                 <button class="speed-boost-btn" id="speedBoostBtn" onclick="activateSpeedBoost()">
                     <i class="fas fa-rocket"></i> Speed Boost
                 </button>
-                <button class="mining-boost-btn" id="miningBoostBtn" onclick="activateMiningBoost()">
-                    <i class="fas fa-bolt"></i> Mining Boost
-                </button>
-                
-                <div class="boost-countdown-box" id="boostCountdownBox">
-                    <div class="countdown-label">⏳ Cooldown</div>
-                    <div class="countdown-time" id="boostCountdownTime">00:00</div>
-                </div>
             </div>
 
             <div class="rules-text">
@@ -487,16 +552,19 @@
                 <div id="miningRulesText">Loading rules...</div>
             </div>
 
-            <!-- ✅ MYSTERY BOX WITH TIMER -->
-            <div class="mystery-box" onclick="openMysteryBox()">
-                <div class="box-left">
-                    <span class="box-icon">🎁</span>
-                    <div>
-                        <div class="box-text">Mystery Box</div>
-                        <div class="box-sub">Watch ad to open</div>
+            <!-- ✅ ANIMATED MYSTERY BOX WITH TIMER -->
+            <div class="mystery-box-wrapper" id="mysteryBoxWrapper">
+                <div class="mystery-box-container" id="mysteryBoxContainer" onclick="openMysteryBox()">
+                    <div class="box-shine"></div>
+                    <div class="box-lid" id="boxLid">
+                        🎁
+                    </div>
+                    <div class="box-body">
+                        <span class="gift-icon" id="giftIcon">🎁</span>
                     </div>
                 </div>
-                <div class="box-status" id="mysteryBoxStatus">🔒</div>
+                <div class="box-label">🎁 Mystery Box</div>
+                <div class="box-timer" id="mysteryBoxTimer">Tap to open</div>
             </div>
         </div>
 
@@ -789,22 +857,20 @@
             balance: 0, usdBalance: 0, referralCount: 0, lastConversion: null, 
             conversionRate: 1000, minWithdraw: 10, withdrawHistory: [], 
             referCode: '', referTiers: {}, progressCoins: TOTAL_COINS, 
-            videoWatchedCount: 0, speedBoostCooldown: 0, miningBoostCooldown: 0,
+            videoWatchedCount: 0, speedBoostCooldown: 0, 
             taskLastCompleted: {}, taskProgress: {}, airdropClaimed: false, 
             xpPoints: NEGATIVE_XP, withdrawMethods: ['Nagad','Rocket'], 
             selectedMethod: 'Nagad', isBanned: false, banReason: '', 
             banAppealSubmitted: false, lastVideoWatchTime: 0,
             dailyBonusClaimed: 0,
+            mysteryBoxCooldown: 0, // ✅ Firebase-এ সেভ থাকবে
             
-            // Admin-controlled settings (fetched from DB)
+            // Admin-controlled settings
             dailyBonusMin: 50,
             dailyBonusMax: 100,
-            miningBoostMin: 20,
-            miningBoostMax: 50,
-            miningBoostDuration: 3600000,
             mysteryBoxMin: 20,
             mysteryBoxMax: 100,
-            mysteryBoxDuration: 1800000
+            mysteryBoxDuration: 1800000 // 30 minutes
         };
         let tasks = [], conversionTimer = null, miningInterval = null, boostTimer = null, airdropTimer = null, 
             currentFilter = 'all', currentLevelFilter = 'all', levelConfigCache = {}, referralConfigCache = {};
@@ -1037,50 +1103,46 @@
         }
 
         // ============================================================
-        // ================== MINING BOOST (WITH TIMER) ================
+        // ================== MYSTERY BOX (ANIMATED + TIMER) ===========
         // ============================================================
-        function activateMiningBoost() {
-            if (!isOnline) { showToast('No internet!', 'error'); return; }
-            if (app.miningBoostCooldown > Date.now()) {
-                const remaining = Math.ceil((app.miningBoostCooldown - Date.now()) / 1000);
-                showToast(`⏳ Cooldown: ${formatTime(remaining)}`, 'error');
-                return;
-            }
-            if (app.progressCoins <= 0) { showToast('❌ No coins to boost!', 'error'); return; }
-            const btn = document.getElementById('miningBoostBtn');
-            btn.dataset.originalText = 'Mining Boost';
+        function updateMysteryBoxUI() {
+            const timerEl = document.getElementById('mysteryBoxTimer');
+            const lid = document.getElementById('boxLid');
+            const icon = document.getElementById('giftIcon');
             
-            showInterstitialAd(() => {
-                const boostAmount = app.miningBoostMin + Math.floor(Math.random() * (app.miningBoostMax - app.miningBoostMin + 1));
-                app.balance += boostAmount;
-                app.xpPoints += boostAmount * 2;
-                app.miningBoostCooldown = Date.now() + app.miningBoostDuration;
-                userRef.update({
-                    balance: app.balance,
-                    xpPoints: app.xpPoints,
-                    miningBoostCooldown: app.miningBoostCooldown
-                });
-                updateUI(); updateLevelUI();
-                showToast(`🚀 Mining Boost: +${boostAmount} Coins!`);
-                document.getElementById('boostCountdownBox').classList.add('show');
-                updateSpeedBoostUI();
-            }, 'miningBoostBtn');
+            if (app.mysteryBoxCooldown > Date.now()) {
+                const remaining = Math.ceil((app.mysteryBoxCooldown - Date.now()) / 1000);
+                timerEl.textContent = `⏳ ${formatTime(remaining)}`;
+                timerEl.classList.add('cooldown');
+                lid.classList.remove('open');
+                icon.className = 'gift-icon';
+                icon.textContent = '🎁';
+                document.getElementById('mysteryBoxWrapper').style.cursor = 'default';
+            } else {
+                timerEl.textContent = '🎯 Tap to open';
+                timerEl.classList.remove('cooldown');
+                lid.classList.remove('open');
+                icon.className = 'gift-icon';
+                icon.textContent = '🎁';
+                document.getElementById('mysteryBoxWrapper').style.cursor = 'pointer';
+            }
         }
-
-        // ============================================================
-        // ================== MYSTERY BOX (WITH TIMER + USD) ===========
-        // ============================================================
-        let mysteryBoxCooldown = 0;
 
         function openMysteryBox() {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
-            if (mysteryBoxCooldown > Date.now()) {
-                const remaining = Math.ceil((mysteryBoxCooldown - Date.now()) / 1000);
+            if (app.mysteryBoxCooldown > Date.now()) {
+                const remaining = Math.ceil((app.mysteryBoxCooldown - Date.now()) / 1000);
                 showToast(`⏳ Cooldown: ${formatTime(remaining)}`, 'error');
                 return;
             }
-            const btn = document.getElementById('mysteryBoxStatus');
-            btn.textContent = '⏳ Loading...';
+            
+            const lid = document.getElementById('boxLid');
+            const icon = document.getElementById('giftIcon');
+            
+            // Animate box opening
+            lid.classList.add('open');
+            icon.className = 'gift-icon opened';
+            icon.textContent = '✨';
             
             showRewardedAd(() => {
                 // ৫০% USD, ৫০% Coins
@@ -1097,11 +1159,14 @@
                 }
                 
                 app.xpPoints += (rewardCoins || parseFloat(rewardUsd) * 1000) * 2;
-                mysteryBoxCooldown = Date.now() + app.mysteryBoxDuration;
+                app.mysteryBoxCooldown = Date.now() + app.mysteryBoxDuration;
+                
+                // ✅ Firebase-এ কুলডাউন সেভ
                 userRef.update({
                     balance: app.balance,
                     usdBalance: app.usdBalance,
-                    xpPoints: app.xpPoints
+                    xpPoints: app.xpPoints,
+                    mysteryBoxCooldown: app.mysteryBoxCooldown
                 });
                 
                 const rewardText = rewardType === 'coins' ? `+${rewardCoins} Coins` : `+$${rewardUsd} USD`;
@@ -1109,40 +1174,30 @@
                 document.getElementById('rewardText').textContent = rewardText;
                 document.getElementById('successModal').classList.add('active');
                 updateUI(); updateLevelUI();
-                btn.textContent = '✅ Opened';
-                setTimeout(() => { btn.textContent = '🎁'; }, 3000);
-            }, 'mysteryBoxStatus');
+                updateMysteryBoxUI();
+                
+                // Close lid after 2 seconds
+                setTimeout(() => {
+                    lid.classList.remove('open');
+                    icon.className = 'gift-icon';
+                    icon.textContent = '🎁';
+                }, 2000);
+            }, 'mysteryBoxWrapper');
         }
 
         // ============================================================
-        // ================== SPEED BOOST (WITH TIMER) =================
+        // ================== SPEED BOOST ==============================
         // ============================================================
-        function updateSpeedBoostUI() { 
-            const bb = document.getElementById('speedBoostBtn'); 
-            const cb = document.getElementById('boostCountdownBox'); 
-            if (app.speedBoostCooldown > Date.now() || app.miningBoostCooldown > Date.now()) { 
-                bb.style.display = 'none'; 
-                cb.classList.add('show'); 
-                if (boostTimer) clearInterval(boostTimer); 
-                boostTimer = setInterval(() => { 
-                    const speedRemaining = Math.max(0, Math.ceil((app.speedBoostCooldown - Date.now()) / 1000));
-                    const miningRemaining = Math.max(0, Math.ceil((app.miningBoostCooldown - Date.now()) / 1000));
-                    const r = Math.max(speedRemaining, miningRemaining);
-                    document.getElementById('boostCountdownTime').textContent = formatTime(r); 
-                    if (r <= 0) { 
-                        app.speedBoostCooldown = 0; 
-                        app.miningBoostCooldown = 0;
-                        userRef.update({ speedBoostCooldown: 0, miningBoostCooldown: 0 }); 
-                        updateSpeedBoostUI(); 
-                        showToast('⚡ Boosts ready!'); 
-                    } 
-                }, 1000); 
-            } else { 
-                bb.style.display = 'flex'; 
-                cb.classList.remove('show'); 
-                if (boostTimer) { clearInterval(boostTimer); boostTimer = null; } 
-                bb.disabled = false; bb.style.opacity = '1'; bb.title = 'Activate Speed Boost (once per hour)';
-            } 
+        function updateSpeedBoostUI() {
+            const bb = document.getElementById('speedBoostBtn');
+            if (app.speedBoostCooldown > Date.now()) {
+                const remaining = Math.ceil((app.speedBoostCooldown - Date.now()) / 1000);
+                bb.disabled = true;
+                bb.textContent = `⏳ ${formatTime(remaining)}`;
+            } else {
+                bb.disabled = false;
+                bb.textContent = '🚀 Speed Boost';
+            }
         }
 
         function activateSpeedBoost() { 
@@ -1276,7 +1331,7 @@
         function buyWithSSLCOMMERZ(amount, method) {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
             
-            // আপনার ব্যাকএন্ড URL (যেখানে SSLCOMMERZ API কল হবে)
+            // আপনার ব্যাকএন্ড URL
             const backendUrl = 'https://yourdomain.com/api/payment-init';
             
             fetch(backendUrl, {
@@ -1293,7 +1348,6 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // SSLCOMMERZ পেমেন্ট পেজে রিডাইরেক্ট
                     window.location.href = data.payment_url;
                 } else {
                     showToast('⚠️ ' + data.message, 'error');
@@ -1371,12 +1425,6 @@
                 app.dailyBonusMin = config.min || 50;
                 app.dailyBonusMax = config.max || 100;
             });
-            db.ref('config/miningBoost').on('value', snap => {
-                const config = snap.val() || { min: 20, max: 50, duration: 3600000 };
-                app.miningBoostMin = config.min || 20;
-                app.miningBoostMax = config.max || 50;
-                app.miningBoostDuration = config.duration || 3600000;
-            });
             db.ref('config/mysteryBox').on('value', snap => {
                 const config = snap.val() || { min: 20, max: 100, duration: 1800000 };
                 app.mysteryBoxMin = config.min || 20;
@@ -1411,23 +1459,23 @@
             if (typeof show_11197472 !== 'function') { if (cb) cb(); return; }
             isAdShowing = true;
             const btn = document.getElementById(btnId);
-            if (btn) { btn.disabled = true; btn.textContent = '⏳ Loading...'; }
+            if (btn) { btn.disabled = true; }
             try {
                 show_11197472('pop')
                     .then(() => {
                         isAdShowing = false;
-                        if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || '▶ Watch'; }
+                        if (btn) { btn.disabled = false; }
                         if (cb) cb();
                     })
                     .catch(() => {
                         isAdShowing = false;
-                        if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || '▶ Watch'; }
+                        if (btn) { btn.disabled = false; }
                         if (cb) cb();
                         showToast('⚠️ Ad failed, but reward given!');
                     });
             } catch (error) {
                 isAdShowing = false;
-                if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || '▶ Watch'; }
+                if (btn) { btn.disabled = false; }
                 if (cb) cb();
                 showToast('⚠️ Ad failed, but reward given!');
             }
@@ -1438,22 +1486,22 @@
             if (typeof show_11197472 !== 'function') { if (cb) cb(); return; }
             isAdShowing = true;
             const btn = document.getElementById(btnId);
-            if (btn) { btn.disabled = true; btn.textContent = '⏳ Loading...'; }
+            if (btn) { btn.disabled = true; }
             try {
                 show_11197472()
                     .then(() => {
                         isAdShowing = false;
-                        if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || 'Speed Boost'; }
+                        if (btn) { btn.disabled = false; }
                         if (cb) cb();
                     })
                     .catch(() => {
                         isAdShowing = false;
-                        if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || 'Speed Boost'; }
+                        if (btn) { btn.disabled = false; }
                         if (cb) cb();
                     });
             } catch (error) {
                 isAdShowing = false;
-                if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || 'Speed Boost'; }
+                if (btn) { btn.disabled = false; }
                 if (cb) cb();
             }
         }
@@ -1463,22 +1511,22 @@
             if (typeof show_11197472 !== 'function') { if (cb) cb(); return; }
             isAdShowing = true;
             const btn = document.getElementById(btnId);
-            if (btn) { btn.disabled = true; btn.textContent = '⏳ Loading...'; }
+            if (btn) { btn.disabled = true; }
             try {
                 show_11197472('pop')
                     .then(() => {
                         isAdShowing = false;
-                        if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || '🎁 Claim'; }
+                        if (btn) { btn.disabled = false; }
                         if (cb) cb();
                     })
                     .catch(() => {
                         isAdShowing = false;
-                        if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || '🎁 Claim'; }
+                        if (btn) { btn.disabled = false; }
                         if (cb) cb();
                     });
             } catch (error) {
                 isAdShowing = false;
-                if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || '🎁 Claim'; }
+                if (btn) { btn.disabled = false; }
                 if (cb) cb();
             }
         }
@@ -2053,7 +2101,7 @@
                 app.referTiers = d.referTiers || {};
                 app.progressCoins = d.progressCoins !== undefined ? d.progressCoins : TOTAL_COINS;
                 app.speedBoostCooldown = d.speedBoostCooldown || 0;
-                app.miningBoostCooldown = d.miningBoostCooldown || 0;
+                app.mysteryBoxCooldown = d.mysteryBoxCooldown || 0; // ✅ Load from Firebase
                 app.taskLastCompleted = d.taskLastCompleted || {};
                 app.taskProgress = d.taskProgress || {};
                 app.xpPoints = d.xpPoints !== undefined ? d.xpPoints : NEGATIVE_XP;
@@ -2072,6 +2120,9 @@
                 
                 const today = new Date().toDateString();
                 document.getElementById('dailyBonusStatus').textContent = app.dailyBonusClaimed === today ? '✅ Claimed' : '🎯 Claim Now';
+                
+                // ✅ Update Mystery Box UI
+                updateMysteryBoxUI();
                 
                 if (!d.balance && d.xpPoints === undefined) {
                     userRef.update({ 
