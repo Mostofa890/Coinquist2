@@ -19,8 +19,19 @@
         
         /* ================== MAINTENANCE OVERLAY ================== */
         #maintenanceOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999999;
-            display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 9999999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 24px;
+            text-align: center;
         }
         #maintenanceOverlay.show { display: flex; }
         #maintenanceOverlay .icon { font-size: 80px; color: #fbbf24; margin-bottom: 20px; animation: pulse 1.5s infinite; }
@@ -44,7 +55,20 @@
         .conversion-timer .time { font-size: 16px; font-weight: bold; color: #10b981; }
 
         /* ================== DAILY BONUS ================== */
-        .daily-bonus { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; padding: 14px 18px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(251,191,36,0.3); font-weight: 700; border: 2px solid rgba(251,191,36,0.5); }
+        .daily-bonus {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #0f172a;
+            padding: 14px 18px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 15px rgba(251,191,36,0.3);
+            font-weight: 700;
+            border: 2px solid rgba(251,191,36,0.5);
+        }
         .daily-bonus .bonus-left { display: flex; align-items: center; gap: 8px; font-size: 16px; }
         .daily-bonus .bonus-status { background: rgba(15,23,42,0.2); padding: 4px 14px; border-radius: 20px; font-size: 14px; }
 
@@ -65,30 +89,137 @@
 
         /* ================== SPEED BOOST ================== */
         .speed-btn-container { margin-top: 12px; width: 100%; display: flex; justify-content: center; }
-        .speed-boost-btn { color: #fff; padding: 10px 20px; border: none; border-radius: 25px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #f97316, #f59e0b); transition: all 0.3s ease; justify-content: center; }
+        .speed-boost-btn {
+            color: #fff; padding: 10px 20px; border: none; border-radius: 25px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #f97316, #f59e0b); transition: all 0.3s ease; justify-content: center;
+        }
         .speed-boost-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* ================== MYSTERY BOX ================== */
-        .mystery-box-wrapper { position: relative; width: 100%; max-width: 280px; margin: 20px auto; cursor: pointer; text-align: center; }
-        .mystery-box-container { position: relative; width: 100%; padding-bottom: 100%; transition: transform 0.3s ease; }
-        .mystery-box-container:hover { transform: scale(1.02); }
-        .mystery-box-container .box-lid { position: absolute; top: 0; left: 0; width: 100%; height: 50%; background: linear-gradient(135deg, #f472b6, #ec4899); border-radius: 20px 20px 0 0; border: 3px solid rgba(244,114,182,0.4); transform-origin: bottom center; transition: transform 0.6s ease; z-index: 2; display: flex; align-items: center; justify-content: center; font-size: 40px; box-shadow: 0 -4px 15px rgba(236,72,153,0.3); }
-        .mystery-box-container .box-lid.open { transform: rotateX(-120deg); }
-        .mystery-box-container .box-body { position: absolute; bottom: 0; left: 0; width: 100%; height: 60%; background: linear-gradient(135deg, #f472b6, #ec4899); border-radius: 0 0 20px 20px; border: 3px solid rgba(244,114,182,0.4); border-top: none; z-index: 1; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(236,72,153,0.3); }
-        .mystery-box-container .box-body .gift-icon { font-size: 60px; animation: pulseBox 1.5s infinite; }
-        @keyframes pulseBox { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-        .mystery-box-container .box-body .gift-icon.opened { animation: none; font-size: 40px; }
-        .mystery-box-container .box-shine { position: absolute; top: -10%; left: -10%; width: 120%; height: 120%; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%); pointer-events: none; z-index: 3; animation: shine 3s infinite; }
-        @keyframes shine { 0% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.3; transform: scale(0.8); } }
-        .mystery-box-wrapper .box-label { margin-top: 12px; font-size: 16px; font-weight: 700; color: #fbbf24; }
-        .mystery-box-wrapper .box-timer { margin-top: 8px; font-size: 20px; font-weight: 900; color: #10b981; min-height: 30px; }
-        .mystery-box-wrapper .box-timer.cooldown { color: #fbbf24; }
+        /* ================== MYSTERY BOX (ANIMATED) ================== */
+        .mystery-box-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 280px;
+            margin: 20px auto;
+            cursor: pointer;
+            text-align: center;
+        }
+        .mystery-box-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%; /* 1:1 Ratio */
+            transition: transform 0.3s ease;
+        }
+        .mystery-box-container:hover {
+            transform: scale(1.02);
+        }
+        .mystery-box-container .box-lid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: linear-gradient(135deg, #f472b6, #ec4899);
+            border-radius: 20px 20px 0 0;
+            border: 3px solid rgba(244,114,182,0.4);
+            transform-origin: bottom center;
+            transition: transform 0.6s ease;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            box-shadow: 0 -4px 15px rgba(236,72,153,0.3);
+        }
+        .mystery-box-container .box-lid.open {
+            transform: rotateX(-120deg);
+        }
+        .mystery-box-container .box-body {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60%;
+            background: linear-gradient(135deg, #f472b6, #ec4899);
+            border-radius: 0 0 20px 20px;
+            border: 3px solid rgba(244,114,182,0.4);
+            border-top: none;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(236,72,153,0.3);
+        }
+        .mystery-box-container .box-body .gift-icon {
+            font-size: 60px;
+            animation: pulseBox 1.5s infinite;
+        }
+        @keyframes pulseBox {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .mystery-box-container .box-body .gift-icon.opened {
+            animation: none;
+            font-size: 40px;
+        }
+        .mystery-box-container .box-shine {
+            position: absolute;
+            top: -10%;
+            left: -10%;
+            width: 120%;
+            height: 120%;
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%);
+            pointer-events: none;
+            z-index: 3;
+            animation: shine 3s infinite;
+        }
+        @keyframes shine {
+            0% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: 0.3; transform: scale(0.8); }
+        }
+        .mystery-box-wrapper .box-label {
+            margin-top: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #fbbf24;
+        }
+        .mystery-box-wrapper .box-timer {
+            margin-top: 8px;
+            font-size: 20px;
+            font-weight: 900;
+            color: #10b981;
+            min-height: 30px;
+        }
+        .mystery-box-wrapper .box-timer.cooldown {
+            color: #fbbf24;
+        }
 
         /* ================== NOTIFICATION BELL ================== */
-        .notification-bell { position: relative; cursor: pointer; margin-left: auto; color: #94a3b8; transition: color 0.3s ease; }
-        .notification-bell:hover { color: #fbbf24; }
-        .notification-bell .bell-icon { font-size: 22px; }
-        .notification-bell .badge { position: absolute; top: -5px; right: -5px; background: #ef4444; color: #fff; border-radius: 50%; padding: 2px 6px; font-size: 10px; font-weight: 700; display: none; }
+        .notification-bell {
+            position: relative;
+            cursor: pointer;
+            margin-left: auto;
+            color: #94a3b8;
+            transition: color 0.3s ease;
+        }
+        .notification-bell:hover {
+            color: #fbbf24;
+        }
+        .notification-bell .bell-icon {
+            font-size: 22px;
+        }
+        .notification-bell .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: #fff;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: 700;
+            display: none;
+        }
 
         /* ================== PAGES ================== */
         .page { display: none; min-height: 60vh; padding-top: 8px; }
@@ -114,7 +245,14 @@
         .withdraw-section .withdraw-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         /* ================== BUY COINS (bKash, Nagad, Rocket) ================== */
-        .buy-coins-section { background: rgba(251,191,36,0.08); border: 2px solid rgba(251,191,36,0.2); border-radius: 16px; padding: 16px; margin: 16px 0; text-align: center; }
+        .buy-coins-section {
+            background: rgba(251,191,36,0.08);
+            border: 2px solid rgba(251,191,36,0.2);
+            border-radius: 16px;
+            padding: 16px;
+            margin: 16px 0;
+            text-align: center;
+        }
         .buy-coins-section .buy-title { font-size: 14px; font-weight: 700; color: #fbbf24; margin-bottom: 10px; }
         .payment-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .payment-card { background: rgba(255,255,255,0.05); padding: 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); text-align: center; cursor: pointer; transition: 0.3s; }
@@ -127,7 +265,14 @@
         .payment-card.rocket { border-color: #c5262c; }
 
         /* ================== SUBSCRIPTION ================== */
-        .subscription-section { background: rgba(16,185,129,0.08); border: 2px solid rgba(16,185,129,0.2); border-radius: 16px; padding: 16px; margin: 16px 0; text-align: center; }
+        .subscription-section {
+            background: rgba(16,185,129,0.08);
+            border: 2px solid rgba(16,185,129,0.2);
+            border-radius: 16px;
+            padding: 16px;
+            margin: 16px 0;
+            text-align: center;
+        }
         .subscription-section .sub-title { font-size: 14px; font-weight: 700; color: #10b981; margin-bottom: 10px; }
         .sub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .sub-card { background: rgba(255,255,255,0.05); padding: 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); text-align: center; cursor: pointer; transition: 0.3s; }
@@ -138,7 +283,14 @@
         .sub-card .sub-features { font-size: 11px; color: #94a3b8; margin-top: 4px; }
 
         /* ================== LEVEL UPGRADE ================== */
-        .level-upgrade-section { background: rgba(139,92,246,0.08); border: 2px solid rgba(139,92,246,0.2); border-radius: 16px; padding: 16px; margin-top: 16px; text-align: center; }
+        .level-upgrade-section {
+            background: rgba(139,92,246,0.08);
+            border: 2px solid rgba(139,92,246,0.2);
+            border-radius: 16px;
+            padding: 16px;
+            margin-top: 16px;
+            text-align: center;
+        }
         .level-upgrade-section .upgrade-title { font-size: 14px; font-weight: 700; color: #8b5cf6; margin-bottom: 10px; }
         .upgrade-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .upgrade-card { background: rgba(255,255,255,0.05); padding: 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); text-align: center; cursor: pointer; transition: 0.3s; }
@@ -149,7 +301,16 @@
         .upgrade-card .upgrade-bonus { font-size: 11px; color: #10b981; margin-top: 4px; }
 
         /* ================== LEADERBOARD ================== */
-        .leaderboard-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.06); }
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
         .leaderboard-item .rank { font-weight: 900; color: #fbbf24; min-width: 30px; }
         .leaderboard-item .user { display: flex; align-items: center; gap: 10px; flex: 1; }
         .leaderboard-item .user .avatar-small { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #3b82f6); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff; }
@@ -237,7 +398,9 @@
         .loader-sub { color: #94a3b8; font-size: 13px; margin-top: 8px; }
 
         /* ================== FLOATING SPIN BUTTON ================== */
-        #floatingSpinBtn { position: fixed; right: 20px; bottom: 120px; width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #f59e0b); color: #fff; border: none; box-shadow: 0 4px 20px rgba(249,115,22,0.4); cursor: grab; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.3s ease; touch-action: none; }
+        #floatingSpinBtn {
+            position: fixed; right: 20px; bottom: 120px; width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #f59e0b); color: #fff; border: none; box-shadow: 0 4px 20px rgba(249,115,22,0.4); cursor: grab; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.3s ease; touch-action: none;
+        }
         #floatingSpinBtn:active { cursor: grabbing; }
         #floatingSpinBtn:disabled { opacity: 0.6; cursor: not-allowed; }
         #floatingSpinBtn .spin-icon { font-size: 28px; animation: spinFloat 4s linear infinite; }
@@ -270,60 +433,6 @@
         .spin-timer-box-new .timer-label { font-size: 12px; color: #94a3b8; }
         .spin-timer-box-new .timer-time { font-size: 24px; font-weight: 700; color: #fbbf24; }
         .spin-result-new { margin-top: 10px; font-size: 18px; font-weight: 700; color: #10b981; min-height: 30px; }
-
-        /* ================== NOTIFICATION OVERLAY ================== */
-        .notification-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 999999; display: none; flex-direction: column; }
-        .notification-overlay.show { display: flex; }
-        .notification-overlay-header { background: rgba(15,23,42,0.95); padding: 15px 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .notification-overlay-header .back-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 8px 16px; border-radius: 10px; cursor: pointer; }
-        #notificationList { padding: 15px; overflow-y: auto; flex: 1; }
-        .notification-item { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 12px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; }
-        .notification-item .notif-content { flex: 1; }
-        .notification-item .notif-title { font-size: 14px; font-weight: 600; color: #fbbf24; }
-        .notification-item .notif-body { font-size: 12px; color: #94a3b8; }
-        .notification-item .notif-time { font-size: 10px; color: #64748b; }
-        .notification-item .notif-read { color: #10b981; font-size: 18px; margin-left: 10px; }
-        .notification-item.unread { border-color: #3b82f6; background: rgba(59,130,246,0.05); }
-
-        /* ================== PACKAGE SELECTION OVERLAY ================== */
-        .package-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 99999; display: none; flex-direction: column; }
-        .package-overlay.show { display: flex; }
-        .package-header { background: rgba(15,23,42,0.95); padding: 15px 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .package-header .back-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 8px 16px; border-radius: 10px; cursor: pointer; }
-        #packageList { padding: 15px; overflow-y: auto; flex: 1; }
-        .package-card { background: rgba(255,255,255,0.03); border-radius: 14px; padding: 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.08); cursor: pointer; transition: 0.3s; }
-        .package-card:hover { background: rgba(255,255,255,0.08); border-color: #fbbf24; }
-        .package-card .pkg-name { font-size: 16px; font-weight: 700; color: #fff; }
-        .package-card .pkg-price { font-size: 14px; color: #fbbf24; font-weight: 600; }
-        .package-card .pkg-desc { font-size: 12px; color: #94a3b8; margin-top: 4px; }
-        .package-card .pkg-coins { font-size: 14px; color: #10b981; font-weight: 700; }
-
-        /* ================== PAYMENT FORM OVERLAY ================== */
-        .payment-form-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 999999; display: none; flex-direction: column; }
-        .payment-form-overlay.show { display: flex; }
-        .payment-form-header { background: rgba(15,23,42,0.95); padding: 15px 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .payment-form-header .back-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 8px 16px; border-radius: 10px; cursor: pointer; }
-        #paymentFormContent { padding: 20px; overflow-y: auto; flex: 1; }
-        .payment-form-card { background: rgba(255,255,255,0.03); border-radius: 14px; padding: 20px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 15px; }
-        .payment-form-card .form-group { margin-bottom: 15px; }
-        .payment-form-card .form-group label { font-size: 12px; color: #94a3b8; display: block; margin-bottom: 4px; }
-        .payment-form-card .form-group input, .payment-form-card .form-group select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #fff; font-size: 14px; outline: none; }
-        .payment-form-card .form-group select option { background: #1e293b; }
-        .payment-form-card .payment-summary { background: rgba(251,191,36,0.08); border-radius: 10px; padding: 12px; border: 1px solid rgba(251,191,36,0.2); margin-bottom: 15px; }
-        .payment-form-card .payment-summary .summary-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 14px; }
-        .payment-form-card .payment-summary .summary-row .label { color: #94a3b8; }
-        .payment-form-card .payment-summary .summary-row .value { color: #fff; font-weight: 600; }
-        .payment-form-card .payment-summary .total { border-top: 1px solid rgba(255,255,255,0.1); margin-top: 8px; padding-top: 8px; font-size: 16px; font-weight: 700; }
-        .payment-form-card .payment-summary .total .value { color: #fbbf24; }
-        .payment-form-card .payment-timer { font-size: 28px; font-weight: 900; color: #fbbf24; text-align: center; margin: 10px 0; }
-        .payment-form-card .submit-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 12px; color: #fff; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.3s; }
-        .payment-form-card .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .payment-form-card .submit-btn:hover:not(:disabled) { transform: scale(1.02); }
-        .method-selector-payment { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
-        .method-btn-payment { padding: 10px 16px; border-radius: 10px; border: 2px solid #334155; background: #1e293b; color: #94a3b8; cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.3s ease; flex: 1; min-width: 60px; text-align: center; }
-        .method-btn-payment.active { border-color: #10b981; background: rgba(16,185,129,0.15); color: #10b981; }
-        .method-btn-payment:hover { border-color: #64748b; }
-        .method-btn-payment i { margin-right: 6px; }
     </style>
 </head>
 <body>
@@ -383,6 +492,7 @@
                 <div class="level-bonus" id="lvlBonus">Mining Bonus: +0%</div>
             </div>
             
+            <!-- ✅ LEVEL UPGRADE (উপরে) -->
             <div class="level-upgrade-section">
                 <div class="upgrade-title">🚀 Level Upgrade</div>
                 <div class="upgrade-grid">
@@ -457,69 +567,6 @@
         </div>
     </div>
 
-    <!-- ================== NOTIFICATION OVERLAY ================== -->
-    <div class="notification-overlay" id="notificationOverlay">
-        <div class="notification-overlay-header">
-            <button class="back-btn" onclick="closeNotificationPanel()"><i class="fas fa-arrow-left"></i> Back</button>
-            <h2 style="color:#fff;">📨 Notifications</h2>
-        </div>
-        <div id="notificationList" style="padding:15px;">
-            <p style="color:#94a3b8;text-align:center;">Loading notifications...</p>
-        </div>
-    </div>
-
-    <!-- ================== PACKAGE SELECTION OVERLAY ================== -->
-    <div class="package-overlay" id="packageOverlay">
-        <div class="package-header">
-            <button class="back-btn" onclick="closePackagePage()"><i class="fas fa-arrow-left"></i> Back</button>
-            <h2 style="color:#fff;">📦 Buy Coins Packages</h2>
-        </div>
-        <div id="packageList">
-            <p style="color:#94a3b8;text-align:center;">Loading packages...</p>
-        </div>
-    </div>
-
-    <!-- ================== PAYMENT FORM OVERLAY ================== -->
-    <div class="payment-form-overlay" id="paymentFormOverlay">
-        <div class="payment-form-header">
-            <button class="back-btn" onclick="closePaymentForm()"><i class="fas fa-arrow-left"></i> Back</button>
-            <h2 style="color:#fff;">💳 Payment Details</h2>
-        </div>
-        <div id="paymentFormContent">
-            <div class="payment-form-card">
-                <div class="form-group">
-                    <label>Payment Method</label>
-                    <div class="method-selector-payment" id="paymentMethodSelector">
-                        <button class="method-btn-payment active" onclick="selectPaymentMethod('bKash',this)"><i class="fas fa-mobile-alt"></i> bKash</button>
-                        <button class="method-btn-payment" onclick="selectPaymentMethod('Nagad',this)"><i class="fas fa-mobile-alt"></i> Nagad</button>
-                        <button class="method-btn-payment" onclick="selectPaymentMethod('Rocket',this)"><i class="fas fa-rocket"></i> Rocket</button>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Your Name</label>
-                    <input type="text" id="paymentUserName" placeholder="Enter your full name">
-                </div>
-                <div class="form-group">
-                    <label>Your Mobile Number</label>
-                    <input type="text" id="paymentUserMobile" placeholder="Enter your mobile number">
-                </div>
-                <div class="form-group">
-                    <label>Transaction ID</label>
-                    <input type="text" id="paymentTransactionId" placeholder="Enter transaction ID from your payment">
-                </div>
-                <div class="payment-summary" id="paymentSummary">
-                    <div class="summary-row"><span class="label">Package:</span><span class="value" id="summaryPackageName">-</span></div>
-                    <div class="summary-row"><span class="label">Coins:</span><span class="value" id="summaryCoins">-</span></div>
-                    <div class="summary-row"><span class="label">Payment Method:</span><span class="value" id="summaryMethod">-</span></div>
-                    <div class="summary-row total"><span class="label">Total to Pay:</span><span class="value" id="summaryAmount">- BDT</span></div>
-                </div>
-                <div class="payment-timer" id="paymentFormTimer">15:00</div>
-                <div style="font-size:12px;color:#94a3b8;text-align:center;margin-bottom:15px;">⏳ Please wait for admin approval (max 15 minutes)</div>
-                <button class="submit-btn" id="paymentSubmitBtn" onclick="submitPaymentRequest()">📤 Submit Payment</button>
-            </div>
-        </div>
-    </div>
-
     <!-- ============================================================ -->
     <!-- ================== MAIN CONTENT ============================= -->
     <!-- ============================================================ -->
@@ -534,6 +581,7 @@
                     <div class="last-login" id="lastLoginDisplay">📅 --</div>
                     <span class="level-badge" onclick="openLevelPage()" id="userLevelBadge">🔒 Unlocking</span>
                 </div>
+                <!-- ✅ NOTIFICATION BELL -->
                 <div class="notification-bell" onclick="openNotificationPanel()">
                     <i class="fas fa-bell bell-icon"></i>
                     <span class="badge" id="notifBadge">0</span>
@@ -562,8 +610,12 @@
             </div>
         </div>
 
+        <!-- ✅ DAILY BONUS -->
         <div class="daily-bonus" onclick="claimDailyBonus()">
-            <div class="bonus-left"><span>🎁</span><span>Daily Bonus</span></div>
+            <div class="bonus-left">
+                <span>🎁</span>
+                <span>Daily Bonus</span>
+            </div>
             <div class="bonus-status" id="dailyBonusStatus">🎯 Claim Now</div>
         </div>
 
@@ -585,17 +637,28 @@
                 </div>
             </div>
 
+            <!-- ✅ SPEED BOOST -->
             <div class="speed-btn-container">
-                <button class="speed-boost-btn" id="speedBoostBtn" onclick="activateSpeedBoost()"><i class="fas fa-rocket"></i> Speed Boost</button>
+                <button class="speed-boost-btn" id="speedBoostBtn" onclick="activateSpeedBoost()">
+                    <i class="fas fa-rocket"></i> Speed Boost
+                </button>
             </div>
 
-            <div class="rules-text"><div class="rule-title">📋 Mining Rules</div><div id="miningRulesText">Loading rules...</div></div>
+            <div class="rules-text">
+                <div class="rule-title">📋 Mining Rules</div>
+                <div id="miningRulesText">Loading rules...</div>
+            </div>
 
+            <!-- ✅ ANIMATED MYSTERY BOX WITH TIMER -->
             <div class="mystery-box-wrapper" id="mysteryBoxWrapper">
                 <div class="mystery-box-container" id="mysteryBoxContainer" onclick="openMysteryBox()">
                     <div class="box-shine"></div>
-                    <div class="box-lid" id="boxLid">🎁</div>
-                    <div class="box-body"><span class="gift-icon" id="giftIcon">🎁</span></div>
+                    <div class="box-lid" id="boxLid">
+                        🎁
+                    </div>
+                    <div class="box-body">
+                        <span class="gift-icon" id="giftIcon">🎁</span>
+                    </div>
                 </div>
                 <div class="box-label">🎁 Mystery Box</div>
                 <div class="box-timer" id="mysteryBoxTimer">Tap to open</div>
@@ -656,26 +719,63 @@
                     <div id="walletTotalUsd" style="font-size:18px;font-weight:bold;color:#10b981;">$0.000</div>
                 </div>
 
-                <!-- ✅ BUY COINS (PACKAGE BASED) -->
-                <div class="buy-coins-section" onclick="openPackagePage()" style="cursor:pointer;">
-                    <div class="buy-title">💳 Buy Coins Packages</div>
-                    <div style="color:#94a3b8;font-size:12px;">Tap to view available packages</div>
+                <!-- ✅ BUY COINS (bKash, Nagad, Rocket) -->
+                <div class="buy-coins-section">
+                    <div class="buy-title">💳 Buy Coins</div>
+                    <div class="payment-grid">
+                        <div class="payment-card bkash" onclick="openPaymentModal('bKash', 100, 1000)">
+                            <div class="icon"><i class="fas fa-mobile-alt"></i></div>
+                            <div class="name">bKash</div>
+                            <div class="desc">১০০ BDT • ১০০০ Coins</div>
+                        </div>
+                        <div class="payment-card bkash" onclick="openPaymentModal('bKash', 500, 5500)">
+                            <div class="icon"><i class="fas fa-mobile-alt"></i></div>
+                            <div class="name">bKash</div>
+                            <div class="desc">৫০০ BDT • ৫৫০০ Coins</div>
+                        </div>
+                        <div class="payment-card nagad" onclick="openPaymentModal('Nagad', 100, 1000)">
+                            <div class="icon"><i class="fas fa-mobile-alt"></i></div>
+                            <div class="name">Nagad</div>
+                            <div class="desc">১০০ BDT • ১০০০ Coins</div>
+                        </div>
+                        <div class="payment-card nagad" onclick="openPaymentModal('Nagad', 500, 5500)">
+                            <div class="icon"><i class="fas fa-mobile-alt"></i></div>
+                            <div class="name">Nagad</div>
+                            <div class="desc">৫০০ BDT • ৫৫০০ Coins</div>
+                        </div>
+                        <div class="payment-card rocket" onclick="openPaymentModal('Rocket', 100, 1000)">
+                            <div class="icon"><i class="fas fa-rocket"></i></div>
+                            <div class="name">Rocket</div>
+                            <div class="desc">১০০ BDT • ১০০০ Coins</div>
+                        </div>
+                        <div class="payment-card rocket" onclick="openPaymentModal('Rocket', 500, 5500)">
+                            <div class="icon"><i class="fas fa-rocket"></i></div>
+                            <div class="name">Rocket</div>
+                            <div class="desc">৫০০ BDT • ৫৫০০ Coins</div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- ✅ SUBSCRIPTION (bKash, Nagad, Rocket) -->
                 <div class="subscription-section">
                     <div class="sub-title">⭐ Premium Subscription</div>
                     <div class="sub-grid">
-                        <div class="sub-card" onclick="openPackagePage()">
+                        <div class="sub-card" onclick="openPaymentModal('bKash', 499, 'subscription_monthly')">
                             <div class="sub-icon">⭐</div>
-                            <div class="sub-name">মাসিক</div>
+                            <div class="sub-name">মাসিক (bKash)</div>
                             <div class="sub-price">৪৯৯ BDT/মাস</div>
                             <div class="sub-features">✅ ২x মাইনিং স্পিড<br>✅ এক্সক্লুসিভ টাস্ক</div>
                         </div>
-                        <div class="sub-card" onclick="openPackagePage()">
+                        <div class="sub-card" onclick="openPaymentModal('Nagad', 499, 'subscription_monthly')">
                             <div class="sub-icon">⭐</div>
-                            <div class="sub-name">বার্ষিক</div>
-                            <div class="sub-price">৪৯৯৯ BDT/বছর</div>
+                            <div class="sub-name">মাসিক (Nagad)</div>
+                            <div class="sub-price">৪৯৯ BDT/মাস</div>
+                            <div class="sub-features">✅ ২x মাইনিং স্পিড<br>✅ এক্সক্লুসিভ টাস্ক</div>
+                        </div>
+                        <div class="sub-card" onclick="openPaymentModal('Rocket', 499, 'subscription_monthly')">
+                            <div class="sub-icon">⭐</div>
+                            <div class="sub-name">মাসিক (Rocket)</div>
+                            <div class="sub-price">৪৯৯ BDT/মাস</div>
                             <div class="sub-features">✅ ২x মাইনিং স্পিড<br>✅ এক্সক্লুসিভ টাস্ক</div>
                         </div>
                     </div>
@@ -685,17 +785,23 @@
                 <div class="level-upgrade-section" style="margin-top:16px;">
                     <div class="upgrade-title">🚀 Level Upgrade</div>
                     <div class="upgrade-grid">
-                        <div class="upgrade-card" onclick="openPackagePage()">
+                        <div class="upgrade-card" onclick="openPaymentModal('bKash', 100, 'level2')">
                             <div class="upgrade-icon">⬆️</div>
-                            <div class="upgrade-level">Level 2</div>
+                            <div class="upgrade-level">Level 2 (bKash)</div>
                             <div class="upgrade-cost">১০০ BDT</div>
                             <div class="upgrade-bonus">+৫% মাইনিং স্পিড</div>
                         </div>
-                        <div class="upgrade-card" onclick="openPackagePage()">
+                        <div class="upgrade-card" onclick="openPaymentModal('Nagad', 100, 'level2')">
                             <div class="upgrade-icon">⬆️</div>
-                            <div class="upgrade-level">Level 3</div>
-                            <div class="upgrade-cost">৫০০ BDT</div>
-                            <div class="upgrade-bonus">+১০% মাইনিং স্পিড</div>
+                            <div class="upgrade-level">Level 2 (Nagad)</div>
+                            <div class="upgrade-cost">১০০ BDT</div>
+                            <div class="upgrade-bonus">+৫% মাইনিং স্পিড</div>
+                        </div>
+                        <div class="upgrade-card" onclick="openPaymentModal('Rocket', 100, 'level2')">
+                            <div class="upgrade-icon">⬆️</div>
+                            <div class="upgrade-level">Level 2 (Rocket)</div>
+                            <div class="upgrade-cost">১০০ BDT</div>
+                            <div class="upgrade-bonus">+৫% মাইনিং স্পিড</div>
                         </div>
                     </div>
                 </div>
@@ -723,7 +829,9 @@
                 <button class="filter-btn active" onclick="loadLeaderboard('coins',this)">💰 Coins</button>
                 <button class="filter-btn" onclick="loadLeaderboard('usd',this)">💵 USD</button>
             </div>
-            <div id="leaderboardContainer"><p style="color:#94a3b8;text-align:center;">Loading leaderboard...</p></div>
+            <div id="leaderboardContainer">
+                <p style="color:#94a3b8;text-align:center;">Loading leaderboard...</p>
+            </div>
         </div>
     </div>
 
@@ -759,7 +867,53 @@
         </div>
     </div>
 
-    <!-- ================== MODALS ================== -->
+    <!-- ✅ NOTIFICATION OVERLAY -->
+    <div class="notification-overlay" id="notificationOverlay">
+        <div class="notification-overlay-header">
+            <button class="back-btn" onclick="closeNotificationPanel()"><i class="fas fa-arrow-left"></i> Back</button>
+            <h2 style="color:#fff;">📨 Notifications</h2>
+        </div>
+        <div id="notificationList" style="padding:15px;">
+            <p style="color:#94a3b8;text-align:center;">Loading notifications...</p>
+        </div>
+    </div>
+
+    <!-- ✅ PAYMENT MODAL (bKash, Nagad, Rocket) -->
+    <div class="modal" id="paymentModal">
+        <div class="modal-content">
+            <h3 id="paymentModalTitle">💳 Pay via bKash</h3>
+            <p id="paymentModalDesc" style="color:#94a3b8;font-size:13px;">Send money to: <span id="paymentNumber" style="color:#fbbf24;font-weight:bold;">017XXXXXXXX</span></p>
+            <div style="margin:15px 0;text-align:left;">
+                <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:12px;border:1px solid rgba(255,255,255,0.1);">
+                    <div style="font-size:12px;color:#94a3b8;">Amount to Pay</div>
+                    <div id="paymentAmount" style="font-size:24px;font-weight:900;color:#fbbf24;">১০০ BDT</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:12px;border:1px solid rgba(255,255,255,0.1);margin-top:10px;">
+                    <div style="font-size:12px;color:#94a3b8;">Transaction ID</div>
+                    <input type="text" id="transactionId" placeholder="Enter your transaction ID..." style="width:100%;padding:8px;background:#1e293b;border:1px solid #334155;border-radius:6px;color:#fff;font-size:14px;outline:none;margin-top:4px;">
+                </div>
+            </div>
+            <div id="paymentTimer" style="font-size:28px;font-weight:900;color:#fbbf24;margin:10px 0;">15:00</div>
+            <div style="font-size:12px;color:#94a3b8;">⏳ Please wait for admin approval (max 15 minutes)</div>
+            <div class="modal-buttons" style="margin-top:15px;">
+                <button class="btn btn-primary" onclick="submitTransaction()">📤 Submit</button>
+                <button class="btn btn-info" onclick="closeModal('paymentModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- ================== BOTTOM NAV =============================== -->
+    <!-- ============================================================ -->
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchPage('home',this)"><i class="fas fa-home"></i><span>Home</span></div>
+        <div class="nav-item" onclick="switchPage('tasks',this)"><i class="fas fa-tasks"></i><span>Tasks</span></div>
+        <div class="nav-item" onclick="switchPage('refer',this)"><i class="fas fa-users"></i><span>Refer</span></div>
+        <div class="nav-item" onclick="switchPage('wallet',this)"><i class="fas fa-wallet"></i><span>Wallet</span></div>
+        <div class="nav-item" onclick="switchPage('leaderboard',this)"><i class="fas fa-trophy"></i><span>Leaderboard</span></div>
+    </div>
+
+    <!-- Modals -->
     <div class="modal" id="successModal"><div class="modal-content"><div style="font-size:50px;">🎉</div><h3>Done!</h3><p id="rewardText"></p><button onclick="closeModal('successModal')">OK</button></div></div>
     <div class="modal" id="conversionModal"><div class="modal-content"><div style="font-size:50px;">💰</div><h3>Converted!</h3><p id="conversionText"></p><button onclick="closeModal('conversionModal')">OK</button></div></div>
     <div class="modal" id="withdrawModal"><div class="modal-content"><div style="font-size:50px;">💳</div><h3 id="withdrawModalTitle"></h3><p id="withdrawModalText"></p><button onclick="closeModal('withdrawModal')">OK</button></div></div>
@@ -784,17 +938,23 @@
             const onMouseMove = (e) => {
                 const dx = e.clientX - startX;
                 const dy = e.clientY - startY;
-                if (Math.abs(dx) > 5 || Math.abs(dy) > 5) { isDragging = true; }
+                if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+                    isDragging = true;
+                }
                 this.style.left = (initialLeft + dx) + 'px';
                 this.style.top = (initialTop + dy) + 'px';
                 this.style.right = 'auto';
             };
+            
             const onMouseUp = () => {
                 document.removeEventListener('mousemove', onMouseMove);
                 document.removeEventListener('mouseup', onMouseUp);
-                if (!isDragging) { openSpinModal(); }
+                if (!isDragging) {
+                    openSpinModal();
+                }
                 isDragging = false;
             };
+            
             document.addEventListener('mousemove', onMouseMove);
             document.addEventListener('mouseup', onMouseUp);
         });
@@ -806,21 +966,28 @@
             startY = touch.clientY;
             initialLeft = this.offsetLeft;
             initialTop = this.offsetTop;
+            
             const onTouchMove = (e) => {
                 const touch = e.touches[0];
                 const dx = touch.clientX - startX;
                 const dy = touch.clientY - startY;
-                if (Math.abs(dx) > 5 || Math.abs(dy) > 5) { isDragging = true; }
+                if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+                    isDragging = true;
+                }
                 this.style.left = (initialLeft + dx) + 'px';
                 this.style.top = (initialTop + dy) + 'px';
                 this.style.right = 'auto';
             };
+            
             const onTouchEnd = () => {
                 document.removeEventListener('touchmove', onTouchMove);
                 document.removeEventListener('touchend', onTouchEnd);
-                if (!isDragging) { openSpinModal(); }
+                if (!isDragging) {
+                    openSpinModal();
+                }
                 isDragging = false;
             };
+            
             document.addEventListener('touchmove', onTouchMove);
             document.addEventListener('touchend', onTouchEnd);
         });
@@ -862,372 +1029,57 @@
             banAppealSubmitted: false, lastVideoWatchTime: 0,
             dailyBonusClaimed: 0,
             mysteryBoxCooldown: 0, 
-            subscription: null, subscriptionExpiry: 0,
-            level: 1, miningSpeed: 0,
-            dailyBonusMin: 50, dailyBonusMax: 100,
-            mysteryBoxMin: 20, mysteryBoxMax: 100, mysteryBoxDuration: 1800000,
-            paymentHistory: [],
-            notifications: []
+            
+            // ✅ New properties for Subscription & Level
+            subscription: null, // 'monthly', 'yearly', or null
+            subscriptionExpiry: 0,
+            level: 1,
+            miningSpeed: 0, // Percentage bonus
+            
+            // Admin-controlled settings
+            dailyBonusMin: 50,
+            dailyBonusMax: 100,
+            mysteryBoxMin: 20,
+            mysteryBoxMax: 100,
+            mysteryBoxDuration: 1800000 // 30 minutes
         };
         let tasks = [], conversionTimer = null, miningInterval = null, boostTimer = null, airdropTimer = null, 
-            currentFilter = 'all', currentLevelFilter = 'all', levelConfigCache = {}, referralConfigCache = {},
-            selectedPackage = null, selectedPaymentMethod = 'bKash', paymentTimerInterval = null, paymentFormSeconds = 0,
-            webViewTaskId = null, webViewTaskReward = 0, webViewRequiredTime = 60, webViewSeconds = 0, webViewTimerInterval = null;
+            currentFilter = 'all', currentLevelFilter = 'all', levelConfigCache = {}, referralConfigCache = {};
         let isOnline = navigator.onLine;
         let wasMiningBeforeOffline = false;
         let isAppHidden = false;
         let isAdShowing = false;
 
         // ============================================================
-        // ================== NOTIFICATION SYSTEM ======================
+        // ================== MAINTENANCE MODE =========================
         // ============================================================
-        function loadNotifications() {
-            db.ref('users/' + userId + '/notifications').on('value', snap => {
-                const notifs = snap.val() || [];
-                app.notifications = notifs;
-                updateNotificationUI();
-            });
-        }
-
-        function updateNotificationUI() {
-            const list = document.getElementById('notificationList');
-            const badge = document.getElementById('notifBadge');
-            
-            if (!app.notifications || app.notifications.length === 0) {
-                list.innerHTML = '<p style="color:#94a3b8;text-align:center;">📭 No notifications</p>';
-                badge.style.display = 'none';
-                return;
-            }
-            
-            // Show latest first
-            const sorted = [...app.notifications].reverse();
-            const unreadCount = sorted.filter(n => !n.read).length;
-            
-            if (unreadCount > 0) {
-                badge.style.display = 'block';
-                badge.textContent = unreadCount;
-            } else {
-                badge.style.display = 'none';
-            }
-            
-            list.innerHTML = sorted.map(n => `
-                <div class="notification-item ${n.read ? '' : 'unread'}" onclick="markNotificationRead('${n.id}')">
-                    <div class="notif-content">
-                        <div class="notif-title">${n.title || 'Notification'}</div>
-                        <div class="notif-body">${n.body || ''}</div>
-                        <div class="notif-time">${n.timestamp ? new Date(n.timestamp).toLocaleString() : ''}</div>
-                    </div>
-                    ${n.read ? '<span class="notif-read"><i class="fas fa-check-circle"></i></span>' : '<span class="notif-read" style="color:#3b82f6;"><i class="fas fa-circle"></i></span>'}
-                </div>
-            `).join('');
-        }
-
-        function markNotificationRead(notifId) {
-            const index = app.notifications.findIndex(n => n.id === notifId);
-            if (index !== -1) {
-                app.notifications[index].read = true;
-                userRef.update({ notifications: app.notifications });
-                updateNotificationUI();
-            }
-        }
-
-        function addNotification(title, body) {
-            const newNotif = {
-                id: Date.now().toString(),
-                title: title,
-                body: body,
-                timestamp: Date.now(),
-                read: false
-            };
-            app.notifications.push(newNotif);
-            userRef.update({ notifications: app.notifications });
-            
-            // Also send to admin channel
-            db.ref('adminNotifications').push({
-                userId: userId,
-                username: displayName,
-                title: title,
-                body: body,
-                timestamp: Date.now()
-            });
-            
-            updateNotificationUI();
-            showToast(`🔔 ${title}`);
-        }
-
-        function openNotificationPanel() {
-            document.getElementById('notificationOverlay').classList.add('show');
-            updateNotificationUI();
-        }
-
-        function closeNotificationPanel() {
-            document.getElementById('notificationOverlay').classList.remove('show');
-        }
-
-        // ============================================================
-        // ================== PACKAGE & PAYMENT SYSTEM =================
-        // ============================================================
-        function loadPackages() {
-            db.ref('packages').on('value', snap => {
-                const pkgs = snap.val() || {};
-                const container = document.getElementById('packageList');
-                if (Object.keys(pkgs).length === 0) {
-                    container.innerHTML = '<p style="color:#94a3b8;text-align:center;">No packages available.</p>';
-                    return;
-                }
-                let html = '';
-                for (let key in pkgs) {
-                    const p = pkgs[key];
-                    html += `
-                        <div class="package-card" onclick="selectPackage('${key}', ${p.price}, ${p.coins}, '${p.name}')">
-                            <div class="pkg-name">${p.name}</div>
-                            <div class="pkg-coins">+${p.coins.toLocaleString()} Coins</div>
-                            <div class="pkg-price">${p.price} BDT</div>
-                            <div class="pkg-desc">${p.description || ''}</div>
-                        </div>
-                    `;
-                }
-                container.innerHTML = html;
-            });
-        }
-
-        function openPackagePage() {
-            document.getElementById('packageOverlay').classList.add('show');
-            loadPackages();
-        }
-
-        function closePackagePage() {
-            document.getElementById('packageOverlay').classList.remove('show');
-            selectedPackage = null;
-        }
-
-        function selectPackage(key, price, coins, name) {
-            selectedPackage = { key, price, coins, name };
-            closePackagePage();
-            openPaymentForm();
-        }
-
-        function openPaymentForm() {
-            if (!selectedPackage) {
-                showToast('Please select a package first.', 'error');
-                return;
-            }
-            
-            document.getElementById('paymentFormOverlay').classList.add('show');
-            document.getElementById('paymentUserName').value = displayName;
-            document.getElementById('paymentUserMobile').value = '';
-            document.getElementById('paymentTransactionId').value = '';
-            document.getElementById('paymentMethodSelector').querySelectorAll('.method-btn-payment').forEach(b => b.classList.remove('active'));
-            document.getElementById('paymentMethodSelector').querySelector('.method-btn-payment').classList.add('active');
-            selectedPaymentMethod = 'bKash';
-            
-            updatePaymentSummary();
-            startPaymentFormTimer();
-        }
-
-        function closePaymentForm() {
-            document.getElementById('paymentFormOverlay').classList.remove('show');
-            if (paymentTimerInterval) { clearInterval(paymentTimerInterval); paymentTimerInterval = null; }
-            selectedPackage = null;
-        }
-
-        function selectPaymentMethod(method, btn) {
-            selectedPaymentMethod = method;
-            document.getElementById('paymentMethodSelector').querySelectorAll('.method-btn-payment').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            updatePaymentSummary();
-        }
-
-        function updatePaymentSummary() {
-            if (!selectedPackage) return;
-            document.getElementById('summaryPackageName').textContent = selectedPackage.name;
-            document.getElementById('summaryCoins').textContent = selectedPackage.coins.toLocaleString();
-            document.getElementById('summaryMethod').textContent = selectedPaymentMethod;
-            document.getElementById('summaryAmount').textContent = selectedPackage.price + ' BDT';
-        }
-
-        function startPaymentFormTimer() {
-            if (paymentTimerInterval) { clearInterval(paymentTimerInterval); paymentTimerInterval = null; }
-            paymentFormSeconds = 15 * 60; // 15 minutes
-            const timerDisplay = document.getElementById('paymentFormTimer');
-            
-            paymentTimerInterval = setInterval(() => {
-                paymentFormSeconds--;
-                if (paymentFormSeconds <= 0) {
-                    clearInterval(paymentTimerInterval);
-                    paymentTimerInterval = null;
-                    timerDisplay.textContent = '00:00';
-                    showToast('⏰ Time expired! Please try again.', 'error');
-                    closePaymentForm();
-                    return;
-                }
-                const mins = Math.floor(paymentFormSeconds / 60);
-                const secs = paymentFormSeconds % 60;
-                timerDisplay.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-            }, 1000);
-        }
-
-        function submitPaymentRequest() {
-            if (!selectedPackage) { showToast('No package selected!', 'error'); return; }
-            
-            const userName = document.getElementById('paymentUserName').value.trim();
-            const userMobile = document.getElementById('paymentUserMobile').value.trim();
-            const txId = document.getElementById('paymentTransactionId').value.trim();
-            
-            if (!userName) { showToast('Please enter your name!', 'error'); return; }
-            if (!userMobile) { showToast('Please enter your mobile number!', 'error'); return; }
-            if (!txId) { showToast('Please enter transaction ID!', 'error'); return; }
-            
-            // Stop timer
-            if (paymentTimerInterval) { clearInterval(paymentTimerInterval); paymentTimerInterval = null; }
-            
-            // Create payment request
-            const requestId = Date.now().toString();
-            const requestData = {
-                userId: userId,
-                username: displayName,
-                fullName: userName,
-                mobile: userMobile,
-                method: selectedPaymentMethod,
-                amount: selectedPackage.price,
-                coins: selectedPackage.coins,
-                packageName: selectedPackage.name,
-                packageKey: selectedPackage.key,
-                transactionId: txId,
-                status: 'pending',
-                requestedAt: Date.now()
-            };
-            
-            // Save to Firebase
-            db.ref('paymentRequests/' + requestId).set(requestData);
-            
-            // Add to user history
-            const historyEntry = {
-                id: requestId,
-                method: selectedPaymentMethod,
-                amount: selectedPackage.price,
-                coins: selectedPackage.coins,
-                packageName: selectedPackage.name,
-                transactionId: txId,
-                status: 'pending',
-                requestedAt: Date.now()
-            };
-            
-            if (!app.paymentHistory) app.paymentHistory = [];
-            app.paymentHistory.unshift(historyEntry);
-            userRef.update({ paymentHistory: app.paymentHistory });
-            
-            // Add notification
-            addNotification('Payment Submitted', `You submitted a payment of ${selectedPackage.price} BDT via ${selectedPaymentMethod}. Waiting for admin approval.`);
-            
-            closePaymentForm();
-            showToast('📤 Payment submitted! Waiting for admin approval...');
-            document.getElementById('rewardText').textContent = 'Waiting for admin approval...';
-            document.getElementById('successModal').classList.add('active');
-            
-            updatePaymentHistoryUI();
-        }
-
-        function updatePaymentHistoryUI() {
-            const container = document.getElementById('withdrawHistoryList');
-            const history = app.paymentHistory || [];
-            
-            if (!history.length) {
-                container.innerHTML = '<span style="color:#94a3b8;font-size:11px;">No history</span>';
-                return;
-            }
-            
-            container.innerHTML = history.slice(-20).reverse().map(h => {
-                let statusText = '';
-                let statusColor = '';
-                if (h.status === 'approved') {
-                    statusText = '✅ Approved';
-                    statusColor = '#10b981';
-                } else if (h.status === 'cancelled') {
-                    statusText = '❌ Cancelled';
-                    statusColor = '#ef4444';
-                    if (h.cancelReason) {
-                        statusText += `<div style="font-size:10px;color:#ef4444;">Reason: ${h.cancelReason}</div>`;
-                    }
-                } else {
-                    statusText = '⏳ Pending';
-                    statusColor = '#fbbf24';
-                }
+        function checkMaintenance() {
+            db.ref('maintenance').on('value', snap => {
+                const data = snap.val() || { enabled: false, message: 'We are currently updating the app. Please come back later.' };
+                const overlay = document.getElementById('maintenanceOverlay');
+                const mainContent = document.getElementById('mainContent');
+                const bottomNav = document.querySelector('.bottom-nav');
                 
-                return `<div class="history-item">
-                    <div>
-                        <b>${h.packageName || h.method}</b> • ${h.amount} BDT
-                        <div style="font-size:10px;color:#94a3b8;">ID: ${h.transactionId}</div>
-                    </div>
-                    <div style="text-align:right;">
-                        <span style="color:${statusColor};">${statusText}</span>
-                        <div style="font-size:9px;color:#94a3b8;">${new Date(h.requestedAt).toLocaleDateString()}</div>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        // ============================================================
-        // ================== ADMIN PAYMENT APPROVAL LISTENER ==========
-        // ============================================================
-        function listenPaymentApprovals() {
-            db.ref('paymentRequests').orderByChild('userId').equalTo(userId).on('child_changed', snap => {
-                const data = snap.val();
-                if (data && app.paymentHistory) {
-                    const index = app.paymentHistory.findIndex(h => h.id === snap.key);
-                    if (index !== -1) {
-                        app.paymentHistory[index].status = data.status;
-                        if (data.cancelReason) {
-                            app.paymentHistory[index].cancelReason = data.cancelReason;
-                        }
-                        if (data.status === 'approved') {
-                            // ✅ Approve the purchase
-                            app.balance += data.coins || 0;
-                            app.xpPoints += (data.coins || 0) * 2;
-                            
-                            // Check if it's a subscription or level upgrade
-                            if (data.packageKey && data.packageKey.includes('subscription')) {
-                                const expiry = data.packageKey.includes('yearly') ? 
-                                    Date.now() + 365*24*60*60*1000 : 
-                                    Date.now() + 30*24*60*60*1000;
-                                app.subscription = data.packageKey;
-                                app.subscriptionExpiry = expiry;
-                                addNotification('Subscription Activated', `Your ${data.packageName} is now active!`);
-                            } else if (data.packageKey && data.packageKey.includes('level')) {
-                                const level = parseInt(data.packageKey.replace('level', ''));
-                                app.level = level;
-                                app.miningSpeed += (level - 1) * 5;
-                                addNotification('Level Upgraded', `You are now Level ${level}! Mining speed +${(level-1)*5}%`);
-                            } else {
-                                addNotification('Payment Approved', `Your payment of ${data.amount} BDT for ${data.coins} Coins is approved!`);
-                            }
-                            
-                            userRef.update({
-                                balance: app.balance,
-                                xpPoints: app.xpPoints,
-                                subscription: app.subscription,
-                                subscriptionExpiry: app.subscriptionExpiry,
-                                level: app.level,
-                                miningSpeed: app.miningSpeed,
-                                paymentHistory: app.paymentHistory
-                            });
-                            showToast('✅ Payment approved! Coins added to your account.');
-                            updateUI(); updateLevelUI();
-                        } else if (data.status === 'cancelled') {
-                            addNotification('Payment Cancelled', `Your payment was cancelled: ${data.cancelReason || 'No reason'}`);
-                            showToast(`❌ Payment cancelled: ${data.cancelReason || 'No reason'}`, 'error');
-                        }
-                        updatePaymentHistoryUI();
-                    }
+                if (data.enabled) {
+                    overlay.classList.add('show');
+                    document.getElementById('maintenanceMessage').textContent = data.message || 'We are currently updating the app. Please come back later.';
+                    mainContent.style.display = 'none';
+                    bottomNav.style.display = 'none';
+                    if (miningInterval) stopMining();
+                } else {
+                    overlay.classList.remove('show');
+                    mainContent.style.display = 'block';
+                    bottomNav.style.display = 'flex';
                 }
             });
         }
 
         // ============================================================
-        // ================== SPIN WHEEL ===============================
+        // ================== SPIN WHEEL SYSTEM =======================
         // ============================================================
         const SPIN_COUNT_LIMIT = 20;
         const SPIN_BUTTON_COOLDOWN_SECONDS = 15;
+
         let spinCount = SPIN_COUNT_LIMIT;
         let spinBtnCooldownInterval = null;
         let isSpinning = false;
@@ -1458,11 +1310,13 @@
             const lid = document.getElementById('boxLid');
             const icon = document.getElementById('giftIcon');
             
+            // Animate box opening
             lid.classList.add('open');
             icon.className = 'gift-icon opened';
             icon.textContent = '✨';
             
             showRewardedAd(() => {
+                // ৫০% USD, ৫০% Coins
                 const rewardType = Math.random() > 0.5 ? 'usd' : 'coins';
                 let rewardCoins = 0, rewardUsd = 0;
                 
@@ -1470,6 +1324,7 @@
                     rewardCoins = app.mysteryBoxMin + Math.floor(Math.random() * (app.mysteryBoxMax - app.mysteryBoxMin + 1));
                     app.balance += rewardCoins;
                 } else {
+                    // ✅ USD: $0.002 - $0.008
                     rewardUsd = (Math.random() * 0.006 + 0.002).toFixed(3);
                     app.usdBalance += parseFloat(rewardUsd);
                 }
@@ -1477,6 +1332,7 @@
                 app.xpPoints += (rewardCoins || parseFloat(rewardUsd) * 1000) * 2;
                 app.mysteryBoxCooldown = Date.now() + app.mysteryBoxDuration;
                 
+                // ✅ Firebase-এ কুলডাউন সেভ
                 userRef.update({
                     balance: app.balance,
                     usdBalance: app.usdBalance,
@@ -1491,6 +1347,7 @@
                 updateUI(); updateLevelUI();
                 updateMysteryBoxUI();
                 
+                // Close lid after 2 seconds
                 setTimeout(() => {
                     lid.classList.remove('open');
                     icon.className = 'gift-icon';
@@ -1571,6 +1428,269 @@
         }
 
         // ============================================================
+        // ================== PAYMENT MODAL (bKash, Nagad, Rocket) =====
+        // ============================================================
+        let paymentData = {
+            method: '',
+            amount: 0,
+            coins: 0,
+            type: 'coins', // 'coins', 'subscription', 'level'
+            plan: '',
+            level: 0
+        };
+        let paymentTimerInterval = null;
+        let paymentTimeout = null;
+
+        function openPaymentModal(method, amount, item) {
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            
+            // Check if method is enabled
+            db.ref('paymentConfig/methodsStatus').once('value', snap => {
+                const status = snap.val() || { bkash: 'on', nagad: 'on', rocket: 'on' };
+                const methodKey = method.toLowerCase();
+                if (status[methodKey] !== 'on') {
+                    showToast(`⚠️ ${method} is currently disabled!`, 'error');
+                    return;
+                }
+                
+                // Load admin payment number
+                db.ref('paymentConfig/manualNumbers').once('value', numSnap => {
+                    const numbers = numSnap.val() || {};
+                    let number = '';
+                    if (method === 'bKash') number = numbers.bkash || '017XXXXXXXX';
+                    else if (method === 'Nagad') number = numbers.nagad || '017XXXXXXXX';
+                    else if (method === 'Rocket') number = numbers.rocket || '017XXXXXXXX';
+                    
+                    document.getElementById('paymentNumber').textContent = number;
+                    document.getElementById('paymentModalTitle').textContent = `💳 Pay via ${method}`;
+                    document.getElementById('paymentAmount').textContent = `${amount} BDT`;
+                    document.getElementById('transactionId').value = '';
+                    
+                    // Determine what the user is buying
+                    let type = 'coins';
+                    let coins = 0;
+                    let plan = '';
+                    let level = 0;
+                    
+                    if (typeof item === 'number') {
+                        type = 'coins';
+                        coins = item;
+                    } else if (item === 'subscription_monthly') {
+                        type = 'subscription';
+                        plan = 'monthly';
+                    } else if (item === 'subscription_yearly') {
+                        type = 'subscription';
+                        plan = 'yearly';
+                    } else if (item.startsWith('level')) {
+                        type = 'level';
+                        level = parseInt(item.replace('level', ''));
+                    }
+                    
+                    paymentData = { method, amount, coins, type, plan, level };
+                    
+                    // Show modal
+                    document.getElementById('paymentModal').classList.add('active');
+                    startPaymentTimer();
+                });
+            });
+        }
+
+        function startPaymentTimer() {
+            // Clear any existing timer
+            if (paymentTimerInterval) clearInterval(paymentTimerInterval);
+            if (paymentTimeout) clearTimeout(paymentTimeout);
+            
+            let seconds = 15 * 60; // 15 minutes
+            const timerDisplay = document.getElementById('paymentTimer');
+            
+            // Check if there's a saved timer in Firebase
+            db.ref('paymentTimers/' + userId).once('value', snap => {
+                const saved = snap.val();
+                if (saved && saved.expiresAt > Date.now()) {
+                    seconds = Math.floor((saved.expiresAt - Date.now()) / 1000);
+                    // Resume from saved time
+                }
+            }).then(() => {
+                paymentTimerInterval = setInterval(() => {
+                    seconds--;
+                    if (seconds <= 0) {
+                        clearInterval(paymentTimerInterval);
+                        paymentTimerInterval = null;
+                        timerDisplay.textContent = '00:00';
+                        showToast('⏰ Time expired! Please try again.', 'error');
+                        closeModal('paymentModal');
+                        db.ref('paymentTimers/' + userId).remove();
+                        return;
+                    }
+                    const mins = Math.floor(seconds / 60);
+                    const secs = seconds % 60;
+                    timerDisplay.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                    
+                    // Save timer to Firebase (persist across reloads)
+                    db.ref('paymentTimers/' + userId).set({
+                        expiresAt: Date.now() + seconds * 1000
+                    });
+                }, 1000);
+                
+                // Auto-close after 15 minutes
+                paymentTimeout = setTimeout(() => {
+                    clearInterval(paymentTimerInterval);
+                    paymentTimerInterval = null;
+                    closeModal('paymentModal');
+                    db.ref('paymentTimers/' + userId).remove();
+                    showToast('⏰ Time expired! Please try again.', 'error');
+                }, 15 * 60 * 1000);
+            });
+        }
+
+        function submitTransaction() {
+            const txId = document.getElementById('transactionId').value.trim();
+            if (!txId) {
+                showToast('⚠️ Please enter transaction ID!', 'error');
+                return;
+            }
+            
+            // Stop timer
+            if (paymentTimerInterval) clearInterval(paymentTimerInterval);
+            if (paymentTimeout) clearTimeout(paymentTimeout);
+            db.ref('paymentTimers/' + userId).remove();
+            
+            // Create transaction request
+            const requestId = Date.now().toString();
+            const requestData = {
+                userId: userId,
+                username: displayName,
+                method: paymentData.method,
+                amount: paymentData.amount,
+                transactionId: txId,
+                type: paymentData.type,
+                coins: paymentData.coins,
+                plan: paymentData.plan,
+                level: paymentData.level,
+                status: 'pending',
+                requestedAt: Date.now(),
+                expiresAt: Date.now() + 15 * 60 * 1000 // 15 minutes expiry
+            };
+            
+            // Save to Firebase
+            db.ref('paymentRequests/' + requestId).set(requestData);
+            
+            // Add to user history
+            const historyEntry = {
+                id: requestId,
+                method: paymentData.method,
+                amount: paymentData.amount,
+                transactionId: txId,
+                type: paymentData.type,
+                status: 'pending',
+                requestedAt: Date.now()
+            };
+            
+            if (!app.paymentHistory) app.paymentHistory = [];
+            app.paymentHistory.unshift(historyEntry);
+            userRef.update({ paymentHistory: app.paymentHistory });
+            
+            // Close modal
+            closeModal('paymentModal');
+            
+            // Show waiting message
+            showToast('📤 Transaction submitted! Waiting for admin approval...');
+            document.getElementById('rewardText').textContent = 'Waiting for admin approval...';
+            document.getElementById('successModal').classList.add('active');
+            
+            // Update history UI
+            updatePaymentHistoryUI();
+        }
+
+        function updatePaymentHistoryUI() {
+            const container = document.getElementById('withdrawHistoryList');
+            const history = app.paymentHistory || [];
+            
+            if (!history.length) {
+                container.innerHTML = '<span style="color:#94a3b8;font-size:11px;">No history</span>';
+                return;
+            }
+            
+            container.innerHTML = history.slice(-20).reverse().map(h => {
+                let statusText = '';
+                let statusColor = '';
+                if (h.status === 'approved') {
+                    statusText = '✅ Approved';
+                    statusColor = '#10b981';
+                } else if (h.status === 'cancelled') {
+                    statusText = '❌ Cancelled';
+                    statusColor = '#ef4444';
+                    if (h.cancelReason) {
+                        statusText += `<div style="font-size:10px;color:#ef4444;">Reason: ${h.cancelReason}</div>`;
+                    }
+                } else {
+                    statusText = '⏳ Pending';
+                    statusColor = '#fbbf24';
+                }
+                
+                return `<div class="history-item">
+                    <div>
+                        <b>${h.method}</b> • ${h.amount} BDT
+                        <div style="font-size:10px;color:#94a3b8;">ID: ${h.transactionId}</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <span style="color:${statusColor};">${statusText}</span>
+                        <div style="font-size:9px;color:#94a3b8;">${new Date(h.requestedAt).toLocaleDateString()}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // ============================================================
+        // ================== LEADERBOARD ==============================
+        // ============================================================
+        function loadLeaderboard(type = 'coins', btn = null) {
+            if (btn) {
+                document.querySelectorAll('#pageLeaderboard .filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+            const container = document.getElementById('leaderboardContainer');
+            container.innerHTML = '<p style="color:#94a3b8;text-align:center;">Loading leaderboard...</p>';
+            
+            db.ref('users').orderByChild(type === 'coins' ? 'balance' : 'usdBalance').limitToLast(50).once('value', snap => {
+                if (!snap.exists()) {
+                    container.innerHTML = '<p style="color:#94a3b8;text-align:center;">No users found.</p>';
+                    return;
+                }
+                let users = [];
+                snap.forEach(child => {
+                    const data = child.val();
+                    users.push({
+                        userId: child.key,
+                        name: data.fullName || data.firstName || data.username || 'User',
+                        score: type === 'coins' ? (data.balance || 0) : (data.usdBalance || 0),
+                        avatar: data.avatar || '👤'
+                    });
+                });
+                users.sort((a, b) => b.score - a.score);
+                users = users.slice(0, 50);
+
+                const top = ['🥇', '🥈', '🥉'];
+                container.innerHTML = users.map((u, i) => {
+                    let className = 'leaderboard-item';
+                    if (i === 0) className += ' top1';
+                    if (i === 1) className += ' top2';
+                    if (i === 2) className += ' top3';
+                    return `<div class="${className}">
+                        <div class="rank">${i < 3 ? top[i] : `#${i+1}`}</div>
+                        <div class="user">
+                            <div class="avatar-small">${u.avatar}</div>
+                            <span style="font-size:14px;">${u.name}</span>
+                        </div>
+                        <div class="score">${type === 'coins' ? u.score.toLocaleString() : '$' + u.score.toFixed(3)}</div>
+                    </div>`;
+                }).join('');
+            }).catch(() => {
+                container.innerHTML = '<p style="color:#ef4444;text-align:center;">Failed to load leaderboard.</p>';
+            });
+        }
+
+        // ============================================================
         // ================== MINING CORE ==============================
         // ============================================================
         function startMining() {
@@ -1588,10 +1708,14 @@
                 const d = calculateLevel(app.xpPoints);
                 let speedMultiplier = 1 + (d.bonusPercent / 100);
                 
+                // ✅ Check subscription bonus
                 if (app.subscription && app.subscriptionExpiry > Date.now()) {
                     speedMultiplier *= 2; // 2x speed for premium users
                 }
+                
+                // ✅ Check level bonus
                 speedMultiplier += app.miningSpeed / 100;
+                
                 const ca = speedMultiplier;
                 
                 app.progressCoins -= 1;
@@ -2133,6 +2257,7 @@
             updateWithdrawUI(); updateSpeedBoostUI(); startConversionTimer();
             updatePaymentHistoryUI();
             
+            // Subscription status
             if (app.subscription && app.subscriptionExpiry > Date.now()) {
                 document.getElementById('userLevelBadge').textContent += ' ⭐';
             }
@@ -2292,53 +2417,6 @@
             });
         }
 
-        // ================== LEADERBOARD ==============================
-        function loadLeaderboard(type = 'coins', btn = null) {
-            if (btn) {
-                document.querySelectorAll('#pageLeaderboard .filter-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-            }
-            const container = document.getElementById('leaderboardContainer');
-            container.innerHTML = '<p style="color:#94a3b8;text-align:center;">Loading leaderboard...</p>';
-            
-            db.ref('users').orderByChild(type === 'coins' ? 'balance' : 'usdBalance').limitToLast(50).once('value', snap => {
-                if (!snap.exists()) {
-                    container.innerHTML = '<p style="color:#94a3b8;text-align:center;">No users found.</p>';
-                    return;
-                }
-                let users = [];
-                snap.forEach(child => {
-                    const data = child.val();
-                    users.push({
-                        userId: child.key,
-                        name: data.fullName || data.firstName || data.username || 'User',
-                        score: type === 'coins' ? (data.balance || 0) : (data.usdBalance || 0),
-                        avatar: data.avatar || '👤'
-                    });
-                });
-                users.sort((a, b) => b.score - a.score);
-                users = users.slice(0, 50);
-
-                const top = ['🥇', '🥈', '🥉'];
-                container.innerHTML = users.map((u, i) => {
-                    let className = 'leaderboard-item';
-                    if (i === 0) className += ' top1';
-                    if (i === 1) className += ' top2';
-                    if (i === 2) className += ' top3';
-                    return `<div class="${className}">
-                        <div class="rank">${i < 3 ? top[i] : `#${i+1}`}</div>
-                        <div class="user">
-                            <div class="avatar-small">${u.avatar}</div>
-                            <span style="font-size:14px;">${u.name}</span>
-                        </div>
-                        <div class="score">${type === 'coins' ? u.score.toLocaleString() : '$' + u.score.toFixed(3)}</div>
-                    </div>`;
-                }).join('');
-            }).catch(() => {
-                container.innerHTML = '<p style="color:#ef4444;text-align:center;">Failed to load leaderboard.</p>';
-            });
-        }
-
         // ================== INIT ====================================
         function initApp() {
             if (!navigator.onLine) { document.getElementById('networkOverlay').classList.add('show'); isOnline = false; }
@@ -2352,19 +2430,15 @@
             watchMiningCoins();
             loadAdminConfig();
             checkMaintenance();
-            loadNotifications();
-            loadPackages();
-            listenPaymentApprovals();
             
             db.ref('conversionRate').on('value', s => { app.conversionRate = s.val() || 1000; updateUI(); });
             loadLevelConfigFromDB();
 
-            // 🔥 লোডিং পেজ ফোর্সলি হাইড করার জন্য ৩ সেকেন্ডের টাইমআউট
-            setTimeout(() => {
-                document.getElementById('loadingPage').classList.add('hidden');
-            }, 3000);
-
+            let loadingTimeout = setTimeout(() => { document.getElementById('loadingPage').classList.add('hidden'); }, 15000);
+            
             userRef.on('value', snap => {
+                clearTimeout(loadingTimeout);
+                document.getElementById('loadingPage').classList.add('hidden');
                 const d = snap.val() || {};
                 if (d.banned) return;
                 app.balance = d.balance || 0;
@@ -2375,7 +2449,7 @@
                 app.referTiers = d.referTiers || {};
                 app.progressCoins = d.progressCoins !== undefined ? d.progressCoins : TOTAL_COINS;
                 app.speedBoostCooldown = d.speedBoostCooldown || 0;
-                app.mysteryBoxCooldown = d.mysteryBoxCooldown || 0;
+                app.mysteryBoxCooldown = d.mysteryBoxCooldown || 0; 
                 app.taskLastCompleted = d.taskLastCompleted || {};
                 app.taskProgress = d.taskProgress || {};
                 app.xpPoints = d.xpPoints !== undefined ? d.xpPoints : NEGATIVE_XP;
@@ -2383,7 +2457,8 @@
                 app.airdropClaimed = d.airdropClaimed || false;
                 app.dailyBonusClaimed = d.dailyBonusClaimed || '';
                 app.paymentHistory = d.paymentHistory || [];
-                app.notifications = d.notifications || [];
+                
+                // ✅ Load Subscription & Level data
                 app.subscription = d.subscription || null;
                 app.subscriptionExpiry = d.subscriptionExpiry || 0;
                 app.level = d.level || 1;
@@ -2401,6 +2476,7 @@
                 const today = new Date().toDateString();
                 document.getElementById('dailyBonusStatus').textContent = app.dailyBonusClaimed === today ? '✅ Claimed' : '🎯 Claim Now';
                 
+                // ✅ Update Mystery Box UI
                 updateMysteryBoxUI();
                 
                 if (!d.balance && d.xpPoints === undefined) {
@@ -2410,8 +2486,7 @@
                         lastConversion: Date.now(), lastLogin: new Date().toISOString(), 
                         airdropClaimed: false, isCurrentlyMining: false, 
                         username: tgUsername, firstName: tgFirstName, 
-                        lastName: tgLastName, fullName: displayName,
-                        notifications: [], paymentHistory: []
+                        lastName: tgLastName, fullName: displayName 
                     });
                 }
                 
@@ -2420,8 +2495,7 @@
                 updateProgressUI();
                 updateSpeedBoostUI();
                 startConversionTimer();
-                updateNotificationUI();
-                updatePaymentHistoryUI();
+                document.getElementById('loadingPage').classList.add('hidden');
             });
 
             db.ref('withdrawSettings').on('value', s => { 
@@ -2453,6 +2527,46 @@
                         updateUI(); updateWithdrawHistoryUI(); 
                     } 
                 } 
+            });
+            
+            // ✅ Listen for payment request updates
+            db.ref('paymentRequests').orderByChild('userId').equalTo(userId).on('child_changed', snap => {
+                const data = snap.val();
+                if (data && app.paymentHistory) {
+                    const index = app.paymentHistory.findIndex(h => h.id === snap.key);
+                    if (index !== -1) {
+                        app.paymentHistory[index].status = data.status;
+                        if (data.cancelReason) {
+                            app.paymentHistory[index].cancelReason = data.cancelReason;
+                        }
+                        if (data.status === 'approved') {
+                            // ✅ Activate the purchase
+                            if (data.type === 'coins') {
+                                app.balance += data.coins || 0;
+                            } else if (data.type === 'subscription') {
+                                const expiry = data.plan === 'monthly' ? Date.now() + 30*24*60*60*1000 : Date.now() + 365*24*60*60*1000;
+                                app.subscription = data.plan;
+                                app.subscriptionExpiry = expiry;
+                            } else if (data.type === 'level') {
+                                app.level = data.level || 1;
+                                app.miningSpeed += (data.level - 1) * 5;
+                            }
+                            userRef.update({
+                                balance: app.balance,
+                                subscription: app.subscription,
+                                subscriptionExpiry: app.subscriptionExpiry,
+                                level: app.level,
+                                miningSpeed: app.miningSpeed,
+                                paymentHistory: app.paymentHistory
+                            });
+                            showToast('✅ Payment approved!');
+                            updateUI(); updateLevelUI();
+                        } else if (data.status === 'cancelled') {
+                            showToast(`❌ Payment cancelled: ${data.cancelReason || 'No reason'}`, 'error');
+                        }
+                        updateUI();
+                    }
+                }
             });
             
             const ref = tg.initDataUnsafe?.start_param || new URLSearchParams(location.search).get('start') || '';
