@@ -2352,18 +2352,19 @@
             watchMiningCoins();
             loadAdminConfig();
             checkMaintenance();
-            loadNotifications();          // ✅ Load notifications
-            loadPackages();               // ✅ Load packages
-            listenPaymentApprovals();     // ✅ Listen for payment approvals
+            loadNotifications();
+            loadPackages();
+            listenPaymentApprovals();
             
             db.ref('conversionRate').on('value', s => { app.conversionRate = s.val() || 1000; updateUI(); });
             loadLevelConfigFromDB();
 
-            let loadingTimeout = setTimeout(() => { document.getElementById('loadingPage').classList.add('hidden'); }, 15000);
-            
-            userRef.on('value', snap => {
-                clearTimeout(loadingTimeout);
+            // 🔥 লোডিং পেজ ফোর্সলি হাইড করার জন্য ৩ সেকেন্ডের টাইমআউট
+            setTimeout(() => {
                 document.getElementById('loadingPage').classList.add('hidden');
+            }, 3000);
+
+            userRef.on('value', snap => {
                 const d = snap.val() || {};
                 if (d.banned) return;
                 app.balance = d.balance || 0;
@@ -2374,7 +2375,7 @@
                 app.referTiers = d.referTiers || {};
                 app.progressCoins = d.progressCoins !== undefined ? d.progressCoins : TOTAL_COINS;
                 app.speedBoostCooldown = d.speedBoostCooldown || 0;
-                app.mysteryBoxCooldown = d.mysteryBoxCooldown || 0; 
+                app.mysteryBoxCooldown = d.mysteryBoxCooldown || 0;
                 app.taskLastCompleted = d.taskLastCompleted || {};
                 app.taskProgress = d.taskProgress || {};
                 app.xpPoints = d.xpPoints !== undefined ? d.xpPoints : NEGATIVE_XP;
@@ -2419,9 +2420,8 @@
                 updateProgressUI();
                 updateSpeedBoostUI();
                 startConversionTimer();
-                updateNotificationUI();    // ✅ Update notification UI
-                updatePaymentHistoryUI();  // ✅ Update payment history UI
-                document.getElementById('loadingPage').classList.add('hidden');
+                updateNotificationUI();
+                updatePaymentHistoryUI();
             });
 
             db.ref('withdrawSettings').on('value', s => { 
