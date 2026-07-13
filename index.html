@@ -16,6 +16,9 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', -apple-system, sans-serif; }
         body { background: #0f172a; color: #e2e8f0; padding-bottom: 80px; min-height: 100vh; background: radial-gradient(circle at 20% 30%, #1e293b, #0f172a); }
         .container { max-width: 500px; margin: 0 auto; padding: 12px; }
+        .page { display: none; padding-top: 8px; min-height: 60vh; }
+        .page.active { display: block; }
+        .page-header { font-size: 20px; font-weight: 800; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
         /* ================== MAINTENANCE OVERLAY ================== */
         #maintenanceOverlay {
@@ -53,6 +56,33 @@
         .conversion-timer { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.15); border-radius: 12px; padding: 10px; margin-top: 10px; }
         .conversion-timer .label { font-size: 10px; color: #94a3b8; }
         .conversion-timer .time { font-size: 16px; font-weight: bold; color: #10b981; }
+        .level-section { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 14px; margin-top: 8px; cursor: pointer; }
+        .level-section .level-row { display: flex; justify-content: space-between; align-items: center; }
+        .level-progress { width: 100%; height: 5px; background: rgba(255,255,255,0.1); border-radius: 5px; margin-top: 6px; overflow: hidden; }
+        .level-progress .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 5px; transition: width 0.5s ease; }
+
+        /* ================== NOTIFICATION BELL ================== */
+        .notification-bell {
+            position: relative;
+            cursor: pointer;
+            margin-left: auto;
+            color: #94a3b8;
+            transition: color 0.3s ease;
+        }
+        .notification-bell:hover { color: #fbbf24; }
+        .notification-bell .bell-icon { font-size: 22px; }
+        .notification-bell .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: #fff;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: 700;
+            display: none;
+        }
 
         /* ================== DAILY BONUS ================== */
         .daily-bonus {
@@ -106,12 +136,10 @@
         .mystery-box-container {
             position: relative;
             width: 100%;
-            padding-bottom: 100%; /* 1:1 Ratio */
+            padding-bottom: 100%;
             transition: transform 0.3s ease;
         }
-        .mystery-box-container:hover {
-            transform: scale(1.02);
-        }
+        .mystery-box-container:hover { transform: scale(1.02); }
         .mystery-box-container .box-lid {
             position: absolute;
             top: 0;
@@ -130,9 +158,7 @@
             font-size: 40px;
             box-shadow: 0 -4px 15px rgba(236,72,153,0.3);
         }
-        .mystery-box-container .box-lid.open {
-            transform: rotateX(-120deg);
-        }
+        .mystery-box-container .box-lid.open { transform: rotateX(-120deg); }
         .mystery-box-container .box-body {
             position: absolute;
             bottom: 0;
@@ -153,14 +179,8 @@
             font-size: 60px;
             animation: pulseBox 1.5s infinite;
         }
-        @keyframes pulseBox {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        .mystery-box-container .box-body .gift-icon.opened {
-            animation: none;
-            font-size: 40px;
-        }
+        @keyframes pulseBox { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        .mystery-box-container .box-body .gift-icon.opened { animation: none; font-size: 40px; }
         .mystery-box-container .box-shine {
             position: absolute;
             top: -10%;
@@ -172,59 +192,12 @@
             z-index: 3;
             animation: shine 3s infinite;
         }
-        @keyframes shine {
-            0% { opacity: 0.3; transform: scale(0.8); }
-            50% { opacity: 1; transform: scale(1.1); }
-            100% { opacity: 0.3; transform: scale(0.8); }
-        }
-        .mystery-box-wrapper .box-label {
-            margin-top: 12px;
-            font-size: 16px;
-            font-weight: 700;
-            color: #fbbf24;
-        }
-        .mystery-box-wrapper .box-timer {
-            margin-top: 8px;
-            font-size: 20px;
-            font-weight: 900;
-            color: #10b981;
-            min-height: 30px;
-        }
-        .mystery-box-wrapper .box-timer.cooldown {
-            color: #fbbf24;
-        }
+        @keyframes shine { 0% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.3; transform: scale(0.8); } }
+        .mystery-box-wrapper .box-label { margin-top: 12px; font-size: 16px; font-weight: 700; color: #fbbf24; }
+        .mystery-box-wrapper .box-timer { margin-top: 8px; font-size: 20px; font-weight: 900; color: #10b981; min-height: 30px; }
+        .mystery-box-wrapper .box-timer.cooldown { color: #fbbf24; }
 
-        /* ================== NOTIFICATION BELL ================== */
-        .notification-bell {
-            position: relative;
-            cursor: pointer;
-            margin-left: auto;
-            color: #94a3b8;
-            transition: color 0.3s ease;
-        }
-        .notification-bell:hover {
-            color: #fbbf24;
-        }
-        .notification-bell .bell-icon {
-            font-size: 22px;
-        }
-        .notification-bell .badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #ef4444;
-            color: #fff;
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 10px;
-            font-weight: 700;
-            display: none;
-        }
-
-        /* ================== PAGES ================== */
-        .page { display: none; min-height: 60vh; padding-top: 8px; }
-        .page.active { display: block; }
-        .page-header { font-size: 20px; font-weight: 800; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        /* ================== TASKS ================== */
         .task-filters { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; }
         .task-filters .filter-btn { padding: 5px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #94a3b8; cursor: pointer; font-size: 11px; white-space: nowrap; }
         .task-filters .filter-btn.active { background: linear-gradient(135deg, #8b5cf6, #3b82f6); border-color: transparent; color: #fff; }
@@ -235,60 +208,23 @@
         .task-card .task-btn { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; padding: 6px 18px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 12px; transition: all 0.3s ease; }
         .task-card .task-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .task-card .task-progress { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+
+        /* ================== WALLET & PAYMENT ================== */
         .wallet-card { background: rgba(255,255,255,0.03); padding: 20px 16px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.08); }
         .wallet-card .wallet-balance { font-size: 36px; font-weight: 900; background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .history-card { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 12px; margin-top: 12px; max-height: 250px; overflow-y: auto; }
         .history-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px; }
+        .buy-options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+        .buy-option-card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); text-align: center; cursor: pointer; transition: all 0.3s ease; }
+        .buy-option-card:hover { background: rgba(255,255,255,0.1); transform: translateY(-3px); border-color: #fbbf24; }
+        .buy-option-card .option-icon { font-size: 40px; margin-bottom: 8px; }
+        .buy-option-card .option-title { font-size: 16px; font-weight: 700; color: #fff; }
+        .buy-option-card .option-desc { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+        .buy-option-card .option-price { font-size: 14px; font-weight: 700; color: #fbbf24; margin-top: 8px; }
+        .buy-option-card.coins { border-color: rgba(251,191,36,0.2); }
+        .buy-option-card.subscription { border-color: rgba(16,185,129,0.2); }
 
-        /* ================== BUY COINS & SUBSCRIPTION (NEW DESIGN) ================== */
-        .buy-options-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin: 16px 0;
-        }
-        .buy-option-card {
-            background: rgba(255,255,255,0.05);
-            padding: 20px;
-            border-radius: 16px;
-            border: 1px solid rgba(255,255,255,0.1);
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .buy-option-card:hover {
-            background: rgba(255,255,255,0.1);
-            transform: translateY(-3px);
-            border-color: #fbbf24;
-        }
-        .buy-option-card .option-icon {
-            font-size: 40px;
-            margin-bottom: 8px;
-        }
-        .buy-option-card .option-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: #fff;
-        }
-        .buy-option-card .option-desc {
-            font-size: 12px;
-            color: #94a3b8;
-            margin-top: 4px;
-        }
-        .buy-option-card .option-price {
-            font-size: 14px;
-            font-weight: 700;
-            color: #fbbf24;
-            margin-top: 8px;
-        }
-        .buy-option-card.coins {
-            border-color: rgba(251,191,36,0.2);
-        }
-        .buy-option-card.subscription {
-            border-color: rgba(16,185,129,0.2);
-        }
-
-        /* ================== PAYMENT MODAL (NEW FULL PAGE) ================== */
+        /* ================== PAYMENT PAGE OVERLAY ================== */
         .payment-page-overlay {
             position: fixed;
             top: 0;
@@ -301,9 +237,7 @@
             flex-direction: column;
             overflow-y: auto;
         }
-        .payment-page-overlay.show {
-            display: flex;
-        }
+        .payment-page-overlay.show { display: flex; }
         .payment-page-header {
             background: rgba(15,23,42,0.95);
             padding: 15px 20px;
@@ -324,12 +258,7 @@
             cursor: pointer;
             font-size: 14px;
         }
-        .payment-page-content {
-            padding: 20px;
-            max-width: 500px;
-            margin: 0 auto;
-            width: 100%;
-        }
+        .payment-page-content { padding: 20px; max-width: 500px; margin: 0 auto; width: 100%; }
         .payment-summary {
             background: rgba(255,255,255,0.05);
             border-radius: 16px;
@@ -338,133 +267,28 @@
             border: 1px solid rgba(255,255,255,0.1);
             text-align: center;
         }
-        .payment-summary .summary-title {
-            font-size: 14px;
-            color: #94a3b8;
-        }
-        .payment-summary .summary-amount {
-            font-size: 28px;
-            font-weight: 900;
-            color: #fbbf24;
-        }
-        .payment-summary .summary-item {
-            font-size: 13px;
-            color: #10b981;
-            margin-top: 4px;
-        }
-        .payment-methods-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 12px;
-            margin: 16px 0;
-        }
-        .payment-method-btn {
-            background: rgba(255,255,255,0.05);
-            padding: 16px;
-            border-radius: 12px;
-            border: 2px solid #334155;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: #94a3b8;
-        }
-        .payment-method-btn:hover {
-            background: rgba(255,255,255,0.1);
-        }
-        .payment-method-btn.active {
-            border-color: #10b981;
-            background: rgba(16,185,129,0.15);
-            color: #10b981;
-        }
-        .payment-method-btn .method-icon {
-            font-size: 28px;
-            margin-bottom: 4px;
-        }
-        .payment-method-btn .method-name {
-            font-size: 13px;
-            font-weight: 700;
-        }
-        .payment-method-btn.disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-            border-color: #334155;
-        }
-        .payment-form {
-            background: rgba(255,255,255,0.05);
-            border-radius: 16px;
-            padding: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
-            margin-top: 16px;
-        }
-        .payment-form .form-group {
-            margin-bottom: 14px;
-        }
-        .payment-form .form-group label {
-            display: block;
-            font-size: 12px;
-            color: #94a3b8;
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
-        .payment-form .form-group input {
-            width: 100%;
-            padding: 10px 14px;
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 14px;
-            outline: none;
-        }
-        .payment-form .form-group input:focus {
-            border-color: #fbbf24;
-        }
-        .payment-form .form-group .number-display {
-            background: #1e293b;
-            padding: 10px 14px;
-            border-radius: 8px;
-            color: #fbbf24;
-            font-weight: 700;
-            font-size: 14px;
-            border: 1px solid #334155;
-        }
-        .payment-timer {
-            font-size: 28px;
-            font-weight: 900;
-            color: #fbbf24;
-            text-align: center;
-            margin: 10px 0;
-        }
-        .payment-timer-label {
-            font-size: 12px;
-            color: #94a3b8;
-            text-align: center;
-        }
-        .payment-submit-btn {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #0f172a;
-            padding: 14px 30px;
-            border: none;
-            border-radius: 12px;
-            font-weight: 900;
-            font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-        .payment-submit-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .payment-history-section {
-            margin-top: 20px;
-        }
-        .payment-history-section h3 {
-            color: #fbbf24;
-            font-size: 16px;
-            margin-bottom: 10px;
-        }
+        .payment-summary .summary-title { font-size: 14px; color: #94a3b8; }
+        .payment-summary .summary-amount { font-size: 28px; font-weight: 900; color: #fbbf24; }
+        .payment-summary .summary-item { font-size: 13px; color: #10b981; margin-top: 4px; }
+        .payment-methods-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 16px 0; }
+        .payment-method-btn { background: rgba(255,255,255,0.05); padding: 16px; border-radius: 12px; border: 2px solid #334155; text-align: center; cursor: pointer; transition: all 0.3s ease; color: #94a3b8; }
+        .payment-method-btn:hover { background: rgba(255,255,255,0.1); }
+        .payment-method-btn.active { border-color: #10b981; background: rgba(16,185,129,0.15); color: #10b981; }
+        .payment-method-btn .method-icon { font-size: 28px; margin-bottom: 4px; }
+        .payment-method-btn .method-name { font-size: 13px; font-weight: 700; }
+        .payment-method-btn.disabled { opacity: 0.3; cursor: not-allowed; border-color: #334155; }
+        .payment-form { background: rgba(255,255,255,0.05); border-radius: 16px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); margin-top: 16px; }
+        .payment-form .form-group { margin-bottom: 14px; }
+        .payment-form .form-group label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 5px; font-weight: 600; }
+        .payment-form .form-group input { width: 100%; padding: 10px 14px; background: #1e293b; border: 1px solid #334155; border-radius: 8px; color: #fff; font-size: 14px; outline: none; }
+        .payment-form .form-group input:focus { border-color: #fbbf24; }
+        .payment-form .form-group .number-display { background: #1e293b; padding: 10px 14px; border-radius: 8px; color: #fbbf24; font-weight: 700; font-size: 14px; border: 1px solid #334155; }
+        .payment-timer { font-size: 28px; font-weight: 900; color: #fbbf24; text-align: center; margin: 10px 0; }
+        .payment-timer-label { font-size: 12px; color: #94a3b8; text-align: center; }
+        .payment-submit-btn { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; padding: 14px 30px; border: none; border-radius: 12px; font-weight: 900; font-size: 16px; cursor: pointer; width: 100%; transition: all 0.3s ease; margin-top: 10px; }
+        .payment-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .payment-history-section { margin-top: 20px; }
+        .payment-history-section h3 { color: #fbbf24; font-size: 16px; margin-bottom: 10px; }
 
         /* ================== NOTIFICATION OVERLAY ================== */
         .notification-overlay {
@@ -479,9 +303,7 @@
             overflow-y: auto;
             padding-bottom: 80px;
         }
-        .notification-overlay.show {
-            display: block;
-        }
+        .notification-overlay.show { display: block; }
         .notification-overlay-header {
             background: rgba(15,23,42,0.95);
             padding: 15px 20px;
@@ -493,34 +315,13 @@
             gap: 10px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        .notification-overlay-header .back-btn {
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: #fff;
-            padding: 8px 16px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        .notification-item {
-            background: rgba(255,255,255,0.03);
-            border-radius: 12px;
-            padding: 12px 16px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .notification-item:hover {
-            background: rgba(255,255,255,0.06);
-        }
-        .notification-item.unread {
-            border-left: 3px solid #3b82f6;
-        }
-        .notification-item.read {
-            opacity: 0.7;
-        }
+        .notification-overlay-header .back-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 8px 16px; border-radius: 10px; cursor: pointer; font-size: 14px; }
+        .notification-item { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 12px 16px; margin-bottom: 8px; cursor: pointer; transition: all 0.3s ease; }
+        .notification-item:hover { background: rgba(255,255,255,0.06); }
+        .notification-item.unread { border-left: 3px solid #3b82f6; }
+        .notification-item.read { opacity: 0.7; }
 
-        /* ================== OVERLAYS ================== */
+        /* ================== LEVEL OVERLAY ================== */
         .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9998; display: none; overflow-y: auto; padding-bottom: 70px; }
         .overlay.show { display: block; }
         .overlay-header { background: rgba(15,23,42,0.95); padding: 15px 20px; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 10px; }
@@ -532,17 +333,330 @@
         .level-card.current { border: 2px solid #fbbf24; background: rgba(251,191,36,0.08); }
         .level-card.unlocked { border-color: rgba(16,185,129,0.3); }
         .level-card.locked { opacity: 0.4; }
-        .floating-coin { position: fixed; font-size: 30px; pointer-events: none; z-index: 1000; animation: floatUp 1s ease-out forwards; }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-150px) scale(0.5); } }
-        .hidden { display: none !important; }
-        .banned-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 99999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; }
-        .banned-overlay.show { display: flex; }
-        .level-filters { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; }
-        .level-filters .lvl-filter-btn { padding: 5px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #94a3b8; cursor: pointer; font-size: 11px; white-space: nowrap; }
-        .level-filters .lvl-filter-btn.active { background: linear-gradient(135deg, #fbbf24, #f59e0b); border-color: transparent; color: #0f172a; }
-        .webview-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #0f172a; z-index: 99999; display: none; flex-direction: column; }
+        .level-upgrade-section { margin-top: 15px; }
+        .upgrade-title { font-size: 14px; font-weight: 700; color: #8b5cf6; margin-bottom: 10px; }
+        .upgrade-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .upgrade-card { background: rgba(255,255,255,0.05); padding: 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); text-align: center; cursor: pointer; transition: 0.3s; }
+        .upgrade-card:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); border-color: #8b5cf6; }
+        .upgrade-card .upgrade-icon { font-size: 28px; margin-bottom: 4px; }
+        .upgrade-card .upgrade-level { font-size: 14px; font-weight: 700; color: #fff; }
+        .upgrade-card .upgrade-cost { font-size: 12px; color: #fbbf24; }
+        .upgrade-card .upgrade-bonus { font-size: 11px; color: #10b981; margin-top: 4px; }
+
+        /* ================== AIRDROP OVERLAY ================== */
+        .airdrop-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9998; display: none; overflow-y: auto; padding-bottom: 70px; }
+        .airdrop-overlay.show { display: block; }
+        .airdrop-overlay-header { background: rgba(15,23,42,0.95); padding: 15px 20px; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 10px; }
+        .airdrop-overlay-header .back-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 8px 16px; border-radius: 10px; cursor: pointer; }
+        .airdrop-content { padding: 15px; }
+        .airdrop-pool { background: rgba(255,255,255,0.05); border-radius: 20px; padding: 25px; text-align: center; border: 2px solid rgba(251,191,36,0.3); }
+        .airdrop-pool .pool-amount { font-size: 42px; font-weight: 900; color: #fbbf24; }
+        .airdrop-pool .countdown { font-size: 36px; font-weight: bold; color: #fbbf24; margin: 15px 0; }
+
+        /* ================== COIN → USD EXCHANGE ================== */
+        .exchange-section { background: rgba(251,191,36,0.08); border: 2px solid rgba(251,191,36,0.2); border-radius: 16px; padding: 16px; margin: 16px 0; text-align: center; }
+        .exchange-section .exchange-title { font-size: 14px; font-weight: 700; color: #fbbf24; margin-bottom: 10px; }
+        .exchange-controls { margin-top: 10px; }
+        .exchange-btn { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; padding: 10px 20px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; flex: 1; transition: all 0.3s ease; }
+        .exchange-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(251,191,36,0.3); }
+
+        /* ================== WITHDRAW ================== */
+        .withdraw-section { margin-top: 15px; padding: 15px; background: rgba(239,68,68,0.08); border-radius: 14px; border: 1px solid rgba(239,68,68,0.15); text-align: left; }
+        .withdraw-section .form-group { margin-bottom: 12px; }
+        .withdraw-section .form-group label { font-size: 12px; color: #94a3b8; margin-bottom: 5px; display: block; }
+        .withdraw-section .form-group input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #fff; font-size: 14px; outline: none; }
+        .withdraw-section .withdraw-btn { margin-top: 8px; padding: 12px 20px; background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; width: 100%; font-size: 15px; transition: all 0.3s ease; }
+        .withdraw-section .withdraw-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .method-selector { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+        .method-btn { padding: 8px 16px; border-radius: 10px; border: 2px solid #334155; background: #1e293b; color: #94a3b8; cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.3s ease; flex: 1; min-width: 70px; text-align: center; }
+        .method-btn.active { border-color: #10b981; background: rgba(16,185,129,0.15); color: #10b981; }
+        .method-btn:hover { border-color: #64748b; }
+        .method-btn i { margin-right: 6px; }
+
+        /* ================== LEADERBOARD ================== */
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .leaderboard-item .rank { font-weight: 900; color: #fbbf24; min-width: 30px; }
+        .leaderboard-item .user { display: flex; align-items: center; gap: 10px; flex: 1; }
+        .leaderboard-item .user .avatar-small { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #3b82f6); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff; }
+        .leaderboard-item .score { color: #10b981; font-weight: 700; }
+        .leaderboard-item.top1 { background: rgba(251,191,36,0.15); border-color: #fbbf24; }
+        .leaderboard-item.top2 { background: rgba(192,192,192,0.1); border-color: #94a3b8; }
+        .leaderboard-item.top3 { background: rgba(205,127,50,0.1); border-color: #cd7f32; }
+
+        /* ================== BOTTOM NAV ================== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 500px;
+            background: rgba(15,23,42,0.95);
+            backdrop-filter: blur(24px);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 4px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            z-index: 1000;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            color: #64748b;
+            font-size: 10px;
+            cursor: pointer;
+            flex: 1;
+        }
+        .nav-item.active { color: #fbbf24; }
+        .nav-item i { font-size: 20px; }
+
+        /* ================== SPIN WHEEL ================== */
+        #floatingSpinBtn {
+            position: fixed;
+            right: 20px;
+            bottom: 120px;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f97316, #f59e0b);
+            color: #fff;
+            border: none;
+            box-shadow: 0 4px 20px rgba(249,115,22,0.4);
+            cursor: grab;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            touch-action: none;
+        }
+        #floatingSpinBtn:active { cursor: grabbing; }
+        #floatingSpinBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+        #floatingSpinBtn .spin-icon { font-size: 28px; animation: spinFloat 4s linear infinite; }
+        #floatingSpinBtn:disabled .spin-icon { animation: none; }
+        @keyframes spinFloat { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #floatingSpinBtn .spin-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: #fff;
+            border-radius: 50%;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* ================== SPIN MODAL ================== */
+        .spin-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 99999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .spin-modal-overlay.show { display: flex; }
+        .spin-modal-content {
+            background: rgba(30,41,59,0.95);
+            padding: 25px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+        }
+        .spin-modal-content .close-modal-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 20;
+        }
+        .wheel-wrapper-new {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .wheel-outer-rim {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, #7c3aed, #6d28d9, #7c3aed, #6d28d9, #7c3aed);
+            padding: 12px;
+            box-shadow: 0 0 30px rgba(124,58,237,0.3);
+        }
+        .wheel-bulbs {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            top: 0;
+            left: 0;
+        }
+        .wheel-bulb {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 0 10px #fff, 0 0 20px #fff;
+            animation: bulbBlink 1s infinite alternate;
+        }
+        .wheel-bulb:nth-child(odd) { animation-delay: 0.5s; }
+        @keyframes bulbBlink { 0% { opacity: 0.3; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); } }
+        .wheel-inner {
+            position: absolute;
+            width: calc(100% - 24px);
+            height: calc(100% - 24px);
+            border-radius: 50%;
+            overflow: hidden;
+            background: #1a1a2e;
+        }
+        .wheel-segments {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+        .wheel-segment {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            top: 0;
+            left: 50%;
+            transform-origin: 0% 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding-left: 20%;
+            font-size: 12px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .wheel-segment span { background: rgba(255,255,255,0.7); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+        .wheel-segment .gift-icon { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 20px; }
+        .wheel-center-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: #0f172a;
+            font-weight: 900;
+            box-shadow: 0 0 30px rgba(251,191,36,0.3);
+            z-index: 10;
+            border: 3px solid #7c3aed;
+        }
+        .wheel-pointer-new {
+            position: absolute;
+            top: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 18px solid transparent;
+            border-right: 18px solid transparent;
+            border-top: 30px solid #fbbf24;
+            z-index: 15;
+            filter: drop-shadow(0 4px 10px rgba(251,191,36,0.5));
+        }
+        .spin-btn-new {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #0f172a;
+            padding: 14px 40px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 900;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 220px;
+            margin-top: 5px;
+            box-shadow: 0 4px 15px rgba(251,191,36,0.3);
+        }
+        .spin-btn-new:disabled { opacity: 0.5; cursor: not-allowed; }
+        .spin-timer-box-new {
+            display: none;
+            background: rgba(249,115,22,0.15);
+            border: 2px solid rgba(249,115,22,0.3);
+            border-radius: 15px;
+            padding: 12px;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .spin-timer-box-new.show { display: block; }
+        .spin-timer-box-new .timer-label { font-size: 12px; color: #94a3b8; }
+        .spin-timer-box-new .timer-time { font-size: 24px; font-weight: 700; color: #fbbf24; }
+        .spin-result-new { margin-top: 10px; font-size: 18px; font-weight: 700; color: #10b981; min-height: 30px; }
+
+        /* ================== MODALS & TOAST ================== */
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 9999; align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: rgba(30,41,59,0.95); padding: 25px; border-radius: 20px; width: 90%; max-width: 350px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+        .modal-content button { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; padding: 12px 30px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; margin-top: 15px; }
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #10b981; color: #fff; padding: 12px 24px; border-radius: 14px; font-weight: 700; z-index: 99999; display: none; font-size: 14px; }
+        .toast.show { display: block; animation: slideDown 0.4s ease; }
+        .toast.error { background: #ef4444; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-80px) translateX(-50%); } to { opacity: 1; transform: translateY(0) translateX(-50%); } }
+
+        /* ================== OVERLAYS ================== */
+        .webview-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #0f172a;
+            z-index: 99999;
+            display: none;
+            flex-direction: column;
+        }
         .webview-overlay.show { display: flex; }
-        .webview-header { background: #1e293b; padding: 12px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #334155; }
+        .webview-header {
+            background: #1e293b;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid #334155;
+        }
         .webview-header .back-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 14px; }
         .webview-header .timer-badge { background: rgba(251,191,36,0.2); color: #fbbf24; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 700; }
         .webview-iframe { flex: 1; border: none; background: #fff; }
@@ -550,70 +664,45 @@
         .webview-footer { background: #1e293b; padding: 10px 16px; text-align: center; border-top: 1px solid #334155; }
         .webview-footer .claim-btn { background: linear-gradient(135deg, #10b981, #059669); color: #fff; padding: 10px 30px; border: none; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; width: 100%; max-width: 300px; transition: all 0.3s ease; }
         .webview-footer .claim-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .rules-text { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; font-size: 12px; color: #94a3b8; border: 1px solid rgba(255,255,255,0.05); }
-        .rules-text strong { color: #fbbf24; }
-        .rules-text .rule-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
-        .method-selector { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-        .method-btn { padding: 8px 16px; border-radius: 10px; border: 2px solid #334155; background: #1e293b; color: #94a3b8; cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.3s ease; flex: 1; min-width: 70px; text-align: center; }
-        .method-btn.active { border-color: #10b981; background: rgba(16,185,129,0.15); color: #10b981; }
-        .method-btn:hover { border-color: #64748b; }
-        .method-btn i { margin-right: 6px; }
-        .network-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 999999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; }
-        .network-overlay.show { display: flex; }
-        .network-overlay .icon { font-size: 60px; color: #ef4444; margin-bottom: 16px; }
-        .network-overlay h2 { color: #fff; font-size: 22px; margin-bottom: 8px; }
-        .network-overlay p { color: #94a3b8; font-size: 14px; }
-        .network-overlay .retry-btn { margin-top: 20px; padding: 12px 30px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none; border-radius: 12px; color: #fff; font-weight: 700; font-size: 16px; cursor: pointer; }
-        .security-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9999999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; }
-        .security-overlay.show { display: flex; }
-        .security-overlay h1 { color: #ef4444; font-size: 28px; margin-bottom: 12px; }
-        .security-overlay p { color: #94a3b8; font-size: 16px; margin-bottom: 20px; }
-        .security-overlay button { padding: 12px 30px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none; border-radius: 12px; color: #fff; font-weight: 700; font-size: 16px; cursor: pointer; }
-        #loadingPage { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 99999999; transition: opacity 0.5s ease; }
+
+        /* ================== LOADING PAGE ================== */
+        #loadingPage {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0f172a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999999;
+            transition: opacity 0.5s ease;
+        }
         #loadingPage.hidden { opacity: 0; pointer-events: none; }
         .loader-container { text-align: center; }
-        .loader-ring { width: 80px; height: 80px; border-radius: 50%; border: 8px solid transparent; border-top-color: #fbbf24; border-right-color: #f59e0b; border-bottom-color: #3b82f6; border-left-color: #8b5cf6; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        .loader-ring {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 8px solid transparent;
+            border-top-color: #fbbf24;
+            border-right-color: #f59e0b;
+            border-bottom-color: #3b82f6;
+            border-left-color: #8b5cf6;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .loader-text { color: #fbbf24; font-size: 18px; font-weight: 700; letter-spacing: 2px; animation: pulseText 1.5s ease-in-out infinite; }
         @keyframes pulseText { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         .loader-sub { color: #94a3b8; font-size: 13px; margin-top: 8px; }
 
-        /* ================== FLOATING SPIN BUTTON ================== */
-        #floatingSpinBtn {
-            position: fixed; right: 20px; bottom: 120px; width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #f59e0b); color: #fff; border: none; box-shadow: 0 4px 20px rgba(249,115,22,0.4); cursor: grab; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.3s ease; touch-action: none;
-        }
-        #floatingSpinBtn:active { cursor: grabbing; }
-        #floatingSpinBtn:disabled { opacity: 0.6; cursor: not-allowed; }
-        #floatingSpinBtn .spin-icon { font-size: 28px; animation: spinFloat 4s linear infinite; }
-        #floatingSpinBtn:disabled .spin-icon { animation: none; }
-        @keyframes spinFloat { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        #floatingSpinBtn .spin-badge { position: absolute; top: -5px; right: -5px; background: #ef4444; color: #fff; border-radius: 50%; padding: 2px 8px; font-size: 12px; font-weight: 700; }
-
-        /* ================== SPIN WHEEL MODAL ================== */
-        .spin-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 99999; display: none; align-items: center; justify-content: center; }
-        .spin-modal-overlay.show { display: flex; }
-        .spin-modal-content { background: rgba(30,41,59,0.95); padding: 25px; border-radius: 24px; width: 90%; max-width: 400px; text-align: center; border: 1px solid rgba(255,255,255,0.1); position: relative; }
-        .spin-modal-content .close-modal-btn { position: absolute; top: 10px; right: 15px; background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; z-index: 20; }
-        .wheel-wrapper-new { position: relative; width: 280px; height: 280px; margin: 0 auto 15px; display: flex; justify-content: center; align-items: center; }
-        .wheel-outer-rim { position: absolute; width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(from 0deg, #7c3aed, #6d28d9, #7c3aed, #6d28d9, #7c3aed); padding: 12px; box-shadow: 0 0 30px rgba(124,58,237,0.3); }
-        .wheel-bulbs { position: absolute; width: 100%; height: 100%; border-radius: 50%; top: 0; left: 0; }
-        .wheel-bulb { position: absolute; width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 0 10px #fff, 0 0 20px #fff; animation: bulbBlink 1s infinite alternate; }
-        .wheel-bulb:nth-child(odd) { animation-delay: 0.5s; }
-        @keyframes bulbBlink { 0% { opacity: 0.3; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); } }
-        .wheel-inner { position: absolute; width: calc(100% - 24px); height: calc(100% - 24px); border-radius: 50%; overflow: hidden; background: #1a1a2e; }
-        .wheel-segments { width: 100%; height: 100%; position: relative; transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1); }
-        .wheel-segment { position: absolute; width: 50%; height: 50%; top: 0; left: 50%; transform-origin: 0% 100%; display: flex; align-items: center; justify-content: flex-start; padding-left: 20%; font-size: 12px; font-weight: 700; color: #0f172a; }
-        .wheel-segment span { background: rgba(255,255,255,0.7); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
-        .wheel-segment .gift-icon { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 20px; }
-        .wheel-center-logo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #fbbf24, #f59e0b); display: flex; align-items: center; justify-content: center; font-size: 30px; color: #0f172a; font-weight: 900; box-shadow: 0 0 30px rgba(251,191,36,0.3); z-index: 10; border: 3px solid #7c3aed; }
-        .wheel-pointer-new { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 18px solid transparent; border-right: 18px solid transparent; border-top: 30px solid #fbbf24; z-index: 15; filter: drop-shadow(0 4px 10px rgba(251,191,36,0.5)); }
-        .spin-btn-new { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; padding: 14px 40px; border: none; border-radius: 30px; font-weight: 900; font-size: 18px; cursor: pointer; transition: all 0.3s ease; width: 100%; max-width: 220px; margin-top: 5px; box-shadow: 0 4px 15px rgba(251,191,36,0.3); }
-        .spin-btn-new:disabled { opacity: 0.5; cursor: not-allowed; }
-        .spin-timer-box-new { display: none; background: rgba(249,115,22,0.15); border: 2px solid rgba(249,115,22,0.3); border-radius: 15px; padding: 12px; margin-top: 10px; text-align: center; }
-        .spin-timer-box-new.show { display: block; }
-        .spin-timer-box-new .timer-label { font-size: 12px; color: #94a3b8; }
-        .spin-timer-box-new .timer-time { font-size: 24px; font-weight: 700; color: #fbbf24; }
-        .spin-result-new { margin-top: 10px; font-size: 18px; font-weight: 700; color: #10b981; min-height: 30px; }
+        /* ================== RULES TEXT ================== */
+        .rules-text { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; font-size: 12px; color: #94a3b8; border: 1px solid rgba(255,255,255,0.05); }
+        .rules-text strong { color: #fbbf24; }
+        .rules-text .rule-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
     </style>
 </head>
 <body>
@@ -626,21 +715,19 @@
         </div>
     </div>
 
-    <!-- ================== MAINTENANCE OVERLAY ================== -->
+    <!-- ================== OVERLAYS ================== -->
     <div id="maintenanceOverlay">
         <div class="icon"><i class="fas fa-tools"></i></div>
         <h1>🔧 Under Maintenance</h1>
         <p id="maintenanceMessage">We are currently updating the app. Please come back later.</p>
     </div>
 
-    <!-- ================== SECURITY OVERLAY ================== -->
     <div class="security-overlay" id="securityOverlay">
         <h1>🚫 Security Alert</h1>
         <p>Unauthorized access detected! Please close Developer Tools to continue.</p>
         <button onclick="location.reload()">🔄 Reload Page</button>
     </div>
 
-    <!-- ================== NETWORK OVERLAY ================== -->
     <div class="network-overlay" id="networkOverlay">
         <div class="icon"><i class="fas fa-wifi"></i></div>
         <h2>🔌 No Internet Connection</h2>
@@ -648,7 +735,6 @@
         <button class="retry-btn" onclick="checkNetworkAndReload()"><i class="fas fa-sync"></i> Retry</button>
     </div>
 
-    <!-- ================== BANNED OVERLAY ================== -->
     <div class="banned-overlay" id="bannedOverlay">
         <h1>🚫 Account Banned</h1>
         <p>Your account has been suspended.</p>
@@ -657,7 +743,6 @@
         <p id="appealStatus" style="display:none;"></p>
     </div>
 
-    <!-- ================== LEVEL OVERLAY ================== -->
     <div class="overlay" id="levelOverlay">
         <div class="overlay-header">
             <button class="back-btn" onclick="closeLevelPage()"><i class="fas fa-arrow-left"></i> Back</button>
@@ -673,7 +758,6 @@
                 <div class="level-bonus" id="lvlBonus">Mining Bonus: +0%</div>
             </div>
             
-            <!-- ✅ LEVEL UPGRADE (উপরে) -->
             <div class="level-upgrade-section">
                 <div class="upgrade-title">🚀 Level Upgrade</div>
                 <div class="upgrade-grid">
@@ -717,14 +801,13 @@
         </div>
     </div>
 
-    <!-- ================== AIRDROP OVERLAY ================== -->
     <div class="overlay" id="airdropOverlay">
-        <div class="overlay-header">
+        <div class="airdrop-overlay-header">
             <button class="back-btn" onclick="closeAirdropPage()"><i class="fas fa-arrow-left"></i> Back</button>
             <h2 style="color:#fff;">📢 Live AirDrop</h2>
         </div>
-        <div style="padding:15px;">
-            <div style="background:rgba(255,255,255,0.05);border-radius:20px;padding:25px;text-align:center;border:2px solid rgba(251,191,36,0.3);">
+        <div class="airdrop-content">
+            <div class="airdrop-pool">
                 <div id="airdropPoolDisplay" style="font-size:42px;font-weight:900;color:#fbbf24;">$50.00</div>
                 <div id="airdropCountdown" style="font-size:36px;font-weight:bold;color:#fbbf24;margin:15px 0;">--:--:--</div>
                 <button id="airdropClaimBtn" onclick="claimAirdrop()" disabled style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:14px 30px;border:none;border-radius:30px;font-weight:700;font-size:16px;cursor:pointer;width:100%;transition:all 0.3s ease;">🎁 Claim</button>
@@ -733,7 +816,6 @@
         </div>
     </div>
 
-    <!-- ================== WEBVIEW OVERLAY ================== -->
     <div class="webview-overlay" id="webviewOverlay">
         <div class="webview-header">
             <button class="back-btn" onclick="closeWebView()"><i class="fas fa-arrow-left"></i> Back</button>
@@ -900,7 +982,7 @@
                     <div id="walletTotalUsd" style="font-size:18px;font-weight:bold;color:#10b981;">$0.000</div>
                 </div>
 
-                <!-- ✅ NEW DESIGN: Buy Coins & Subscription -->
+                <!-- ✅ Buy Coins & Subscription -->
                 <div class="buy-options-grid">
                     <div class="buy-option-card coins" onclick="openPaymentPage('coins', 'Buy Coins', 100, 1000)">
                         <div class="option-icon">🪙</div>
@@ -916,9 +998,9 @@
                     </div>
                 </div>
 
-                <!-- ✅ COIN → USD EXCHANGE -->
-                <div class="buy-coins-section" style="margin-top:16px;">
-                    <div class="buy-title">🪙 Exchange Coins to USD</div>
+                <!-- ✅ Coin → USD Exchange -->
+                <div class="exchange-section">
+                    <div class="exchange-title">🪙 Exchange Coins to USD</div>
                     <div id="exchangeInfo" style="font-size:13px;color:#94a3b8;margin-bottom:10px;">
                         Rate: 100 Coins = $0.01 USD
                     </div>
@@ -936,7 +1018,7 @@
                     </div>
                 </div>
 
-                <!-- WITHDRAW SECTION -->
+                <!-- ✅ Withdraw -->
                 <div class="withdraw-section">
                     <p id="withdrawInfo" style="font-weight:bold;color:#fbbf24;">Min: $10.000</p>
                     <div class="form-group"><label>Payment Method</label><div class="method-selector" id="methodSelector"></div></div>
@@ -1008,7 +1090,7 @@
         </div>
     </div>
 
-    <!-- ✅ PAYMENT PAGE OVERLAY (NEW FULL PAGE) -->
+    <!-- ✅ PAYMENT PAGE OVERLAY -->
     <div class="payment-page-overlay" id="paymentPageOverlay">
         <div class="payment-page-header">
             <button class="back-btn" onclick="closePaymentPage()"><i class="fas fa-arrow-left"></i> Back</button>
@@ -1068,11 +1150,41 @@
         <div class="nav-item" onclick="switchPage('leaderboard',this)"><i class="fas fa-trophy"></i><span>Leaderboard</span></div>
     </div>
 
-    <!-- Modals -->
-    <div class="modal" id="successModal"><div class="modal-content"><div style="font-size:50px;">🎉</div><h3>Done!</h3><p id="rewardText"></p><button onclick="closeModal('successModal')">OK</button></div></div>
-    <div class="modal" id="conversionModal"><div class="modal-content"><div style="font-size:50px;">💰</div><h3>Converted!</h3><p id="conversionText"></p><button onclick="closeModal('conversionModal')">OK</button></div></div>
-    <div class="modal" id="withdrawModal"><div class="modal-content"><div style="font-size:50px;">💳</div><h3 id="withdrawModalTitle"></h3><p id="withdrawModalText"></p><button onclick="closeModal('withdrawModal')">OK</button></div></div>
-    <div class="modal" id="airdropModal"><div class="modal-content"><div style="font-size:50px;">🎁</div><h3>Airdrop!</h3><p id="airdropModalText"></p><button onclick="closeModal('airdropModal')">OK</button></div></div>
+    <!-- ============================================================ -->
+    <!-- ================== MODALS =================================== -->
+    <!-- ============================================================ -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <div style="font-size:50px;">🎉</div>
+            <h3>Done!</h3>
+            <p id="rewardText"></p>
+            <button onclick="closeModal('successModal')">OK</button>
+        </div>
+    </div>
+    <div class="modal" id="conversionModal">
+        <div class="modal-content">
+            <div style="font-size:50px;">💰</div>
+            <h3>Converted!</h3>
+            <p id="conversionText"></p>
+            <button onclick="closeModal('conversionModal')">OK</button>
+        </div>
+    </div>
+    <div class="modal" id="withdrawModal">
+        <div class="modal-content">
+            <div style="font-size:50px;">💳</div>
+            <h3 id="withdrawModalTitle"></h3>
+            <p id="withdrawModalText"></p>
+            <button onclick="closeModal('withdrawModal')">OK</button>
+        </div>
+    </div>
+    <div class="modal" id="airdropModal">
+        <div class="modal-content">
+            <div style="font-size:50px;">🎁</div>
+            <h3>Airdrop!</h3>
+            <p id="airdropModalText"></p>
+            <button onclick="closeModal('airdropModal')">OK</button>
+        </div>
+    </div>
     <div class="toast" id="toast"></div>
 
     <script>
@@ -1189,7 +1301,10 @@
             paymentHistory: [],
             // Exchange
             exchangeStats: { today: 0, lifetime: 0, lastExchangeDate: '' },
-            exchangeConfig: { coins: 100, usd: 0.01, dailyLimit: 5, lifetimeLimit: 50 }
+            exchangeConfig: { coins: 100, usd: 0.01, dailyLimit: 5, lifetimeLimit: 50 },
+            // Subscription
+            subscription: null,
+            subscriptionExpiry: 0
         };
         let tasks = [], conversionTimer = null, miningInterval = null, boostTimer = null, airdropTimer = null, 
             currentFilter = 'all', currentLevelFilter = 'all', levelConfigCache = {}, referralConfigCache = {};
@@ -1430,7 +1545,6 @@
                 }
             });
             
-            // নতুন নোটিফিকেশন আসলে টোস্ট দেখানো
             db.ref('notifications').orderByChild('createdAt').limitToLast(1).on('child_added', snap => {
                 const data = snap.val();
                 if (data.recipient === 'all' || data.recipientUserId === userId) {
@@ -1520,11 +1634,9 @@
         // ================== PAYMENT PAGE SYSTEM ======================
         // ============================================================
         function openPaymentPage(type, title, amount, item) {
-            // Load payment config (ON/OFF methods)
             db.ref('paymentConfig/methodsStatus').once('value', snap => {
                 const methodsStatus = snap.val() || { bkash: 'on', nagad: 'on', rocket: 'on' };
                 
-                // Load numbers
                 db.ref('paymentConfig/manualNumbers').once('value', numSnap => {
                     const numbers = numSnap.val() || {};
                     
@@ -1539,7 +1651,6 @@
                     document.getElementById('paymentPageTxId').value = '';
                     document.getElementById('paymentPageNumber').textContent = 'Select a method first';
                     
-                    // Render methods (only ON ones)
                     const grid = document.getElementById('paymentMethodsGrid');
                     const methodConfigs = {
                         bKash: { icon: 'fa-mobile-alt', status: methodsStatus.bkash },
@@ -1562,7 +1673,6 @@
                         `;
                     }).join('');
                     
-                    // Reset selection
                     document.querySelectorAll('.payment-method-btn').forEach(el => el.classList.remove('active'));
                     
                     document.getElementById('paymentPageOverlay').classList.add('show');
@@ -1631,11 +1741,9 @@
                 return;
             }
             
-            // Stop timer
             if (paymentPageData.timerInterval) clearInterval(paymentPageData.timerInterval);
             if (paymentPageData.timeout) clearTimeout(paymentPageData.timeout);
             
-            // Create transaction request
             const requestId = Date.now().toString();
             const requestData = {
                 userId: userId,
@@ -1652,10 +1760,8 @@
                 expiresAt: Date.now() + 15 * 60 * 1000
             };
             
-            // Save to Firebase
             db.ref('paymentRequests/' + requestId).set(requestData);
             
-            // Add to history
             const historyEntry = {
                 id: requestId,
                 method: paymentPageData.method,
@@ -1671,15 +1777,12 @@
             app.paymentHistory.unshift(historyEntry);
             userRef.update({ paymentHistory: app.paymentHistory });
             
-            // Close payment page
             closePaymentPage();
             
-            // Show success
             showToast('📤 Transaction submitted! Waiting for admin approval...');
             document.getElementById('rewardText').textContent = 'Waiting for admin approval...';
             document.getElementById('successModal').classList.add('active');
             
-            // Update history
             updatePaymentHistoryUI();
         }
 
@@ -2824,6 +2927,8 @@
                 app.level = d.level || 1;
                 app.miningSpeed = d.miningSpeed || 0;
                 app.exchangeStats = d.exchangeStats || { today: 0, lifetime: 0, lastExchangeDate: '' };
+                app.subscription = d.subscription || null;
+                app.subscriptionExpiry = d.subscriptionExpiry || 0;
 
                 if (!window._lastReferCode || window._lastReferCode !== app.referCode) {
                     window._lastReferCode = app.referCode;
@@ -2889,7 +2994,6 @@
                 } 
             });
             
-            // Listen for payment request updates
             db.ref('paymentRequests').orderByChild('userId').equalTo(userId).on('child_changed', snap => {
                 const data = snap.val();
                 if (data && app.paymentHistory) {
@@ -2963,6 +3067,8 @@
         }
 
         document.addEventListener('DOMContentLoaded', initApp);
+        // Listen for notifications on load
+        setTimeout(() => { listenNotifications(); }, 1000);
     </script>
 </body>
 </html>
