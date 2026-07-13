@@ -492,6 +492,7 @@
                 <div class="level-bonus" id="lvlBonus">Mining Bonus: +0%</div>
             </div>
             
+            <!-- ✅ LEVEL UPGRADE (উপরে) -->
             <div class="level-upgrade-section">
                 <div class="upgrade-title">🚀 Level Upgrade</div>
                 <div class="upgrade-grid">
@@ -580,6 +581,7 @@
                     <div class="last-login" id="lastLoginDisplay">📅 --</div>
                     <span class="level-badge" onclick="openLevelPage()" id="userLevelBadge">🔒 Unlocking</span>
                 </div>
+                <!-- ✅ NOTIFICATION BELL -->
                 <div class="notification-bell" onclick="openNotificationPanel()">
                     <i class="fas fa-bell bell-icon"></i>
                     <span class="badge" id="notifBadge">0</span>
@@ -866,8 +868,8 @@
     </div>
 
     <!-- ✅ NOTIFICATION OVERLAY -->
-    <div class="notification-overlay" id="notificationOverlay" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.95);z-index:999999;display:none;overflow-y:auto;">
-        <div class="notification-overlay-header" style="background:rgba(15,23,42,0.95);padding:15px 20px;position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:10px;">
+    <div class="notification-overlay" id="notificationOverlay">
+        <div class="notification-overlay-header">
             <button class="back-btn" onclick="closeNotificationPanel()"><i class="fas fa-arrow-left"></i> Back</button>
             <h2 style="color:#fff;">📨 Notifications</h2>
         </div>
@@ -1028,17 +1030,18 @@
             dailyBonusClaimed: 0,
             mysteryBoxCooldown: 0, 
             
-            subscription: null,
+            // ✅ New properties for Subscription & Level
+            subscription: null, // 'monthly', 'yearly', or null
             subscriptionExpiry: 0,
             level: 1,
-            miningSpeed: 0,
+            miningSpeed: 0, // Percentage bonus
             
+            // Admin-controlled settings
             dailyBonusMin: 50,
             dailyBonusMax: 100,
             mysteryBoxMin: 20,
             mysteryBoxMax: 100,
-            mysteryBoxDuration: 1800000,
-            paymentHistory: []
+            mysteryBoxDuration: 1800000 // 30 minutes
         };
         let tasks = [], conversionTimer = null, miningInterval = null, boostTimer = null, airdropTimer = null, 
             currentFilter = 'all', currentLevelFilter = 'all', levelConfigCache = {}, referralConfigCache = {};
@@ -1186,18 +1189,15 @@
                     isAdShowing = false;
                     const prize = getPrizeByAngle(currentRotation);
                     let rewardCoins = 0, rewardUsd = 0;
-                    
                     if (prize.type === 'coins') {
                         rewardCoins = prize.value;
-                        // ✅ কয়েন পেলে মাইনিং কয়েনে যোগ হবে (progressCoins)
                         const newCoins = app.progressCoins + rewardCoins;
                         if (newCoins > TOTAL_COINS) rewardCoins = Math.max(0, TOTAL_COINS - app.progressCoins);
-                        if (rewardCoins > 0) app.progressCoins += rewardCoins;
                     } else if (prize.type === 'usd') {
                         rewardUsd = prize.value;
-                        // ✅ USD পেলে USD ব্যালেন্সে যোগ হবে
-                        if (rewardUsd > 0) app.usdBalance += rewardUsd;
                     }
+                    if (rewardCoins > 0) app.progressCoins += rewardCoins;
+                    if (rewardUsd > 0) app.usdBalance += rewardUsd;
 
                     spinCount--;
                     document.getElementById('spinBadge').textContent = spinCount;
@@ -1205,18 +1205,13 @@
                     updateSpinModalUI();
 
                     let resultText = '';
-                    if (rewardCoins > 0) resultText += `+${rewardCoins} Mining Coins!`;
+                    if (rewardCoins > 0) resultText += `+${rewardCoins} Coins!`;
                     if (rewardUsd > 0) resultText += `+$${rewardUsd.toFixed(3)} USD!`;
                     if (resultText === '') resultText = 'Better luck next time!';
                     document.getElementById('rewardText').textContent = resultText;
                     document.getElementById('successModal').classList.add('active');
 
-                    // ✅ Firebase আপডেট
-                    userRef.update({ 
-                        progressCoins: app.progressCoins, 
-                        usdBalance: app.usdBalance, 
-                        spinCount: spinCount 
-                    });
+                    userRef.update({ progressCoins: app.progressCoins, usdBalance: app.usdBalance, spinCount: spinCount });
                     updateUI(); updateProgressUI(); updateLevelUI();
                     isSpinning = false;
                     showToast(`🎰 Spin result: ${prize.label}`);
@@ -1224,6 +1219,7 @@
                 .catch(() => {
                     isAdShowing = false;
                     btn.disabled = false;
+                    btn.textContent = '🎡 SPIN';
                     isSpinning = false;
                     document.getElementById('modalSpinResult').textContent = '⚠️ Ad not watched! Try again.';
                     showToast('⚠️ Please watch the ad to get reward!', 'error');
@@ -1314,11 +1310,13 @@
             const lid = document.getElementById('boxLid');
             const icon = document.getElementById('giftIcon');
             
+            // Animate box opening
             lid.classList.add('open');
             icon.className = 'gift-icon opened';
             icon.textContent = '✨';
             
             showRewardedAd(() => {
+                // ৫০% USD, ৫০% Coins
                 const rewardType = Math.random() > 0.5 ? 'usd' : 'coins';
                 let rewardCoins = 0, rewardUsd = 0;
                 
@@ -1326,6 +1324,7 @@
                     rewardCoins = app.mysteryBoxMin + Math.floor(Math.random() * (app.mysteryBoxMax - app.mysteryBoxMin + 1));
                     app.balance += rewardCoins;
                 } else {
+                    // ✅ USD: $0.002 - $0.008
                     rewardUsd = (Math.random() * 0.006 + 0.002).toFixed(3);
                     app.usdBalance += parseFloat(rewardUsd);
                 }
@@ -1333,6 +1332,7 @@
                 app.xpPoints += (rewardCoins || parseFloat(rewardUsd) * 1000) * 2;
                 app.mysteryBoxCooldown = Date.now() + app.mysteryBoxDuration;
                 
+                // ✅ Firebase-এ কুলডাউন সেভ
                 userRef.update({
                     balance: app.balance,
                     usdBalance: app.usdBalance,
@@ -1347,6 +1347,7 @@
                 updateUI(); updateLevelUI();
                 updateMysteryBoxUI();
                 
+                // Close lid after 2 seconds
                 setTimeout(() => {
                     lid.classList.remove('open');
                     icon.className = 'gift-icon';
@@ -1379,7 +1380,7 @@
             
             showInterstitialAd(() => { 
                 const st = Date.now(); 
-                const totalBoostTime = 3000;
+                const totalBoostTime = 3000; // 3 seconds
                 const intervalTime = 100; 
                 const maxCoins = 60, minCoins = 50;
                 let totalAdded = 0;
@@ -1433,7 +1434,7 @@
             method: '',
             amount: 0,
             coins: 0,
-            type: 'coins',
+            type: 'coins', // 'coins', 'subscription', 'level'
             plan: '',
             level: 0
         };
@@ -1443,6 +1444,7 @@
         function openPaymentModal(method, amount, item) {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
             
+            // Check if method is enabled
             db.ref('paymentConfig/methodsStatus').once('value', snap => {
                 const status = snap.val() || { bkash: 'on', nagad: 'on', rocket: 'on' };
                 const methodKey = method.toLowerCase();
@@ -1451,6 +1453,7 @@
                     return;
                 }
                 
+                // Load admin payment number
                 db.ref('paymentConfig/manualNumbers').once('value', numSnap => {
                     const numbers = numSnap.val() || {};
                     let number = '';
@@ -1463,6 +1466,7 @@
                     document.getElementById('paymentAmount').textContent = `${amount} BDT`;
                     document.getElementById('transactionId').value = '';
                     
+                    // Determine what the user is buying
                     let type = 'coins';
                     let coins = 0;
                     let plan = '';
@@ -1484,6 +1488,7 @@
                     
                     paymentData = { method, amount, coins, type, plan, level };
                     
+                    // Show modal
                     document.getElementById('paymentModal').classList.add('active');
                     startPaymentTimer();
                 });
@@ -1491,33 +1496,51 @@
         }
 
         function startPaymentTimer() {
+            // Clear any existing timer
             if (paymentTimerInterval) clearInterval(paymentTimerInterval);
             if (paymentTimeout) clearTimeout(paymentTimeout);
             
-            let seconds = 15 * 60;
+            let seconds = 15 * 60; // 15 minutes
             const timerDisplay = document.getElementById('paymentTimer');
             
-            paymentTimerInterval = setInterval(() => {
-                seconds--;
-                if (seconds <= 0) {
+            // Check if there's a saved timer in Firebase
+            db.ref('paymentTimers/' + userId).once('value', snap => {
+                const saved = snap.val();
+                if (saved && saved.expiresAt > Date.now()) {
+                    seconds = Math.floor((saved.expiresAt - Date.now()) / 1000);
+                    // Resume from saved time
+                }
+            }).then(() => {
+                paymentTimerInterval = setInterval(() => {
+                    seconds--;
+                    if (seconds <= 0) {
+                        clearInterval(paymentTimerInterval);
+                        paymentTimerInterval = null;
+                        timerDisplay.textContent = '00:00';
+                        showToast('⏰ Time expired! Please try again.', 'error');
+                        closeModal('paymentModal');
+                        db.ref('paymentTimers/' + userId).remove();
+                        return;
+                    }
+                    const mins = Math.floor(seconds / 60);
+                    const secs = seconds % 60;
+                    timerDisplay.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                    
+                    // Save timer to Firebase (persist across reloads)
+                    db.ref('paymentTimers/' + userId).set({
+                        expiresAt: Date.now() + seconds * 1000
+                    });
+                }, 1000);
+                
+                // Auto-close after 15 minutes
+                paymentTimeout = setTimeout(() => {
                     clearInterval(paymentTimerInterval);
                     paymentTimerInterval = null;
-                    timerDisplay.textContent = '00:00';
-                    showToast('⏰ Time expired! Please try again.', 'error');
                     closeModal('paymentModal');
-                    return;
-                }
-                const mins = Math.floor(seconds / 60);
-                const secs = seconds % 60;
-                timerDisplay.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-            }, 1000);
-            
-            paymentTimeout = setTimeout(() => {
-                clearInterval(paymentTimerInterval);
-                paymentTimerInterval = null;
-                closeModal('paymentModal');
-                showToast('⏰ Time expired! Please try again.', 'error');
-            }, 15 * 60 * 1000);
+                    db.ref('paymentTimers/' + userId).remove();
+                    showToast('⏰ Time expired! Please try again.', 'error');
+                }, 15 * 60 * 1000);
+            });
         }
 
         function submitTransaction() {
@@ -1527,9 +1550,12 @@
                 return;
             }
             
+            // Stop timer
             if (paymentTimerInterval) clearInterval(paymentTimerInterval);
             if (paymentTimeout) clearTimeout(paymentTimeout);
+            db.ref('paymentTimers/' + userId).remove();
             
+            // Create transaction request
             const requestId = Date.now().toString();
             const requestData = {
                 userId: userId,
@@ -1543,11 +1569,13 @@
                 level: paymentData.level,
                 status: 'pending',
                 requestedAt: Date.now(),
-                expiresAt: Date.now() + 15 * 60 * 1000
+                expiresAt: Date.now() + 15 * 60 * 1000 // 15 minutes expiry
             };
             
+            // Save to Firebase
             db.ref('paymentRequests/' + requestId).set(requestData);
             
+            // Add to user history
             const historyEntry = {
                 id: requestId,
                 method: paymentData.method,
@@ -1562,10 +1590,15 @@
             app.paymentHistory.unshift(historyEntry);
             userRef.update({ paymentHistory: app.paymentHistory });
             
+            // Close modal
             closeModal('paymentModal');
+            
+            // Show waiting message
             showToast('📤 Transaction submitted! Waiting for admin approval...');
             document.getElementById('rewardText').textContent = 'Waiting for admin approval...';
             document.getElementById('successModal').classList.add('active');
+            
+            // Update history UI
             updatePaymentHistoryUI();
         }
 
@@ -1675,10 +1708,12 @@
                 const d = calculateLevel(app.xpPoints);
                 let speedMultiplier = 1 + (d.bonusPercent / 100);
                 
+                // ✅ Check subscription bonus
                 if (app.subscription && app.subscriptionExpiry > Date.now()) {
-                    speedMultiplier *= 2;
+                    speedMultiplier *= 2; // 2x speed for premium users
                 }
                 
+                // ✅ Check level bonus
                 speedMultiplier += app.miningSpeed / 100;
                 
                 const ca = speedMultiplier;
@@ -2222,6 +2257,7 @@
             updateWithdrawUI(); updateSpeedBoostUI(); startConversionTimer();
             updatePaymentHistoryUI();
             
+            // Subscription status
             if (app.subscription && app.subscriptionExpiry > Date.now()) {
                 document.getElementById('userLevelBadge').textContent += ' ⭐';
             }
@@ -2381,74 +2417,6 @@
             });
         }
 
-        // ================== NOTIFICATION PANEL ======================
-        function openNotificationPanel() {
-            document.getElementById('notificationOverlay').style.display = 'block';
-            loadNotifications();
-        }
-        
-        function closeNotificationPanel() {
-            document.getElementById('notificationOverlay').style.display = 'none';
-        }
-        
-        function loadNotifications() {
-            const container = document.getElementById('notificationList');
-            container.innerHTML = '<p style="color:#94a3b8;text-align:center;">Loading notifications...</p>';
-            
-            db.ref('notifications').orderByChild('userId').equalTo(userId).limitToLast(20).once('value', snap => {
-                if (!snap.exists()) {
-                    container.innerHTML = '<p style="color:#94a3b8;text-align:center;">No notifications</p>';
-                    return;
-                }
-                
-                let notifications = [];
-                snap.forEach(child => {
-                    notifications.push(child.val());
-                });
-                
-                notifications.sort((a, b) => b.timestamp - a.timestamp);
-                
-                container.innerHTML = notifications.map(n => `
-                    <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:12px;margin-bottom:8px;">
-                        <div style="font-size:13px;color:#fff;">${n.message || ''}</div>
-                        <div style="font-size:10px;color:#94a3b8;">${new Date(n.timestamp).toLocaleString()}</div>
-                    </div>
-                `).join('');
-                
-                document.getElementById('notifBadge').style.display = 'none';
-            });
-        }
-
-        // ================== UPGRADE LEVEL ===========================
-        function upgradeLevel(level, cost) {
-            if (app.balance < cost) {
-                showToast('Not enough coins!', 'error');
-                return;
-            }
-            if (app.level >= level) {
-                showToast('Level already unlocked!', 'error');
-                return;
-            }
-            app.balance -= cost;
-            app.level = level;
-            app.miningSpeed = (level - 1) * 5;
-            userRef.update({
-                balance: app.balance,
-                level: app.level,
-                miningSpeed: app.miningSpeed
-            });
-            updateUI();
-            updateLevelUI();
-            showToast(`🚀 Upgraded to Level ${level}!`);
-        }
-
-        // ================== WEBVIEW VARIABLES ======================
-        let webViewTaskId = null;
-        let webViewTaskReward = 0;
-        let webViewRequiredTime = 60;
-        let webViewSeconds = 0;
-        let webViewTimerInterval = null;
-
         // ================== INIT ====================================
         function initApp() {
             if (!navigator.onLine) { document.getElementById('networkOverlay').classList.add('show'); isOnline = false; }
@@ -2490,6 +2458,7 @@
                 app.dailyBonusClaimed = d.dailyBonusClaimed || '';
                 app.paymentHistory = d.paymentHistory || [];
                 
+                // ✅ Load Subscription & Level data
                 app.subscription = d.subscription || null;
                 app.subscriptionExpiry = d.subscriptionExpiry || 0;
                 app.level = d.level || 1;
@@ -2507,6 +2476,7 @@
                 const today = new Date().toDateString();
                 document.getElementById('dailyBonusStatus').textContent = app.dailyBonusClaimed === today ? '✅ Claimed' : '🎯 Claim Now';
                 
+                // ✅ Update Mystery Box UI
                 updateMysteryBoxUI();
                 
                 if (!d.balance && d.xpPoints === undefined) {
@@ -2559,6 +2529,7 @@
                 } 
             });
             
+            // ✅ Listen for payment request updates
             db.ref('paymentRequests').orderByChild('userId').equalTo(userId).on('child_changed', snap => {
                 const data = snap.val();
                 if (data && app.paymentHistory) {
@@ -2569,6 +2540,7 @@
                             app.paymentHistory[index].cancelReason = data.cancelReason;
                         }
                         if (data.status === 'approved') {
+                            // ✅ Activate the purchase
                             if (data.type === 'coins') {
                                 app.balance += data.coins || 0;
                             } else if (data.type === 'subscription') {
@@ -2588,6 +2560,7 @@
                                 paymentHistory: app.paymentHistory
                             });
                             showToast('✅ Payment approved!');
+                            updateUI(); updateLevelUI();
                         } else if (data.status === 'cancelled') {
                             showToast(`❌ Payment cancelled: ${data.cancelReason || 'No reason'}`, 'error');
                         }
