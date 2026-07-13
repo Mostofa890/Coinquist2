@@ -34,30 +34,11 @@
             padding: 24px;
             text-align: center;
         }
-        #maintenanceOverlay.show {
-            display: flex;
-        }
-        #maintenanceOverlay .icon {
-            font-size: 80px;
-            color: #fbbf24;
-            margin-bottom: 20px;
-            animation: pulse 1.5s infinite;
-        }
-        #maintenanceOverlay h1 {
-            color: #fbbf24;
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
-        #maintenanceOverlay p {
-            color: #94a3b8;
-            font-size: 16px;
-            max-width: 400px;
-            line-height: 1.6;
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
+        #maintenanceOverlay.show { display: flex; }
+        #maintenanceOverlay .icon { font-size: 80px; color: #fbbf24; margin-bottom: 20px; animation: pulse 1.5s infinite; }
+        #maintenanceOverlay h1 { color: #fbbf24; font-size: 28px; margin-bottom: 10px; }
+        #maintenanceOverlay p { color: #94a3b8; font-size: 16px; max-width: 400px; line-height: 1.6; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
         /* ================== HEADER ================== */
         .header { background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); padding: 14px 18px; border-radius: 20px; margin-bottom: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
@@ -107,7 +88,7 @@
         @keyframes coinSpin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
         .mining-circle .coin-count { font-size: 30px; font-weight: 900; color: #fbbf24; }
 
-        /* ================== BOOST BUTTONS ================== */
+        /* ================== BOOST BUTTONS + TIMER ================== */
         .speed-btn-container { margin-top: 12px; width: 100%; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
         .speed-boost-btn, .mining-boost-btn {
             color: #fff; padding: 10px 20px; border: none; border-radius: 25px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; flex: 1; max-width: 180px; justify-content: center;
@@ -117,6 +98,8 @@
         .speed-boost-btn:disabled, .mining-boost-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .boost-countdown-box { display: none; background: rgba(249,115,22,0.15); border: 2px solid rgba(249,115,22,0.3); border-radius: 15px; padding: 14px 20px; text-align: center; width: 100%; max-width: 280px; }
         .boost-countdown-box.show { display: block; }
+        .boost-countdown-box .countdown-label { font-size: 12px; color: #94a3b8; }
+        .boost-countdown-box .countdown-time { font-size: 24px; font-weight: 700; color: #fbbf24; }
 
         /* ================== MYSTERY BOX ================== */
         .mystery-box {
@@ -162,7 +145,7 @@
         .withdraw-section .withdraw-btn { margin-top: 8px; padding: 12px 20px; background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; width: 100%; font-size: 15px; transition: all 0.3s ease; }
         .withdraw-section .withdraw-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* ================== BUY COINS (In-App Purchase) ================== */
+        /* ================== BUY COINS (SSLCOMMERZ + Stripe) ================== */
         .buy-coins-section {
             background: rgba(251,191,36,0.08);
             border: 2px solid rgba(251,191,36,0.2);
@@ -178,11 +161,11 @@
         .payment-card .icon { font-size: 28px; margin-bottom: 4px; }
         .payment-card .name { font-size: 13px; font-weight: 700; color: #fff; }
         .payment-card .desc { font-size: 10px; color: #94a3b8; }
-        .payment-card.visa { border-color: #1a1f71; }
-        .payment-card.stars { border-color: #fbbf24; }
         .payment-card.bkash { border-color: #d92b3a; }
         .payment-card.nagad { border-color: #f05a28; }
         .payment-card.rocket { border-color: #c5262c; }
+        .payment-card.visa { border-color: #1a1f71; }
+        .payment-card.mastercard { border-color: #f79e1b; }
 
         /* ================== LEADERBOARD ================== */
         .leaderboard-item {
@@ -484,10 +467,15 @@
                 </div>
             </div>
 
-            <!-- ✅ BOOST BUTTONS -->
+            <!-- ✅ BOOST BUTTONS WITH TIMER -->
             <div class="speed-btn-container">
-                <button class="speed-boost-btn" id="speedBoostBtn" onclick="activateSpeedBoost()"><i class="fas fa-rocket"></i> Speed Boost</button>
-                <button class="mining-boost-btn" id="miningBoostBtn" onclick="activateMiningBoost()"><i class="fas fa-bolt"></i> Mining Boost</button>
+                <button class="speed-boost-btn" id="speedBoostBtn" onclick="activateSpeedBoost()">
+                    <i class="fas fa-rocket"></i> Speed Boost
+                </button>
+                <button class="mining-boost-btn" id="miningBoostBtn" onclick="activateMiningBoost()">
+                    <i class="fas fa-bolt"></i> Mining Boost
+                </button>
+                
                 <div class="boost-countdown-box" id="boostCountdownBox">
                     <div class="countdown-label">⏳ Cooldown</div>
                     <div class="countdown-time" id="boostCountdownTime">00:00</div>
@@ -499,7 +487,7 @@
                 <div id="miningRulesText">Loading rules...</div>
             </div>
 
-            <!-- ✅ MYSTERY BOX -->
+            <!-- ✅ MYSTERY BOX WITH TIMER -->
             <div class="mystery-box" onclick="openMysteryBox()">
                 <div class="box-left">
                     <span class="box-icon">🎁</span>
@@ -582,37 +570,40 @@
                             <div class="desc">5000 Coins • $4.99</div>
                         </div>
                         
-                        <!-- Telegram Stars (tg.openInvoice) -->
-                        <div class="payment-card stars" onclick="buyWithStars(1000, 1)">
-                            <div class="icon"><i class="fab fa-telegram"></i></div>
-                            <div class="name">⭐ Stars</div>
-                            <div class="desc">1000 Coins • 1⭐</div>
-                        </div>
-                        <div class="payment-card stars" onclick="buyWithStars(5000, 5)">
-                            <div class="icon"><i class="fab fa-telegram"></i></div>
-                            <div class="name">⭐ Stars</div>
-                            <div class="desc">5000 Coins • 5⭐</div>
-                        </div>
-                        
-                        <!-- bKash (Manual) -->
-                        <div class="payment-card bkash" onclick="buyManual('bKash')">
+                        <!-- bKash (SSLCOMMERZ) -->
+                        <div class="payment-card bkash" onclick="buyWithSSLCOMMERZ(100, 'bKash')">
                             <div class="icon"><i class="fas fa-mobile-alt"></i></div>
                             <div class="name">bKash</div>
-                            <div class="desc">Manual Payment</div>
+                            <div class="desc">100 BDT • 1000 Coins</div>
+                        </div>
+                        <div class="payment-card bkash" onclick="buyWithSSLCOMMERZ(500, 'bKash')">
+                            <div class="icon"><i class="fas fa-mobile-alt"></i></div>
+                            <div class="name">bKash</div>
+                            <div class="desc">500 BDT • 5000 Coins</div>
                         </div>
                         
-                        <!-- Nagad (Manual) -->
-                        <div class="payment-card nagad" onclick="buyManual('Nagad')">
+                        <!-- Nagad (SSLCOMMERZ) -->
+                        <div class="payment-card nagad" onclick="buyWithSSLCOMMERZ(100, 'Nagad')">
                             <div class="icon"><i class="fas fa-mobile-alt"></i></div>
                             <div class="name">Nagad</div>
-                            <div class="desc">Manual Payment</div>
+                            <div class="desc">100 BDT • 1000 Coins</div>
+                        </div>
+                        <div class="payment-card nagad" onclick="buyWithSSLCOMMERZ(500, 'Nagad')">
+                            <div class="icon"><i class="fas fa-mobile-alt"></i></div>
+                            <div class="name">Nagad</div>
+                            <div class="desc">500 BDT • 5000 Coins</div>
                         </div>
                         
-                        <!-- Rocket (Manual) -->
-                        <div class="payment-card rocket" onclick="buyManual('Rocket')">
+                        <!-- Rocket (SSLCOMMERZ) -->
+                        <div class="payment-card rocket" onclick="buyWithSSLCOMMERZ(100, 'Rocket')">
                             <div class="icon"><i class="fas fa-rocket"></i></div>
                             <div class="name">Rocket</div>
-                            <div class="desc">Manual Payment</div>
+                            <div class="desc">100 BDT • 1000 Coins</div>
+                        </div>
+                        <div class="payment-card rocket" onclick="buyWithSSLCOMMERZ(500, 'Rocket')">
+                            <div class="icon"><i class="fas fa-rocket"></i></div>
+                            <div class="name">Rocket</div>
+                            <div class="desc">500 BDT • 5000 Coins</div>
                         </div>
                     </div>
                 </div>
@@ -833,18 +824,12 @@
                 const bottomNav = document.querySelector('.bottom-nav');
                 
                 if (data.enabled) {
-                    // Maintenance ON
                     overlay.classList.add('show');
                     document.getElementById('maintenanceMessage').textContent = data.message || 'We are currently updating the app. Please come back later.';
                     mainContent.style.display = 'none';
                     bottomNav.style.display = 'none';
-                    
-                    // Stop mining if active
-                    if (miningInterval) {
-                        stopMining();
-                    }
+                    if (miningInterval) stopMining();
                 } else {
-                    // Maintenance OFF
                     overlay.classList.remove('show');
                     mainContent.style.display = 'block';
                     bottomNav.style.display = 'flex';
@@ -1052,13 +1037,13 @@
         }
 
         // ============================================================
-        // ================== MINING BOOST =============================
+        // ================== MINING BOOST (WITH TIMER) ================
         // ============================================================
         function activateMiningBoost() {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
             if (app.miningBoostCooldown > Date.now()) {
                 const remaining = Math.ceil((app.miningBoostCooldown - Date.now()) / 1000);
-                showToast(`⏳ Cooldown: ${remaining}s`, 'error');
+                showToast(`⏳ Cooldown: ${formatTime(remaining)}`, 'error');
                 return;
             }
             if (app.progressCoins <= 0) { showToast('❌ No coins to boost!', 'error'); return; }
@@ -1083,36 +1068,42 @@
         }
 
         // ============================================================
-        // ================== MYSTERY BOX ==============================
+        // ================== MYSTERY BOX (WITH TIMER + USD) ===========
         // ============================================================
         let mysteryBoxCooldown = 0;
+
         function openMysteryBox() {
             if (!isOnline) { showToast('No internet!', 'error'); return; }
             if (mysteryBoxCooldown > Date.now()) {
                 const remaining = Math.ceil((mysteryBoxCooldown - Date.now()) / 1000);
-                showToast(`⏳ Cooldown: ${remaining}s`, 'error');
+                showToast(`⏳ Cooldown: ${formatTime(remaining)}`, 'error');
                 return;
             }
             const btn = document.getElementById('mysteryBoxStatus');
             btn.textContent = '⏳ Loading...';
             
             showRewardedAd(() => {
-                const rewardType = Math.random() > 0.5 ? 'coins' : 'usd';
+                // ৫০% USD, ৫০% Coins
+                const rewardType = Math.random() > 0.5 ? 'usd' : 'coins';
                 let rewardCoins = 0, rewardUsd = 0;
+                
                 if (rewardType === 'coins') {
                     rewardCoins = app.mysteryBoxMin + Math.floor(Math.random() * (app.mysteryBoxMax - app.mysteryBoxMin + 1));
                     app.balance += rewardCoins;
                 } else {
-                    rewardUsd = (Math.random() * 0.5 + 0.1).toFixed(3);
+                    // ✅ USD: $0.002 - $0.008
+                    rewardUsd = (Math.random() * 0.006 + 0.002).toFixed(3);
                     app.usdBalance += parseFloat(rewardUsd);
                 }
-                app.xpPoints += rewardCoins * 2;
+                
+                app.xpPoints += (rewardCoins || parseFloat(rewardUsd) * 1000) * 2;
                 mysteryBoxCooldown = Date.now() + app.mysteryBoxDuration;
                 userRef.update({
                     balance: app.balance,
                     usdBalance: app.usdBalance,
                     xpPoints: app.xpPoints
                 });
+                
                 const rewardText = rewardType === 'coins' ? `+${rewardCoins} Coins` : `+$${rewardUsd} USD`;
                 showToast(`🎁 Mystery Box: ${rewardText}!`);
                 document.getElementById('rewardText').textContent = rewardText;
@@ -1124,185 +1115,7 @@
         }
 
         // ============================================================
-        // ================== LEADERBOARD ==============================
-        // ============================================================
-        function loadLeaderboard(type = 'coins', btn = null) {
-            if (btn) {
-                document.querySelectorAll('#pageLeaderboard .filter-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-            }
-            const container = document.getElementById('leaderboardContainer');
-            container.innerHTML = '<p style="color:#94a3b8;text-align:center;">Loading leaderboard...</p>';
-            
-            db.ref('users').orderByChild(type === 'coins' ? 'balance' : 'usdBalance').limitToLast(50).once('value', snap => {
-                if (!snap.exists()) {
-                    container.innerHTML = '<p style="color:#94a3b8;text-align:center;">No users found.</p>';
-                    return;
-                }
-                let users = [];
-                snap.forEach(child => {
-                    const data = child.val();
-                    users.push({
-                        userId: child.key,
-                        name: data.fullName || data.firstName || data.username || 'User',
-                        score: type === 'coins' ? (data.balance || 0) : (data.usdBalance || 0),
-                        avatar: data.avatar || '👤'
-                    });
-                });
-                users.sort((a, b) => b.score - a.score);
-                users = users.slice(0, 50);
-
-                const top = ['🥇', '🥈', '🥉'];
-                container.innerHTML = users.map((u, i) => {
-                    let className = 'leaderboard-item';
-                    if (i === 0) className += ' top1';
-                    if (i === 1) className += ' top2';
-                    if (i === 2) className += ' top3';
-                    return `<div class="${className}">
-                        <div class="rank">${i < 3 ? top[i] : `#${i+1}`}</div>
-                        <div class="user">
-                            <div class="avatar-small">${u.avatar}</div>
-                            <span style="font-size:14px;">${u.name}</span>
-                        </div>
-                        <div class="score">${type === 'coins' ? u.score.toLocaleString() : '$' + u.score.toFixed(3)}</div>
-                    </div>`;
-                }).join('');
-            }).catch(() => {
-                container.innerHTML = '<p style="color:#ef4444;text-align:center;">Failed to load leaderboard.</p>';
-            });
-        }
-
-        // ============================================================
-        // ================== PAYMENT GATEWAYS ==========================
-        // ============================================================
-
-        // ✅ 1. Visa (Stripe Checkout)
-        function buyWithVisa(coins, price) {
-            db.ref('paymentConfig/stripe/publishableKey').once('value', snap => {
-                const key = snap.val();
-                if (!key) {
-                    showToast('⚠️ Stripe not configured!', 'error');
-                    return;
-                }
-                const stripe = Stripe(key);
-                if (confirm(`💳 Buy ${coins} Coins for $${price} with Visa?`)) {
-                    app.balance += coins;
-                    userRef.update({ balance: app.balance });
-                    updateUI();
-                    showToast(`✅ +${coins} Coins (Visa)`);
-                }
-            });
-        }
-
-        // ✅ 2. Telegram Stars (tg.openInvoice)
-        function buyWithStars(coins, stars) {
-            db.ref('paymentConfig/telegram/invoiceLink').once('value', snap => {
-                const invoiceLink = snap.val();
-                if (!invoiceLink) {
-                    showToast('⚠️ Telegram Stars not configured!', 'error');
-                    return;
-                }
-                if (typeof tg.openInvoice === 'function') {
-                    tg.openInvoice(invoiceLink, (result) => {
-                        if (result === 'paid') {
-                            app.balance += coins;
-                            userRef.update({ balance: app.balance });
-                            updateUI();
-                            showToast(`⭐ +${coins} Coins (Stars)`);
-                        } else {
-                            showToast('❌ Payment cancelled!', 'error');
-                        }
-                    });
-                } else {
-                    showToast('⚠️ Telegram Stars not available!', 'error');
-                }
-            });
-        }
-
-        // ✅ 3. bKash / Nagad / Rocket (Manual)
-        function buyManual(method) {
-            db.ref('paymentConfig/manualNumbers').once('value', snap => {
-                const numbers = snap.val() || {};
-                const number = numbers[method.toLowerCase()] || '017XXXXXXXX';
-                
-                const amount = prompt(`💰 Enter amount in BDT for ${method}:`);
-                if (!amount || isNaN(amount) || amount <= 0) {
-                    showToast('❌ Invalid amount!', 'error');
-                    return;
-                }
-                
-                const msg = `📲 Send ${amount} BDT to ${method}: ${number}\n\nAfter sending, please contact support for confirmation.`;
-                alert(msg);
-                
-                db.ref('manualPayments').push({
-                    userId, method, amount: parseFloat(amount),
-                    coins: Math.floor(parseFloat(amount) * 10),
-                    status: 'pending', timestamp: Date.now()
-                });
-                showToast(`📩 Payment request sent! Wait for admin confirmation.`);
-            });
-        }
-
-        // ============================================================
-        // ================== MINING CORE ==============================
-        // ============================================================
-        function startMining() {
-            if (!isOnline) { showToast('No internet!', 'error'); return; }
-            if (miningInterval) return;
-            if (app.progressCoins <= 0) { showToast('❌ No coins!', 'error'); updateProgressUI(); return; }
-            document.getElementById('circleStartOverlay').classList.add('hidden');
-            userRef.update({ isCurrentlyMining: true, lastMiningActivity: Date.now() });
-            wasMiningBeforeOffline = true;
-            
-            function mineNextCoin() {
-                if (!isOnline) { stopMining(); showToast('⚠️ Network lost!', 'error'); return; }
-                if (isAdShowing) { setTimeout(mineNextCoin, 1000); return; }
-                if (app.progressCoins <= 0) { stopMining(); showToast('🎉 Coins finished!', 'success'); updateProgressUI(); return; }
-                const d = calculateLevel(app.xpPoints);
-                const ca = 1 + (d.bonusPercent / 100);
-                
-                app.progressCoins -= 1;
-                app.balance += ca;
-                app.xpPoints += 1;
-                
-                userRef.transaction((currentData) => {
-                    if (currentData === null) return null;
-                    return {
-                        ...currentData,
-                        balance: (currentData.balance || 0) + ca,
-                        progressCoins: Math.max(0, (currentData.progressCoins || 0) - 1),
-                        xpPoints: (currentData.xpPoints || 0) + 1,
-                        lastMiningActivity: Date.now()
-                    };
-                }, (error, committed) => {
-                    if (error) { showToast('⚠️ Mining error!', 'error'); return; }
-                }, false);
-                
-                const coin = document.createElement('div');
-                coin.className = 'floating-coin';
-                coin.textContent = `+${ca.toFixed(2)} 🪙`;
-                coin.style.left = (Math.random() * 80 + 10) + '%';
-                coin.style.top = '35%';
-                document.body.appendChild(coin);
-                setTimeout(() => coin.remove(), 1000);
-                
-                updateProgressUI(); updateUI(); updateLevelUI();
-                miningInterval = setTimeout(mineNextCoin, 5000);
-            }
-            mineNextCoin();
-            updateProgressUI();
-            showToast('⛏️ Mining!');
-        }
-
-        function stopMining() {
-            if (miningInterval) { clearTimeout(miningInterval); miningInterval = null; }
-            wasMiningBeforeOffline = false;
-            userRef.update({ isCurrentlyMining: false });
-            updateProgressUI();
-        }
-
-        // ============================================================
-        // ================== SPEED BOOST ==============================
+        // ================== SPEED BOOST (WITH TIMER) =================
         // ============================================================
         function updateSpeedBoostUI() { 
             const bb = document.getElementById('speedBoostBtn'); 
@@ -1315,7 +1128,7 @@
                     const speedRemaining = Math.max(0, Math.ceil((app.speedBoostCooldown - Date.now()) / 1000));
                     const miningRemaining = Math.max(0, Math.ceil((app.miningBoostCooldown - Date.now()) / 1000));
                     const r = Math.max(speedRemaining, miningRemaining);
-                    document.getElementById('boostCountdownTime').textContent = `${String(Math.floor(r / 60)).padStart(2, '0')}:${String(r % 60).padStart(2, '0')}`; 
+                    document.getElementById('boostCountdownTime').textContent = formatTime(r); 
                     if (r <= 0) { 
                         app.speedBoostCooldown = 0; 
                         app.miningBoostCooldown = 0;
@@ -1376,6 +1189,177 @@
                 }, intervalTime); 
                 showToast('⚡ Speed Boost Active!'); 
             }, 'speedBoostBtn');
+        }
+
+        // ============================================================
+        // ================== TIME FORMATTER ===========================
+        // ============================================================
+        function formatTime(seconds) {
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = seconds % 60;
+            return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        // ============================================================
+        // ================== LEADERBOARD ==============================
+        // ============================================================
+        function loadLeaderboard(type = 'coins', btn = null) {
+            if (btn) {
+                document.querySelectorAll('#pageLeaderboard .filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+            const container = document.getElementById('leaderboardContainer');
+            container.innerHTML = '<p style="color:#94a3b8;text-align:center;">Loading leaderboard...</p>';
+            
+            db.ref('users').orderByChild(type === 'coins' ? 'balance' : 'usdBalance').limitToLast(50).once('value', snap => {
+                if (!snap.exists()) {
+                    container.innerHTML = '<p style="color:#94a3b8;text-align:center;">No users found.</p>';
+                    return;
+                }
+                let users = [];
+                snap.forEach(child => {
+                    const data = child.val();
+                    users.push({
+                        userId: child.key,
+                        name: data.fullName || data.firstName || data.username || 'User',
+                        score: type === 'coins' ? (data.balance || 0) : (data.usdBalance || 0),
+                        avatar: data.avatar || '👤'
+                    });
+                });
+                users.sort((a, b) => b.score - a.score);
+                users = users.slice(0, 50);
+
+                const top = ['🥇', '🥈', '🥉'];
+                container.innerHTML = users.map((u, i) => {
+                    let className = 'leaderboard-item';
+                    if (i === 0) className += ' top1';
+                    if (i === 1) className += ' top2';
+                    if (i === 2) className += ' top3';
+                    return `<div class="${className}">
+                        <div class="rank">${i < 3 ? top[i] : `#${i+1}`}</div>
+                        <div class="user">
+                            <div class="avatar-small">${u.avatar}</div>
+                            <span style="font-size:14px;">${u.name}</span>
+                        </div>
+                        <div class="score">${type === 'coins' ? u.score.toLocaleString() : '$' + u.score.toFixed(3)}</div>
+                    </div>`;
+                }).join('');
+            }).catch(() => {
+                container.innerHTML = '<p style="color:#ef4444;text-align:center;">Failed to load leaderboard.</p>';
+            });
+        }
+
+        // ============================================================
+        // ================== PAYMENT GATEWAYS ==========================
+        // ============================================================
+
+        // ✅ Visa (Stripe Checkout)
+        function buyWithVisa(coins, price) {
+            db.ref('paymentConfig/stripe/publishableKey').once('value', snap => {
+                const key = snap.val();
+                if (!key) {
+                    showToast('⚠️ Stripe not configured!', 'error');
+                    return;
+                }
+                const stripe = Stripe(key);
+                if (confirm(`💳 Buy ${coins} Coins for $${price} with Visa?`)) {
+                    app.balance += coins;
+                    userRef.update({ balance: app.balance });
+                    updateUI();
+                    showToast(`✅ +${coins} Coins (Visa)`);
+                }
+            });
+        }
+
+        // ✅ bKash / Nagad / Rocket (SSLCOMMERZ - Automatic)
+        function buyWithSSLCOMMERZ(amount, method) {
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            
+            // আপনার ব্যাকএন্ড URL (যেখানে SSLCOMMERZ API কল হবে)
+            const backendUrl = 'https://yourdomain.com/api/payment-init';
+            
+            fetch(backendUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    amount: amount,
+                    userId: userId,
+                    method: method,
+                    email: tgUser?.email || 'user@example.com',
+                    phone: '017XXXXXXXX'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // SSLCOMMERZ পেমেন্ট পেজে রিডাইরেক্ট
+                    window.location.href = data.payment_url;
+                } else {
+                    showToast('⚠️ ' + data.message, 'error');
+                }
+            })
+            .catch(error => {
+                showToast('⚠️ Payment error: ' + error.message, 'error');
+            });
+        }
+
+        // ============================================================
+        // ================== MINING CORE ==============================
+        // ============================================================
+        function startMining() {
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            if (miningInterval) return;
+            if (app.progressCoins <= 0) { showToast('❌ No coins!', 'error'); updateProgressUI(); return; }
+            document.getElementById('circleStartOverlay').classList.add('hidden');
+            userRef.update({ isCurrentlyMining: true, lastMiningActivity: Date.now() });
+            wasMiningBeforeOffline = true;
+            
+            function mineNextCoin() {
+                if (!isOnline) { stopMining(); showToast('⚠️ Network lost!', 'error'); return; }
+                if (isAdShowing) { setTimeout(mineNextCoin, 1000); return; }
+                if (app.progressCoins <= 0) { stopMining(); showToast('🎉 Coins finished!', 'success'); updateProgressUI(); return; }
+                const d = calculateLevel(app.xpPoints);
+                const ca = 1 + (d.bonusPercent / 100);
+                
+                app.progressCoins -= 1;
+                app.balance += ca;
+                app.xpPoints += 1;
+                
+                userRef.transaction((currentData) => {
+                    if (currentData === null) return null;
+                    return {
+                        ...currentData,
+                        balance: (currentData.balance || 0) + ca,
+                        progressCoins: Math.max(0, (currentData.progressCoins || 0) - 1),
+                        xpPoints: (currentData.xpPoints || 0) + 1,
+                        lastMiningActivity: Date.now()
+                    };
+                }, (error, committed) => {
+                    if (error) { showToast('⚠️ Mining error!', 'error'); return; }
+                }, false);
+                
+                const coin = document.createElement('div');
+                coin.className = 'floating-coin';
+                coin.textContent = `+${ca.toFixed(2)} 🪙`;
+                coin.style.left = (Math.random() * 80 + 10) + '%';
+                coin.style.top = '35%';
+                document.body.appendChild(coin);
+                setTimeout(() => coin.remove(), 1000);
+                
+                updateProgressUI(); updateUI(); updateLevelUI();
+                miningInterval = setTimeout(mineNextCoin, 5000);
+            }
+            mineNextCoin();
+            updateProgressUI();
+            showToast('⛏️ Mining!');
+        }
+
+        function stopMining() {
+            if (miningInterval) { clearTimeout(miningInterval); miningInterval = null; }
+            wasMiningBeforeOffline = false;
+            userRef.update({ isCurrentlyMining: false });
+            updateProgressUI();
         }
 
         // ============================================================
@@ -2048,8 +2032,8 @@
             loadSpinData();
             buildWheel();
             watchMiningCoins();
-            loadAdminConfig(); // ✅ Admin config load
-            checkMaintenance(); // ✅ Maintenance Mode check
+            loadAdminConfig();
+            checkMaintenance();
             
             db.ref('conversionRate').on('value', s => { app.conversionRate = s.val() || 1000; updateUI(); });
             loadLevelConfigFromDB();
