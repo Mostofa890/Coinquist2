@@ -218,7 +218,7 @@
         .withdraw-section .withdraw-btn { margin-top: 8px; padding: 12px 20px; background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; width: 100%; font-size: 15px; transition: all 0.3s ease; }
         .withdraw-section .withdraw-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* ================== BUY COINS ================== */
+        /* ================== BUY COINS (In-App Purchase) ================== */
         .buy-coins-section {
             background: rgba(251,191,36,0.08);
             border: 2px solid rgba(251,191,36,0.2);
@@ -239,6 +239,42 @@
         .payment-card.rocket { border-color: #c5262c; }
         .payment-card.visa { border-color: #1a1f71; }
         .payment-card.mastercard { border-color: #f79e1b; }
+
+        /* ================== SUBSCRIPTION ================== */
+        .subscription-section {
+            background: rgba(16,185,129,0.08);
+            border: 2px solid rgba(16,185,129,0.2);
+            border-radius: 16px;
+            padding: 16px;
+            margin: 16px 0;
+            text-align: center;
+        }
+        .subscription-section .sub-title { font-size: 14px; font-weight: 700; color: #10b981; margin-bottom: 10px; }
+        .sub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .sub-card { background: rgba(255,255,255,0.05); padding: 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); text-align: center; cursor: pointer; transition: 0.3s; }
+        .sub-card:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); border-color: #10b981; }
+        .sub-card .sub-icon { font-size: 28px; margin-bottom: 4px; }
+        .sub-card .sub-name { font-size: 14px; font-weight: 700; color: #fff; }
+        .sub-card .sub-price { font-size: 12px; color: #10b981; }
+        .sub-card .sub-features { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+
+        /* ================== LEVEL UPGRADE ================== */
+        .level-upgrade-section {
+            background: rgba(139,92,246,0.08);
+            border: 2px solid rgba(139,92,246,0.2);
+            border-radius: 16px;
+            padding: 16px;
+            margin-top: 16px;
+            text-align: center;
+        }
+        .level-upgrade-section .upgrade-title { font-size: 14px; font-weight: 700; color: #8b5cf6; margin-bottom: 10px; }
+        .upgrade-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .upgrade-card { background: rgba(255,255,255,0.05); padding: 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); text-align: center; cursor: pointer; transition: 0.3s; }
+        .upgrade-card:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); border-color: #8b5cf6; }
+        .upgrade-card .upgrade-icon { font-size: 28px; margin-bottom: 4px; }
+        .upgrade-card .upgrade-level { font-size: 14px; font-weight: 700; color: #fff; }
+        .upgrade-card .upgrade-cost { font-size: 12px; color: #fbbf24; }
+        .upgrade-card .upgrade-bonus { font-size: 11px; color: #10b981; margin-top: 4px; }
 
         /* ================== LEADERBOARD ================== */
         .leaderboard-item {
@@ -440,6 +476,35 @@
                 <button class="lvl-filter-btn" onclick="filterLevels('diamond',this)">👑 Diamond</button>
             </div>
             <div class="level-grid" id="levelGrid"></div>
+            <div class="level-upgrade-section">
+                <div class="upgrade-title">🚀 Level Upgrade</div>
+                <div class="upgrade-grid">
+                    <div class="upgrade-card" onclick="upgradeLevel(2, 100)">
+                        <div class="upgrade-icon">⬆️</div>
+                        <div class="upgrade-level">Level 2</div>
+                        <div class="upgrade-cost">১০০ কয়েন</div>
+                        <div class="upgrade-bonus">+৫% মাইনিং স্পিড</div>
+                    </div>
+                    <div class="upgrade-card" onclick="upgradeLevel(3, 500)">
+                        <div class="upgrade-icon">⬆️</div>
+                        <div class="upgrade-level">Level 3</div>
+                        <div class="upgrade-cost">৫০০ কয়েন</div>
+                        <div class="upgrade-bonus">+১০% মাইনিং স্পিড</div>
+                    </div>
+                    <div class="upgrade-card" onclick="upgradeLevel(4, 1000)">
+                        <div class="upgrade-icon">⬆️</div>
+                        <div class="upgrade-level">Level 4</div>
+                        <div class="upgrade-cost">১০০০ কয়েন</div>
+                        <div class="upgrade-bonus">+১৫% মাইনিং স্পিড</div>
+                    </div>
+                    <div class="upgrade-card" onclick="upgradeLevel(5, 2000)">
+                        <div class="upgrade-icon">⬆️</div>
+                        <div class="upgrade-level">Level 5</div>
+                        <div class="upgrade-cost">২০০০ কয়েন</div>
+                        <div class="upgrade-bonus">+২০% মাইনিং স্পিড</div>
+                    </div>
+                </div>
+            </div>
             <div class="rules-text" style="margin-top:15px;"><div class="rule-title">📋 Level Rules</div><div id="levelRulesText">Loading rules...</div></div>
         </div>
     </div>
@@ -540,7 +605,7 @@
                 </div>
             </div>
 
-            <!-- ✅ SPEED BOOST (Mining Boost রিমুভ করা হয়েছে) -->
+            <!-- ✅ SPEED BOOST -->
             <div class="speed-btn-container">
                 <button class="speed-boost-btn" id="speedBoostBtn" onclick="activateSpeedBoost()">
                     <i class="fas fa-rocket"></i> Speed Boost
@@ -622,56 +687,48 @@
                     <div id="walletTotalUsd" style="font-size:18px;font-weight:bold;color:#10b981;">$0.000</div>
                 </div>
 
-                <!-- ✅ ALL PAYMENT GATEWAYS -->
+                <!-- ✅ IN-APP PURCHASE (Buy Coins with Real Money) -->
                 <div class="buy-coins-section">
                     <div class="buy-title">💳 Buy Coins</div>
                     <div class="payment-grid">
-                        <!-- Visa (Stripe Checkout) -->
-                        <div class="payment-card visa" onclick="buyWithVisa(1000, 0.99)">
-                            <div class="icon"><i class="fab fa-cc-visa"></i></div>
-                            <div class="name">Visa</div>
-                            <div class="desc">1000 Coins • $0.99</div>
+                        <div class="payment-card" onclick="buyCoins(100, 1000)">
+                            <div class="icon">🪙</div>
+                            <div class="name">১০০ টাকা</div>
+                            <div class="desc">১০০০ কয়েন</div>
                         </div>
-                        <div class="payment-card visa" onclick="buyWithVisa(5000, 4.99)">
-                            <div class="icon"><i class="fab fa-cc-visa"></i></div>
-                            <div class="name">Visa</div>
-                            <div class="desc">5000 Coins • $4.99</div>
+                        <div class="payment-card" onclick="buyCoins(500, 5500)">
+                            <div class="icon">🪙</div>
+                            <div class="name">৫০০ টাকা</div>
+                            <div class="desc">৫৫০০ কয়েন</div>
                         </div>
-                        
-                        <!-- bKash (SSLCOMMERZ) -->
-                        <div class="payment-card bkash" onclick="buyWithSSLCOMMERZ(100, 'bKash')">
-                            <div class="icon"><i class="fas fa-mobile-alt"></i></div>
-                            <div class="name">bKash</div>
-                            <div class="desc">100 BDT • 1000 Coins</div>
+                        <div class="payment-card" onclick="buyCoins(1000, 12000)">
+                            <div class="icon">🪙</div>
+                            <div class="name">১০০০ টাকা</div>
+                            <div class="desc">১২০০০ কয়েন</div>
                         </div>
-                        <div class="payment-card bkash" onclick="buyWithSSLCOMMERZ(500, 'bKash')">
-                            <div class="icon"><i class="fas fa-mobile-alt"></i></div>
-                            <div class="name">bKash</div>
-                            <div class="desc">500 BDT • 5000 Coins</div>
+                        <div class="payment-card" onclick="buyCoins(5000, 65000)">
+                            <div class="icon">🪙</div>
+                            <div class="name">৫০০০ টাকা</div>
+                            <div class="desc">৬৫০০০ কয়েন</div>
                         </div>
-                        
-                        <!-- Nagad (SSLCOMMERZ) -->
-                        <div class="payment-card nagad" onclick="buyWithSSLCOMMERZ(100, 'Nagad')">
-                            <div class="icon"><i class="fas fa-mobile-alt"></i></div>
-                            <div class="name">Nagad</div>
-                            <div class="desc">100 BDT • 1000 Coins</div>
+                    </div>
+                </div>
+
+                <!-- ✅ SUBSCRIPTION -->
+                <div class="subscription-section">
+                    <div class="sub-title">⭐ Premium Subscription</div>
+                    <div class="sub-grid">
+                        <div class="sub-card" onclick="subscribe('monthly', 4.99)">
+                            <div class="sub-icon">⭐</div>
+                            <div class="sub-name">মাসিক</div>
+                            <div class="sub-price">$4.99/মাস</div>
+                            <div class="sub-features">✅ ২x মাইনিং স্পিড<br>✅ এক্সক্লুসিভ টাস্ক</div>
                         </div>
-                        <div class="payment-card nagad" onclick="buyWithSSLCOMMERZ(500, 'Nagad')">
-                            <div class="icon"><i class="fas fa-mobile-alt"></i></div>
-                            <div class="name">Nagad</div>
-                            <div class="desc">500 BDT • 5000 Coins</div>
-                        </div>
-                        
-                        <!-- Rocket (SSLCOMMERZ) -->
-                        <div class="payment-card rocket" onclick="buyWithSSLCOMMERZ(100, 'Rocket')">
-                            <div class="icon"><i class="fas fa-rocket"></i></div>
-                            <div class="name">Rocket</div>
-                            <div class="desc">100 BDT • 1000 Coins</div>
-                        </div>
-                        <div class="payment-card rocket" onclick="buyWithSSLCOMMERZ(500, 'Rocket')">
-                            <div class="icon"><i class="fas fa-rocket"></i></div>
-                            <div class="name">Rocket</div>
-                            <div class="desc">500 BDT • 5000 Coins</div>
+                        <div class="sub-card" onclick="subscribe('yearly', 49.99)">
+                            <div class="sub-icon">⭐</div>
+                            <div class="sub-name">বার্ষিক</div>
+                            <div class="sub-price">$49.99/বছর</div>
+                            <div class="sub-features">✅ ২x মাইনিং স্পিড<br>✅ এক্সক্লুসিভ টাস্ক<br>✅ ৫০% বোনাস</div>
                         </div>
                     </div>
                 </div>
@@ -863,7 +920,13 @@
             selectedMethod: 'Nagad', isBanned: false, banReason: '', 
             banAppealSubmitted: false, lastVideoWatchTime: 0,
             dailyBonusClaimed: 0,
-            mysteryBoxCooldown: 0, // ✅ Firebase-এ সেভ থাকবে
+            mysteryBoxCooldown: 0, 
+            
+            // ✅ New properties for Subscription & Level
+            subscription: null, // 'monthly', 'yearly', or null
+            subscriptionExpiry: 0,
+            level: 1,
+            miningSpeed: 0, // Percentage bonus
             
             // Admin-controlled settings
             dailyBonusMin: 50,
@@ -1257,6 +1320,80 @@
         }
 
         // ============================================================
+        // ================== IN-APP PURCHASE ==========================
+        // ============================================================
+        function buyCoins(amountBDT, coins) {
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            
+            // এখানে আপনার পেমেন্ট গেটওয়ে ইন্টিগ্রেশন (SSLCOMMERZ/bKash/Nagad/Rocket/Visa)
+            // ডেমো হিসেবে কনফার্ম বক্স ব্যবহার করছি
+            if (confirm(`💳 Buy ${coins} Coins for ${amountBDT} BDT?`)) {
+                app.balance += coins;
+                app.xpPoints += coins * 2;
+                userRef.update({ balance: app.balance, xpPoints: app.xpPoints });
+                updateUI(); updateLevelUI();
+                showToast(`✅ +${coins} Coins!`);
+                document.getElementById('rewardText').textContent = `+${coins} Coins!`;
+                document.getElementById('successModal').classList.add('active');
+            }
+        }
+
+        // ============================================================
+        // ================== SUBSCRIPTION ============================
+        // ============================================================
+        function subscribe(plan, price) {
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            
+            // চেক করুন সাবস্ক্রিপশন ইতিমধ্যে সক্রিয় কিনা
+            if (app.subscription && app.subscriptionExpiry > Date.now()) {
+                showToast('✅ You already have an active subscription!', 'error');
+                return;
+            }
+            
+            if (confirm(`⭐ Subscribe to ${plan} plan for $${price}?`)) {
+                // এখানে পেমেন্ট গেটওয়ে ইন্টিগ্রেশন হবে
+                const expiry = plan === 'monthly' ? Date.now() + 30*24*60*60*1000 : Date.now() + 365*24*60*60*1000;
+                app.subscription = plan;
+                app.subscriptionExpiry = expiry;
+                userRef.update({
+                    subscription: app.subscription,
+                    subscriptionExpiry: app.subscriptionExpiry
+                });
+                showToast(`✅ ${plan} subscription activated!`);
+                updateUI();
+            }
+        }
+
+        // ============================================================
+        // ================== LEVEL UPGRADE ============================
+        // ============================================================
+        function upgradeLevel(targetLevel, cost) {
+            if (!isOnline) { showToast('No internet!', 'error'); return; }
+            if (app.balance < cost) {
+                showToast(`❌ Need ${cost} coins!`, 'error');
+                return;
+            }
+            if (app.level >= targetLevel) {
+                showToast('✅ Already at this level!', 'error');
+                return;
+            }
+            if (confirm(`🪙 Spend ${cost} coins to upgrade to Level ${targetLevel}?`)) {
+                app.balance -= cost;
+                app.level = targetLevel;
+                app.miningSpeed += (targetLevel - 1) * 5; // প্রতি লেভেলে +৫% স্পিড
+                userRef.update({
+                    balance: app.balance,
+                    level: app.level,
+                    miningSpeed: app.miningSpeed
+                });
+                showToast(`🎉 Upgraded to Level ${targetLevel}!`);
+                updateUI(); updateLevelUI();
+                document.getElementById('rewardText').textContent = `Level ${targetLevel}!`;
+                document.getElementById('successModal').classList.add('active');
+            }
+        }
+
+        // ============================================================
         // ================== LEADERBOARD ==============================
         // ============================================================
         function loadLeaderboard(type = 'coins', btn = null) {
@@ -1306,59 +1443,6 @@
         }
 
         // ============================================================
-        // ================== PAYMENT GATEWAYS ==========================
-        // ============================================================
-
-        // ✅ Visa (Stripe Checkout)
-        function buyWithVisa(coins, price) {
-            db.ref('paymentConfig/stripe/publishableKey').once('value', snap => {
-                const key = snap.val();
-                if (!key) {
-                    showToast('⚠️ Stripe not configured!', 'error');
-                    return;
-                }
-                const stripe = Stripe(key);
-                if (confirm(`💳 Buy ${coins} Coins for $${price} with Visa?`)) {
-                    app.balance += coins;
-                    userRef.update({ balance: app.balance });
-                    updateUI();
-                    showToast(`✅ +${coins} Coins (Visa)`);
-                }
-            });
-        }
-
-        // ✅ bKash / Nagad / Rocket (SSLCOMMERZ - Automatic)
-        function buyWithSSLCOMMERZ(amount, method) {
-            if (!isOnline) { showToast('No internet!', 'error'); return; }
-            
-            // আপনার ব্যাকএন্ড URL
-            const backendUrl = 'https://yourdomain.com/api/payment-init';
-            
-            fetch(backendUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    amount: amount,
-                    userId: userId,
-                    method: method,
-                    email: tgUser?.email || 'user@example.com',
-                    phone: '017XXXXXXXX'
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.href = data.payment_url;
-                } else {
-                    showToast('⚠️ ' + data.message, 'error');
-                }
-            })
-            .catch(error => {
-                showToast('⚠️ Payment error: ' + error.message, 'error');
-            });
-        }
-
-        // ============================================================
         // ================== MINING CORE ==============================
         // ============================================================
         function startMining() {
@@ -1374,7 +1458,17 @@
                 if (isAdShowing) { setTimeout(mineNextCoin, 1000); return; }
                 if (app.progressCoins <= 0) { stopMining(); showToast('🎉 Coins finished!', 'success'); updateProgressUI(); return; }
                 const d = calculateLevel(app.xpPoints);
-                const ca = 1 + (d.bonusPercent / 100);
+                let speedMultiplier = 1 + (d.bonusPercent / 100);
+                
+                // ✅ Check subscription bonus
+                if (app.subscription && app.subscriptionExpiry > Date.now()) {
+                    speedMultiplier *= 2; // 2x speed for premium users
+                }
+                
+                // ✅ Check level bonus
+                speedMultiplier += app.miningSpeed / 100;
+                
+                const ca = speedMultiplier;
                 
                 app.progressCoins -= 1;
                 app.balance += ca;
@@ -1402,7 +1496,7 @@
                 setTimeout(() => coin.remove(), 1000);
                 
                 updateProgressUI(); updateUI(); updateLevelUI();
-                miningInterval = setTimeout(mineNextCoin, 5000);
+                miningInterval = setTimeout(mineNextCoin, 5000 / speedMultiplier);
             }
             mineNextCoin();
             updateProgressUI();
@@ -1913,6 +2007,11 @@
             document.getElementById('usdBalanceDisplay').textContent = `$${app.usdBalance.toFixed(3)}`;
             document.getElementById('totalBalanceDisplay').textContent = `${app.balance.toLocaleString()} + $${app.usdBalance.toFixed(3)}`;
             updateWithdrawUI(); updateSpeedBoostUI(); startConversionTimer();
+            
+            // Subscription status
+            if (app.subscription && app.subscriptionExpiry > Date.now()) {
+                document.getElementById('userLevelBadge').textContent += ' ⭐';
+            }
         }
 
         function updateProgressUI() { 
@@ -2101,13 +2200,19 @@
                 app.referTiers = d.referTiers || {};
                 app.progressCoins = d.progressCoins !== undefined ? d.progressCoins : TOTAL_COINS;
                 app.speedBoostCooldown = d.speedBoostCooldown || 0;
-                app.mysteryBoxCooldown = d.mysteryBoxCooldown || 0; // ✅ Load from Firebase
+                app.mysteryBoxCooldown = d.mysteryBoxCooldown || 0; 
                 app.taskLastCompleted = d.taskLastCompleted || {};
                 app.taskProgress = d.taskProgress || {};
                 app.xpPoints = d.xpPoints !== undefined ? d.xpPoints : NEGATIVE_XP;
                 app.withdrawHistory = d.withdrawHistory || [];
                 app.airdropClaimed = d.airdropClaimed || false;
                 app.dailyBonusClaimed = d.dailyBonusClaimed || '';
+                
+                // ✅ Load Subscription & Level data
+                app.subscription = d.subscription || null;
+                app.subscriptionExpiry = d.subscriptionExpiry || 0;
+                app.level = d.level || 1;
+                app.miningSpeed = d.miningSpeed || 0;
 
                 if (!window._lastReferCode || window._lastReferCode !== app.referCode) {
                     window._lastReferCode = app.referCode;
