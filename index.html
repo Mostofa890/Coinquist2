@@ -129,24 +129,79 @@
         .game-header .back-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; }
         .game-header .game-info { color: #94a3b8; font-size: 12px; }
         .game-content { padding: 10px 0; }
+        
+        /* ================== XO GAME (Fixed CSS) ================== */
+        .xo-game-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: none; align-items: center; justify-content: center; }
+        .xo-game-overlay.show { display: flex; }
+        .xo-game-container { background: rgba(30,41,59,0.98); padding: 20px; border-radius: 20px; width: 90%; max-width: 380px; text-align: center; border: 1px solid rgba(255,255,255,0.1); max-height: 90vh; overflow-y: auto; }
+        .xo-game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .xo-game-header .back-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; }
+        
+        .xo-bet-section { margin: 10px 0; }
+        .xo-bet-section label { font-size: 14px; color: #fbbf24; display: block; margin-bottom: 8px; }
+        .xo-bet-input { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+        .bet-preset { background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 8px; cursor: pointer; color: #94a3b8; font-weight: 600; transition: 0.3s; }
+        .bet-preset:hover { background: #fbbf24; color: #0f172a; }
+        .xo-bet-input input { width: 80px; padding: 8px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #fff; text-align: center; font-size: 16px; }
+        
+        .xo-action-btn { width: 100%; padding: 12px; border: none; border-radius: 12px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; font-weight: 700; font-size: 15px; cursor: pointer; margin: 6px 0; transition: 0.3s; }
+        .xo-action-btn.free { background: linear-gradient(135deg, #10b981, #059669); }
+        .xo-action-btn.restart { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .xo-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .xo-online-info { color: #fbbf24; font-size: 16px; padding: 20px; animation: pulse 1.5s infinite; }
+        .xo-online-players { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; }
+        .xo-player-badge { background: rgba(255,255,255,0.05); padding: 8px 15px; border-radius: 12px; text-align: center; }
+        .player-symbol { font-size: 28px; font-weight: 900; }
+        .x-player { color: #3b82f6; }
+        .o-player { color: #ef4444; }
+        
+        .xo-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; max-width: 240px; margin: 15px auto; }
+        .xo-cell { background: rgba(255,255,255,0.05); aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 900; border-radius: 12px; cursor: pointer; border: 2px solid rgba(255,255,255,0.1); transition: 0.3s; }
+        .xo-cell:hover { background: rgba(255,255,255,0.1); }
+        .xo-cell.x-player { color: #3b82f6; }
+        .xo-cell.o-player { color: #ef4444; }
+        .xo-cell.win-cell { background: rgba(16,185,129,0.2); border-color: #10b981; animation: pulse 1s infinite; }
+        
+        .xo-status { font-size: 18px; font-weight: 700; margin: 10px 0; }
+        .xo-status.win { color: #10b981; }
+        .xo-status.lose { color: #ef4444; }
+        .xo-status.draw { color: #fbbf24; }
+
+        /* ================== DICE GAME ================== */
         .game-dice-container { display: flex; justify-content: center; gap: 30px; margin: 20px 0; }
         .game-dice { width: 80px; height: 80px; background: rgba(255,255,255,0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 40px; border: 2px solid rgba(255,255,255,0.2); transition: all 0.3s ease; }
         .game-dice.rolling { animation: diceRoll 0.5s ease; }
         @keyframes diceRoll { 0% { transform: rotate(0deg); } 25% { transform: rotate(90deg); } 50% { transform: rotate(180deg); } 75% { transform: rotate(270deg); } 100% { transform: rotate(360deg); } }
         .game-dice.win { border-color: #10b981; box-shadow: 0 0 20px rgba(16,185,129,0.3); }
         .game-dice.lose { border-color: #ef4444; box-shadow: 0 0 20px rgba(239,68,68,0.3); }
+
+        /* ================== CARD GAME ================== */
         .game-cards { display: flex; justify-content: center; gap: 20px; margin: 20px 0; }
         .game-card-item { width: 70px; height: 100px; background: linear-gradient(135deg, #1e293b, #334155); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 28px; font-weight: 900; border: 2px solid rgba(255,255,255,0.2); transition: all 0.3s ease; position: relative; }
         .game-card-item.win { border-color: #10b981; box-shadow: 0 0 20px rgba(16,185,129,0.3); }
         .game-card-item.lose { border-color: #ef4444; box-shadow: 0 0 20px rgba(239,68,68,0.3); }
         .game-card-item .card-suit { font-size: 24px; }
         .game-card-item .card-value { font-size: 20px; font-weight: 900; }
+
+        /* ================== TARGET GAME ================== */
         .game-target { position: relative; width: 200px; height: 200px; margin: 20px auto; }
         .game-target-circle { position: absolute; border-radius: 50%; border: 3px solid rgba(255,255,255,0.3); }
         .game-target-circle.outer { width: 100%; height: 100%; top: 0; left: 0; background: rgba(239,68,68,0.1); }
         .game-target-circle.mid { width: 60%; height: 60%; top: 20%; left: 20%; background: rgba(251,191,36,0.1); }
         .game-target-circle.inner { width: 20%; height: 20%; top: 40%; left: 40%; background: rgba(16,185,129,0.2); border-color: #10b981; }
         .game-target-dot { position: absolute; width: 12px; height: 12px; background: #fbbf24; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 10px #fbbf24; }
+
+        /* ================== MEMORY GAME ================== */
+        .memory-card { background: #1e293b; padding: 20px; border-radius: 10px; font-size: 24px; cursor: pointer; text-align: center; color: #fff; border: 2px solid #334155; transition: 0.3s; }
+        .memory-card:hover { border-color: #fbbf24; }
+
+        /* ================== FLAPPY BIRD ================== */
+        #flappyCanvas { background: #87CEEB; border-radius: 10px; width: 100%; max-width: 300px; height: auto; }
+
+        /* ================== PUZZLE GAME ================== */
+        #puzzleGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; width: 200px; height: 200px; margin: 0 auto; }
+        #puzzleGrid div { background: #fbbf24; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; border-radius: 8px; cursor: pointer; color: #0f172a; }
 
         /* ================== BOTTOM NAV ================== */
         .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; background: rgba(15,23,42,0.95); backdrop-filter: blur(24px); display: flex; justify-content: space-around; padding: 10px 4px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
@@ -1608,7 +1663,7 @@
             });
         }
 
-        // ================== SPIN WHEEL (unchanged) ==================
+        // ================== SPIN WHEEL ==================
         const SPIN_COUNT_LIMIT = 20,
             SPIN_BUTTON_COOLDOWN_SECONDS = 15;
         let spinCount = SPIN_COUNT_LIMIT,
@@ -1877,7 +1932,7 @@
             updateProgressUI();
         }
 
-        // ================== LEVEL (unchanged) ==================
+        // ================== LEVEL ==================
         function getLevelConfig(l) {
             if (l === 0) return { tier: 'unlocking', tierName: 'Unlocking', tierEmoji: '🔒', bonusPercent: 0, xpForLevel: 5000 };
             let tier, tn, te, bonus;
@@ -1990,7 +2045,7 @@
             renderLevelGrid();
         }
 
-        // ================== TASKS (unchanged) ==================
+        // ================== TASKS ==================
         function loadTasks() {
             db.ref('tasks').on('value', s => {
                 tasks = s.exists() ? Object.keys(s.val()).map(k => ({ id: k, ...s.val()[k] })) : [];
@@ -2093,7 +2148,7 @@
             showToast(`🎉 +${rw} Coins!`);
         }
 
-        // ================== REFERRAL (unchanged) ==================
+        // ================== REFERRAL ==================
         function loadReferralConfigFromDB() {
             db.ref('referralConfig').on('value', s => {
                 referralConfigCache = s.val() || { perReferralCoins: 50, xpPerReferral: 100 };
@@ -2163,7 +2218,7 @@
             if (l && l !== 'Loading...') navigator.clipboard.writeText(l).then(() => showToast('📋 Copied!')).catch(() => showToast('Copy manually', 'error'));
         }
 
-        // ================== AIRDROP (unchanged) ==================
+        // ================== AIRDROP ==================
         function loadAirdrop() {
             db.ref('airdropConfig').on('value', s => {
                 const c = s.val() || {};
@@ -2208,7 +2263,7 @@
             }).catch(() => showToast('Ad not watched!', 'error'));
         }
 
-        // ================== WITHDRAW (unchanged) ==================
+        // ================== WITHDRAW ==================
         function updateWithdrawUI() {
             const b = app.usdBalance || 0,
                 m = app.minWithdraw || 10;
@@ -2253,7 +2308,7 @@
             c.innerHTML = h.length ? h.slice(-20).reverse().map(h => `<div class="history-item"><div><b>$${h.amount?.toFixed(4)||'0.0000'}</b> <small>${h.method||''}</small></div><div style="text-align:right;"><span>${h.status==='approved'?'✅':h.status==='cancelled'?'❌':'⏳'} ${h.status}</span><div style="font-size:9px;">${h.date?new Date(h.date).toLocaleDateString():''}</div></div></div>`).join('') : '<span style="color:#94a3b8;font-size:11px;">No history</span>';
         }
 
-        // ================== CONVERSION (unchanged) ==================
+        // ================== CONVERSION ==================
         let conversionTimerInterval = null;
 
         function performConversion() {
