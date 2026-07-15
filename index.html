@@ -113,7 +113,7 @@
         /* ================== GAME SECTION ================== */
         .game-section { background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(59,130,246,0.15)); border: 2px solid rgba(139,92,246,0.3); border-radius: 16px; padding: 16px; margin: 16px 0; text-align: center; }
         .game-section .game-title { font-size: 16px; font-weight: 700; color: #8b5cf6; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .game-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .game-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
         .game-card { background: rgba(255,255,255,0.05); padding: 18px 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); text-align: center; cursor: pointer; transition: 0.3s; }
         .game-card:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); border-color: #8b5cf6; }
         .game-card .game-icon { font-size: 32px; margin-bottom: 6px; }
@@ -455,6 +455,75 @@
         </div>
     </div>
 
+    <!-- ================== MEMORY GAME OVERLAY ================== -->
+    <div class="game-overlay" id="memoryGameOverlay">
+        <div class="game-container">
+            <div class="game-header"><button class="back-btn" onclick="closeMemoryGame()"><i class="fas fa-arrow-left"></i> Back</button><span class="game-info">🧠 Memory Game</span></div>
+            <div id="memoryBetSection" class="xo-bet-section">
+                <label>💰 Entry Fee (100-500) | Win: +15% Bonus</label>
+                <div class="xo-bet-input">
+                    <span class="bet-preset" onclick="setMemoryBet(100)">100</span><span class="bet-preset" onclick="setMemoryBet(200)">200</span>
+                    <input type="number" id="memoryBetAmount" value="100" min="100" max="500" step="50">
+                    <span class="bet-preset" onclick="setMemoryBet(300)">300</span><span class="bet-preset" onclick="setMemoryBet(500)">500</span>
+                </div>
+                <button class="xo-action-btn" onclick="playMemoryGamePaid()">🧠 Pay & Play</button>
+                <button class="xo-action-btn free" onclick="playMemoryGameFree()">📺 Watch Ad (Get 20 🪙)</button>
+            </div>
+            <div id="memoryGameBoard" style="display:none;">
+                <div id="memoryGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px;"></div>
+                <div class="xo-status" id="memoryStatus">Match all pairs!</div>
+                <div id="memoryRewardInfo" style="color:#10b981;font-size:14px;font-weight:700;margin:8px 0;"></div>
+                <button class="xo-action-btn restart" onclick="resetMemoryGame()" style="display:none;">🔄 Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================== FLAPPY BIRD GAME OVERLAY ================== -->
+    <div class="game-overlay" id="flappyGameOverlay">
+        <div class="game-container">
+            <div class="game-header"><button class="back-btn" onclick="closeFlappyGame()"><i class="fas fa-arrow-left"></i> Back</button><span class="game-info">🦅 Flappy Bird</span></div>
+            <div id="flappyBetSection" class="xo-bet-section">
+                <label>💰 Entry Fee (100-500) | Win: +20% Bonus</label>
+                <div class="xo-bet-input">
+                    <span class="bet-preset" onclick="setFlappyBet(100)">100</span><span class="bet-preset" onclick="setFlappyBet(200)">200</span>
+                    <input type="number" id="flappyBetAmount" value="100" min="100" max="500" step="50">
+                    <span class="bet-preset" onclick="setFlappyBet(300)">300</span><span class="bet-preset" onclick="setFlappyBet(500)">500</span>
+                </div>
+                <button class="xo-action-btn" onclick="playFlappyGamePaid()">🦅 Pay & Fly</button>
+                <button class="xo-action-btn free" onclick="playFlappyGameFree()">📺 Watch Ad (Get 20 🪙)</button>
+            </div>
+            <div id="flappyGameBoard" style="display:none;">
+                <canvas id="flappyCanvas" width="300" height="400" style="background:#87CEEB;border-radius:10px;"></canvas>
+                <div class="xo-status" id="flappyStatus">Tap to fly!</div>
+                <div id="flappyRewardInfo" style="color:#10b981;font-size:14px;font-weight:700;margin:8px 0;"></div>
+                <button class="xo-action-btn restart" onclick="resetFlappyGame()" style="display:none;">🔄 Fly Again</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================== PUZZLE GAME OVERLAY ================== -->
+    <div class="game-overlay" id="puzzleGameOverlay">
+        <div class="game-container">
+            <div class="game-header"><button class="back-btn" onclick="closePuzzleGame()"><i class="fas fa-arrow-left"></i> Back</button><span class="game-info">🧩 Puzzle Game</span></div>
+            <div id="puzzleBetSection" class="xo-bet-section">
+                <label>💰 Entry Fee (100-500) | Win: +18% Bonus</label>
+                <div class="xo-bet-input">
+                    <span class="bet-preset" onclick="setPuzzleBet(100)">100</span><span class="bet-preset" onclick="setPuzzleBet(200)">200</span>
+                    <input type="number" id="puzzleBetAmount" value="100" min="100" max="500" step="50">
+                    <span class="bet-preset" onclick="setPuzzleBet(300)">300</span><span class="bet-preset" onclick="setPuzzleBet(500)">500</span>
+                </div>
+                <button class="xo-action-btn" onclick="playPuzzleGamePaid()">🧩 Pay & Play</button>
+                <button class="xo-action-btn free" onclick="playPuzzleGameFree()">📺 Watch Ad (Get 20 🪙)</button>
+            </div>
+            <div id="puzzleGameBoard" style="display:none;">
+                <div id="puzzleGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;width:200px;height:200px;margin:0 auto;"></div>
+                <div class="xo-status" id="puzzleStatus">Arrange numbers 1-8!</div>
+                <div id="puzzleRewardInfo" style="color:#10b981;font-size:14px;font-weight:700;margin:8px 0;"></div>
+                <button class="xo-action-btn restart" onclick="resetPuzzleGame()" style="display:none;">🔄 Play Again</button>
+            </div>
+        </div>
+    </div>
+
     <!-- ============================================================ -->
     <!-- ================== MAIN CONTENT ============================= -->
     <!-- ============================================================ -->
@@ -542,6 +611,9 @@
                     <div class="game-card" onclick="openGame('dice')"><div class="game-icon">🎲</div><div class="game-name">Dice Roll</div><div class="game-desc">Roll higher than opponent</div><div class="game-bet">Entry: 100-500 🪙 | Win: 15%</div></div>
                     <div class="game-card" onclick="openGame('target')"><div class="game-icon">🎯</div><div class="game-name">Target Shoot</div><div class="game-desc">Hit the target to win</div><div class="game-bet">Entry: 100-500 🪙 | Win: 20%</div></div>
                     <div class="game-card" onclick="openGame('card')"><div class="game-icon">🃏</div><div class="game-name">Card Draw</div><div class="game-desc">Draw higher card to win</div><div class="game-bet">Entry: 100-500 🪙 | Win: 12%</div></div>
+                    <div class="game-card" onclick="openGame('memory')"><div class="game-icon">🧠</div><div class="game-name">Memory Game</div><div class="game-desc">Match all pairs</div><div class="game-bet">Entry: 100-500 🪙 | Win: 15%</div></div>
+                    <div class="game-card" onclick="openGame('flappy')"><div class="game-icon">🦅</div><div class="game-name">Flappy Bird</div><div class="game-desc">Tap to fly</div><div class="game-bet">Entry: 100-500 🪙 | Win: 20%</div></div>
+                    <div class="game-card" onclick="openGame('puzzle')"><div class="game-icon">🧩</div><div class="game-name">Puzzle Game</div><div class="game-desc">Arrange 1-8</div><div class="game-bet">Entry: 100-500 🪙 | Win: 18%</div></div>
                 </div>
             </div>
         </div>
@@ -591,6 +663,9 @@
         let diceGameData = { betAmount: 100, isFree: false, rewardGiven: false };
         let targetGameData = { betAmount: 100, isFree: false, rewardGiven: false };
         let cardGameData = { betAmount: 100, isFree: false, rewardGiven: false };
+        let memoryGameData = { betAmount: 100, isFree: false, rewardGiven: false };
+        let flappyGameData = { betAmount: 100, isFree: false, rewardGiven: false };
+        let puzzleGameData = { betAmount: 100, isFree: false, rewardGiven: false };
 
         // ================== OPEN GAME ==================
         function openGame(type) {
@@ -598,6 +673,9 @@
             else if (type === 'dice') openDiceGame();
             else if (type === 'target') openTargetGame();
             else if (type === 'card') openCardGame();
+            else if (type === 'memory') openMemoryGame();
+            else if (type === 'flappy') openFlappyGame();
+            else if (type === 'puzzle') openPuzzleGame();
         }
 
         // ================== DICE GAME ==================
@@ -716,7 +794,7 @@
         }
         function resetCardGame() { cardGameData.rewardGiven = false; document.getElementById('cardBetSection').style.display = 'block'; document.getElementById('cardGameBoard').style.display = 'none'; document.getElementById('cardGameBoard').querySelector('.restart').style.display = 'none'; document.getElementById('playerCard').innerHTML = '<span class="card-value">?</span><span class="card-suit">?</span>'; document.getElementById('opponentCard').innerHTML = '<span class="card-value">?</span><span class="card-suit">?</span>'; document.getElementById('playerCard').className = 'game-card-item'; document.getElementById('opponentCard').className = 'game-card-item'; }
 
-        // ================== XO GAME (FIXED) ==================
+        // ================== XO GAME ==================
         let xoGameData = { mode: null, betAmount: 100, board: Array(9).fill(''), mySymbol: 'X', opponentSymbol: 'O', gameActive: false, gameOver: false, winner: null, onlineGameId: null, isMyTurn: true, gameRef: null, rewardGiven: false, winningCombo: null, isFree: false };
         let xoAITimeout = null;
 
@@ -1099,6 +1177,418 @@
             document.getElementById('xoOnlineInfo').style.display = 'none';
             if (xoAITimeout) { clearTimeout(xoAITimeout);
                 xoAITimeout = null; }
+        }
+
+        // ================== MEMORY GAME ==================
+        let memoryCards = [];
+        let memoryFlipped = [];
+        let memoryMatched = [];
+        let memoryLockBoard = false;
+        let memoryTimeout = null;
+
+        function openMemoryGame() {
+            document.getElementById('memoryGameOverlay').classList.add('show');
+            document.getElementById('memoryBetSection').style.display = 'block';
+            document.getElementById('memoryGameBoard').style.display = 'none';
+            memoryGameData.rewardGiven = false;
+        }
+
+        function closeMemoryGame() {
+            document.getElementById('memoryGameOverlay').classList.remove('show');
+            if (memoryTimeout) clearTimeout(memoryTimeout);
+        }
+
+        function setMemoryBet(a) {
+            memoryGameData.betAmount = Math.min(a, 500);
+            document.getElementById('memoryBetAmount').value = memoryGameData.betAmount;
+        }
+
+        function playMemoryGamePaid() {
+            let bet = parseInt(document.getElementById('memoryBetAmount').value) || 100;
+            bet = Math.max(100, Math.min(bet, 500));
+            if (bet > app.balance) { showToast('Insufficient balance!', 'error'); return; }
+            memoryGameData.betAmount = bet;
+            memoryGameData.isFree = false;
+            app.balance -= bet;
+            userRef.update({ balance: app.balance });
+            updateUI();
+            document.getElementById('memoryBetSection').style.display = 'none';
+            document.getElementById('memoryGameBoard').style.display = 'block';
+            startMemoryGame();
+        }
+
+        function playMemoryGameFree() {
+            show_11197472().then(() => {
+                memoryGameData.betAmount = 100;
+                memoryGameData.isFree = true;
+                document.getElementById('memoryBetSection').style.display = 'none';
+                document.getElementById('memoryGameBoard').style.display = 'block';
+                startMemoryGame();
+            }).catch(() => showToast('Ad not watched!', 'error'));
+        }
+
+        function startMemoryGame() {
+            if (memoryGameData.rewardGiven) return;
+            memoryFlipped = [];
+            memoryMatched = [];
+            memoryLockBoard = false;
+            const icons = ['🍎','🍌','🍒','🍇','🍊','🍓','🍉','🍋'];
+            memoryCards = [...icons, ...icons];
+            memoryCards.sort(() => Math.random() - 0.5);
+            const grid = document.getElementById('memoryGrid');
+            grid.innerHTML = '';
+            memoryCards.forEach((icon, idx) => {
+                const card = document.createElement('div');
+                card.className = 'memory-card';
+                card.dataset.index = idx;
+                card.dataset.icon = icon;
+                card.textContent = '❓';
+                card.style.cssText = 'background:#1e293b;padding:20px;border-radius:10px;font-size:24px;cursor:pointer;text-align:center;color:#fff;border:2px solid #334155;';
+                card.onclick = () => flipMemoryCard(idx);
+                grid.appendChild(card);
+            });
+            document.getElementById('memoryStatus').textContent = 'Match all pairs!';
+            document.getElementById('memoryRewardInfo').textContent = '';
+            document.getElementById('memoryGameBoard').querySelector('.restart').style.display = 'none';
+        }
+
+        function flipMemoryCard(idx) {
+            if (memoryLockBoard || memoryFlipped.length >= 2 || memoryMatched.includes(idx)) return;
+            const cards = document.querySelectorAll('.memory-card');
+            const card = cards[idx];
+            if (card.textContent !== '❓') return;
+            card.textContent = card.dataset.icon;
+            memoryFlipped.push(idx);
+
+            if (memoryFlipped.length === 2) {
+                memoryLockBoard = true;
+                const idx1 = memoryFlipped[0];
+                const idx2 = memoryFlipped[1];
+                const card1 = cards[idx1];
+                const card2 = cards[idx2];
+
+                if (card1.dataset.icon === card2.dataset.icon) {
+                    memoryMatched.push(idx1, idx2);
+                    memoryFlipped = [];
+                    memoryLockBoard = false;
+                    checkMemoryWin();
+                } else {
+                    memoryTimeout = setTimeout(() => {
+                        card1.textContent = '❓';
+                        card2.textContent = '❓';
+                        memoryFlipped = [];
+                        memoryLockBoard = false;
+                        memoryTimeout = null;
+                    }, 1000);
+                }
+            }
+        }
+
+        function checkMemoryWin() {
+            if (memoryMatched.length === memoryCards.length) {
+                let reward = 0;
+                if (memoryGameData.isFree) {
+                    reward = 20;
+                    app.balance += reward;
+                } else {
+                    reward = memoryGameData.betAmount + Math.floor(memoryGameData.betAmount * 0.15);
+                    app.balance += reward;
+                }
+                document.getElementById('memoryStatus').textContent = '🎉 You win!';
+                document.getElementById('memoryRewardInfo').textContent = `+${reward} Coins`;
+                document.getElementById('memoryGameBoard').querySelector('.restart').style.display = 'block';
+                userRef.update({ balance: app.balance });
+                updateUI();
+            }
+        }
+
+        function resetMemoryGame() {
+            memoryGameData.rewardGiven = false;
+            if (memoryTimeout) clearTimeout(memoryTimeout);
+            document.getElementById('memoryBetSection').style.display = 'block';
+            document.getElementById('memoryGameBoard').style.display = 'none';
+            document.getElementById('memoryGameBoard').querySelector('.restart').style.display = 'none';
+        }
+
+        // ================== FLAPPY BIRD GAME ==================
+        let flappyGameLoop = null;
+        let flappyBird = { x: 50, y: 200, velocity: 0 };
+        let flappyPipes = [];
+        let flappyScore = 0;
+        let flappyGameOver = false;
+
+        function openFlappyGame() {
+            document.getElementById('flappyGameOverlay').classList.add('show');
+            document.getElementById('flappyBetSection').style.display = 'block';
+            document.getElementById('flappyGameBoard').style.display = 'none';
+            flappyGameData.rewardGiven = false;
+        }
+
+        function closeFlappyGame() {
+            document.getElementById('flappyGameOverlay').classList.remove('show');
+            if (flappyGameLoop) { cancelAnimationFrame(flappyGameLoop);
+                flappyGameLoop = null; }
+        }
+
+        function setFlappyBet(a) {
+            flappyGameData.betAmount = Math.min(a, 500);
+            document.getElementById('flappyBetAmount').value = flappyGameData.betAmount;
+        }
+
+        function playFlappyGamePaid() {
+            let bet = parseInt(document.getElementById('flappyBetAmount').value) || 100;
+            bet = Math.max(100, Math.min(bet, 500));
+            if (bet > app.balance) { showToast('Insufficient balance!', 'error'); return; }
+            flappyGameData.betAmount = bet;
+            flappyGameData.isFree = false;
+            app.balance -= bet;
+            userRef.update({ balance: app.balance });
+            updateUI();
+            document.getElementById('flappyBetSection').style.display = 'none';
+            document.getElementById('flappyGameBoard').style.display = 'block';
+            startFlappyGame();
+        }
+
+        function playFlappyGameFree() {
+            show_11197472().then(() => {
+                flappyGameData.betAmount = 100;
+                flappyGameData.isFree = true;
+                document.getElementById('flappyBetSection').style.display = 'none';
+                document.getElementById('flappyGameBoard').style.display = 'block';
+                startFlappyGame();
+            }).catch(() => showToast('Ad not watched!', 'error'));
+        }
+
+        function startFlappyGame() {
+            if (flappyGameData.rewardGiven) return;
+            flappyBird = { x: 50, y: 200, velocity: 0 };
+            flappyPipes = [];
+            flappyScore = 0;
+            flappyGameOver = false;
+            document.getElementById('flappyStatus').textContent = 'Tap to fly!';
+            document.getElementById('flappyRewardInfo').textContent = '';
+            document.getElementById('flappyGameBoard').querySelector('.restart').style.display = 'none';
+            const canvas = document.getElementById('flappyCanvas');
+            canvas.width = 300;
+            canvas.height = 400;
+            if (flappyGameLoop) cancelAnimationFrame(flappyGameLoop);
+            updateFlappyGame();
+        }
+
+        function updateFlappyGame() {
+            if (flappyGameOver) return;
+            const canvas = document.getElementById('flappyCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Gravity
+            flappyBird.velocity += 0.5;
+            flappyBird.y += flappyBird.velocity;
+
+            // Pipes
+            if (flappyPipes.length === 0 || flappyPipes[flappyPipes.length - 1].x < canvas.width - 200) {
+                const gap = 120;
+                const height = Math.random() * (canvas.height - gap - 40) + 20;
+                flappyPipes.push({ x: canvas.width, topHeight: height, gap: gap });
+            }
+
+            flappyPipes = flappyPipes.filter(p => p.x > -50);
+            flappyPipes.forEach(p => p.x -= 3);
+
+            // Draw pipes
+            flappyPipes.forEach(p => {
+                ctx.fillStyle = '#2e7d32';
+                ctx.fillRect(p.x, 0, 40, p.topHeight);
+                ctx.fillRect(p.x, p.topHeight + p.gap, 40, canvas.height - p.topHeight - p.gap);
+            });
+
+            // Draw bird
+            ctx.fillStyle = '#fbbf24';
+            ctx.beginPath();
+            ctx.arc(flappyBird.x, flappyBird.y, 15, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Collision
+            const birdRect = { x: flappyBird.x - 15, y: flappyBird.y - 15, w: 30, h: 30 };
+            flappyPipes.forEach(p => {
+                const topPipe = { x: p.x, y: 0, w: 40, h: p.topHeight };
+                const bottomPipe = { x: p.x, y: p.topHeight + p.gap, w: 40, h: canvas.height - p.topHeight - p.gap };
+                if (rectCollide(birdRect, topPipe) || rectCollide(birdRect, bottomPipe)) {
+                    flappyGameOver = true;
+                }
+            });
+
+            if (flappyBird.y < 0 || flappyBird.y > canvas.height) {
+                flappyGameOver = true;
+            }
+
+            if (flappyGameOver) {
+                document.getElementById('flappyStatus').textContent = '💥 Game Over!';
+                let reward = 0;
+                if (flappyGameData.isFree) {
+                    reward = 20;
+                    app.balance += reward;
+                } else {
+                    reward = flappyGameData.betAmount + Math.floor(flappyGameData.betAmount * 0.20);
+                    app.balance += reward;
+                }
+                document.getElementById('flappyRewardInfo').textContent = `+${reward} Coins`;
+                document.getElementById('flappyGameBoard').querySelector('.restart').style.display = 'block';
+                userRef.update({ balance: app.balance });
+                updateUI();
+                return;
+            }
+
+            flappyGameLoop = requestAnimationFrame(updateFlappyGame);
+        }
+
+        function rectCollide(r1, r2) {
+            return r1.x < r2.x + r2.w && r1.x + r1.w > r2.x &&
+                r1.y < r2.y + r2.h && r1.y + r1.h > r2.y;
+        }
+
+        function flappyJump() {
+            if (!flappyGameOver) {
+                flappyBird.velocity = -8;
+                document.getElementById('flappyStatus').textContent = `Score: ${flappyScore}`;
+            }
+        }
+
+        function resetFlappyGame() {
+            flappyGameData.rewardGiven = false;
+            if (flappyGameLoop) { cancelAnimationFrame(flappyGameLoop);
+                flappyGameLoop = null; }
+            document.getElementById('flappyBetSection').style.display = 'block';
+            document.getElementById('flappyGameBoard').style.display = 'none';
+            document.getElementById('flappyGameBoard').querySelector('.restart').style.display = 'none';
+        }
+
+        // ================== PUZZLE GAME ==================
+        let puzzleTiles = [];
+        let puzzleEmpty = 8;
+
+        function openPuzzleGame() {
+            document.getElementById('puzzleGameOverlay').classList.add('show');
+            document.getElementById('puzzleBetSection').style.display = 'block';
+            document.getElementById('puzzleGameBoard').style.display = 'none';
+            puzzleGameData.rewardGiven = false;
+        }
+
+        function closePuzzleGame() {
+            document.getElementById('puzzleGameOverlay').classList.remove('show');
+        }
+
+        function setPuzzleBet(a) {
+            puzzleGameData.betAmount = Math.min(a, 500);
+            document.getElementById('puzzleBetAmount').value = puzzleGameData.betAmount;
+        }
+
+        function playPuzzleGamePaid() {
+            let bet = parseInt(document.getElementById('puzzleBetAmount').value) || 100;
+            bet = Math.max(100, Math.min(bet, 500));
+            if (bet > app.balance) { showToast('Insufficient balance!', 'error'); return; }
+            puzzleGameData.betAmount = bet;
+            puzzleGameData.isFree = false;
+            app.balance -= bet;
+            userRef.update({ balance: app.balance });
+            updateUI();
+            document.getElementById('puzzleBetSection').style.display = 'none';
+            document.getElementById('puzzleGameBoard').style.display = 'block';
+            startPuzzleGame();
+        }
+
+        function playPuzzleGameFree() {
+            show_11197472().then(() => {
+                puzzleGameData.betAmount = 100;
+                puzzleGameData.isFree = true;
+                document.getElementById('puzzleBetSection').style.display = 'none';
+                document.getElementById('puzzleGameBoard').style.display = 'block';
+                startPuzzleGame();
+            }).catch(() => showToast('Ad not watched!', 'error'));
+        }
+
+        function startPuzzleGame() {
+            if (puzzleGameData.rewardGiven) return;
+            puzzleTiles = [1, 2, 3, 4, 5, 6, 7, 8, null];
+            puzzleEmpty = 8;
+            shufflePuzzle();
+            renderPuzzle();
+            document.getElementById('puzzleStatus').textContent = 'Arrange numbers 1-8!';
+            document.getElementById('puzzleRewardInfo').textContent = '';
+            document.getElementById('puzzleGameBoard').querySelector('.restart').style.display = 'none';
+        }
+
+        function shufflePuzzle() {
+            for (let i = 0; i < 100; i++) {
+                const neighbors = getNeighbors(puzzleEmpty);
+                const randomNeighbor = neighbors[Math.floor(Math.random() * neighbors.length)];
+                swapPuzzle(puzzleEmpty, randomNeighbor);
+            }
+        }
+
+        function getNeighbors(empty) {
+            const neighbors = [];
+            if (empty % 3 !== 0) neighbors.push(empty - 1);
+            if (empty % 3 !== 2) neighbors.push(empty + 1);
+            if (empty >= 3) neighbors.push(empty - 3);
+            if (empty < 6) neighbors.push(empty + 3);
+            return neighbors;
+        }
+
+        function swapPuzzle(i, j) {
+            [puzzleTiles[i], puzzleTiles[j]] = [puzzleTiles[j], puzzleTiles[i]];
+            if (puzzleTiles[i] === null) puzzleEmpty = i;
+            if (puzzleTiles[j] === null) puzzleEmpty = j;
+        }
+
+        function renderPuzzle() {
+            const grid = document.getElementById('puzzleGrid');
+            grid.innerHTML = '';
+            puzzleTiles.forEach((tile, idx) => {
+                const cell = document.createElement('div');
+                cell.textContent = tile || '';
+                cell.style.cssText = `background:${tile ? '#fbbf24' : '#1e293b'};display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;border-radius:8px;cursor:pointer;color:#0f172a;`;
+                cell.onclick = () => movePuzzleTile(idx);
+                grid.appendChild(cell);
+            });
+        }
+
+        function movePuzzleTile(idx) {
+            if (puzzleGameData.rewardGiven) return;
+            const neighbors = getNeighbors(puzzleEmpty);
+            if (neighbors.includes(idx)) {
+                swapPuzzle(idx, puzzleEmpty);
+                renderPuzzle();
+                if (checkPuzzleWin()) {
+                    let reward = 0;
+                    if (puzzleGameData.isFree) {
+                        reward = 20;
+                        app.balance += reward;
+                    } else {
+                        reward = puzzleGameData.betAmount + Math.floor(puzzleGameData.betAmount * 0.18);
+                        app.balance += reward;
+                    }
+                    document.getElementById('puzzleStatus').textContent = '🎉 You win!';
+                    document.getElementById('puzzleRewardInfo').textContent = `+${reward} Coins`;
+                    document.getElementById('puzzleGameBoard').querySelector('.restart').style.display = 'block';
+                    userRef.update({ balance: app.balance });
+                    updateUI();
+                }
+            }
+        }
+
+        function checkPuzzleWin() {
+            for (let i = 0; i < 8; i++) {
+                if (puzzleTiles[i] !== i + 1) return false;
+            }
+            return puzzleTiles[8] === null;
+        }
+
+        function resetPuzzleGame() {
+            puzzleGameData.rewardGiven = false;
+            document.getElementById('puzzleBetSection').style.display = 'block';
+            document.getElementById('puzzleGameBoard').style.display = 'none';
+            document.getElementById('puzzleGameBoard').querySelector('.restart').style.display = 'none';
         }
 
         // ================== MAINTENANCE ==================
