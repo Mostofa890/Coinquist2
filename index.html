@@ -4,556 +4,212 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>CoinQuest - Tap & Earn</title>
-    
     <script src='//libtl.com/sdk.js' data-zone='11197472' data-sdk='show_11197472'></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
-        /* ================== GLOBAL ================== */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', -apple-system, sans-serif; }
-        body { background: #0f172a; color: #e2e8f0; padding-bottom: 80px; min-height: 100vh; background: radial-gradient(circle at 20% 30%, #1e293b, #0f172a); }
-        .container { max-width: 500px; margin: 0 auto; padding: 12px; }
-        
-        /* ================== MAINTENANCE OVERLAY ================== */
-        #maintenanceOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; }
-        #maintenanceOverlay.show { display: flex; }
-        #maintenanceOverlay .icon { font-size: 80px; color: #fbbf24; margin-bottom: 20px; animation: pulse 1.5s infinite; }
-        #maintenanceOverlay h1 { color: #fbbf24; font-size: 28px; margin-bottom: 10px; }
-        #maintenanceOverlay p { color: #94a3b8; font-size: 16px; max-width: 400px; line-height: 1.6; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-
-        /* ================== HEADER ================== */
-        .header { background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); padding: 14px 18px; border-radius: 20px; margin-bottom: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
-        .user-info { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-        .avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #3b82f6); display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; color: #fff; }
-        .user-details h3 { font-size: 15px; font-weight: 600; color: #fff; }
-        .user-details .last-login { font-size: 10px; color: #94a3b8; }
-        .level-badge { display: inline-block; background: rgba(251,191,36,0.15); padding: 3px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; border: 1px solid rgba(251,191,36,0.3); color: #fbbf24; }
-        .balance-card { background: rgba(255,255,255,0.05); padding: 14px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); }
-        .balance-label { font-size: 11px; color: #94a3b8; }
-        .balance-amount { font-size: 32px; font-weight: 900; background: linear-gradient(to right, #fcd34d, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .usd-value { color: #10b981; font-size: 15px; font-weight: bold; }
-        .conversion-timer { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.15); border-radius: 12px; padding: 10px; margin-top: 10px; }
-        .conversion-timer .label { font-size: 10px; color: #94a3b8; }
-        .conversion-timer .time { font-size: 16px; font-weight: bold; color: #10b981; }
-
-        /* ================== DAILY BONUS ================== */
-        .daily-bonus { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; padding: 14px 18px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(251,191,36,0.3); font-weight: 700; border: 2px solid rgba(251,191,36,0.5); }
-        .daily-bonus .bonus-left { display: flex; align-items: center; gap: 8px; font-size: 16px; }
-        .daily-bonus .bonus-status { background: rgba(15,23,42,0.2); padding: 4px 14px; border-radius: 20px; font-size: 14px; }
-
-        /* ================== MINING CIRCLE ================== */
-        .mining-circle-wrapper { display: flex; justify-content: center; align-items: center; margin: 15px 0; position: relative; }
-        .mining-circle { position: relative; width: 250px; height: 250px; border-radius: 50%; background: conic-gradient(#fbbf24 100%, #1e293b 100%); display: flex; justify-content: center; align-items: center; box-shadow: 0 0 50px rgba(251,191,36,0.2); transition: background 0.5s ease; cursor: pointer; }
-        .mining-circle.mining-active { box-shadow: 0 0 60px rgba(251,191,36,0.4); animation: miningPulse 2s infinite; }
-        @keyframes miningPulse { 0%, 100% { box-shadow: 0 0 40px rgba(251,191,36,0.2); } 50% { box-shadow: 0 0 70px rgba(251,191,36,0.5); } }
-        .circle-start-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; cursor: pointer; transition: all 0.4s ease; border: 3px solid rgba(251,191,36,0.4); }
-        .circle-start-overlay.hidden { opacity: 0; pointer-events: none; transform: scale(0.95); }
-        .circle-start-overlay .start-icon { font-size: 48px; margin-bottom: 8px; animation: bounceIcon 1.5s infinite; }
-        @keyframes bounceIcon { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        .circle-start-overlay .start-text { font-size: 20px; font-weight: 900; color: #fbbf24; text-shadow: 0 0 20px rgba(251,191,36,0.5); letter-spacing: 2px; text-align: center; line-height: 1.3; }
-        .mining-circle .inner-circle { width: 170px; height: 170px; border-radius: 50%; background: #0f172a; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 5; border: 2px solid rgba(255,255,255,0.08); }
-        .mining-circle .coin-icon { font-size: 32px; margin-bottom: 5px; animation: coinSpin 3s linear infinite; }
-        @keyframes coinSpin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
-        .mining-circle .coin-count { font-size: 30px; font-weight: 900; color: #fbbf24; }
-
-        /* ================== SPEED BOOST ================== */
-        .speed-btn-container { margin-top: 12px; width: 100%; display: flex; justify-content: center; }
-        .speed-boost-btn { color: #fff; padding: 10px 20px; border: none; border-radius: 25px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #f97316, #f59e0b); transition: all 0.3s ease; justify-content: center; }
-        .speed-boost-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        /* ================== MYSTERY BOX ================== */
-        .mystery-box-wrapper { position: relative; width: 100%; max-width: 280px; margin: 20px auto; cursor: pointer; text-align: center; }
-        .mystery-box-container { position: relative; width: 100%; padding-bottom: 100%; transition: transform 0.3s ease; }
-        .mystery-box-container:hover { transform: scale(1.02); }
-        .mystery-box-container .box-lid { position: absolute; top: 0; left: 0; width: 100%; height: 50%; background: linear-gradient(135deg, #f472b6, #ec4899); border-radius: 20px 20px 0 0; border: 3px solid rgba(244,114,182,0.4); transform-origin: bottom center; transition: transform 0.6s ease; z-index: 2; display: flex; align-items: center; justify-content: center; font-size: 40px; box-shadow: 0 -4px 15px rgba(236,72,153,0.3); }
-        .mystery-box-container .box-lid.open { transform: rotateX(-120deg); }
-        .mystery-box-container .box-body { position: absolute; bottom: 0; left: 0; width: 100%; height: 60%; background: linear-gradient(135deg, #f472b6, #ec4899); border-radius: 0 0 20px 20px; border: 3px solid rgba(244,114,182,0.4); border-top: none; z-index: 1; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(236,72,153,0.3); }
-        .mystery-box-container .box-body .gift-icon { font-size: 60px; animation: pulseBox 1.5s infinite; }
-        @keyframes pulseBox { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-        .mystery-box-container .box-body .gift-icon.opened { animation: none; font-size: 40px; }
-        .mystery-box-container .box-shine { position: absolute; top: -10%; left: -10%; width: 120%; height: 120%; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%); pointer-events: none; z-index: 3; animation: shine 3s infinite; }
-        @keyframes shine { 0% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.3; transform: scale(0.8); } }
-        .mystery-box-wrapper .box-label { margin-top: 12px; font-size: 16px; font-weight: 700; color: #fbbf24; }
-        .mystery-box-wrapper .box-timer { margin-top: 8px; font-size: 20px; font-weight: 900; color: #10b981; min-height: 30px; }
-        .mystery-box-wrapper .box-timer.cooldown { color: #fbbf24; }
-
-        /* ================== NOTIFICATION BELL ================== */
-        .notification-bell { position: relative; cursor: pointer; margin-left: auto; color: #94a3b8; transition: color 0.3s ease; }
-        .notification-bell:hover { color: #fbbf24; }
-        .notification-bell .bell-icon { font-size: 22px; }
-        .notification-bell .badge { position: absolute; top: -5px; right: -5px; background: #ef4444; color: #fff; border-radius: 50%; padding: 2px 6px; font-size: 10px; font-weight: 700; display: none; }
-
-        /* ================== PAGES ================== */
-        .page { display: none; min-height: 60vh; padding-top: 8px; }
-        .page.active { display: block; }
-        .page-header { font-size: 20px; font-weight: 800; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .task-filters { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; }
-        .task-filters .filter-btn { padding: 5px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #94a3b8; cursor: pointer; font-size: 11px; white-space: nowrap; }
-        .task-filters .filter-btn.active { background: linear-gradient(135deg, #8b5cf6, #3b82f6); border-color: transparent; color: #fff; }
-        .task-card { background: rgba(255,255,255,0.03); border-radius: 14px; padding: 14px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.08); }
-        .task-card .task-header { display: flex; justify-content: space-between; align-items: center; }
-        .task-card .task-title { font-size: 14px; font-weight: 600; color: #fff; }
-        .task-card .task-reward { color: #10b981; font-weight: bold; font-size: 14px; }
-        .task-card .task-btn { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; padding: 6px 18px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 12px; transition: all 0.3s ease; }
-        .task-card .task-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .task-card .task-progress { font-size: 11px; color: #94a3b8; margin-top: 4px; }
-        .wallet-card { background: rgba(255,255,255,0.03); padding: 20px 16px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.08); }
-        .wallet-card .wallet-balance { font-size: 36px; font-weight: 900; background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .withdraw-section { margin-top: 15px; padding: 15px; background: rgba(239,68,68,0.08); border-radius: 14px; border: 1px solid rgba(239,68,68,0.15); text-align: left; }
-        .withdraw-section .form-group { margin-bottom: 12px; }
-        .withdraw-section .form-group label { font-size: 12px; color: #94a3b8; margin-bottom: 5px; display: block; }
-        .withdraw-section .form-group input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #fff; font-size: 14px; outline: none; }
-        .withdraw-section .withdraw-btn { margin-top: 8px; padding: 12px 20px; background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; width: 100%; font-size: 15px; transition: all 0.3s ease; }
-        .withdraw-section .withdraw-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        /* ================== GAME SECTION ================== */
-        .game-section { background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(59,130,246,0.15)); border: 2px solid rgba(139,92,246,0.3); border-radius: 16px; padding: 16px; margin: 16px 0; text-align: center; }
-        .game-section .game-title { font-size: 16px; font-weight: 700; color: #8b5cf6; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .game-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .game-card { background: rgba(255,255,255,0.05); padding: 18px 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); text-align: center; cursor: pointer; transition: 0.3s; }
-        .game-card:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); border-color: #8b5cf6; }
-        .game-card .game-icon { font-size: 32px; margin-bottom: 6px; }
-        .game-card .game-name { font-size: 14px; font-weight: 700; color: #fff; }
-        .game-card .game-desc { font-size: 11px; color: #94a3b8; margin-top: 4px; }
-        .game-card .game-bet { font-size: 10px; color: #fbbf24; margin-top: 4px; }
-
-        /* ================== GAME OVERLAY ================== */
-        .game-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 20px; }
-        .game-overlay.show { display: flex; }
-        .game-container { background: rgba(30,41,59,0.98); padding: 20px; border-radius: 20px; width: 90%; max-width: 380px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
-        .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .game-header .back-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; }
-        .game-header .game-info { color: #94a3b8; font-size: 12px; }
-        .game-content { padding: 10px 0; }
-        .game-dice-container { display: flex; justify-content: center; gap: 30px; margin: 20px 0; }
-        .game-dice { width: 80px; height: 80px; background: rgba(255,255,255,0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 40px; border: 2px solid rgba(255,255,255,0.2); transition: all 0.3s ease; }
-        .game-dice.rolling { animation: diceRoll 0.5s ease; }
-        @keyframes diceRoll { 0% { transform: rotate(0deg); } 25% { transform: rotate(90deg); } 50% { transform: rotate(180deg); } 75% { transform: rotate(270deg); } 100% { transform: rotate(360deg); } }
-        .game-dice.win { border-color: #10b981; box-shadow: 0 0 20px rgba(16,185,129,0.3); }
-        .game-dice.lose { border-color: #ef4444; box-shadow: 0 0 20px rgba(239,68,68,0.3); }
-        .game-cards { display: flex; justify-content: center; gap: 20px; margin: 20px 0; }
-        .game-card-item { width: 70px; height: 100px; background: linear-gradient(135deg, #1e293b, #334155); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 28px; font-weight: 900; border: 2px solid rgba(255,255,255,0.2); transition: all 0.3s ease; position: relative; }
-        .game-card-item.win { border-color: #10b981; box-shadow: 0 0 20px rgba(16,185,129,0.3); }
-        .game-card-item.lose { border-color: #ef4444; box-shadow: 0 0 20px rgba(239,68,68,0.3); }
-        .game-card-item .card-suit { font-size: 24px; }
-        .game-card-item .card-value { font-size: 20px; font-weight: 900; }
-        .game-target { position: relative; width: 200px; height: 200px; margin: 20px auto; }
-        .game-target-circle { position: absolute; border-radius: 50%; border: 3px solid rgba(255,255,255,0.3); }
-        .game-target-circle.outer { width: 100%; height: 100%; top: 0; left: 0; background: rgba(239,68,68,0.1); }
-        .game-target-circle.mid { width: 60%; height: 60%; top: 20%; left: 20%; background: rgba(251,191,36,0.1); }
-        .game-target-circle.inner { width: 20%; height: 20%; top: 40%; left: 40%; background: rgba(16,185,129,0.2); border-color: #10b981; }
-        .game-target-dot { position: absolute; width: 12px; height: 12px; background: #fbbf24; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 10px #fbbf24; }
-
-        /* ================== BOTTOM NAV ================== */
-        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; background: rgba(15,23,42,0.95); backdrop-filter: blur(24px); display: flex; justify-content: space-around; padding: 10px 4px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; color: #64748b; font-size: 10px; cursor: pointer; flex: 1; }
-        .nav-item.active { color: #fbbf24; }
-        .nav-item i { font-size: 20px; }
-
-        /* ================== MODALS ================== */
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 9999; align-items: center; justify-content: center; }
-        .modal.active { display: flex; }
-        .modal-content { background: rgba(30,41,59,0.95); padding: 25px; border-radius: 20px; width: 90%; max-width: 350px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
-        .modal-content button { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; padding: 12px 30px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; margin-top: 15px; }
-
-        /* ================== TOAST ================== */
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #10b981; color: #fff; padding: 12px 24px; border-radius: 14px; font-weight: 700; z-index: 99999; display: none; font-size: 14px; }
-        .toast.show { display: block; animation: slideDown 0.4s ease; }
-        .toast.error { background: #ef4444; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-80px) translateX(-50%); } to { opacity: 1; transform: translateY(0) translateX(-50%); } }
-
-        /* ================== OVERLAYS ================== */
-        .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9998; display: none; overflow-y: auto; padding-bottom: 70px; }
-        .overlay.show { display: block; }
-        .overlay-header { background: rgba(15,23,42,0.95); padding: 15px 20px; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 10px; }
-        .overlay-header .back-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 8px 16px; border-radius: 10px; cursor: pointer; }
-        .level-overlay-content { padding: 15px; }
-        .current-level-card { background: rgba(255,255,255,0.05); border-radius: 20px; padding: 20px; text-align: center; margin-bottom: 20px; border: 2px solid rgba(251,191,36,0.2); }
-        .level-progress { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin: 8px 0; }
-        .level-progress .fill { height: 100%; background: linear-gradient(90deg, #fbbf24, #f59e0b); border-radius: 10px; transition: width 0.5s ease; }
-        .level-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-        .level-card { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.08); }
-        .level-card.current { border: 2px solid #fbbf24; background: rgba(251,191,36,0.08); }
-        .level-card.unlocked { border-color: rgba(16,185,129,0.3); }
-        .level-card.locked { opacity: 0.4; }
-        .history-card { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 12px; margin-top: 12px; max-height: 250px; overflow-y: auto; }
-        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px; }
-        .floating-coin { position: fixed; font-size: 30px; pointer-events: none; z-index: 1000; animation: floatUp 1s ease-out forwards; }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-150px) scale(0.5); } }
-        .hidden { display: none !important; }
-        .banned-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 99999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; }
-        .banned-overlay.show { display: flex; }
-        .level-filters { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; }
-        .level-filters .lvl-filter-btn { padding: 5px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #94a3b8; cursor: pointer; font-size: 11px; white-space: nowrap; }
-        .level-filters .lvl-filter-btn.active { background: linear-gradient(135deg, #fbbf24, #f59e0b); border-color: transparent; color: #0f172a; }
-        .webview-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #0f172a; z-index: 99999; display: none; flex-direction: column; }
-        .webview-overlay.show { display: flex; }
-        .webview-header { background: #1e293b; padding: 12px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #334155; }
-        .webview-header .back-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 14px; }
-        .webview-header .timer-badge { background: rgba(251,191,36,0.2); color: #fbbf24; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 700; }
-        .webview-iframe { flex: 1; border: none; background: #fff; }
-        .webview-iframe iframe { width: 100%; height: 100%; border: none; }
-        .webview-footer { background: #1e293b; padding: 10px 16px; text-align: center; border-top: 1px solid #334155; }
-        .webview-footer .claim-btn { background: linear-gradient(135deg, #10b981, #059669); color: #fff; padding: 10px 30px; border: none; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; width: 100%; max-width: 300px; transition: all 0.3s ease; }
-        .webview-footer .claim-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .rules-text { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; font-size: 12px; color: #94a3b8; border: 1px solid rgba(255,255,255,0.05); }
-        .rules-text strong { color: #fbbf24; }
-        .rules-text .rule-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
-        .method-selector { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-        .method-btn { padding: 8px 16px; border-radius: 10px; border: 2px solid #334155; background: #1e293b; color: #94a3b8; cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.3s ease; flex: 1; min-width: 70px; text-align: center; }
-        .method-btn.active { border-color: #10b981; background: rgba(16,185,129,0.15); color: #10b981; }
-        .method-btn:hover { border-color: #64748b; }
-        .method-btn i { margin-right: 6px; }
-        .network-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 999999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; }
-        .network-overlay.show { display: flex; }
-        .network-overlay .icon { font-size: 60px; color: #ef4444; margin-bottom: 16px; }
-        .network-overlay h2 { color: #fff; font-size: 22px; margin-bottom: 8px; }
-        .network-overlay p { color: #94a3b8; font-size: 14px; }
-        .network-overlay .retry-btn { margin-top: 20px; padding: 12px 30px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none; border-radius: 12px; color: #fff; font-weight: 700; font-size: 16px; cursor: pointer; }
-        .security-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9999999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; }
-        .security-overlay.show { display: flex; }
-        .security-overlay h1 { color: #ef4444; font-size: 28px; margin-bottom: 12px; }
-        .security-overlay p { color: #94a3b8; font-size: 16px; margin-bottom: 20px; }
-        .security-overlay button { padding: 12px 30px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none; border-radius: 12px; color: #fff; font-weight: 700; font-size: 16px; cursor: pointer; }
-        #loadingPage { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 99999999; transition: opacity 0.5s ease; }
-        #loadingPage.hidden { opacity: 0; pointer-events: none; }
-        .loader-container { text-align: center; }
-        .loader-ring { width: 80px; height: 80px; border-radius: 50%; border: 8px solid transparent; border-top-color: #fbbf24; border-right-color: #f59e0b; border-bottom-color: #3b82f6; border-left-color: #8b5cf6; animation: spin 1s linear infinite; margin: 0 auto 20px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .loader-text { color: #fbbf24; font-size: 18px; font-weight: 700; letter-spacing: 2px; animation: pulseText 1.5s ease-in-out infinite; }
-        @keyframes pulseText { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-        .loader-sub { color: #94a3b8; font-size: 13px; margin-top: 8px; }
-
-        /* ================== FLOATING SPIN BUTTON ================== */
-        #floatingSpinBtn { position: fixed; right: 20px; bottom: 120px; width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #f59e0b); color: #fff; border: none; box-shadow: 0 4px 20px rgba(249,115,22,0.4); cursor: grab; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.3s ease; touch-action: none; }
-        #floatingSpinBtn:active { cursor: grabbing; }
-        #floatingSpinBtn:disabled { opacity: 0.6; cursor: not-allowed; }
-        #floatingSpinBtn .spin-icon { font-size: 28px; animation: spinFloat 4s linear infinite; }
-        #floatingSpinBtn:disabled .spin-icon { animation: none; }
-        @keyframes spinFloat { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        #floatingSpinBtn .spin-badge { position: absolute; top: -5px; right: -5px; background: #ef4444; color: #fff; border-radius: 50%; padding: 2px 8px; font-size: 12px; font-weight: 700; }
-
-        /* ================== SPIN WHEEL MODAL ================== */
-        .spin-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 99999; display: none; align-items: center; justify-content: center; }
-        .spin-modal-overlay.show { display: flex; }
-        .spin-modal-content { background: rgba(30,41,59,0.95); padding: 25px; border-radius: 24px; width: 90%; max-width: 400px; text-align: center; border: 1px solid rgba(255,255,255,0.1); position: relative; }
-        .spin-modal-content .close-modal-btn { position: absolute; top: 10px; right: 15px; background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; z-index: 20; }
-        .wheel-wrapper-new { position: relative; width: 280px; height: 280px; margin: 0 auto 15px; display: flex; justify-content: center; align-items: center; }
-        .wheel-outer-rim { position: absolute; width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(from 0deg, #7c3aed, #6d28d9, #7c3aed, #6d28d9, #7c3aed); padding: 12px; box-shadow: 0 0 30px rgba(124,58,237,0.3); }
-        .wheel-bulbs { position: absolute; width: 100%; height: 100%; border-radius: 50%; top: 0; left: 0; }
-        .wheel-bulb { position: absolute; width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 0 10px #fff, 0 0 20px #fff; animation: bulbBlink 1s infinite alternate; }
-        .wheel-bulb:nth-child(odd) { animation-delay: 0.5s; }
-        @keyframes bulbBlink { 0% { opacity: 0.3; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); } }
-        .wheel-inner { position: absolute; width: calc(100% - 24px); height: calc(100% - 24px); border-radius: 50%; overflow: hidden; background: #1a1a2e; }
-        .wheel-segments { width: 100%; height: 100%; position: relative; transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1); }
-        .wheel-segment { position: absolute; width: 50%; height: 50%; top: 0; left: 50%; transform-origin: 0% 100%; display: flex; align-items: center; justify-content: flex-start; padding-left: 20%; font-size: 12px; font-weight: 700; color: #0f172a; }
-        .wheel-segment span { background: rgba(255,255,255,0.7); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
-        .wheel-center-logo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #fbbf24, #f59e0b); display: flex; align-items: center; justify-content: center; font-size: 30px; color: #0f172a; font-weight: 900; box-shadow: 0 0 30px rgba(251,191,36,0.3); z-index: 10; border: 3px solid #7c3aed; }
-        .wheel-pointer-new { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 18px solid transparent; border-right: 18px solid transparent; border-top: 30px solid #fbbf24; z-index: 15; filter: drop-shadow(0 4px 10px rgba(251,191,36,0.5)); }
-        .spin-btn-new { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; padding: 14px 40px; border: none; border-radius: 30px; font-weight: 900; font-size: 18px; cursor: pointer; transition: all 0.3s ease; width: 100%; max-width: 220px; margin-top: 5px; box-shadow: 0 4px 15px rgba(251,191,36,0.3); }
-        .spin-btn-new:disabled { opacity: 0.5; cursor: not-allowed; }
-        .spin-timer-box-new { display: none; background: rgba(249,115,22,0.15); border: 2px solid rgba(249,115,22,0.3); border-radius: 15px; padding: 12px; margin-top: 10px; text-align: center; }
-        .spin-timer-box-new.show { display: block; }
-        .spin-timer-box-new .timer-label { font-size: 12px; color: #94a3b8; }
-        .spin-timer-box-new .timer-time { font-size: 24px; font-weight: 700; color: #fbbf24; }
-        .spin-result-new { margin-top: 10px; font-size: 18px; font-weight: 700; color: #10b981; min-height: 30px; }
-
-        /* ================== NOTIFICATION OVERLAY ================== */
-        .notification-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9998; display: none; overflow-y: auto; padding-bottom: 70px; }
-        .notification-overlay.show { display: block; }
-        .notification-overlay-header { background: rgba(15,23,42,0.95); padding: 15px 20px; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 10px; }
-        .notification-overlay-header .back-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 8px 16px; border-radius: 10px; cursor: pointer; }
-        .notification-item { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 14px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.08); }
-        .notification-item .notif-title { font-size: 14px; font-weight: 600; color: #fff; }
-        .notification-item .notif-message { font-size: 12px; color: #94a3b8; margin-top: 4px; }
-        .notification-item .notif-time { font-size: 10px; color: #64748b; margin-top: 4px; }
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',-apple-system,sans-serif}
+        body{background:#0f172a;color:#e2e8f0;padding-bottom:80px;min-height:100vh;background:radial-gradient(circle at 20% 30%,#1e293b,#0f172a)}
+        .container{max-width:500px;margin:0 auto;padding:12px}
+        #maintenanceOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:9999999;display:none;align-items:center;justify-content:center;flex-direction:column;padding:24px;text-align:center}
+        #maintenanceOverlay.show{display:flex}
+        .header{background:rgba(255,255,255,0.05);backdrop-filter:blur(12px);padding:14px 18px;border-radius:20px;margin-bottom:16px;box-shadow:0 8px 32px rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1)}
+        .user-info{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+        .avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;color:#fff}
+        .user-details h3{font-size:15px;font-weight:600;color:#fff}
+        .level-badge{display:inline-block;background:rgba(251,191,36,0.15);padding:3px 12px;border-radius:20px;font-size:11px;cursor:pointer;border:1px solid rgba(251,191,36,0.3);color:#fbbf24}
+        .balance-card{background:rgba(255,255,255,0.05);padding:14px;border-radius:16px;border:1px solid rgba(255,255,255,0.1)}
+        .balance-amount{font-size:32px;font-weight:900;background:linear-gradient(to right,#fcd34d,#fbbf24,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .usd-value{color:#10b981;font-size:15px;font-weight:bold}
+        .daily-bonus{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0f172a;padding:14px 18px;border-radius:16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;margin-bottom:16px;box-shadow:0 4px 15px rgba(251,191,36,0.3);font-weight:700;border:2px solid rgba(251,191,36,0.5)}
+        .mining-circle-wrapper{display:flex;justify-content:center;align-items:center;margin:15px 0;position:relative}
+        .mining-circle{position:relative;width:250px;height:250px;border-radius:50%;background:conic-gradient(#fbbf24 100%,#1e293b 100%);display:flex;justify-content:center;align-items:center;box-shadow:0 0 50px rgba(251,191,36,0.2);cursor:pointer}
+        .circle-start-overlay{position:absolute;top:0;left:0;width:100%;height:100%;border-radius:50%;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:10;cursor:pointer;border:3px solid rgba(251,191,36,0.4)}
+        .circle-start-overlay.hidden{opacity:0;pointer-events:none}
+        .circle-start-overlay .start-icon{font-size:48px;margin-bottom:8px;animation:bounceIcon 1.5s infinite}
+        @keyframes bounceIcon{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+        .circle-start-overlay .start-text{font-size:20px;font-weight:900;color:#fbbf24;text-shadow:0 0 20px rgba(251,191,36,0.5)}
+        .inner-circle{width:170px;height:170px;border-radius:50%;background:#0f172a;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:5;border:2px solid rgba(255,255,255,0.08)}
+        .coin-icon{font-size:32px;margin-bottom:5px;animation:coinSpin 3s linear infinite}
+        @keyframes coinSpin{0%{transform:rotateY(0deg)}100%{transform:rotateY(360deg)}}
+        .coin-count{font-size:30px;font-weight:900;color:#fbbf24}
+        .speed-boost-btn{color:#fff;padding:10px 20px;border:none;border-radius:25px;font-weight:700;font-size:13px;cursor:pointer;background:linear-gradient(135deg,#f97316,#f59e0b);width:100%;max-width:250px;margin:12px auto;display:block}
+        .page{display:none;min-height:60vh;padding-top:8px}
+        .page.active{display:block}
+        .page-header{font-size:20px;font-weight:800;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.1);background:linear-gradient(135deg,#fbbf24,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .game-section{background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(59,130,246,0.15));border:2px solid rgba(139,92,246,0.3);border-radius:16px;padding:16px;margin:16px 0;text-align:center}
+        .game-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+        .game-card{background:rgba(255,255,255,0.05);padding:18px 14px;border-radius:14px;border:1px solid rgba(255,255,255,0.1);text-align:center;cursor:pointer;transition:0.3s}
+        .game-card:hover{background:rgba(255,255,255,0.1);transform:translateY(-2px);border-color:#8b5cf6}
+        .game-card .game-icon{font-size:32px;margin-bottom:6px}
+        .game-card .game-name{font-size:14px;font-weight:700;color:#fff}
+        .game-card .game-desc{font-size:11px;color:#94a3b8}
+        .game-card .game-bet{font-size:10px;color:#fbbf24;margin-top:4px}
+        .game-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.95);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px}
+        .game-overlay.show{display:flex}
+        .game-container{background:rgba(30,41,59,0.98);padding:20px;border-radius:20px;width:90%;max-width:380px;text-align:center;border:1px solid rgba(255,255,255,0.1)}
+        .game-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.1)}
+        .game-header .back-btn{background:rgba(255,255,255,0.1);border:none;color:#fff;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px}
+        .btn{padding:10px 20px;border-radius:8px;border:none;font-weight:700;cursor:pointer;font-size:13px;width:100%;margin-top:8px}
+        .btn-primary{background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff}
+        .btn-success{background:linear-gradient(135deg,#10b981,#059669);color:#fff}
+        .btn-warning{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000}
+        .btn:disabled{opacity:0.5}
+        .bet-input{display:flex;align-items:center;gap:6px;justify-content:center;flex-wrap:wrap;margin:10px 0}
+        .bet-input input{width:80px;padding:8px;border-radius:8px;border:1px solid #334155;background:#1e293b;color:#fff;font-size:14px;text-align:center}
+        .bet-preset{padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#94a3b8;cursor:pointer;font-size:11px}
+        .bet-preset:hover{background:rgba(139,92,246,0.2);border-color:#8b5cf6;color:#fff}
+        .dice-row{display:flex;justify-content:center;gap:30px;margin:20px 0}
+        .dice-box{width:70px;height:70px;background:rgba(255,255,255,0.1);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:36px;border:2px solid rgba(255,255,255,0.2)}
+        .dice-box.win{border-color:#10b981;box-shadow:0 0 20px rgba(16,185,129,0.3)}
+        .dice-box.lose{border-color:#ef4444}
+        .card-row{display:flex;justify-content:center;gap:20px;margin:20px 0}
+        .card-display{width:60px;height:85px;background:linear-gradient(135deg,#1e293b,#334155);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;border:2px solid rgba(255,255,255,0.2)}
+        .card-display.win{border-color:#10b981;box-shadow:0 0 20px rgba(16,185,129,0.3)}
+        .card-display.lose{border-color:#ef4444}
+        .target-circle{width:150px;height:150px;border-radius:50%;border:3px solid rgba(255,255,255,0.3);margin:20px auto;position:relative;background:rgba(239,68,68,0.1)}
+        .target-inner{position:absolute;width:60px;height:60px;border-radius:50%;background:rgba(16,185,129,0.2);border:2px solid #10b981;top:50%;left:50%;transform:translate(-50%,-50%)}
+        .target-dot{position:absolute;width:10px;height:10px;background:#fbbf24;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);box-shadow:0 0 10px #fbbf24}
+        .status-text{font-size:16px;font-weight:700;margin:12px 0;min-height:30px}
+        .status-text.win{color:#10b981}.status-text.lose{color:#ef4444}.status-text.draw{color:#fbbf24}
+        .reward-text{color:#10b981;font-size:14px;font-weight:700;margin:8px 0}
+        .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:500px;background:rgba(15,23,42,0.95);backdrop-filter:blur(24px);display:flex;justify-content:space-around;padding:10px 4px;border-top:1px solid rgba(255,255,255,0.05);z-index:1000}
+        .nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;color:#64748b;font-size:10px;cursor:pointer;flex:1}
+        .nav-item.active{color:#fbbf24}
+        .nav-item i{font-size:20px}
+        .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#10b981;color:#fff;padding:12px 24px;border-radius:14px;font-weight:700;z-index:99999;display:none;font-size:14px}
+        .toast.show{display:block;animation:slideDown 0.4s ease}
+        .toast.error{background:#ef4444}
+        @keyframes slideDown{from{opacity:0;transform:translateY(-80px) translateX(-50%)}to{opacity:1;transform:translateY(0) translateX(-50%)}}
+        .floating-coin{position:fixed;font-size:30px;pointer-events:none;z-index:1000;animation:floatUp 1s ease-out forwards}
+        @keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-150px) scale(0.5)}}
+        .notification-bell{position:relative;cursor:pointer;margin-left:auto;color:#94a3b8}
+        .notification-bell:hover{color:#fbbf24}
+        .notification-bell .bell-icon{font-size:22px}
+        .notification-bell .badge{position:absolute;top:-5px;right:-5px;background:#ef4444;color:#fff;border-radius:50%;padding:2px 6px;font-size:10px;font-weight:700;display:none}
+        .overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.95);z-index:9998;display:none;overflow-y:auto;padding-bottom:70px}
+        .overlay.show{display:block}
+        .overlay-header{background:rgba(15,23,42,0.95);padding:15px 20px;position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:10px}
+        .overlay-header .back-btn{background:rgba(255,255,255,0.1);border:none;color:#fff;padding:8px 16px;border-radius:10px;cursor:pointer}
+        .notification-item{background:rgba(255,255,255,0.03);border-radius:12px;padding:14px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08)}
+        .notification-item .notif-title{font-size:14px;font-weight:600;color:#fff}
+        .notification-item .notif-message{font-size:12px;color:#94a3b8;margin-top:4px}
+        .notification-item .notif-time{font-size:10px;color:#64748b;margin-top:4px}
+        .level-progress{width:100%;height:8px;background:rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;margin:8px 0}
+        .level-progress .fill{height:100%;background:linear-gradient(90deg,#fbbf24,#f59e0b);border-radius:10px;transition:width 0.5s ease}
+        .network-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.95);z-index:999999;display:none;align-items:center;justify-content:center;flex-direction:column;padding:24px;text-align:center}
+        .network-overlay.show{display:flex}
+        .network-overlay .retry-btn{margin-top:20px;padding:12px 30px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border:none;border-radius:12px;color:#fff;font-weight:700;font-size:16px;cursor:pointer}
+        .security-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.95);z-index:9999999;display:none;align-items:center;justify-content:center;flex-direction:column;padding:24px;text-align:center}
+        .security-overlay.show{display:flex}
+        #loadingPage{position:fixed;top:0;left:0;width:100%;height:100%;background:#0f172a;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:99999999;transition:opacity 0.5s ease}
+        #loadingPage.hidden{opacity:0;pointer-events:none}
+        .loader-ring{width:80px;height:80px;border-radius:50%;border:8px solid transparent;border-top-color:#fbbf24;border-right-color:#f59e0b;border-bottom-color:#3b82f6;border-left-color:#8b5cf6;animation:spin 1s linear infinite;margin:0 auto 20px}
+        @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+        .loader-text{color:#fbbf24;font-size:18px;font-weight:700}
+        .xo-board{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:15px 0;max-width:280px;margin-left:auto;margin-right:auto}
+        .xo-cell{aspect-ratio:1;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.15);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:900;cursor:pointer;color:#fff}
+        .xo-cell.x-player{color:#3b82f6}.xo-cell.o-player{color:#ef4444}
+        .xo-cell.win-cell{animation:winPulse 0.8s infinite;background:rgba(16,185,129,0.2);border-color:#10b981}
+        @keyframes winPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+        .xo-online-players{display:flex;justify-content:space-around;margin:10px 0;gap:10px}
+        .xo-player-badge{background:rgba(255,255,255,0.05);padding:10px;border-radius:10px;flex:1;font-size:12px;text-align:center;border:1px solid rgba(255,255,255,0.1)}
+        .xo-player-badge .player-symbol{font-size:28px;font-weight:900}
+        .rules-text{background:rgba(255,255,255,0.03);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:12px;color:#94a3b8;border:1px solid rgba(255,255,255,0.05)}
+        .rules-text .rule-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:6px}
+        .method-selector{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+        .method-btn{padding:8px 16px;border-radius:10px;border:2px solid #334155;background:#1e293b;color:#94a3b8;cursor:pointer;font-weight:600;font-size:13px;flex:1;min-width:70px;text-align:center}
+        .method-btn.active{border-color:#10b981;background:rgba(16,185,129,0.15);color:#10b981}
+        .wallet-card{background:rgba(255,255,255,0.03);padding:20px 16px;border-radius:20px;text-align:center;border:1px solid rgba(255,255,255,0.08);margin-bottom:15px}
+        .withdraw-section{margin-top:15px;padding:15px;background:rgba(239,68,68,0.08);border-radius:14px;border:1px solid rgba(239,68,68,0.15);text-align:left}
+        .form-group{margin-bottom:12px}
+        .form-group label{font-size:12px;color:#94a3b8;margin-bottom:5px;display:block}
+        .form-group input{width:100%;padding:10px;border-radius:8px;border:1px solid #334155;background:#1e293b;color:#fff;font-size:14px;outline:none}
+        .task-filters{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto}
+        .task-filters .filter-btn{padding:5px 14px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:#94a3b8;cursor:pointer;font-size:11px;white-space:nowrap}
+        .task-filters .filter-btn.active{background:linear-gradient(135deg,#8b5cf6,#3b82f6);border-color:transparent;color:#fff}
+        .task-card{background:rgba(255,255,255,0.03);border-radius:14px;padding:14px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.08)}
+        .task-card .task-header{display:flex;justify-content:space-between;align-items:center}
+        .task-card .task-title{font-size:14px;font-weight:600;color:#fff}
+        .task-card .task-reward{color:#10b981;font-weight:bold;font-size:14px}
+        .task-card .task-btn{background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;padding:6px 18px;border-radius:10px;border:none;font-weight:700;cursor:pointer;font-size:12px}
+        .history-card{background:rgba(255,255,255,0.03);border-radius:12px;padding:12px;margin-top:12px;max-height:250px;overflow-y:auto}
+        .history-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:12px}
+        .banned-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.95);z-index:99999;display:none;align-items:center;justify-content:center;flex-direction:column;padding:24px;text-align:center}
+        .banned-overlay.show{display:flex}
+        .webview-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:#0f172a;z-index:99999;display:none;flex-direction:column}
+        .webview-overlay.show{display:flex}
+        .webview-header{background:#1e293b;padding:12px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #334155}
+        .webview-header .back-btn{background:rgba(255,255,255,0.1);border:none;color:#fff;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:14px}
+        .webview-iframe{flex:1;border:none;background:#fff}
+        .webview-iframe iframe{width:100%;height:100%;border:none}
+        .webview-footer{background:#1e293b;padding:10px 16px;text-align:center;border-top:1px solid #334155}
+        .webview-footer .claim-btn{background:linear-gradient(135deg,#10b981,#059669);color:#fff;padding:10px 30px;border:none;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer;width:100%;max-width:300px}
+        #floatingSpinBtn{position:fixed;right:20px;bottom:120px;width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#f97316,#f59e0b);color:#fff;border:none;box-shadow:0 4px 20px rgba(249,115,22,0.4);cursor:pointer;z-index:999;display:flex;align-items:center;justify-content:center;font-size:24px}
+        .spin-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:99999;display:none;align-items:center;justify-content:center}
+        .spin-modal-overlay.show{display:flex}
+        .spin-modal-content{background:rgba(30,41,59,0.95);padding:25px;border-radius:24px;width:90%;max-width:400px;text-align:center;border:1px solid rgba(255,255,255,0.1)}
     </style>
 </head>
 <body>
-    <!-- ================== LOADING PAGE ================== -->
-    <div id="loadingPage">
-        <div class="loader-container">
-            <div class="loader-ring"></div>
-            <div class="loader-text">CoinQuest</div>
-            <div class="loader-sub">⏳ Loading your data...</div>
-        </div>
-    </div>
+    <div id="loadingPage"><div class="loader-ring"></div><div class="loader-text">CoinQuest</div><p style="color:#94a3b8;margin-top:8px;">⏳ Loading...</p></div>
+    <div id="maintenanceOverlay"><div class="icon"><i class="fas fa-tools"></i></div><h1 style="color:#fbbf24;">🔧 Under Maintenance</h1><p id="maintenanceMessage" style="color:#94a3b8;"></p></div>
+    <div class="security-overlay" id="securityOverlay"><h1 style="color:#ef4444;">🚫 Security Alert</h1><p style="color:#94a3b8;">Please close Developer Tools to continue.</p><button onclick="location.reload()" style="padding:12px 30px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border:none;border-radius:12px;color:#fff;font-weight:700;font-size:16px;cursor:pointer;margin-top:15px;">🔄 Reload</button></div>
+    <div class="network-overlay" id="networkOverlay"><div class="icon"><i class="fas fa-wifi" style="font-size:60px;color:#ef4444;"></i></div><h2 style="color:#fff;">🔌 No Internet</h2><p style="color:#94a3b8;">Check connection.</p><button class="retry-btn" onclick="location.reload()">🔄 Retry</button></div>
+    <div class="banned-overlay" id="bannedOverlay"><h1 style="color:#ef4444;">🚫 Banned</h1><p style="color:#94a3b8;">Account suspended.</p><div id="banReason" style="color:#fbbf24;margin:10px 0;"></div><button id="appealBtn" onclick="submitBanAppeal()" style="padding:12px 30px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border:none;border-radius:12px;color:#fff;font-weight:700;cursor:pointer;">📩 Appeal</button></div>
 
-    <!-- ================== MAINTENANCE OVERLAY ================== -->
-    <div id="maintenanceOverlay"><div class="icon"><i class="fas fa-tools"></i></div><h1>🔧 Under Maintenance</h1><p id="maintenanceMessage">We are currently updating the app. Please come back later.</p></div>
+    <!-- GAME OVERLAYS -->
+    <div class="game-overlay" id="xoGameOverlay"><div class="game-container"><div class="game-header"><button class="back-btn" onclick="closeXOGame()"><i class="fas fa-arrow-left"></i> Back</button><span style="color:#94a3b8;">🎮 Tic-Tac-Toe</span></div><div id="xoModeSelect"><h3 style="color:#fbbf24;margin:10px 0;">Select Mode</h3><div class="game-grid"><div class="game-card" onclick="startXOMode('computer')"><div class="game-icon">🤖</div><div class="game-name">vs Computer</div><div class="game-bet">100-500 | +10%</div></div><div class="game-card" onclick="startXOMode('online')"><div class="game-icon">🌐</div><div class="game-name">Online</div><div class="game-bet">100-500 | +10%</div></div></div></div><div id="xoBetSection" style="display:none;"><p style="color:#fbbf24;">💰 Entry: 100-500 | Win: +10%</p><div class="bet-input"><span class="bet-preset" onclick="setXOBet(100)">100</span><span class="bet-preset" onclick="setXOBet(200)">200</span><input type="number" id="xoBet" value="100" min="100" max="500"><span class="bet-preset" onclick="setXOBet(300)">300</span><span class="bet-preset" onclick="setXOBet(500)">500</span></div><button class="btn btn-primary" onclick="playXOPaid()">🎮 Pay & Play</button><button class="btn btn-success" onclick="playXOFree()">📺 Ad & Play (+20🪙)</button></div><div id="xoGameBoard" style="display:none;"><div class="xo-online-players" id="xoPlayers"><div class="xo-player-badge"><div style="font-size:11px;">You (X)</div><div class="player-symbol x-player">X</div></div><div style="display:flex;align-items:center;font-size:20px;color:#fbbf24;">VS</div><div class="xo-player-badge"><div style="font-size:11px;">Opp (O)</div><div class="player-symbol o-player">O</div></div></div><div class="xo-board" id="xoBoard"></div><div class="status-text" id="xoStatus">Your turn!</div><div class="reward-text" id="xoReward"></div><button class="btn btn-warning" id="xoReplay" onclick="restartXO()" style="display:none;">🔄 Play Again</button></div><div id="xoOnlineInfo" style="display:none;color:#fbbf24;padding:10px;">🔍 Searching...</div></div></div>
 
-    <!-- ================== SECURITY OVERLAY ================== -->
-    <div class="security-overlay" id="securityOverlay"><h1>🚫 Security Alert</h1><p>Unauthorized access detected! Please close Developer Tools to continue.</p><button onclick="location.reload()">🔄 Reload Page</button></div>
+    <div class="game-overlay" id="diceGameOverlay"><div class="game-container"><div class="game-header"><button class="back-btn" onclick="closeDiceGame()"><i class="fas fa-arrow-left"></i> Back</button><span style="color:#94a3b8;">🎲 Dice Roll</span></div><div id="diceBetSection"><p style="color:#fbbf24;">💰 Entry: 100-500 | Win: +15%</p><div class="bet-input"><span class="bet-preset" onclick="setDiceBet(100)">100</span><span class="bet-preset" onclick="setDiceBet(200)">200</span><input type="number" id="diceBet" value="100" min="100" max="500"><span class="bet-preset" onclick="setDiceBet(300)">300</span><span class="bet-preset" onclick="setDiceBet(500)">500</span></div><button class="btn btn-primary" onclick="playDicePaid()">🎲 Pay & Roll</button><button class="btn btn-success" onclick="playDiceFree()">📺 Ad & Roll (+20🪙)</button></div><div id="diceGameBoard" style="display:none;"><div class="dice-row"><div style="text-align:center"><div style="font-size:11px;">YOU</div><div class="dice-box" id="pDice">🎲</div></div><div style="text-align:center"><div style="font-size:11px;">OPP</div><div class="dice-box" id="oDice">🎲</div></div></div><div class="status-text" id="diceStatus">Rolling...</div><div class="reward-text" id="diceReward"></div><button class="btn btn-warning" id="diceReplay" onclick="resetDice()" style="display:none;">🔄 Roll Again</button></div></div></div>
 
-    <!-- ================== NETWORK OVERLAY ================== -->
-    <div class="network-overlay" id="networkOverlay"><div class="icon"><i class="fas fa-wifi"></i></div><h2>🔌 No Internet Connection</h2><p>Please check your network connection and try again.</p><button class="retry-btn" onclick="checkNetworkAndReload()"><i class="fas fa-sync"></i> Retry</button></div>
+    <div class="game-overlay" id="cardGameOverlay"><div class="game-container"><div class="game-header"><button class="back-btn" onclick="closeCardGame()"><i class="fas fa-arrow-left"></i> Back</button><span style="color:#94a3b8;">🃏 Card Draw</span></div><div id="cardBetSection"><p style="color:#fbbf24;">💰 Entry: 100-500 | Win: +12%</p><div class="bet-input"><span class="bet-preset" onclick="setCardBet(100)">100</span><span class="bet-preset" onclick="setCardBet(200)">200</span><input type="number" id="cardBet" value="100" min="100" max="500"><span class="bet-preset" onclick="setCardBet(300)">300</span><span class="bet-preset" onclick="setCardBet(500)">500</span></div><button class="btn btn-primary" onclick="playCardPaid()">🃏 Pay & Draw</button><button class="btn btn-success" onclick="playCardFree()">📺 Ad & Draw (+20🪙)</button></div><div id="cardGameBoard" style="display:none;"><div class="card-row"><div style="text-align:center"><div style="font-size:11px;">YOU</div><div class="card-display" id="pCard">?</div></div><div style="text-align:center"><div style="font-size:11px;">OPP</div><div class="card-display" id="oCard">?</div></div></div><div class="status-text" id="cardStatus">Drawing...</div><div class="reward-text" id="cardReward"></div><button class="btn btn-warning" id="cardReplay" onclick="resetCard()" style="display:none;">🔄 Draw Again</button></div></div></div>
 
-    <!-- ================== BANNED OVERLAY ================== -->
-    <div class="banned-overlay" id="bannedOverlay"><h1>🚫 Account Banned</h1><p>Your account has been suspended.</p><div class="ban-reason" id="banReason"></div><button class="appeal-btn" id="appealBtn" onclick="submitBanAppeal()">📩 Submit Appeal</button><p id="appealStatus" style="display:none;"></p></div>
+    <div class="game-overlay" id="targetGameOverlay"><div class="game-container"><div class="game-header"><button class="back-btn" onclick="closeTargetGame()"><i class="fas fa-arrow-left"></i> Back</button><span style="color:#94a3b8;">🎯 Target Shoot</span></div><div id="targetBetSection"><p style="color:#fbbf24;">💰 Entry: 100-500 | Win: +20%</p><div class="bet-input"><span class="bet-preset" onclick="setTargetBet(100)">100</span><span class="bet-preset" onclick="setTargetBet(200)">200</span><input type="number" id="targetBet" value="100" min="100" max="500"><span class="bet-preset" onclick="setTargetBet(300)">300</span><span class="bet-preset" onclick="setTargetBet(500)">500</span></div><button class="btn btn-primary" onclick="playTargetPaid()">🎯 Pay & Shoot</button><button class="btn btn-success" onclick="playTargetFree()">📺 Ad & Shoot (+20🪙)</button></div><div id="targetGameBoard" style="display:none;"><div class="target-circle"><div class="target-inner"></div><div class="target-dot"></div></div><div class="status-text" id="targetStatus">Shooting...</div><div class="reward-text" id="targetReward"></div><button class="btn btn-warning" id="targetReplay" onclick="resetTarget()" style="display:none;">🎯 Shoot Again</button></div></div></div>
 
-    <!-- ================== LEVEL OVERLAY ================== -->
-    <div class="overlay" id="levelOverlay">
-        <div class="overlay-header"><button class="back-btn" onclick="closeLevelPage()"><i class="fas fa-arrow-left"></i> Back</button><h2 style="color:#fff;">🏆 Level System</h2></div>
-        <div class="level-overlay-content">
-            <div class="current-level-card">
-                <div class="level-emoji" id="lvlEmoji">🔒</div><div class="level-number" id="lvlNumber">Level 0</div>
-                <div class="level-name" id="lvlName">Unlocking</div>
-                <div style="margin-top:8px;"><span id="lvlXP">-5000 / 0 XP</span></div>
-                <div class="level-progress" style="margin-top:10px;"><div class="fill" id="lvlProgressFill" style="width:0%;"></div></div>
-                <div class="level-bonus" id="lvlBonus">Mining Bonus: +0%</div>
-            </div>
-            <div class="level-filters">
-                <button class="lvl-filter-btn active" onclick="filterLevels('all',this)">All</button>
-                <button class="lvl-filter-btn" onclick="filterLevels('bronze',this)">🥉 Bronze</button>
-                <button class="lvl-filter-btn" onclick="filterLevels('silver',this)">🥈 Silver</button>
-                <button class="lvl-filter-btn" onclick="filterLevels('gold',this)">🥇 Gold</button>
-                <button class="lvl-filter-btn" onclick="filterLevels('platinum',this)">💎 Platinum</button>
-                <button class="lvl-filter-btn" onclick="filterLevels('diamond',this)">👑 Diamond</button>
-            </div>
-            <div class="level-grid" id="levelGrid"></div>
-            <div class="rules-text" style="margin-top:15px;"><div class="rule-title">📋 Level Rules</div><div id="levelRulesText">Loading rules...</div></div>
-        </div>
-    </div>
+    <!-- NOTIFICATION OVERLAY -->
+    <div class="overlay" id="notificationOverlay"><div class="overlay-header"><button class="back-btn" onclick="closeNotifications()"><i class="fas fa-arrow-left"></i> Back</button><h2 style="color:#fff;">📨 Notifications</h2></div><div id="notificationList" style="padding:15px;"></div></div>
 
-    <!-- ================== AIRDROP OVERLAY ================== -->
-    <div class="overlay" id="airdropOverlay">
-        <div class="overlay-header"><button class="back-btn" onclick="closeAirdropPage()"><i class="fas fa-arrow-left"></i> Back</button><h2 style="color:#fff;">📢 Live AirDrop</h2></div>
-        <div style="padding:15px;">
-            <div style="background:rgba(255,255,255,0.05);border-radius:20px;padding:25px;text-align:center;border:2px solid rgba(251,191,36,0.3);">
-                <div id="airdropPoolDisplay" style="font-size:42px;font-weight:900;color:#fbbf24;">$50.0000</div>
-                <div id="airdropCountdown" style="font-size:36px;font-weight:bold;color:#fbbf24;margin:15px 0;">--:--:--</div>
-                <button id="airdropClaimBtn" onclick="claimAirdrop()" disabled style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:14px 30px;border:none;border-radius:30px;font-weight:700;font-size:16px;cursor:pointer;width:100%;transition:all 0.3s ease;">🎁 Claim</button>
-            </div>
-            <div class="rules-text" style="margin-top:15px;"><div class="rule-title">📋 Airdrop Rules</div><div id="airdropRulesText">Loading rules...</div></div>
-        </div>
-    </div>
+    <!-- WEBVIEW OVERLAY -->
+    <div class="webview-overlay" id="webviewOverlay"><div class="webview-header"><button class="back-btn" onclick="closeWebView()"><i class="fas fa-arrow-left"></i> Back</button><span id="webviewUrl" style="color:#94a3b8;">Loading...</span></div><div class="webview-iframe"><iframe id="webviewIframe" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe></div><div class="webview-footer"><button class="claim-btn" id="webviewClaimBtn" disabled onclick="claimWebViewTask()">⏳ Wait...</button></div></div>
 
-    <!-- ================== WEBVIEW OVERLAY ================== -->
-    <div class="webview-overlay" id="webviewOverlay">
-        <div class="webview-header"><button class="back-btn" onclick="closeWebView()"><i class="fas fa-arrow-left"></i> Back</button><span class="url-text" id="webviewUrlText">Loading...</span><span class="timer-badge" id="webviewTimer">⏱ 0s</span></div>
-        <div class="webview-iframe" id="webviewIframeContainer"><iframe id="webviewIframe" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe></div>
-        <div class="webview-footer"><button class="claim-btn" id="webviewClaimBtn" disabled onclick="claimWebViewTask()">⏳ Wait...</button></div>
-    </div>
-
-    <!-- ================== XO GAME OVERLAY ================== -->
-    <div class="xo-game-overlay" id="xoGameOverlay">
-        <div class="xo-game-container">
-            <div class="xo-game-header"><button class="back-btn" onclick="closeXOGame()"><i class="fas fa-arrow-left"></i> Back</button><span class="game-info" id="xoGameInfo">🎮 Tic-Tac-Toe</span></div>
-            <div id="xoModeSelection">
-                <h3 style="color:#fbbf24;margin-bottom:10px;">Select Game Mode</h3>
-                <div class="game-grid" style="grid-template-columns:1fr 1fr;">
-                    <div class="game-card" onclick="startXOGame('computer')"><div class="game-icon">🤖</div><div class="game-name">vs Computer</div><div class="game-desc">Play against AI</div><div class="game-bet">Entry: 100-500 🪙 | Win: 10%</div></div>
-                    <div class="game-card" onclick="startXOGame('online')"><div class="game-icon">🌐</div><div class="game-name">Online</div><div class="game-desc">Real players</div><div class="game-bet">Entry: 100-500 🪙 | Win: 10%</div></div>
-                </div>
-            </div>
-            <div id="xoBetSection" class="xo-bet-section" style="display:none;">
-                <label>💰 Entry Fee (100-500) | Win: +10% Bonus</label>
-                <div class="xo-bet-input">
-                    <span class="bet-preset" onclick="setXOBet(100)">100</span><span class="bet-preset" onclick="setXOBet(200)">200</span>
-                    <input type="number" id="xoBetAmount" value="100" min="100" max="500" step="50">
-                    <span class="bet-preset" onclick="setXOBet(300)">300</span><span class="bet-preset" onclick="setXOBet(500)">500</span>
-                </div>
-                <button class="xo-action-btn" id="xoStartGameBtn" onclick="confirmXOGame()">🎮 Pay & Play</button>
-                <button class="xo-action-btn free" onclick="playXOGameFree()">📺 Watch Ad (Get 20 🪙)</button>
-            </div>
-            <div id="xoOnlineInfo" class="xo-online-info" style="display:none;">🔍 Searching...</div>
-            <div id="xoGameBoard" style="display:none;">
-                <div class="xo-online-players" id="xoPlayersInfo">
-                    <div class="xo-player-badge" id="xoPlayer1Badge"><div style="font-size:11px;">You (X)</div><div class="player-symbol x-player">X</div></div>
-                    <div style="display:flex;align-items:center;font-size:20px;color:#fbbf24;">VS</div>
-                    <div class="xo-player-badge" id="xoPlayer2Badge"><div style="font-size:11px;">Opponent (O)</div><div class="player-symbol o-player">O</div></div>
-                </div>
-                <div class="xo-board" id="xoBoard"></div>
-                <div class="xo-status" id="xoStatus">Your turn!</div>
-                <div id="xoRewardInfo" style="color:#10b981;font-size:14px;font-weight:700;margin:8px 0;"></div>
-                <button class="xo-action-btn restart" id="xoRestartBtn" onclick="restartXOGame()" style="display:none;">🔄 Play Again</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ================== DICE GAME OVERLAY ================== -->
-    <div class="game-overlay" id="diceGameOverlay">
-        <div class="game-container">
-            <div class="game-header"><button class="back-btn" onclick="closeDiceGame()"><i class="fas fa-arrow-left"></i> Back</button><span class="game-info">🎲 Dice Roll</span></div>
-            <div id="diceBetSection" class="xo-bet-section">
-                <label>💰 Entry Fee (100-500) | Win: +15% Bonus</label>
-                <div class="xo-bet-input">
-                    <span class="bet-preset" onclick="setDiceBet(100)">100</span><span class="bet-preset" onclick="setDiceBet(200)">200</span>
-                    <input type="number" id="diceBetAmount" value="100" min="100" max="500" step="50">
-                    <span class="bet-preset" onclick="setDiceBet(300)">300</span><span class="bet-preset" onclick="setDiceBet(500)">500</span>
-                </div>
-                <button class="xo-action-btn" onclick="playDiceGamePaid()">🎮 Pay & Roll</button>
-                <button class="xo-action-btn free" onclick="playDiceGameFree()">📺 Watch Ad (Get 20 🪙)</button>
-            </div>
-            <div id="diceGameBoard" style="display:none;">
-                <div class="game-dice-container">
-                    <div style="text-align:center;"><div style="font-size:11px;color:#94a3b8;margin-bottom:5px;">YOU</div><div class="game-dice" id="playerDice">🎲</div></div>
-                    <div style="text-align:center;"><div style="font-size:11px;color:#94a3b8;margin-bottom:5px;">OPPONENT</div><div class="game-dice" id="opponentDice">🎲</div></div>
-                </div>
-                <div class="xo-status" id="diceStatus">Roll the dice!</div>
-                <div id="diceRewardInfo" style="color:#10b981;font-size:14px;font-weight:700;margin:8px 0;"></div>
-                <button class="xo-action-btn restart" onclick="resetDiceGame()" style="display:none;">🔄 Roll Again</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ================== TARGET GAME OVERLAY ================== -->
-    <div class="game-overlay" id="targetGameOverlay">
-        <div class="game-container">
-            <div class="game-header"><button class="back-btn" onclick="closeTargetGame()"><i class="fas fa-arrow-left"></i> Back</button><span class="game-info">🎯 Target Shoot</span></div>
-            <div id="targetBetSection" class="xo-bet-section">
-                <label>💰 Entry Fee (100-500) | Win: +20% Bonus</label>
-                <div class="xo-bet-input">
-                    <span class="bet-preset" onclick="setTargetBet(100)">100</span><span class="bet-preset" onclick="setTargetBet(200)">200</span>
-                    <input type="number" id="targetBetAmount" value="100" min="100" max="500" step="50">
-                    <span class="bet-preset" onclick="setTargetBet(300)">300</span><span class="bet-preset" onclick="setTargetBet(500)">500</span>
-                </div>
-                <button class="xo-action-btn" onclick="playTargetGamePaid()">🎯 Pay & Shoot</button>
-                <button class="xo-action-btn free" onclick="playTargetGameFree()">📺 Watch Ad (Get 20 🪙)</button>
-            </div>
-            <div id="targetGameBoard" style="display:none;">
-                <div class="game-target" id="targetDisplay">
-                    <div class="game-target-circle outer"></div>
-                    <div class="game-target-circle mid"></div>
-                    <div class="game-target-circle inner"></div>
-                    <div class="game-target-dot"></div>
-                </div>
-                <div class="xo-status" id="targetStatus">Shoot the target!</div>
-                <div id="targetRewardInfo" style="color:#10b981;font-size:14px;font-weight:700;margin:8px 0;"></div>
-                <button class="xo-action-btn restart" onclick="resetTargetGame()" style="display:none;">🎯 Shoot Again</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ================== CARD GAME OVERLAY ================== -->
-    <div class="game-overlay" id="cardGameOverlay">
-        <div class="game-container">
-            <div class="game-header"><button class="back-btn" onclick="closeCardGame()"><i class="fas fa-arrow-left"></i> Back</button><span class="game-info">🃏 Card Draw</span></div>
-            <div id="cardBetSection" class="xo-bet-section">
-                <label>💰 Entry Fee (100-500) | Win: +12% Bonus</label>
-                <div class="xo-bet-input">
-                    <span class="bet-preset" onclick="setCardBet(100)">100</span><span class="bet-preset" onclick="setCardBet(200)">200</span>
-                    <input type="number" id="cardBetAmount" value="100" min="100" max="500" step="50">
-                    <span class="bet-preset" onclick="setCardBet(300)">300</span><span class="bet-preset" onclick="setCardBet(500)">500</span>
-                </div>
-                <button class="xo-action-btn" onclick="playCardGamePaid()">🃏 Pay & Draw</button>
-                <button class="xo-action-btn free" onclick="playCardGameFree()">📺 Watch Ad (Get 20 🪙)</button>
-            </div>
-            <div id="cardGameBoard" style="display:none;">
-                <div class="game-cards">
-                    <div style="text-align:center;"><div style="font-size:11px;color:#94a3b8;margin-bottom:5px;">YOU</div><div class="game-card-item" id="playerCard"><span class="card-value">?</span><span class="card-suit">?</span></div></div>
-                    <div style="text-align:center;"><div style="font-size:11px;color:#94a3b8;margin-bottom:5px;">OPPONENT</div><div class="game-card-item" id="opponentCard"><span class="card-value">?</span><span class="card-suit">?</span></div></div>
-                </div>
-                <div class="xo-status" id="cardStatus">Draw a card!</div>
-                <div id="cardRewardInfo" style="color:#10b981;font-size:14px;font-weight:700;margin:8px 0;"></div>
-                <button class="xo-action-btn restart" onclick="resetCardGame()" style="display:none;">🃏 Draw Again</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- ================== MAIN CONTENT ============================= -->
-    <!-- ============================================================ -->
-    <div class="container main-content" id="mainContent">
+    <!-- MAIN CONTENT -->
+    <div class="container" id="mainContent">
         <div class="header">
             <div class="user-info">
                 <div class="avatar">👤</div>
-                <div class="user-details">
-                    <h3 id="userName">User</h3>
-                    <div class="last-login" id="lastLoginDisplay">📅 --</div>
-                    <span class="level-badge" onclick="openLevelPage()" id="userLevelBadge">🔒 Unlocking</span>
-                </div>
-                <div class="notification-bell" onclick="openNotificationPanel()"><i class="fas fa-bell bell-icon"></i><span class="badge" id="notifBadge">0</span></div>
+                <div class="user-details"><h3 id="userName">User</h3><span class="level-badge" onclick="openLevelPage()" id="userLevelBadge">🔒 Unlocking</span></div>
+                <div class="notification-bell" onclick="openNotifications()"><i class="fas fa-bell bell-icon"></i><span class="badge" id="notifBadge">0</span></div>
             </div>
             <div class="balance-card">
-                <div class="balance-label">💰 Coins Balance</div>
                 <div class="balance-amount" id="balance">0</div>
                 <div class="usd-value" id="usdValue">≈ $0.0000 USD</div>
-                <div style="margin-top:8px; border-top: 1px solid rgba(255,255,255,0.1); padding-top:8px;">
-                    <div style="display:flex; justify-content:space-between; font-size:14px; color:#94a3b8;"><span>💵 USD Balance</span><span id="usdBalanceDisplay" style="color:#10b981; font-weight:bold;">$0.0000</span></div>
-                    <div style="display:flex; justify-content:space-between; font-size:14px; color:#94a3b8; margin-top:4px;"><span>💰 Total Balance</span><span id="totalBalanceDisplay" style="color:#fbbf24; font-weight:bold;">0</span></div>
-                </div>
-                <div class="level-section" onclick="openLevelPage()">
-                    <div class="level-row"><span class="level-title" id="levelTitle">🔒 Unlocking</span><span class="level-number" id="levelNumber">Level 0</span></div>
-                    <div class="level-progress"><div class="fill" id="levelProgressFill" style="width:0%;"></div></div>
-                    <div style="font-size:9px;color:#94a3b8;display:flex;justify-content:space-between;"><span id="levelCurrentPoints">-5000 XP</span><span id="levelNextPoints">/ 5000 XP</span></div>
-                </div>
-                <div class="conversion-timer"><div class="label">⏰ Next Conversion</div><div class="time" id="conversionCountdown">--:--:--</div><div style="font-size:9px;color:#94a3b8;" id="rateInfo">1 USD = 1000 Coins</div></div>
+                <div style="margin-top:8px;display:flex;justify-content:space-between;font-size:14px;"><span>💵 USD</span><span id="usdBal" style="color:#10b981;">$0.0000</span></div>
+                <div class="level-progress"><div class="fill" id="levelBar" style="width:0;"></div></div>
+                <div style="font-size:9px;display:flex;justify-content:space-between;"><span id="lvlText">🔒 Unlocking</span><span id="lvlXp">-5000/5000 XP</span></div>
             </div>
         </div>
+        <div class="daily-bonus" onclick="claimDailyBonus()"><span>🎁 Daily Bonus</span><span id="dailyStatus">🎯 Claim</span></div>
 
-        <div class="daily-bonus" onclick="claimDailyBonus()"><div class="bonus-left"><span>🎁</span><span>Daily Bonus</span></div><div class="bonus-status" id="dailyBonusStatus">🎯 Claim Now</div></div>
-
-        <!-- HOME PAGE -->
         <div class="page active" id="pageHome">
-            <div class="mining-circle-wrapper">
-                <div class="mining-circle" id="miningCircle">
-                    <div class="circle-start-overlay" id="circleStartOverlay" onclick="startMining()"><div class="start-icon">⚡</div><div class="start-text">START<br>MINING</div><div class="start-subtext">Tap to earn coins</div></div>
-                    <div class="inner-circle"><span class="coin-icon">🪙</span><span class="coin-count" id="progressCoinCount">1000</span><div class="circle-status" id="progressStatus">Ready</div><div class="circle-progress-text" id="progressPercent">100%</div></div>
-                </div>
-            </div>
-            <div class="speed-btn-container"><button class="speed-boost-btn" id="speedBoostBtn" onclick="activateSpeedBoost()"><i class="fas fa-rocket"></i> Speed Boost</button></div>
-            <div class="rules-text"><div class="rule-title">📋 Mining Rules</div><div id="miningRulesText">Loading rules...</div></div>
-            <div class="mystery-box-wrapper" id="mysteryBoxWrapper">
-                <div class="mystery-box-container" id="mysteryBoxContainer" onclick="openMysteryBox()"><div class="box-shine"></div><div class="box-lid" id="boxLid">🎁</div><div class="box-body"><span class="gift-icon" id="giftIcon">🎁</span></div></div>
-                <div class="box-label">🎁 Mystery Box</div><div class="box-timer" id="mysteryBoxTimer">Tap to open</div>
-            </div>
+            <div class="mining-circle-wrapper"><div class="mining-circle" id="miningCircle"><div class="circle-start-overlay" id="circleStart" onclick="startMining()"><div class="start-icon">⚡</div><div class="start-text">START<br>MINING</div></div><div class="inner-circle"><span class="coin-icon">🪙</span><span class="coin-count" id="progressCoins">1000</span><div id="progressStatus" style="color:#94a3b8;font-size:12px;">Ready</div></div></div></div>
+            <button class="speed-boost-btn" id="speedBtn" onclick="activateBoost()">🚀 Speed Boost</button>
+            <div class="rules-text"><div class="rule-title">📋 Mining Rules</div><div id="miningRules">Loading...</div></div>
         </div>
 
-        <!-- TASKS PAGE -->
-        <div class="page" id="pageTasks">
-            <h2 class="page-header">📋 Tasks</h2>
-            <div class="task-filters"><button class="filter-btn active" onclick="filterTasks('all',this)">All</button><button class="filter-btn" onclick="filterTasks('link',this)">🔗 Link</button><button class="filter-btn" onclick="filterTasks('video',this)">📺 Video</button></div>
-            <div id="tasksContainer"></div>
-            <div class="rules-text"><div class="rule-title">📋 Task Rules</div><div id="taskRulesText">Loading rules...</div></div>
-        </div>
+        <div class="page" id="pageTasks"><h2 class="page-header">📋 Tasks</h2><div class="task-filters"><button class="filter-btn active" onclick="filterTasks('all',this)">All</button><button class="filter-btn" onclick="filterTasks('link',this)">🔗 Link</button><button class="filter-btn" onclick="filterTasks('video',this)">📺 Video</button></div><div id="tasksContainer"></div></div>
 
-        <!-- REFER PAGE -->
-        <div class="page" id="pageRefer">
-            <h2 class="page-header">👥 Refer & Earn</h2>
-            <div style="background:rgba(255,255,255,0.03);border-radius:14px;padding:14px;margin-bottom:14px;text-align:center;"><p>Your Referral Link</p><div id="referLinkHome" style="background:rgba(255,255,255,0.05);padding:10px;border-radius:10px;font-size:12px;color:#3b82f6;word-break:break-all;">Loading...</div><button onclick="copyReferLink()" style="background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;padding:8px 20px;border-radius:10px;border:none;font-weight:700;cursor:pointer;">📋 Copy</button></div>
-            <div style="background:rgba(255,255,255,0.03);border-radius:14px;padding:14px;margin-bottom:14px;text-align:center;"><input type="text" id="referCodeInput" placeholder="Enter code..." style="width:100%;padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;margin-bottom:8px;outline:none;"><button id="referCodeSubmitBtn" onclick="submitReferCode()" style="background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;padding:8px 20px;border-radius:10px;border:none;font-weight:700;cursor:pointer;">Submit</button></div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;"><div style="background:rgba(255,255,255,0.03);padding:12px;border-radius:12px;text-align:center;"><div id="referTotal" style="font-size:20px;font-weight:900;color:#fbbf24;">0</div><div style="font-size:10px;color:#94a3b8;">Refs</div></div><div style="background:rgba(255,255,255,0.03);padding:12px;border-radius:12px;text-align:center;"><div id="referEarned" style="font-size:20px;font-weight:900;color:#fbbf24;">0</div><div style="font-size:10px;color:#94a3b8;">Coins</div></div><div style="background:rgba(255,255,255,0.03);padding:12px;border-radius:12px;text-align:center;"><div id="referBonus" style="font-size:20px;font-weight:900;color:#fbbf24;">0</div><div style="font-size:10px;color:#94a3b8;">Bonus</div></div></div>
-            <div id="referTierList"></div>
-            <div class="rules-text"><div class="rule-title">📋 Referral Rules</div><div id="referRulesText">Loading rules...</div></div>
-        </div>
+        <div class="page" id="pageRefer"><h2 class="page-header">👥 Refer & Earn</h2><div style="text-align:center;margin:10px 0;background:rgba(255,255,255,0.03);padding:14px;border-radius:14px;"><p style="color:#94a3b8;">Your Link</p><div id="refLink" style="word-break:break-all;color:#3b82f6;font-size:12px;margin:8px 0;">Loading...</div><button class="btn btn-primary" onclick="copyRef()" style="width:auto;padding:8px 20px;">📋 Copy</button></div><div style="text-align:center;margin:10px 0;background:rgba(255,255,255,0.03);padding:14px;border-radius:14px;"><input type="text" id="refCodeInput" placeholder="Enter code..." style="width:100%;padding:10px;background:rgba(255,255,255,0.05);border:1px solid #334155;border-radius:10px;color:#fff;margin-bottom:8px;"><button class="btn btn-primary" onclick="submitRefCode()">Submit</button></div></div>
 
-        <!-- WALLET PAGE -->
-        <div class="page" id="pageWallet">
-            <h2 class="page-header">💰 Wallet</h2>
-            <div class="wallet-card"><p>Coins Balance</p><div class="wallet-balance" id="walletBalance">0</div><div id="walletUsd" style="color:#10b981;font-size:18px;font-weight:bold;">≈ $0.0000</div><div style="background:rgba(16,185,129,0.1);border-radius:10px;padding:10px;margin-top:15px;"><div>💵 Total USD</div><div id="walletTotalUsd" style="font-size:18px;font-weight:bold;color:#10b981;">$0.0000</div></div>
-                <div class="withdraw-section"><p id="withdrawInfo" style="font-weight:bold;color:#fbbf24;">Min: $10.0000</p><div class="form-group"><label>Payment Method</label><div class="method-selector" id="methodSelector"></div></div><div class="form-group"><label>Account Number</label><input type="text" id="withdrawAccount" placeholder="Enter your account number..."></div><p id="withdrawStatus" style="font-size:11px;color:#94a3b8;">You have: $0.0000</p><button class="withdraw-btn" id="withdrawBtn" onclick="withdraw()">Withdraw Now</button></div>
-                <div class="history-card"><div style="font-size:11px;color:#94a3b8;margin-bottom:8px;">📜 History</div><div id="withdrawHistoryList"></div></div>
-                <div class="rules-text"><div class="rule-title">📋 Withdraw Rules</div><div id="withdrawRulesText">Loading rules...</div></div>
-            </div>
-        </div>
+        <div class="page" id="pageGames"><h2 class="page-header">🎮 Games</h2><div class="game-section"><div class="game-grid"><div class="game-card" onclick="openGame('xo')"><div class="game-icon">❌</div><div class="game-name">Tic-Tac-Toe</div><div class="game-desc">vs AI or Online</div><div class="game-bet">100-500 | +10%</div></div><div class="game-card" onclick="openGame('dice')"><div class="game-icon">🎲</div><div class="game-name">Dice Roll</div><div class="game-desc">Roll higher</div><div class="game-bet">100-500 | +15%</div></div><div class="game-card" onclick="openGame('card')"><div class="game-icon">🃏</div><div class="game-name">Card Draw</div><div class="game-desc">Draw higher</div><div class="game-bet">100-500 | +12%</div></div><div class="game-card" onclick="openGame('target')"><div class="game-icon">🎯</div><div class="game-name">Target Shoot</div><div class="game-desc">Hit target</div><div class="game-bet">100-500 | +20%</div></div></div></div></div>
 
-        <!-- GAMES PAGE -->
-        <div class="page" id="pageGames">
-            <h2 class="page-header">🎮 Games</h2>
-            <div class="game-section">
-                <div class="game-title"><span>🎮</span> Available Games <span>🎮</span></div>
-                <div class="game-grid">
-                    <div class="game-card" onclick="openGame('xo')"><div class="game-icon">❌</div><div class="game-name">Tic-Tac-Toe</div><div class="game-desc">vs Computer or Online</div><div class="game-bet">Entry: 100-500 🪙 | Win: 10%</div></div>
-                    <div class="game-card" onclick="openGame('dice')"><div class="game-icon">🎲</div><div class="game-name">Dice Roll</div><div class="game-desc">Roll higher than opponent</div><div class="game-bet">Entry: 100-500 🪙 | Win: 15%</div></div>
-                    <div class="game-card" onclick="openGame('target')"><div class="game-icon">🎯</div><div class="game-name">Target Shoot</div><div class="game-desc">Hit the target to win</div><div class="game-bet">Entry: 100-500 🪙 | Win: 20%</div></div>
-                    <div class="game-card" onclick="openGame('card')"><div class="game-icon">🃏</div><div class="game-name">Card Draw</div><div class="game-desc">Draw higher card to win</div><div class="game-bet">Entry: 100-500 🪙 | Win: 12%</div></div>
-                </div>
-            </div>
-        </div>
+        <div class="page" id="pageWallet"><h2 class="page-header">💰 Wallet</h2><div class="wallet-card"><p>Coins Balance</p><div class="balance-amount" id="wBalance">0</div><p style="color:#10b981;">≈ $<span id="wUsd">0.0000</span></p></div><div class="withdraw-section"><p style="font-weight:bold;color:#fbbf24;">Min: $10.0000</p><div class="form-group"><label>Method</label><div class="method-selector" id="methodSelector"><button class="method-btn active" onclick="selectMethod('Nagad')">Nagad</button><button class="method-btn" onclick="selectMethod('Rocket')">Rocket</button><button class="method-btn" onclick="selectMethod('bKash')">bKash</button></div></div><div class="form-group"><label>Account</label><input type="text" id="wAccount" placeholder="Account number"></div><button class="btn btn-primary" onclick="withdraw()" style="background:linear-gradient(135deg,#10b981,#059669);">Withdraw Now</button></div><div class="history-card"><div style="color:#94a3b8;margin-bottom:8px;">📜 History</div><div id="wHistory"></div></div></div>
     </div>
 
-    <div id="floatingSpinBtn" onclick="openSpinModal()"><span class="spin-icon">🎰</span><span class="spin-badge" id="spinBadge">20</span></div>
-    <div class="spin-modal-overlay" id="spinModal"><div class="spin-modal-content"><button class="close-modal-btn" onclick="closeSpinModal()"><i class="fas fa-times"></i></button><h3 style="color:#fbbf24; margin-bottom:5px;">🎰 Lucky Spin</h3><div style="color:#94a3b8; font-size:13px; margin-bottom:10px;" id="modalSpinCount">Spins: 20/20</div><div class="wheel-wrapper-new"><div class="wheel-outer-rim"></div><div class="wheel-bulbs" id="wheelBulbs"></div><div class="wheel-inner"><div class="wheel-segments" id="wheelSegments"></div></div><div class="wheel-center-logo">🎯</div><div class="wheel-pointer-new"></div></div><button class="spin-btn-new" id="modalSpinBtn" onclick="spinWheelFromModal()">🎡 SPIN</button><div class="spin-timer-box-new" id="modalSpinTimerBox"><div class="timer-label">⏳ Cooldown</div><div class="timer-time" id="modalSpinTimerDisplay">00:15</div></div><div class="spin-result-new" id="modalSpinResult"></div></div></div>
-    <div class="notification-overlay" id="notificationOverlay"><div class="notification-overlay-header"><button class="back-btn" onclick="closeNotificationPanel()"><i class="fas fa-arrow-left"></i> Back</button><h2 style="color:#fff;">📨 Notifications</h2></div><div id="notificationList" style="padding:15px;"><p style="color:#94a3b8;text-align:center;">Loading notifications...</p></div></div>
-    <div class="modal" id="successModal"><div class="modal-content"><div style="font-size:50px;">🎉</div><h3>Done!</h3><p id="rewardText"></p><button onclick="closeModal('successModal')">OK</button></div></div>
-    <div class="modal" id="conversionModal"><div class="modal-content"><div style="font-size:50px;">💰</div><h3>Converted!</h3><p id="conversionText"></p><button onclick="closeModal('conversionModal')">OK</button></div></div>
-    <div class="modal" id="withdrawModal"><div class="modal-content"><div style="font-size:50px;">💳</div><h3 id="withdrawModalTitle"></h3><p id="withdrawModalText"></p><button onclick="closeModal('withdrawModal')">OK</button></div></div>
-    <div class="modal" id="airdropModal"><div class="modal-content"><div style="font-size:50px;">🎁</div><h3>Airdrop!</h3><p id="airdropModalText"></p><button onclick="closeModal('airdropModal')">OK</button></div></div>
+    <div id="floatingSpinBtn" onclick="spinWheel()">🎰</div>
+    <div class="spin-modal-overlay" id="spinModal"><div class="spin-modal-content"><h3 style="color:#fbbf24;">🎰 Lucky Spin</h3><p id="spinResult" style="color:#10b981;margin:15px 0;"></p><button class="btn btn-warning" onclick="closeSpin()">Close</button></div></div>
     <div class="toast" id="toast"></div>
 
     <div class="bottom-nav">
@@ -565,319 +221,146 @@
     </div>
 
     <script>
-        // ================== FIREBASE CONFIG ==================
-        const firebaseConfig = { apiKey: "AIzaSyAqCNHhu9oaBDea85tAH-iHucHczZnR7nY", authDomain: "tolaka-exc-reverb-b1afd.firebaseapp.com", databaseURL: "https://tolaka-exc-reverb-b1afd-default-rtdb.firebaseio.com", projectId: "tolaka-exc-reverb-b1afd", storageBucket: "tolaka-exc-reverb-b1afd.appspot.com", messagingSenderId: "25114300036", appId: "1:25114300036:android:579e5c869a075113603cd1" };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        let tg = window.Telegram.WebApp; tg.expand();
-        let userId = tg.initDataUnsafe?.user?.id?.toString() || 'default_user';
-        const displayName = (tg.initDataUnsafe?.user?.first_name||'') + (tg.initDataUnsafe?.user?.last_name?' '+tg.initDataUnsafe?.user?.last_name:'') || tg.initDataUnsafe?.user?.username || 'User';
-        const userRef = db.ref('users/' + userId);
-        const TOTAL_COINS = 1000;
-        const NEGATIVE_XP = -5000;
+    const fc={apiKey:"AIzaSyAqCNHhu9oaBDea85tAH-iHucHczZnR7nY",authDomain:"tolaka-exc-reverb-b1afd.firebaseapp.com",databaseURL:"https://tolaka-exc-reverb-b1afd-default-rtdb.firebaseio.com",projectId:"tolaka-exc-reverb-b1afd",storageBucket:"tolaka-exc-reverb-b1afd.appspot.com",messagingSenderId:"25114300036",appId:"1:25114300036:android:579e5c869a075113603cd1"};
+    firebase.initializeApp(fc);const db=firebase.database();
+    let tg=window.Telegram.WebApp;tg.expand();
+    let uid=tg.initDataUnsafe?.user?.id?.toString()||'default_user';
+    let dn=(tg.initDataUnsafe?.user?.first_name||'')+' '+(tg.initDataUnsafe?.user?.last_name||'')||tg.initDataUnsafe?.user?.username||'User';
+    const ur=db.ref('users/'+uid);
+    let app={bal:0,usd:0,xp:-5000,pcoins:1000,refs:0,refCode:'',daily:'',mystCD:0,boostCD:0,convRate:1000,lastConv:null,taskDone:{},taskProg:{},airClaimed:false,minWithdraw:10,wMethods:['Nagad','Rocket','bKash'],wMethod:'Nagad',wHist:[]};
+    let miningInt=null,isOnline=navigator.onLine,tasks=[],currentFilter='all';
 
-        let spinConfig = { usdPrizes: [0.08, 0.05, 0.02, 0.01, 0], coinPrizes: [500, 200, 150, 100, 90, 70, 50, 20, 10, 0] };
-        let prizeData = [];
+    function toast(m,t='success'){const e=document.getElementById('toast');e.textContent=m;e.className='toast show'+(t==='error'?' error':'');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),3000);}
+    function updateUI(){document.getElementById('balance').textContent=Math.floor(app.bal);document.getElementById('wBalance').textContent=Math.floor(app.bal);document.getElementById('usdValue').textContent='≈ $'+(app.bal/app.convRate).toFixed(4)+' USD';document.getElementById('usdBal').textContent='$'+app.usd.toFixed(4);document.getElementById('wUsd').textContent=app.usd.toFixed(4);}
+    function updateMining(){const p=app.pcoins/1000*100;document.getElementById('miningCircle').style.background='conic-gradient(#fbbf24 '+p+'%, #1e293b '+p+'%)';document.getElementById('progressCoins').textContent=app.pcoins;}
+    function calcLvl(xp){xp=xp||-5000;if(xp<0){const b=5000;return{lvl:0,prog:Math.min(100,Math.floor((xp+b)/b*100)),name:'Unlocking',emoji:'🔒',need:b,bonus:0};}let l=1,xn=1800,tx=0;while(l<=100){if(xp<tx+xn)break;tx+=xn;l++;if(l>100)break;xn=1800*Math.pow(2,l-1);}if(l>100){l=100;xn=1800*Math.pow(2,99);tx=0;for(let i=1;i<100;i++)tx+=1800*Math.pow(2,i-1);}let e='🥉',n='Bronze',b=10;if(l>20){e='🥈';n='Silver';b=20;}if(l>40){e='🥇';n='Gold';b=30;}if(l>60){e='💎';n='Platinum';b=40;}if(l>80){e='👑';n='Diamond';b=50;}return{lvl:l,prog:Math.min(100,Math.floor(((xp-tx)/xn)*100)),name:n,emoji:e,need:xn,bonus:b};}
+    function updateLevel(){const d=calcLvl(app.xp);document.getElementById('levelBar').style.width=d.prog+'%';document.getElementById('lvlText').textContent=d.emoji+' '+d.name;document.getElementById('lvlXp').textContent=app.xp+'/'+d.need+' XP';document.getElementById('userLevelBadge').textContent=d.emoji+' Lv.'+d.lvl;}
 
-        function loadSpinConfig() { db.ref('spinConfig').on('value', snap => { const c = snap.val() || {}; if (c.usdPrizes) spinConfig.usdPrizes = c.usdPrizes; if (c.coinPrizes) spinConfig.coinPrizes = c.coinPrizes; buildPrizeData(); buildWheel(); }); }
-        function buildPrizeData() { prizeData = [...spinConfig.coinPrizes.map(v => ({ label: `${v} 🎁`, value: v, type: 'coins' })), ...spinConfig.usdPrizes.map(v => ({ label: `$${v.toFixed(2)} 🎁`, value: v, type: 'usd' }))]; }
+    function startMining(){if(!isOnline||miningInt||app.pcoins<=0)return;document.getElementById('circleStart').classList.add('hidden');ur.update({mining:true});function mn(){if(!isOnline||app.pcoins<=0){stopMining();return;}const d=calcLvl(app.xp);let s=1+(d.bonus/100);app.pcoins-=1;app.bal+=s;app.xp+=1;ur.update({bal:app.bal,pcoins:app.pcoins,xp:app.xp});const c=document.createElement('div');c.className='floating-coin';c.textContent='+'+Math.floor(s)+' 🪙';c.style.left=(Math.random()*80+10)+'%';c.style.top='35%';document.body.appendChild(c);setTimeout(()=>c.remove(),1000);updateMining();updateUI();updateLevel();miningInt=setTimeout(mn,5000/s);}mn();toast('⛏️ Mining!');}
+    function stopMining(){if(miningInt){clearTimeout(miningInt);miningInt=null;}ur.update({mining:false});updateMining();}
+    function claimDailyBonus(){const t=new Date().toDateString();if(app.daily===t){toast('Already claimed!','error');return;}const b=50+Math.floor(Math.random()*51);app.bal+=b;app.xp+=b*2;app.daily=t;ur.update({bal:app.bal,xp:app.xp,daily:t});document.getElementById('dailyStatus').textContent='✅ Claimed';updateUI();updateLevel();toast('🎁 +'+b+' Coins!');}
+    function activateBoost(){if(!isOnline||app.boostCD>Date.now()||app.pcoins<=0)return;show_11197472().then(()=>{const st=Date.now();let ta=0;const tc=Math.floor(Math.random()*11)+50;const bm=setInterval(()=>{if(Date.now()-st>=3000||ta>=tc){clearInterval(bm);app.boostCD=Date.now()+3600000;ur.update({boostCD:app.boostCD});toast('🚀 +'+ta+' coins');return;}const aa=Math.min(3,tc-ta);if(aa<=0){clearInterval(bm);return;}app.pcoins-=1;app.bal+=aa;app.xp+=aa*2;ta+=aa;ur.update({bal:app.bal,pcoins:app.pcoins,xp:app.xp});updateMining();updateUI();updateLevel();},100);}).catch(()=>toast('Ad failed!','error'));}
 
-        let app = { balance: 0, usdBalance: 0, referralCount: 0, lastConversion: null, conversionRate: 1000, minWithdraw: 10, withdrawHistory: [], referCode: '', referTiers: {}, progressCoins: TOTAL_COINS, speedBoostCooldown: 0, taskLastCompleted: {}, taskProgress: {}, airdropClaimed: false, xpPoints: NEGATIVE_XP, withdrawMethods: ['Nagad','Rocket'], selectedMethod: 'Nagad', isBanned: false, dailyBonusClaimed: 0, mysteryBoxCooldown: 0, dailyBonusMin: 50, dailyBonusMax: 100, mysteryBoxMin: 20, mysteryBoxMax: 100, mysteryBoxDuration: 1800000 };
-        let tasks = [], conversionTimer = null, miningInterval = null, airdropTimer = null, currentFilter = 'all', currentLevelFilter = 'all', referralConfigCache = {};
-        let isOnline = navigator.onLine, wasMiningBeforeOffline = false, isAdShowing = false;
-        let webViewTaskId = null, webViewTaskReward = 0, webViewRequiredTime = 60, webViewSeconds = 0, webViewTimerInterval = null;
+    // ===== GAMES =====
+    let xo={mode:null,bet:100,board:Array(9).fill(''),mySym:'X',opSym:'O',active:false,over:false,winner:null,myTurn:true,free:false,done:false,gid:null,gref:null,wcombo:null,aiTO:null};
+    let dice={bet:100,free:false,done:false};
+    let card={bet:100,free:false,done:false};
+    let target={bet:100,free:false,done:false};
 
-        // ================== GAME DATA ==================
-        let diceGameData = { betAmount: 100, isFree: false, rewardGiven: false };
-        let targetGameData = { betAmount: 100, isFree: false, rewardGiven: false };
-        let cardGameData = { betAmount: 100, isFree: false, rewardGiven: false };
+    function openGame(t){
+        if(t==='xo'){document.getElementById('xoGameOverlay').classList.add('show');resetXO();}
+        else if(t==='dice'){document.getElementById('diceGameOverlay').classList.add('show');resetDiceUI();}
+        else if(t==='card'){document.getElementById('cardGameOverlay').classList.add('show');resetCardUI();}
+        else if(t==='target'){document.getElementById('targetGameOverlay').classList.add('show');resetTargetUI();}
+    }
 
-        // ================== OPEN GAME ==================
-        function openGame(type) {
-            if (type === 'xo') openXOGame('computer');
-            else if (type === 'dice') openDiceGame();
-            else if (type === 'target') openTargetGame();
-            else if (type === 'card') openCardGame();
-        }
+    // XO
+    function resetXO(){xo={mode:null,bet:100,board:Array(9).fill(''),mySym:'X',opSym:'O',active:false,over:false,winner:null,myTurn:true,free:false,done:false,gid:null,gref:null,wcombo:null,aiTO:null};document.getElementById('xoModeSelect').style.display='block';document.getElementById('xoBetSection').style.display='none';document.getElementById('xoGameBoard').style.display='none';document.getElementById('xoOnlineInfo').style.display='none';}
+    function closeXOGame(){document.getElementById('xoGameOverlay').classList.remove('show');if(xo.gref){xo.gref.remove();xo.gref=null;}if(xo.aiTO)clearTimeout(xo.aiTO);}
+    function startXOMode(m){xo.mode=m;document.getElementById('xoModeSelect').style.display='none';document.getElementById('xoBetSection').style.display='block';}
+    function setXOBet(v){xo.bet=Math.min(v,500,Math.floor(app.bal));document.getElementById('xoBet').value=xo.bet;}
+    function playXOPaid(){let b=parseInt(document.getElementById('xoBet').value)||100;b=Math.max(100,Math.min(b,500));if(b>app.bal){toast('Insufficient!','error');return;}xo.bet=b;xo.free=false;app.bal-=b;ur.update({bal:app.bal});updateUI();startXOGameBoard();}
+    function playXOFree(){show_11197472().then(()=>{xo.bet=100;xo.free=true;startXOGameBoard();}).catch(()=>toast('Ad failed!','error'));}
+    function startXOGameBoard(){document.getElementById('xoBetSection').style.display='none';if(xo.mode==='computer'){initXOCPU();}else{initXOOnline();}}
+    function initXOCPU(){document.getElementById('xoGameBoard').style.display='block';document.getElementById('xoOnlineInfo').style.display='none';xo.board=Array(9).fill('');xo.mySym='X';xo.opSym='O';xo.active=true;xo.over=false;xo.winner=null;xo.myTurn=true;xo.done=false;document.getElementById('xoStatus').textContent='Your turn!';document.getElementById('xoStatus').className='status-text';document.getElementById('xoReward').textContent='';document.getElementById('xoReplay').style.display='none';document.getElementById('xoPlayers').style.display='flex';renderXBO();}
+    function initXOOnline(){document.getElementById('xoGameBoard').style.display='none';document.getElementById('xoOnlineInfo').style.display='block';document.getElementById('xoOnlineInfo').textContent='🔍 Searching...';xo.board=Array(9).fill('');xo.active=false;findXOOp();}
+    function findXOOp(){db.ref('xoWait').once('value',s=>{const w=s.val()||{};let f=false;for(const[k,d]of Object.entries(w)){if(d.p1!==uid&&!d.started&&Date.now()-d.at<30000){f=true;joinXOGame(k,d);break;}}if(!f)createXOGame();});}
+    function createXOGame(){const id=Date.now().toString();xo.gid=id;xo.mySym='X';xo.opSym='O';xo.myTurn=true;db.ref('xoWait/'+id).set({p1:uid,p1n:dn,bet:xo.bet,board:Array(9).fill(''),turn:'X',active:false,started:false,at:Date.now(),free:xo.free}).then(()=>{setTimeout(()=>{db.ref('xoWait/'+id).once('value',s=>{if(s.exists()&&!s.val().p2){db.ref('xoWait/'+id).remove();if(!xo.free){app.bal+=xo.bet;ur.update({bal:app.bal});updateUI();}toast('No opponent! Refunded!');closeXOGame();}});},30000);db.ref('xoWait/'+id).on('value',s=>{const d=s.val();if(!d){if(!xo.active)closeXOGame();return;}if(d.p2&&!xo.active){xo.opId=d.p2;xo.gref=db.ref('xoGames/'+id);startXOnline(id,d);}});});}
+    function joinXOGame(id,d){xo.gid=id;xo.mySym='O';xo.opSym='X';xo.myTurn=false;xo.gref=db.ref('xoGames/'+id);db.ref('xoGames/'+id).set({...d,p2:uid,p2n:dn,started:true,active:true}).then(()=>{db.ref('xoWait/'+id).remove();startXOnline(id,{...d,p2:uid,p2n:dn,started:true,active:true});});}
+    function startXOnline(id,d){document.getElementById('xoOnlineInfo').style.display='none';document.getElementById('xoGameBoard').style.display='block';xo.board=d.board||Array(9).fill('');xo.active=true;xo.myTurn=d.turn===xo.mySym;document.getElementById('xoPlayers').style.display='flex';updateXOStatus();renderXBO();if(xo.gref)xo.gref.off();xo.gref=db.ref('xoGames/'+id);xo.gref.on('value',s=>{const d=s.val();if(!d){if(xo.active){xo.active=false;toast('Opponent left!');document.getElementById('xoStatus').textContent='Opponent left!';document.getElementById('xoReplay').style.display='block';}return;}if(d.board&&JSON.stringify(d.board)!==JSON.stringify(xo.board)){xo.board=d.board;xo.myTurn=d.turn===xo.mySym;xo.active=d.active;xo.winner=d.winner;xo.wcombo=d.wcombo;renderXBO();updateXOStatus();if(d.winner&&!xo.done)endXOGame(d.winner);}});}
+    function renderXBO(){const b=document.getElementById('xoBoard');b.innerHTML='';for(let i=0;i<9;i++){const c=document.createElement('div');c.className='xo-cell';c.textContent=xo.board[i];if(xo.board[i]==='X')c.classList.add('x-player');else if(xo.board[i]==='O')c.classList.add('o-player');if(xo.winner&&xo.wcombo?.includes(i))c.classList.add('win-cell');c.onclick=()=>makeXOMove(i);b.appendChild(c);}}
+    function makeXOMove(i){if(!xo.active||xo.over||xo.board[i]!==''||!xo.myTurn)return;xo.board[i]=xo.mySym;xo.myTurn=false;const w=checkXOWin();if(xo.mode==='computer'){renderXBO();updateXOStatus();if(w)endXOGame(w);else if(!xo.board.includes(''))endXOGame('draw');else{xo.aiTO=setTimeout(makeXOAI,500+Math.random()*1000);}}else{xo.gref.update({board:xo.board,turn:xo.opSym,active:!w,winner:w||null,wcombo:xo.wcombo||null});renderXBO();updateXOStatus();if(w)endXOGame(w);else if(!xo.board.includes('')){endXOGame('draw');xo.gref.update({winner:'draw',active:false});}}}
+    function makeXOAI(){if(!xo.active)return;const b=[...xo.board];for(let i=0;i<9;i++){if(b[i]===''){b[i]='O';if(checkXOWinSym(b,'O')){finishXOAI(i);return;}b[i]='';}}for(let i=0;i<9;i++){if(b[i]===''){b[i]='X';if(checkXOWinSym(b,'X')){finishXOAI(i);return;}b[i]='';}}if(b[4]===''){finishXOAI(4);return;}const co=[0,2,6,8].filter(i=>b[i]==='');if(co.length){finishXOAI(co[Math.floor(Math.random()*co.length)]);return;}const ed=[1,3,5,7].filter(i=>b[i]==='');if(ed.length)finishXOAI(ed[Math.floor(Math.random()*ed.length)]);}
+    function finishXOAI(i){xo.board[i]='O';xo.myTurn=true;const w=checkXOWin();renderXBO();updateXOStatus();if(w)endXOGame(w);else if(!xo.board.includes(''))endXOGame('draw');}
+    function checkXOWin(){const p=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];for(const[a,b,c]of p){if(xo.board[a]&&xo.board[a]===xo.board[b]&&xo.board[a]===xo.board[c]){xo.wcombo=[a,b,c];return xo.board[a];}}return null;}
+    function checkXOWinSym(b,s){const p=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];return p.some(([a,b2,c])=>b[a]===s&&b[b2]===s&&b[c]===s);}
+    function endXOGame(r){if(xo.done)return;xo.done=true;xo.active=false;xo.over=true;let rw=0,msg='';if(r==='draw'){msg='🤝 Draw!';document.getElementById('xoStatus').className='status-text draw';if(!xo.free){rw=xo.bet;app.bal+=rw;}}else if(r===xo.mySym){msg='🎉 Win!';document.getElementById('xoStatus').className='status-text win';rw=xo.bet+Math.floor(xo.bet*0.10);app.bal+=rw;app.xp+=rw*2;}else{msg='😞 Lose!';document.getElementById('xoStatus').className='status-text lose';}if(xo.free){rw=20;app.bal+=rw;}document.getElementById('xoStatus').textContent=msg;document.getElementById('xoReward').textContent=rw>0?'+'+rw+' Coins':(xo.free?'+20 Coins':'-'+xo.bet+' Coins');document.getElementById('xoReplay').style.display='block';ur.update({bal:app.bal,xp:app.xp});updateUI();updateLevel();renderXBO();}
+    function updateXOStatus(){if(xo.over)return;document.getElementById('xoStatus').textContent=xo.myTurn?'Your turn!':(xo.mode==='computer'?'Computer thinking...':'Opponent\'s turn...');}
+    function restartXO(){resetXO();if(xo.mode==='online'){if(xo.gref){xo.gref.remove();xo.gref=null;}closeXOGame();return;}if(!xo.free&&app.bal<100){closeXOGame();toast('Not enough!','error');return;}if(!xo.free){app.bal-=xo.bet;ur.update({bal:app.bal});updateUI();}initXOCPU();}
 
-        // ================== DICE GAME ==================
-        function openDiceGame() { document.getElementById('diceGameOverlay').classList.add('show'); document.getElementById('diceBetSection').style.display = 'block'; document.getElementById('diceGameBoard').style.display = 'none'; diceGameData.rewardGiven = false; }
-        function closeDiceGame() { document.getElementById('diceGameOverlay').classList.remove('show'); }
-        function setDiceBet(a) { diceGameData.betAmount = Math.min(a, 500); document.getElementById('diceBetAmount').value = diceGameData.betAmount; }
-        function playDiceGamePaid() {
-            let bet = parseInt(document.getElementById('diceBetAmount').value) || 100; bet = Math.max(100, Math.min(bet, 500));
-            if (bet > app.balance) { showToast('Insufficient balance!', 'error'); return; }
-            diceGameData.betAmount = bet; diceGameData.isFree = false; app.balance -= bet;
-            userRef.update({ balance: app.balance }); updateUI();
-            document.getElementById('diceBetSection').style.display = 'none'; document.getElementById('diceGameBoard').style.display = 'block';
-            rollDice();
-        }
-        function playDiceGameFree() {
-            show_11197472().then(() => { diceGameData.betAmount = 100; diceGameData.isFree = true;
-                document.getElementById('diceBetSection').style.display = 'none'; document.getElementById('diceGameBoard').style.display = 'block';
-                rollDice(); }).catch(() => showToast('Ad not watched!', 'error'));
-        }
-        function rollDice() {
-            if (diceGameData.rewardGiven) return; diceGameData.rewardGiven = true;
-            const pd = document.getElementById('playerDice'), od = document.getElementById('opponentDice');
-            pd.classList.add('rolling'); od.classList.add('rolling');
-            document.getElementById('diceStatus').textContent = 'Rolling...'; document.getElementById('diceRewardInfo').textContent = '';
-            setTimeout(() => {
-                pd.classList.remove('rolling'); od.classList.remove('rolling');
-                const pr = Math.floor(Math.random()*6)+1, or = Math.floor(Math.random()*6)+1;
-                const diceFaces = ['⚀','⚁','⚂','⚃','⚄','⚅'];
-                pd.textContent = diceFaces[pr-1]; od.textContent = diceFaces[or-1];
-                let reward = 0, msg = '';
-                if (pr > or) { msg = '🎉 You win!'; reward = diceGameData.betAmount + Math.floor(diceGameData.betAmount*0.15); app.balance += reward; pd.classList.add('win'); od.classList.add('lose'); }
-                else if (pr < or) { msg = '😞 You lose!'; od.classList.add('win'); pd.classList.add('lose'); }
-                else { msg = '🤝 Draw!'; if (!diceGameData.isFree) { reward = diceGameData.betAmount; app.balance += reward; } }
-                if (diceGameData.isFree) { reward = 20; app.balance += reward; }
-                document.getElementById('diceStatus').textContent = msg;
-                document.getElementById('diceRewardInfo').textContent = reward > 0 ? `+${reward} Coins` : (diceGameData.isFree ? '+20 Coins' : `-${diceGameData.betAmount} Coins`);
-                document.getElementById('diceGameBoard').querySelector('.restart').style.display = 'block';
-                userRef.update({ balance: app.balance }); updateUI();
-            }, 1000);
-        }
-        function resetDiceGame() { diceGameData.rewardGiven = false; document.getElementById('diceBetSection').style.display = 'block'; document.getElementById('diceGameBoard').style.display = 'none'; document.getElementById('diceGameBoard').querySelector('.restart').style.display = 'none'; document.getElementById('playerDice').textContent = '🎲'; document.getElementById('opponentDice').textContent = '🎲'; document.getElementById('playerDice').className = 'game-dice'; document.getElementById('opponentDice').className = 'game-dice'; }
+    // DICE
+    function resetDiceUI(){document.getElementById('diceBetSection').style.display='block';document.getElementById('diceGameBoard').style.display='none';dice.done=false;document.getElementById('pDice').textContent='🎲';document.getElementById('oDice').textContent='🎲';document.getElementById('pDice').className='dice-box';document.getElementById('oDice').className='dice-box';document.getElementById('diceReplay').style.display='none';}
+    function closeDiceGame(){document.getElementById('diceGameOverlay').classList.remove('show');}
+    function setDiceBet(v){dice.bet=Math.min(v,500);document.getElementById('diceBet').value=dice.bet;}
+    function playDicePaid(){let b=parseInt(document.getElementById('diceBet').value)||100;b=Math.max(100,Math.min(b,500));if(b>app.bal){toast('Insufficient!','error');return;}dice.bet=b;dice.free=false;app.bal-=b;ur.update({bal:app.bal});updateUI();document.getElementById('diceBetSection').style.display='none';document.getElementById('diceGameBoard').style.display='block';rollDice();}
+    function playDiceFree(){show_11197472().then(()=>{dice.bet=100;dice.free=true;document.getElementById('diceBetSection').style.display='none';document.getElementById('diceGameBoard').style.display='block';rollDice();}).catch(()=>toast('Ad failed!','error'));}
+    function rollDice(){if(dice.done)return;dice.done=true;const df=['⚀','⚁','⚂','⚃','⚄','⚅'];document.getElementById('diceStatus').textContent='Rolling...';setTimeout(()=>{const pr=Math.floor(Math.random()*6)+1,or=Math.floor(Math.random()*6)+1;document.getElementById('pDice').textContent=df[pr-1];document.getElementById('oDice').textContent=df[or-1];let rw=0,msg='';if(pr>or){msg='🎉 Win!';document.getElementById('diceStatus').className='status-text win';rw=dice.bet+Math.floor(dice.bet*0.15);app.bal+=rw;document.getElementById('pDice').classList.add('win');document.getElementById('oDice').classList.add('lose');}else if(pr<or){msg='😞 Lose!';document.getElementById('diceStatus').className='status-text lose';document.getElementById('oDice').classList.add('win');document.getElementById('pDice').classList.add('lose');}else{msg='🤝 Draw!';document.getElementById('diceStatus').className='status-text draw';if(!dice.free){rw=dice.bet;app.bal+=rw;}}if(dice.free){rw=20;app.bal+=rw;}document.getElementById('diceStatus').textContent=msg;document.getElementById('diceReward').textContent=rw>0?'+'+rw+' Coins':(dice.free?'+20 Coins':'-'+dice.bet+' Coins');document.getElementById('diceReplay').style.display='block';ur.update({bal:app.bal});updateUI();},1000);}
+    function resetDice(){dice.done=false;resetDiceUI();}
 
-        // ================== TARGET GAME ==================
-        function openTargetGame() { document.getElementById('targetGameOverlay').classList.add('show'); document.getElementById('targetBetSection').style.display = 'block'; document.getElementById('targetGameBoard').style.display = 'none'; targetGameData.rewardGiven = false; }
-        function closeTargetGame() { document.getElementById('targetGameOverlay').classList.remove('show'); }
-        function setTargetBet(a) { targetGameData.betAmount = Math.min(a, 500); document.getElementById('targetBetAmount').value = targetGameData.betAmount; }
-        function playTargetGamePaid() {
-            let bet = parseInt(document.getElementById('targetBetAmount').value) || 100; bet = Math.max(100, Math.min(bet, 500));
-            if (bet > app.balance) { showToast('Insufficient balance!', 'error'); return; }
-            targetGameData.betAmount = bet; targetGameData.isFree = false; app.balance -= bet;
-            userRef.update({ balance: app.balance }); updateUI();
-            document.getElementById('targetBetSection').style.display = 'none'; document.getElementById('targetGameBoard').style.display = 'block';
-            shootTarget();
-        }
-        function playTargetGameFree() {
-            show_11197472().then(() => { targetGameData.betAmount = 100; targetGameData.isFree = true;
-                document.getElementById('targetBetSection').style.display = 'none'; document.getElementById('targetGameBoard').style.display = 'block';
-                shootTarget(); }).catch(() => showToast('Ad not watched!', 'error'));
-        }
-        function shootTarget() {
-            if (targetGameData.rewardGiven) return; targetGameData.rewardGiven = true;
-            const accuracy = Math.floor(Math.random()*100);
-            document.getElementById('targetStatus').textContent = 'Shooting...';
-            document.getElementById('targetRewardInfo').textContent = '';
-            setTimeout(() => {
-                let reward = 0, msg = '';
-                if (accuracy > 80) { msg = '🎯 Bullseye!'; reward = targetGameData.betAmount + Math.floor(targetGameData.betAmount*0.20); app.balance += reward; }
-                else if (accuracy > 50) { msg = '🎯 Close!'; if (!targetGameData.isFree) { /* Lost */ } else { reward = 20; app.balance += reward; } }
-                else { msg = '💨 Missed!'; if (targetGameData.isFree) { reward = 20; app.balance += reward; } }
-                document.getElementById('targetStatus').textContent = `${msg} (Accuracy: ${accuracy}%)`;
-                document.getElementById('targetRewardInfo').textContent = reward > 0 ? `+${reward} Coins` : (targetGameData.isFree ? '+20 Coins' : `-${targetGameData.betAmount} Coins`);
-                document.getElementById('targetGameBoard').querySelector('.restart').style.display = 'block';
-                userRef.update({ balance: app.balance }); updateUI();
-            }, 800);
-        }
-        function resetTargetGame() { targetGameData.rewardGiven = false; document.getElementById('targetBetSection').style.display = 'block'; document.getElementById('targetGameBoard').style.display = 'none'; document.getElementById('targetGameBoard').querySelector('.restart').style.display = 'none'; document.getElementById('targetStatus').textContent = 'Shoot the target!'; }
+    // CARD
+    function resetCardUI(){document.getElementById('cardBetSection').style.display='block';document.getElementById('cardGameBoard').style.display='none';card.done=false;document.getElementById('pCard').textContent='?';document.getElementById('oCard').textContent='?';document.getElementById('pCard').className='card-display';document.getElementById('oCard').className='card-display';document.getElementById('cardReplay').style.display='none';}
+    function closeCardGame(){document.getElementById('cardGameOverlay').classList.remove('show');}
+    function setCardBet(v){card.bet=Math.min(v,500);document.getElementById('cardBet').value=card.bet;}
+    function playCardPaid(){let b=parseInt(document.getElementById('cardBet').value)||100;b=Math.max(100,Math.min(b,500));if(b>app.bal){toast('Insufficient!','error');return;}card.bet=b;card.free=false;app.bal-=b;ur.update({bal:app.bal});updateUI();document.getElementById('cardBetSection').style.display='none';document.getElementById('cardGameBoard').style.display='block';drawCard();}
+    function playCardFree(){show_11197472().then(()=>{card.bet=100;card.free=true;document.getElementById('cardBetSection').style.display='none';document.getElementById('cardGameBoard').style.display='block';drawCard();}).catch(()=>toast('Ad failed!','error'));}
+    function drawCard(){if(card.done)return;card.done=true;const v=['2','3','4','5','6','7','8','9','10','J','Q','K','A'];document.getElementById('cardStatus').textContent='Drawing...';setTimeout(()=>{const pv=Math.floor(Math.random()*13),ov=Math.floor(Math.random()*13);document.getElementById('pCard').textContent=v[pv];document.getElementById('oCard').textContent=v[ov];let rw=0,msg='';if(pv>ov){msg='🎉 Win!';document.getElementById('cardStatus').className='status-text win';rw=card.bet+Math.floor(card.bet*0.12);app.bal+=rw;document.getElementById('pCard').classList.add('win');document.getElementById('oCard').classList.add('lose');}else if(pv<ov){msg='😞 Lose!';document.getElementById('cardStatus').className='status-text lose';document.getElementById('oCard').classList.add('win');document.getElementById('pCard').classList.add('lose');}else{msg='🤝 Draw!';document.getElementById('cardStatus').className='status-text draw';if(!card.free){rw=card.bet;app.bal+=rw;}}if(card.free){rw=20;app.bal+=rw;}document.getElementById('cardStatus').textContent=msg;document.getElementById('cardReward').textContent=rw>0?'+'+rw+' Coins':(card.free?'+20 Coins':'-'+card.bet+' Coins');document.getElementById('cardReplay').style.display='block';ur.update({bal:app.bal});updateUI();},800);}
+    function resetCard(){card.done=false;resetCardUI();}
 
-        // ================== CARD GAME ==================
-        function openCardGame() { document.getElementById('cardGameOverlay').classList.add('show'); document.getElementById('cardBetSection').style.display = 'block'; document.getElementById('cardGameBoard').style.display = 'none'; cardGameData.rewardGiven = false; }
-        function closeCardGame() { document.getElementById('cardGameOverlay').classList.remove('show'); }
-        function setCardBet(a) { cardGameData.betAmount = Math.min(a, 500); document.getElementById('cardBetAmount').value = cardGameData.betAmount; }
-        function playCardGamePaid() {
-            let bet = parseInt(document.getElementById('cardBetAmount').value) || 100; bet = Math.max(100, Math.min(bet, 500));
-            if (bet > app.balance) { showToast('Insufficient balance!', 'error'); return; }
-            cardGameData.betAmount = bet; cardGameData.isFree = false; app.balance -= bet;
-            userRef.update({ balance: app.balance }); updateUI();
-            document.getElementById('cardBetSection').style.display = 'none'; document.getElementById('cardGameBoard').style.display = 'block';
-            drawCards();
-        }
-        function playCardGameFree() {
-            show_11197472().then(() => { cardGameData.betAmount = 100; cardGameData.isFree = true;
-                document.getElementById('cardBetSection').style.display = 'none'; document.getElementById('cardGameBoard').style.display = 'block';
-                drawCards(); }).catch(() => showToast('Ad not watched!', 'error'));
-        }
-        function drawCards() {
-            if (cardGameData.rewardGiven) return; cardGameData.rewardGiven = true;
-            const vals = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
-            const suits = ['♠️','♥️','♦️','♣️'];
-            document.getElementById('cardStatus').textContent = 'Drawing...';
-            document.getElementById('cardRewardInfo').textContent = '';
-            setTimeout(() => {
-                const pv = Math.floor(Math.random()*13), ov = Math.floor(Math.random()*13);
-                const ps = Math.floor(Math.random()*4), os = Math.floor(Math.random()*4);
-                document.getElementById('playerCard').innerHTML = `<span class="card-value">${vals[pv]}</span><span class="card-suit">${suits[ps]}</span>`;
-                document.getElementById('opponentCard').innerHTML = `<span class="card-value">${vals[ov]}</span><span class="card-suit">${suits[os]}</span>`;
-                let reward = 0, msg = '';
-                if (pv > ov) { msg = '🎉 You win!'; reward = cardGameData.betAmount + Math.floor(cardGameData.betAmount*0.12); app.balance += reward; document.getElementById('playerCard').classList.add('win'); document.getElementById('opponentCard').classList.add('lose'); }
-                else if (pv < ov) { msg = '😞 You lose!'; document.getElementById('opponentCard').classList.add('win'); document.getElementById('playerCard').classList.add('lose'); }
-                else { msg = '🤝 Draw!'; if (!cardGameData.isFree) { reward = cardGameData.betAmount; app.balance += reward; } }
-                if (cardGameData.isFree) { reward = 20; app.balance += reward; }
-                document.getElementById('cardStatus').textContent = msg;
-                document.getElementById('cardRewardInfo').textContent = reward > 0 ? `+${reward} Coins` : (cardGameData.isFree ? '+20 Coins' : `-${cardGameData.betAmount} Coins`);
-                document.getElementById('cardGameBoard').querySelector('.restart').style.display = 'block';
-                userRef.update({ balance: app.balance }); updateUI();
-            }, 800);
-        }
-        function resetCardGame() { cardGameData.rewardGiven = false; document.getElementById('cardBetSection').style.display = 'block'; document.getElementById('cardGameBoard').style.display = 'none'; document.getElementById('cardGameBoard').querySelector('.restart').style.display = 'none'; document.getElementById('playerCard').innerHTML = '<span class="card-value">?</span><span class="card-suit">?</span>'; document.getElementById('opponentCard').innerHTML = '<span class="card-value">?</span><span class="card-suit">?</span>'; document.getElementById('playerCard').className = 'game-card-item'; document.getElementById('opponentCard').className = 'game-card-item'; }
+    // TARGET
+    function resetTargetUI(){document.getElementById('targetBetSection').style.display='block';document.getElementById('targetGameBoard').style.display='none';target.done=false;document.getElementById('targetReplay').style.display='none';}
+    function closeTargetGame(){document.getElementById('targetGameOverlay').classList.remove('show');}
+    function setTargetBet(v){target.bet=Math.min(v,500);document.getElementById('targetBet').value=target.bet;}
+    function playTargetPaid(){let b=parseInt(document.getElementById('targetBet').value)||100;b=Math.max(100,Math.min(b,500));if(b>app.bal){toast('Insufficient!','error');return;}target.bet=b;target.free=false;app.bal-=b;ur.update({bal:app.bal});updateUI();document.getElementById('targetBetSection').style.display='none';document.getElementById('targetGameBoard').style.display='block';shootTarget();}
+    function playTargetFree(){show_11197472().then(()=>{target.bet=100;target.free=true;document.getElementById('targetBetSection').style.display='none';document.getElementById('targetGameBoard').style.display='block';shootTarget();}).catch(()=>toast('Ad failed!','error'));}
+    function shootTarget(){if(target.done)return;target.done=true;const acc=Math.floor(Math.random()*100);document.getElementById('targetStatus').textContent='Shooting...';setTimeout(()=>{let rw=0,msg='';if(acc>80){msg='🎯 Bullseye! ('+acc+'%)';document.getElementById('targetStatus').className='status-text win';rw=target.bet+Math.floor(target.bet*0.20);app.bal+=rw;}else if(acc>50){msg='🎯 Close! ('+acc+'%)';document.getElementById('targetStatus').className='status-text draw';if(target.free){rw=20;app.bal+=rw;}}else{msg='💨 Missed! ('+acc+'%)';document.getElementById('targetStatus').className='status-text lose';if(target.free){rw=20;app.bal+=rw;}}document.getElementById('targetStatus').textContent=msg;document.getElementById('targetReward').textContent=rw>0?'+'+rw+' Coins':(target.free?'+20 Coins':'-'+target.bet+' Coins');document.getElementById('targetReplay').style.display='block';ur.update({bal:app.bal});updateUI();},800);}
+    function resetTarget(){target.done=false;resetTargetUI();}
 
-        // ================== XO GAME (unchanged) ==================
-        let xoGameData = { mode: null, betAmount: 100, board: Array(9).fill(''), mySymbol: 'X', opponentSymbol: 'O', gameActive: false, gameOver: false, winner: null, onlineGameId: null, isMyTurn: true, gameRef: null, rewardGiven: false, winningCombo: null, isFree: false };
-        let xoAITimeout = null;
-        function openXOGame(m) { if (!isOnline) return; document.getElementById('xoGameOverlay').classList.add('show'); resetXOGame(); }
-        function closeXOGame() { document.getElementById('xoGameOverlay').classList.remove('show'); resetXOGame(); if (xoGameData.gameRef) { xoGameData.gameRef.remove(); xoGameData.gameRef = null; } if (xoAITimeout) { clearTimeout(xoAITimeout); xoAITimeout = null; } }
-        function startXOGame(m) { xoGameData.mode = m; document.getElementById('xoModeSelection').style.display = 'none'; document.getElementById('xoBetSection').style.display = 'block'; document.getElementById('xoGameBoard').style.display = 'none'; document.getElementById('xoBetAmount').value = 100; xoGameData.betAmount = 100; xoGameData.isFree = false; }
-        function setXOBet(a) { xoGameData.betAmount = Math.min(a, 500, Math.floor(app.balance)); document.getElementById('xoBetAmount').value = xoGameData.betAmount; }
-        function confirmXOGame() { let bet = parseInt(document.getElementById('xoBetAmount').value) || 100; bet = Math.max(100, Math.min(bet, 500)); if (bet > app.balance) { showToast('Insufficient!', 'error'); return; } xoGameData.betAmount = bet; xoGameData.isFree = false; app.balance -= bet; userRef.update({ balance: app.balance }); updateUI(); if (xoGameData.mode === 'computer') initComputerGame(); else initOnlineGame(); }
-        function playXOGameFree() { show_11197472().then(() => { xoGameData.betAmount = 100; xoGameData.isFree = true; if (xoGameData.mode === 'computer') initComputerGame(); else initOnlineGame(); }).catch(() => showToast('Ad not watched!', 'error')); }
-        function initComputerGame() { document.getElementById('xoBetSection').style.display = 'none'; document.getElementById('xoGameBoard').style.display = 'block'; xoGameData.board = Array(9).fill(''); xoGameData.mySymbol = 'X'; xoGameData.opponentSymbol = 'O'; xoGameData.gameActive = true; xoGameData.gameOver = false; xoGameData.winner = null; xoGameData.isMyTurn = true; xoGameData.rewardGiven = false; document.getElementById('xoStatus').textContent = 'Your turn!'; document.getElementById('xoStatus').className = 'xo-status'; document.getElementById('xoRewardInfo').textContent = ''; document.getElementById('xoRestartBtn').style.display = 'none'; document.getElementById('xoPlayer1Badge').querySelector('.player-symbol').textContent = 'X'; document.getElementById('xoPlayer2Badge').querySelector('.player-symbol').textContent = 'O'; document.getElementById('xoPlayersInfo').style.display = 'flex'; renderXOBoard(); }
-        function initOnlineGame() { document.getElementById('xoBetSection').style.display = 'none'; document.getElementById('xoGameBoard').style.display = 'none'; document.getElementById('xoOnlineInfo').style.display = 'block'; xoGameData.board = Array(9).fill(''); xoGameData.gameActive = false; findOnlineOpponent(); }
-        function findOnlineOpponent() { db.ref('xoWaitingGames').once('value', s => { const wg = s.val() || {}; let found = false; for (const [gid, gd] of Object.entries(wg)) { if (gd.player1Id !== userId && !gd.started && Date.now()-gd.createdAt < 30000) { found = true; joinOnlineGame(gid, gd); break; } } if (!found) createNewOnlineGame(); }); }
-        function createNewOnlineGame() { const gid = Date.now().toString(); xoGameData.onlineGameId = gid; xoGameData.mySymbol = 'X'; xoGameData.opponentSymbol = 'O'; xoGameData.isMyTurn = true; db.ref('xoWaitingGames/'+gid).set({ player1Id: userId, betAmount: xoGameData.betAmount, board: Array(9).fill(''), currentTurn: 'X', gameActive: false, started: false, createdAt: Date.now(), winner: null, isFree: xoGameData.isFree }).then(() => { setTimeout(() => { db.ref('xoWaitingGames/'+gid).once('value', s => { if (s.exists() && !s.val().player2Id) { db.ref('xoWaitingGames/'+gid).remove(); if (!xoGameData.isFree) { app.balance += xoGameData.betAmount; userRef.update({ balance: app.balance }); updateUI(); } showToast('No opponent! Refunded!'); closeXOGame(); } }); }, 30000); db.ref('xoWaitingGames/'+gid).on('value', s => { const d = s.val(); if (!d) { if (!xoGameData.gameActive) closeXOGame(); return; } if (d.player2Id && !xoGameData.gameActive) { xoGameData.onlineOpponentId = d.player2Id; xoGameData.gameRef = db.ref('xoGames/'+gid); startOnlineGame(gid, d); } }); }); }
-        function joinOnlineGame(gid, gd) { xoGameData.onlineGameId = gid; xoGameData.mySymbol = 'O'; xoGameData.opponentSymbol = 'X'; xoGameData.isMyTurn = false; xoGameData.gameRef = db.ref('xoGames/'+gid); db.ref('xoGames/'+gid).set({ ...gd, player2Id: userId, started: true, gameActive: true }).then(() => { db.ref('xoWaitingGames/'+gid).remove(); startOnlineGame(gid, { ...gd, player2Id: userId, started: true, gameActive: true }); }); }
-        function startOnlineGame(gid, gd) { document.getElementById('xoOnlineInfo').style.display = 'none'; document.getElementById('xoGameBoard').style.display = 'block'; xoGameData.board = gd.board || Array(9).fill(''); xoGameData.gameActive = true; xoGameData.isMyTurn = gd.currentTurn === xoGameData.mySymbol; document.getElementById('xoPlayer1Badge').querySelector('.player-symbol').textContent = xoGameData.mySymbol; document.getElementById('xoPlayer2Badge').querySelector('.player-symbol').textContent = xoGameData.opponentSymbol; document.getElementById('xoPlayersInfo').style.display = 'flex'; updateXOStatus(); renderXOBoard(); if (xoGameData.gameRef) xoGameData.gameRef.off(); xoGameData.gameRef = db.ref('xoGames/'+gid); xoGameData.gameRef.on('value', s => { const d = s.val(); if (!d) { if (xoGameData.gameActive) { xoGameData.gameActive = false; showToast('Opponent left!'); document.getElementById('xoStatus').textContent = 'Opponent left!'; document.getElementById('xoRestartBtn').style.display = 'block'; } return; } if (d.board && JSON.stringify(d.board) !== JSON.stringify(xoGameData.board)) { xoGameData.board = d.board; xoGameData.isMyTurn = d.currentTurn === xoGameData.mySymbol; xoGameData.gameActive = d.gameActive; xoGameData.winner = d.winner; xoGameData.winningCombo = d.winningCombo; renderXOBoard(); updateXOStatus(); if (d.winner && !xoGameData.rewardGiven) handleGameEnd(d.winner); } }); }
-        function renderXOBoard() { const b = document.getElementById('xoBoard'); b.innerHTML = ''; for (let i = 0; i < 9; i++) { const c = document.createElement('div'); c.className = 'xo-cell'; c.textContent = xoGameData.board[i]; if (xoGameData.board[i] === 'X') c.classList.add('x-player'); else if (xoGameData.board[i] === 'O') c.classList.add('o-player'); if (xoGameData.winner && xoGameData.winningCombo?.includes(i)) c.classList.add('win-cell'); c.onclick = () => makeXOMove(i); b.appendChild(c); } }
-        function makeXOMove(i) { if (!xoGameData.gameActive || xoGameData.gameOver || xoGameData.board[i] !== '' || !xoGameData.isMyTurn) return; xoGameData.board[i] = xoGameData.mySymbol; xoGameData.isMyTurn = false; const w = checkXOWinner(); if (xoGameData.mode === 'computer') { renderXOBoard(); updateXOStatus(); if (w) handleGameEnd(w); else if (!xoGameData.board.includes('')) handleGameEnd('draw'); else { xoAITimeout = setTimeout(makeAIMove, 500+Math.random()*1000); } } else { xoGameData.gameRef.update({ board: xoGameData.board, currentTurn: xoGameData.opponentSymbol, gameActive: !w, winner: w||null, winningCombo: xoGameData.winningCombo||null }); renderXOBoard(); updateXOStatus(); if (w) handleGameEnd(w); else if (!xoGameData.board.includes('')) { handleGameEnd('draw'); xoGameData.gameRef.update({ winner: 'draw', gameActive: false }); } } }
-        function makeAIMove() { if (!xoGameData.gameActive) return; const b = [...xoGameData.board]; for (let i = 0; i < 9; i++) { if (b[i]==='') { b[i]='O'; if (checkXOWinnerForSymbol(b,'O')) { finalizeAIMove(i); return; } b[i]=''; } } for (let i = 0; i < 9; i++) { if (b[i]==='') { b[i]='X'; if (checkXOWinnerForSymbol(b,'X')) { finalizeAIMove(i); return; } b[i]=''; } } if (b[4]==='') { finalizeAIMove(4); return; } const corners = [0,2,6,8].filter(i=>b[i]===''); if (corners.length) { finalizeAIMove(corners[Math.floor(Math.random()*corners.length)]); return; } const edges = [1,3,5,7].filter(i=>b[i]===''); if (edges.length) finalizeAIMove(edges[Math.floor(Math.random()*edges.length)]); }
-        function finalizeAIMove(i) { xoGameData.board[i] = 'O'; xoGameData.isMyTurn = true; const w = checkXOWinner(); renderXOBoard(); updateXOStatus(); if (w) handleGameEnd(w); else if (!xoGameData.board.includes('')) handleGameEnd('draw'); }
-        function checkXOWinner() { const wp = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]; for (const [a,b,c] of wp) { if (xoGameData.board[a] && xoGameData.board[a]===xoGameData.board[b] && xoGameData.board[a]===xoGameData.board[c]) { xoGameData.winningCombo=[a,b,c]; return xoGameData.board[a]; } } return null; }
-        function checkXOWinnerForSymbol(b,s) { const wp = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]; return wp.some(([a,b2,c])=>b[a]===s&&b[b2]===s&&b[c]===s); }
-        function handleGameEnd(r) { if (xoGameData.rewardGiven) return; xoGameData.rewardGiven=true; xoGameData.gameActive=false; xoGameData.gameOver=true; let reward=0,msg=''; if (r==='draw') { msg='🤝 Draw!'; document.getElementById('xoStatus').className='xo-status draw'; if (!xoGameData.isFree) { reward=xoGameData.betAmount; app.balance+=reward; } } else if (r===xoGameData.mySymbol) { msg='🎉 You win!'; document.getElementById('xoStatus').className='xo-status win'; reward=xoGameData.betAmount+Math.floor(xoGameData.betAmount*0.10); app.balance+=reward; app.xpPoints+=reward*2; } else { msg='😞 You lose!'; document.getElementById('xoStatus').className='xo-status lose'; } if (xoGameData.isFree) { reward=20; app.balance+=reward; } document.getElementById('xoStatus').textContent=msg; document.getElementById('xoRewardInfo').textContent=reward>0?`+${reward} Coins`:(xoGameData.isFree?'+20 Coins':`-${xoGameData.betAmount} Coins`); document.getElementById('xoRestartBtn').style.display='block'; userRef.update({balance:app.balance,xpPoints:app.xpPoints}); updateUI();updateLevelUI();renderXOBoard(); }
-        function updateXOStatus() { if (xoGameData.gameOver) return; document.getElementById('xoStatus').textContent=xoGameData.isMyTurn?'Your turn!':(xoGameData.mode==='computer'?'Computer thinking...':'Opponent\'s turn...'); }
-        function restartXOGame() { resetXOGame(); if (xoGameData.mode==='online') { if (xoGameData.gameRef){xoGameData.gameRef.remove();xoGameData.gameRef=null;} closeXOGame(); return; } if (!xoGameData.isFree&&app.balance<100){closeXOGame();showToast('Not enough!','error');return;} if(!xoGameData.isFree){app.balance-=xoGameData.betAmount;userRef.update({balance:app.balance});updateUI();} initComputerGame(); }
-        function resetXOGame() { xoGameData.board=Array(9).fill(''); xoGameData.gameActive=false; xoGameData.gameOver=false; xoGameData.winner=null; xoGameData.isMyTurn=true; xoGameData.rewardGiven=false; xoGameData.winningCombo=null; document.getElementById('xoGameBoard').style.display='none'; document.getElementById('xoModeSelection').style.display='block'; document.getElementById('xoBetSection').style.display='none'; document.getElementById('xoOnlineInfo').style.display='none'; if(xoAITimeout){clearTimeout(xoAITimeout);xoAITimeout=null;} }
+    // ===== TASKS =====
+    function loadTasks(){db.ref('tasks').on('value',s=>{tasks=s.exists()?Object.keys(s.val()).map(k=>({id:k,...s.val()[k]})):[];renderTasks();});}
+    function renderTasks(){const c=document.getElementById('tasksContainer'),f=currentFilter==='all'?tasks:tasks.filter(t=>t.type===currentFilter);c.innerHTML=f.length?f.map(t=>{const done=app.taskDone[t.id]===new Date().toDateString();const p=app.taskProg[t.id]||0;const l=t.limit||1;const ic=p>=l;let st='',bh='';if(done&&ic)st='<span style="color:#10b981;">✅ Done</span>';else if(ic)st='<span style="color:#10b981;">✅ Completed</span>';else{const r=l-p;if(t.type==='video')bh='<button class="task-btn" onclick="completeTask(\''+t.id+'\','+t.reward+',\'video\')">📺 Watch ('+r+' left)</button>';else if(t.type==='link')bh='<button class="task-btn" onclick="openWebViewTask(\''+t.id+'\',\''+(t.link||'#')+'\','+t.reward+','+(t.waitTime||60)+')">🔗 Open ('+r+' left)</button>';}return '<div class="task-card"><div class="task-header"><span class="task-title">'+t.title+'</span><span class="task-reward">+'+t.reward+' 🪙</span></div><div style="margin-top:6px;">'+(st||bh)+'</div></div>';}).join(''):'<p style="color:#94a3b8;text-align:center;">📭 No tasks</p>';}
+    function filterTasks(f,b){currentFilter=f;document.querySelectorAll('.task-filters .filter-btn').forEach(x=>x.classList.remove('active'));if(b)b.classList.add('active');renderTasks();}
+    function completeTask(tid,rw,type){if(!isOnline)return;const t=tasks.find(t=>t.id===tid);if(!t||(app.taskProg[tid]||0)>=(t.limit||1))return;if(type==='video'){show_11197472().then(()=>{finishTask(tid,rw,t.limit||1);}).catch(()=>toast('Ad failed!','error'));}else{finishTask(tid,rw,t.limit||1);}}
+    function finishTask(tid,rw,l){app.taskProg[tid]=(app.taskProg[tid]||0)+1;if(app.taskProg[tid]>=l)app.taskDone[tid]=new Date().toDateString();app.bal+=rw;app.xp+=rw*2;ur.update({bal:app.bal,xp:app.xp,taskDone:app.taskDone,taskProg:app.taskProg});updateUI();updateLevel();renderTasks();toast('🎉 +'+rw+' Coins!');}
+    let wvTid=null,wvRw=0,wvTime=60,wvSec=0,wvInt=null;
+    function openWebViewTask(tid,url,rw,wt){if(!isOnline)return;wvTid=tid;wvRw=rw;wvTime=wt||60;wvSec=0;document.getElementById('webviewIframe').src=url;document.getElementById('webviewUrl').textContent=url;document.getElementById('webviewOverlay').classList.add('show');if(wvInt)clearInterval(wvInt);wvInt=setInterval(()=>{wvSec++;const r=Math.max(0,wvTime-wvSec);if(r<=0){clearInterval(wvInt);wvInt=null;document.getElementById('webviewClaimBtn').disabled=false;document.getElementById('webviewClaimBtn').textContent='✅ Claim';}else{document.getElementById('webviewClaimBtn').textContent='⏳ '+r+'s';}},1000);}
+    function closeWebView(){document.getElementById('webviewOverlay').classList.remove('show');if(wvInt){clearInterval(wvInt);wvInt=null;}document.getElementById('webviewIframe').src='about:blank';wvTid=null;}
+    function claimWebViewTask(){if(!wvTid)return;app.taskProg[wvTid]=(app.taskProg[wvTid]||0)+1;if(app.taskProg[wvTid]>=(tasks.find(t=>t.id===wvTid)?.limit||1))app.taskDone[wvTid]=new Date().toDateString();app.bal+=wvRw;app.xp+=wvRw*2;ur.update({bal:app.bal,xp:app.xp,taskDone:app.taskDone,taskProg:app.taskProg});closeWebView();updateUI();updateLevel();renderTasks();toast('🎉 +'+wvRw+' Coins!');}
 
-        // ================== MAINTENANCE ==================
-        function checkMaintenance() { db.ref('maintenance').on('value', s => { const d=s.val()||{enabled:false}; if(d.enabled){document.getElementById('maintenanceOverlay').classList.add('show');document.getElementById('mainContent').style.display='none';document.querySelector('.bottom-nav').style.display='none';if(miningInterval)stopMining();} else{document.getElementById('maintenanceOverlay').classList.remove('show');document.getElementById('mainContent').style.display='block';document.querySelector('.bottom-nav').style.display='flex';} }); }
+    // ===== REFERRAL =====
+    function copyRef(){const l=document.getElementById('refLink').textContent;if(l&&l!=='Loading...')navigator.clipboard.writeText(l).then(()=>toast('📋 Copied!'));}
+    function submitRefCode(){const c=document.getElementById('refCodeInput').value.trim().toUpperCase();if(!c)return;ur.once('value',s=>{if(s.val()?.refUsed){toast('Already used!','error');return;}db.ref('users').orderByChild('refCode').equalTo(c).once('value',sn=>{if(!sn.exists()){toast('Invalid!','error');return;}sn.forEach(ch=>{if(ch.key===uid)return;db.ref('refs/'+uid).set({by:ch.key,at:Date.now(),name:dn});db.ref('users/'+ch.key).transaction(cur=>({...(cur||{}),refs:(cur?.refs||0)+1}));app.bal+=50;app.xp+=100;ur.update({bal:app.bal,xp:app.xp,refUsed:true});updateUI();updateLevel();toast('🎉 +50 Coins!');});});});}
 
-        // ================== SPIN WHEEL (unchanged) ==================
-        const SPIN_COUNT_LIMIT=20,SPIN_BUTTON_COOLDOWN_SECONDS=15;let spinCount=SPIN_COUNT_LIMIT,spinBtnCooldownInterval=null,isSpinning=false,currentRotation=0;
-        function buildWheel(){const sc=document.getElementById('wheelSegments');const ns=prizeData.length;const as=360/ns;sc.innerHTML='';const colors=['#FF6B6B','#4ECDC4','#45B7D1','#96CEB4','#FFEAA7','#DDA0DD','#FF9FF3','#54A0FF','#5F27CD','#FF6B6B','#4ECDC4','#45B7D1','#96CEB4','#FFEAA7','#DDA0DD'];for(let i=0;i<ns;i++){const s=document.createElement('div');s.className='wheel-segment';s.style.transform=`rotate(${i*as}deg)`;s.style.backgroundColor=colors[i%colors.length];s.innerHTML=`<span>${prizeData[i].label}</span>`;sc.appendChild(s);}const bc=document.getElementById('wheelBulbs');bc.innerHTML='';for(let i=0;i<20;i++){const b=document.createElement('div');b.className='wheel-bulb';const a=(i/20)*360;b.style.left=(140+140*Math.cos(a*Math.PI/180)-6)+'px';b.style.top=(140+140*Math.sin(a*Math.PI/180)-6)+'px';bc.appendChild(b);}}
-        function getPrizeByAngle(a){const ns=prizeData.length;let n=a%360;if(n<0)n+=360;return prizeData[Math.floor(n/(360/ns))%ns];}
-        function openSpinModal(){if(spinCount<=0){showToast('No spins!','error');return;}document.getElementById('spinModal').classList.add('show');updateSpinModalUI();}
-        function closeSpinModal(){document.getElementById('spinModal').classList.remove('show');}
-        function updateSpinModalUI(){document.getElementById('modalSpinCount').textContent=`Spins: ${spinCount}/${SPIN_COUNT_LIMIT}`;}
-        function spinWheelFromModal(){if(!isOnline||isSpinning||spinCount<=0)return;const btn=document.getElementById('modalSpinBtn');btn.disabled=true;isSpinning=true;let cd=SPIN_BUTTON_COOLDOWN_SECONDS;document.getElementById('modalSpinTimerBox').classList.add('show');document.getElementById('modalSpinTimerDisplay').textContent=`00:${String(cd).padStart(2,'0')}`;if(spinBtnCooldownInterval)clearInterval(spinBtnCooldownInterval);spinBtnCooldownInterval=setInterval(()=>{cd--;if(cd>0)document.getElementById('modalSpinTimerDisplay').textContent=`00:${String(cd).padStart(2,'0')}`;else{clearInterval(spinBtnCooldownInterval);spinBtnCooldownInterval=null;document.getElementById('modalSpinTimerBox').classList.remove('show');btn.disabled=false;}},1000);currentRotation+=(5+Math.floor(Math.random()*5))*360+Math.floor(Math.random()*360);document.getElementById('wheelSegments').style.transform=`rotate(${currentRotation}deg)`;show_11197472().then(()=>{const p=getPrizeByAngle(currentRotation);if(p.type==='coins')app.balance+=p.value;else app.usdBalance+=p.value;spinCount--;document.getElementById('spinBadge').textContent=spinCount;updateSpinModalUI();document.getElementById('rewardText').textContent=`You won ${p.label}!`;document.getElementById('successModal').classList.add('active');userRef.update({balance:app.balance,usdBalance:app.usdBalance,spinCount});updateUI();isSpinning=false;}).catch(()=>{btn.disabled=false;isSpinning=false;showToast('Ad not watched!','error');});}
-        function loadSpinData(){db.ref('users/'+userId+'/spinCount').on('value',s=>{spinCount=s.val()!==null?s.val():SPIN_COUNT_LIMIT;document.getElementById('spinBadge').textContent=spinCount;updateSpinModalUI();});}
-        function watchMiningCoins(){db.ref('users/'+userId+'/progressCoins').on('value',s=>{if(s.val()===0){spinCount=SPIN_COUNT_LIMIT;document.getElementById('spinBadge').textContent=spinCount;updateSpinModalUI();userRef.update({spinCount});showToast('🔄 Spins reset!');}});}
+    // ===== WITHDRAW =====
+    function selectMethod(m){app.wMethod=m;document.querySelectorAll('.method-btn').forEach(b=>b.classList.remove('active'));event.target.classList.add('active');}
+    function withdraw(){if(app.usd<10){toast('Min $10!','error');return;}const a=document.getElementById('wAccount').value.trim();if(!a){toast('Enter account!','error');return;}const id=Date.now().toString();db.ref('withdraws/'+id).set({uid,name:dn,amt:app.usd,method:app.wMethod,acct:a,status:'pending',at:new Date().toISOString()});app.usd=0;app.wHist.unshift({id,amt:app.usd,method:app.wMethod,status:'pending',date:new Date().toISOString()});ur.update({usd:0,wHist:app.wHist});updateUI();renderWHist();toast('Request sent!');}
+    function renderWHist(){const c=document.getElementById('wHistory');c.innerHTML=app.wHist.length?app.wHist.map(h=>'<div class="history-item"><div>$'+h.amt.toFixed(4)+' via '+h.method+'</div><div>'+h.status+'</div></div>').join(''):'<span style="color:#94a3b8;">No history</span>';}
 
-        // ================== DAILY BONUS ==================
-        function claimDailyBonus(){if(!isOnline)return;const today=new Date().toDateString();if(app.dailyBonusClaimed===today){showToast('Already claimed!','error');return;}const ba=app.dailyBonusMin+Math.floor(Math.random()*(app.dailyBonusMax-app.dailyBonusMin+1));app.balance+=ba;app.xpPoints+=ba*2;app.dailyBonusClaimed=today;userRef.update({balance:app.balance,xpPoints:app.xpPoints,dailyBonusClaimed:today});document.getElementById('dailyBonusStatus').textContent='✅ Claimed';updateUI();updateLevelUI();showToast(`🎁 +${ba} Coins!`);}
+    // ===== NOTIFICATIONS =====
+    function openNotifications(){document.getElementById('notificationOverlay').classList.add('show');db.ref('notifications').orderByChild('createdAt').limitToLast(20).once('value',s=>{const ns=s.val()||{};const na=Object.values(ns).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));document.getElementById('notificationList').innerHTML=na.length?na.map(n=>'<div class="notification-item"><div class="notif-title">'+(n.title||'Notification')+'</div><div class="notif-message">'+(n.message||'')+'</div><div class="notif-time">'+(n.createdAt?new Date(n.createdAt).toLocaleString():'')+'</div></div>').join(''):'<p style="color:#94a3b8;">No notifications</p>';});}
+    function closeNotifications(){document.getElementById('notificationOverlay').classList.remove('show');}
 
-        // ================== MYSTERY BOX ==================
-        function updateMysteryBoxUI(){const te=document.getElementById('mysteryBoxTimer');if(app.mysteryBoxCooldown>Date.now()){te.textContent=`⏳ ${formatTime(Math.ceil((app.mysteryBoxCooldown-Date.now())/1000))}`;te.classList.add('cooldown');}else{te.textContent='🎯 Tap to open';te.classList.remove('cooldown');}}
-        function openMysteryBox(){if(!isOnline||app.mysteryBoxCooldown>Date.now())return;document.getElementById('boxLid').classList.add('open');document.getElementById('giftIcon').className='gift-icon opened';document.getElementById('giftIcon').textContent='✨';show_11197472().then(()=>{const rt=Math.random()>0.5?'usd':'coins';let rc=0,ru=0;if(rt==='coins'){rc=app.mysteryBoxMin+Math.floor(Math.random()*(app.mysteryBoxMax-app.mysteryBoxMin+1));app.balance+=rc;}else{ru=parseFloat((Math.random()*0.006+0.002).toFixed(4));app.usdBalance+=ru;}app.xpPoints+=(rc||ru*1000)*2;app.mysteryBoxCooldown=Date.now()+app.mysteryBoxDuration;userRef.update({balance:app.balance,usdBalance:app.usdBalance,xpPoints:app.xpPoints,mysteryBoxCooldown:app.mysteryBoxCooldown});const rt2=rt==='coins'?`+${rc} Coins`:`+$${ru.toFixed(4)} USD`;showToast(`🎁 ${rt2}!`);updateUI();updateLevelUI();updateMysteryBoxUI();setTimeout(()=>{document.getElementById('boxLid').classList.remove('open');document.getElementById('giftIcon').className='gift-icon';document.getElementById('giftIcon').textContent='🎁';},2000);}).catch(()=>{document.getElementById('boxLid').classList.remove('open');document.getElementById('giftIcon').className='gift-icon';document.getElementById('giftIcon').textContent='🎁';showToast('Ad not watched!','error');});}
+    // ===== SPIN =====
+    function spinWheel(){show_11197472().then(()=>{const r=Math.random();let prize=0,type='coins';if(r<0.3){prize=Math.floor(Math.random()*100)+50;app.bal+=prize;}else if(r<0.6){prize=Math.floor(Math.random()*300)+100;app.bal+=prize;}else{prize=parseFloat((Math.random()*0.05+0.01).toFixed(4));app.usd+=prize;type='usd';}ur.update({bal:app.bal,usd:app.usd});updateUI();document.getElementById('spinResult').textContent='🎉 Won '+(type==='coins'?prize+' Coins':'$'+prize.toFixed(4))+'!';document.getElementById('spinModal').classList.add('show');}).catch(()=>toast('Ad failed!','error'));}
+    function closeSpin(){document.getElementById('spinModal').classList.remove('show');}
 
-        // ================== SPEED BOOST ==================
-        function updateSpeedBoostUI(){const bb=document.getElementById('speedBoostBtn');if(app.speedBoostCooldown>Date.now()){bb.disabled=true;bb.textContent=`⏳ ${formatTime(Math.ceil((app.speedBoostCooldown-Date.now())/1000))}`;}else{bb.disabled=false;bb.textContent='🚀 Speed Boost';}}
-        function activateSpeedBoost(){if(!isOnline||app.speedBoostCooldown>Date.now()||app.progressCoins<=0)return;show_11197472().then(()=>{const st=Date.now();let ta=0;const tc=Math.floor(Math.random()*11)+50;const bm=setInterval(()=>{if(Date.now()-st>=3000||ta>=tc){clearInterval(bm);app.speedBoostCooldown=Date.now()+3600000;userRef.update({speedBoostCooldown:app.speedBoostCooldown});updateSpeedBoostUI();showToast(`🚀 Done! +${ta} coins`);return;}const aa=Math.min(3,tc-ta);if(aa<=0){clearInterval(bm);return;}app.progressCoins-=1;app.balance+=aa;app.xpPoints+=aa*2;ta+=aa;userRef.update({balance:app.balance,progressCoins:app.progressCoins,xpPoints:app.xpPoints});updateProgressUI();updateUI();updateLevelUI();},100);showToast('⚡ Speed Boost!');}).catch(()=>showToast('Ad not watched!','error'));}
+    // ===== BAN =====
+    function submitBanAppeal(){const m=prompt('Write appeal:');if(!m)return;db.ref('banAppeals/'+uid).set({uid,name:dn,msg:m,status:'pending',at:Date.now()});toast('📩 Submitted!');}
 
-        // ================== TIME ==================
-        function formatTime(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;}
+    // ===== NAVIGATION =====
+    function switchPage(p,el){document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));if(el)el.classList.add('active');document.querySelectorAll('.page').forEach(pg=>pg.classList.remove('active'));const t=document.getElementById('page'+p.charAt(0).toUpperCase()+p.slice(1));if(t)t.classList.add('active');if(p==='wallet')renderWHist();}
 
-        // ================== MINING ==================
-        function startMining(){if(!isOnline||miningInterval||app.progressCoins<=0)return;document.getElementById('circleStartOverlay').classList.add('hidden');userRef.update({isCurrentlyMining:true,lastMiningActivity:Date.now()});wasMiningBeforeOffline=true;function mnc(){if(!isOnline||isAdShowing||app.progressCoins<=0){stopMining();return;}const d=calculateLevel(app.xpPoints);let sm=1+(d.bonusPercent/100);app.progressCoins-=1;app.balance+=sm;app.xpPoints+=1;userRef.update({balance:app.balance,progressCoins:app.progressCoins,xpPoints:app.xpPoints});const coin=document.createElement('div');coin.className='floating-coin';coin.textContent=`+${sm.toFixed(0)} 🪙`;coin.style.left=(Math.random()*80+10)+'%';coin.style.top='35%';document.body.appendChild(coin);setTimeout(()=>coin.remove(),1000);updateProgressUI();updateUI();updateLevelUI();miningInterval=setTimeout(mnc,5000/sm);}mnc();showToast('⛏️ Mining!');}
-        function stopMining(){if(miningInterval){clearTimeout(miningInterval);miningInterval=null;}wasMiningBeforeOffline=false;userRef.update({isCurrentlyMining:false});updateProgressUI();}
-
-        // ================== LEVEL (unchanged) ==================
-        function getLevelConfig(l){if(l===0)return{tier:'unlocking',tierName:'Unlocking',tierEmoji:'🔒',bonusPercent:0,xpForLevel:5000};let tier,tn,te,bonus;if(l>=1&&l<=20){tier='bronze';tn='Bronze';te='🥉';bonus=10;}else if(l>=21&&l<=40){tier='silver';tn='Silver';te='🥈';bonus=20;}else if(l>=41&&l<=60){tier='gold';tn='Gold';te='🥇';bonus=30;}else if(l>=61&&l<=80){tier='platinum';tn='Platinum';te='💎';bonus=40;}else if(l>=81&&l<=100){tier='diamond';tn='Diamond';te='👑';bonus=50;}else{tier='max';tn='MAX';te='⭐';bonus=50;}return{tier,tierName:tn,tierEmoji:te,bonusPercent:bonus,xpForLevel:Math.floor(l===1?1800:1800*Math.pow(2,l-1))};}
-        function calculateLevel(xp){xp=xp||NEGATIVE_XP;if(xp<0){const b=5000;return{level:0,xp,progress:Math.min(100,Math.floor((xp+b)/b*100)),tierName:'Unlocking',tierEmoji:'🔒',bonusPercent:0,xpForLevel:b};}let l=1,xn=1800,tx=0;while(l<=100){if(xp<tx+xn)break;tx+=xn;l++;if(l>100)break;xn=1800*Math.pow(2,l-1);}if(l>100){l=100;xn=1800*Math.pow(2,99);tx=0;for(let i=1;i<100;i++)tx+=1800*Math.pow(2,i-1);}const c=getLevelConfig(l);return{level:l,xp,progress:Math.min(100,Math.floor(((xp-tx)/xn)*100)),tierName:c.tierName,tierEmoji:c.tierEmoji,bonusPercent:c.bonusPercent,xpForLevel:xn};}
-        function updateLevelUI(){const d=calculateLevel(app.xpPoints);if(d.level===0){document.getElementById('levelTitle').textContent='🔒 Unlocking';document.getElementById('levelNumber').textContent='Level 0';document.getElementById('levelProgressFill').style.width=d.progress+'%';document.getElementById('levelCurrentPoints').textContent=`${d.xp} XP`;document.getElementById('levelNextPoints').textContent=`/ ${d.xpForLevel} XP`;document.getElementById('userLevelBadge').textContent='🔒 Unlocking';}else{document.getElementById('levelTitle').textContent=`${d.tierEmoji} ${d.tierName}`;document.getElementById('levelNumber').textContent=`Level ${d.level}`;document.getElementById('levelProgressFill').style.width=d.progress+'%';document.getElementById('levelCurrentPoints').textContent=`${d.xp} XP`;document.getElementById('levelNextPoints').textContent=d.level>=100?'⭐ MAX':`/ ${d.xpForLevel} XP`;document.getElementById('userLevelBadge').textContent=`${d.tierEmoji} Lv.${d.level}`;}}
-        function openLevelPage(){document.getElementById('levelOverlay').classList.add('show');updateLevelPageUI();renderLevelGrid();}
-        function closeLevelPage(){document.getElementById('levelOverlay').classList.remove('show');}
-        function updateLevelPageUI(){const d=calculateLevel(app.xpPoints);document.getElementById('lvlEmoji').textContent=d.tierEmoji;document.getElementById('lvlNumber').textContent=d.level===0?'Level 0':`Level ${d.level}`;document.getElementById('lvlName').textContent=d.tierName;document.getElementById('lvlXP').textContent=d.level===0?`${d.xp} / ${d.xpForLevel} XP`:`${d.xp} XP (${d.progress}%)`;document.getElementById('lvlProgressFill').style.width=d.progress+'%';document.getElementById('lvlBonus').textContent=`Mining Bonus: +${d.bonusPercent}%`;}
-        function renderLevelGrid(){const g=document.getElementById('levelGrid'),cl=calculateLevel(app.xpPoints);let h='';for(let i=0;i<=100;i++){if(currentLevelFilter!=='all'){const r={bronze:[1,20],silver:[21,40],gold:[41,60],platinum:[61,80],diamond:[81,100]};if(i>0&&(i<r[currentLevelFilter][0]||i>r[currentLevelFilter][1]))continue;if(i===0&&currentLevelFilter!=='bronze')continue;}const c=getLevelConfig(i);const isC=cl.level===i,isU=cl.level>=i;h+=`<div class="level-card ${isC?'current':isU?'unlocked':'locked'}"><div style="font-size:18px;font-weight:900;color:#fbbf24;">${c.tierEmoji} ${i}</div><div style="font-size:11px;color:#94a3b8;">${c.tierName}</div><div style="font-size:12px;color:#10b981;">+${c.bonusPercent}%</div><div style="font-size:10px;color:#94a3b8;">${isC?'👈':isU?'✅':'🔒'}</div></div>`;}g.innerHTML=h;}
-        function filterLevels(f,b){currentLevelFilter=f;document.querySelectorAll('.lvl-filter-btn').forEach(x=>x.classList.remove('active'));if(b)b.classList.add('active');renderLevelGrid();}
-
-        // ================== TASKS (unchanged) ==================
-        function loadTasks(){db.ref('tasks').on('value',s=>{tasks=s.exists()?Object.keys(s.val()).map(k=>({id:k,...s.val()[k]})):[];renderTasks();});}
-        function renderTasks(){const c=document.getElementById('tasksContainer'),f=currentFilter==='all'?tasks:tasks.filter(t=>t.type===currentFilter);c.innerHTML=f.length?f.map(t=>{const done=app.taskLastCompleted[t.id]===new Date().toDateString();const p=app.taskProgress[t.id]||0;const l=t.limit||1;const ic=p>=l;let st='',bh='';if(done&&ic)st='<span style="color:#10b981;">✅ Done</span>';else if(ic)st='<span style="color:#10b981;">✅ Completed</span>';else{const r=l-p;if(t.type==='video')bh=`<button class="task-btn" onclick="completeTask('${t.id}',${t.reward},'${t.type}')">📺 Watch (${r} left)</button>`;else if(t.type==='link')bh=`<button class="task-btn" onclick="openWebViewTask('${t.id}','${t.link||'#'}',${t.reward},${t.waitTime||60})">🔗 Open (${r} left)</button>`;else bh=`<button class="task-btn" onclick="completeTask('${t.id}',${t.reward},'${t.type}')">🔗 Open (${r} left)</button>`;}return `<div class="task-card"><div class="task-header"><span class="task-title">${t.title}</span><span class="task-reward">+${t.reward} 🪙</span></div><div style="font-size:11px;">${t.description||''}</div><div class="task-progress">Progress: ${p}/${l}</div><div style="display:flex;justify-content:space-between;margin-top:6px;">${st||bh}</div></div>`;}).join(''):'<p style="color:#94a3b8;text-align:center;">📭 No tasks</p>';}
-        function filterTasks(f,b){currentFilter=f;document.querySelectorAll('.task-filters .filter-btn').forEach(x=>x.classList.remove('active'));if(b)b.classList.add('active');renderTasks();}
-        function openWebViewTask(tid,url,rw,wt){if(!isOnline)return;if(app.taskProgress[tid]>=(tasks.find(t=>t.id===tid)?.limit||1)){showToast('Completed!','error');return;}webViewTaskId=tid;webViewTaskReward=rw;webViewRequiredTime=wt||60;webViewSeconds=0;document.getElementById('webviewIframe').src=url;document.getElementById('webviewUrlText').textContent=url;document.getElementById('webviewOverlay').classList.add('show');if(webViewTimerInterval)clearInterval(webViewTimerInterval);webViewTimerInterval=setInterval(()=>{webViewSeconds++;const r=Math.max(0,webViewRequiredTime-webViewSeconds);document.getElementById('webviewTimer').textContent=`⏱ ${r}s`;if(r<=0){clearInterval(webViewTimerInterval);webViewTimerInterval=null;document.getElementById('webviewClaimBtn').disabled=false;document.getElementById('webviewClaimBtn').textContent='✅ Claim';}else document.getElementById('webviewClaimBtn').textContent=`⏳ ${r}s`;},1000);}
-        function closeWebView(){document.getElementById('webviewOverlay').classList.remove('show');if(webViewTimerInterval){clearInterval(webViewTimerInterval);webViewTimerInterval=null;}document.getElementById('webviewIframe').src='about:blank';webViewTaskId=null;}
-        function claimWebViewTask(){if(!webViewTaskId)return;app.taskProgress[webViewTaskId]=(app.taskProgress[webViewTaskId]||0)+1;if(app.taskProgress[webViewTaskId]>=(tasks.find(t=>t.id===webViewTaskId)?.limit||1))app.taskLastCompleted[webViewTaskId]=new Date().toDateString();app.balance+=webViewTaskReward;app.xpPoints+=webViewTaskReward*2;userRef.update({balance:app.balance,xpPoints:app.xpPoints,taskProgress:app.taskProgress,taskLastCompleted:app.taskLastCompleted});closeWebView();updateUI();updateLevelUI();renderTasks();showToast(`🎉 +${webViewTaskReward} Coins!`);}
-        function completeTask(tid,rw,type){if(!isOnline)return;const t=tasks.find(t=>t.id===tid);if(!t||(app.taskProgress[tid]||0)>=(t.limit||1))return;if(type==='video')show_11197472().then(()=>finishTaskProgress(tid,rw,t.limit||1)).catch(()=>showToast('Ad not watched!','error'));else finishTaskProgress(tid,rw,t.limit||1);}
-        function finishTaskProgress(tid,rw,l){app.taskProgress[tid]=(app.taskProgress[tid]||0)+1;if(app.taskProgress[tid]>=l)app.taskLastCompleted[tid]=new Date().toDateString();app.balance+=rw;app.xpPoints+=rw*2;userRef.update({balance:app.balance,xpPoints:app.xpPoints,taskLastCompleted:app.taskLastCompleted,taskProgress:app.taskProgress});updateUI();updateLevelUI();renderTasks();showToast(`🎉 +${rw} Coins!`);}
-
-        // ================== REFERRAL (unchanged) ==================
-        function loadReferralConfigFromDB(){db.ref('referralConfig').on('value',s=>{referralConfigCache=s.val()||{perReferralCoins:50,xpPerReferral:100};updateReferUI();});}
-        function updateReferUI(){const t=app.referralCount||0;document.getElementById('referTotal').textContent=t;document.getElementById('referEarned').textContent=t*(referralConfigCache.perReferralCoins||50);document.getElementById('referBonus').textContent=Math.floor(t/10)*50;const tiers=[{l:1,c:referralConfigCache.tier1?.count||10,b:referralConfigCache.tier1?.bonus||50,n:'🥉 Bronze'},{l:2,c:referralConfigCache.tier2?.count||25,b:referralConfigCache.tier2?.bonus||150,n:'🥈 Silver'},{l:3,c:referralConfigCache.tier3?.count||50,b:referralConfigCache.tier3?.bonus||300,n:'🥇 Gold'},{l:4,c:referralConfigCache.tier4?.count||100,b:referralConfigCache.tier4?.bonus||500,n:'💎 Platinum'},{l:5,c:referralConfigCache.tier5?.count||200,b:referralConfigCache.tier5?.bonus||1000,n:'👑 Diamond'}];document.getElementById('referTierList').innerHTML=tiers.map(r=>{const cl=app.referTiers?.[r.l]===1,av=t>=r.c&&!cl;return `<div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;"><div><div style="font-size:13px;">${r.n}</div><div style="font-size:10px;color:#94a3b8;">${r.c} refs • +${r.b} 🪙</div></div><span style="color:${av?'#fbbf24':'#64748b'};" ${av?`onclick="claimTier(${r.l},${r.b})"`:''}>${cl?'✅':av?'🎁':'🔒'}</span></div>`;}).join('');}
-        function claimTier(l,b){if(app.referTiers?.[l]===1)return;app.balance+=b;app.xpPoints+=b*2;if(!app.referTiers)app.referTiers={};app.referTiers[l]=1;userRef.update({balance:app.balance,xpPoints:app.xpPoints,referTiers:app.referTiers});updateUI();updateLevelUI();updateReferUI();showToast(`🎁 +${b} Coins!`);}
-        function genRefCode(){return Array(8).fill(0).map(()=>'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random()*36)]).join('');}
-        function submitReferCode(){if(!isOnline)return;const code=document.getElementById('referCodeInput').value.trim().toUpperCase();if(!code){showToast('Enter code!','error');return;}userRef.once('value',s=>{if((s.val()||{}).referCodeSubmitted){showToast('Already used!','error');return;}db.ref('users').orderByChild('referCode').equalTo(code).once('value',sn=>{if(!sn.exists()){showToast('Invalid!','error');return;}sn.forEach(c=>{if(c.key===userId){showToast('Own code!','error');return;}const b=referralConfigCache.perReferralCoins||50;db.ref('referrals/'+userId).set({referredBy:c.key,referredAt:Date.now(),username:displayName,bonus:b,userId}).then(()=>{db.ref('users/'+c.key).transaction(cur=>({...(cur||{}),referCount:(cur?.referCount||0)+1}));app.balance+=b;app.xpPoints+=referralConfigCache.xpPerReferral||100;userRef.update({balance:app.balance,xpPoints:app.xpPoints,referCodeSubmitted:true});document.getElementById('referCodeSubmitBtn').disabled=true;document.getElementById('referCodeInput').disabled=true;updateUI();updateLevelUI();showToast(`🎉 +${b} Coins!`);});});});});}
-        function copyReferLink(){const l=document.getElementById('referLinkHome').textContent;if(l&&l!=='Loading...')navigator.clipboard.writeText(l).then(()=>showToast('📋 Copied!')).catch(()=>showToast('Copy manually','error'));}
-
-        // ================== AIRDROP (unchanged) ==================
-        function loadAirdrop(){db.ref('airdropConfig').on('value',s=>{const c=s.val()||{};document.getElementById('airdropPoolDisplay').textContent=`$${(c.poolAmount||50).toFixed(4)}`;if(c.startTime)startAirdropCountdown(c.startTime,c.endTime);});}
-        function startAirdropCountdown(st,et){if(airdropTimer)clearInterval(airdropTimer);const endTime=et||st+300000;airdropTimer=setInterval(()=>{const r=Math.max(0,endTime-Date.now()),h=Math.floor(r/3600000),m=Math.floor((r%3600000)/60000),s=Math.floor((r%60000)/1000);document.getElementById('airdropCountdown').textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;const btn=document.getElementById('airdropClaimBtn');if(r>0&&!app.airdropClaimed){btn.disabled=false;btn.textContent='🎁 Claim';}else{btn.disabled=true;btn.textContent=app.airdropClaimed?'✅ Claimed':'⛔ Ended';}if(r<=0){clearInterval(airdropTimer);airdropTimer=null;}},1000);}
-        function claimAirdrop(){if(!isOnline||app.airdropClaimed)return;show_11197472().then(()=>{const amt=Math.random()*1.5+0.5,coins=Math.floor(amt*app.conversionRate);app.balance+=coins;app.airdropClaimed=true;app.xpPoints+=coins;db.ref('airdropList/'+Date.now()).set({userId,username:displayName,amount:amt,coins,timestamp:Date.now()});userRef.update({balance:app.balance,airdropClaimed:true,xpPoints:app.xpPoints});document.getElementById('airdropModalText').textContent=`+${coins} Coins!`;document.getElementById('airdropModal').classList.add('active');updateUI();updateLevelUI();showToast(`🎉 +${coins} Coins!`);}).catch(()=>showToast('Ad not watched!','error'));}
-
-        // ================== WITHDRAW (unchanged) ==================
-        function updateWithdrawUI(){const b=app.usdBalance||0,m=app.minWithdraw||10;document.getElementById('withdrawInfo').textContent=`Min: $${m.toFixed(4)}`;document.getElementById('withdrawStatus').textContent=`You have: $${b.toFixed(4)}`;const c=document.getElementById('methodSelector');const mt=app.withdrawMethods||['Nagad','Rocket'];if(!mt.includes(app.selectedMethod))app.selectedMethod=mt[0]||'Nagad';c.innerHTML=mt.map(m=>`<button class="method-btn ${m===app.selectedMethod?'active':''}" onclick="selectMethod('${m}')"><i class="fas ${m.toLowerCase()==='nagad'?'fa-mobile-alt':m.toLowerCase()==='rocket'?'fa-rocket':'fa-wallet'}"></i> ${m}</button>`).join('');document.getElementById('withdrawBtn').disabled=b<m||!isOnline;document.getElementById('withdrawBtn').textContent=!isOnline?'No Internet':(b<m?`Need $${(m-b).toFixed(4)} more`:'Withdraw Now');}
-        function selectMethod(m){app.selectedMethod=m;updateWithdrawUI();}
-        function withdraw(){if(!isOnline)return;const b=app.usdBalance||0;if(b<(app.minWithdraw||10)){showToast('Insufficient!','error');return;}const mt=app.selectedMethod,ac=document.getElementById('withdrawAccount').value.trim();if(!ac){showToast('Enter account!','error');return;}const id=Date.now().toString();db.ref('withdrawRequests/'+id).set({userId,username:displayName,amount:b,method:mt,account:ac,status:'pending',requestedAt:new Date().toISOString()});app.usdBalance=0;app.withdrawHistory=[...(app.withdrawHistory||[]),{id,amount:b,method:mt,account:ac,status:'pending',date:new Date().toISOString()}];userRef.update({usdBalance:0,withdrawHistory:app.withdrawHistory});document.getElementById('withdrawModalTitle').textContent='Sent!';document.getElementById('withdrawModalText').textContent=`$${b.toFixed(4)} via ${mt}`;document.getElementById('withdrawModal').classList.add('active');document.getElementById('withdrawAccount').value='';updateUI();updateWithdrawUI();updateWithdrawHistoryUI();showToast(`$${b.toFixed(4)} requested!`);}
-        function updateWithdrawHistoryUI(){const c=document.getElementById('withdrawHistoryList'),h=app.withdrawHistory||[];c.innerHTML=h.length?h.slice(-20).reverse().map(h=>`<div class="history-item"><div><b>$${h.amount?.toFixed(4)||'0.0000'}</b> <small>${h.method||''}</small></div><div style="text-align:right;"><span>${h.status==='approved'?'✅':h.status==='cancelled'?'❌':'⏳'} ${h.status}</span><div style="font-size:9px;">${h.date?new Date(h.date).toLocaleDateString():''}</div></div></div>`).join(''):'<span style="color:#94a3b8;font-size:11px;">No history</span>';}
-
-        // ================== CONVERSION (unchanged) ==================
-        let conversionTimerInterval=null;
-        function performConversion(){if(app.balance>0){const e=app.balance/app.conversionRate;app.usdBalance+=e;const c=app.balance;app.balance=0;app.lastConversion=Date.now();userRef.update({balance:0,usdBalance:app.usdBalance,lastConversion:app.lastConversion});document.getElementById('conversionText').textContent=`${c} Coins → $${e.toFixed(4)} USD`;document.getElementById('conversionModal').classList.add('active');updateUI();showToast(`💰 Converted to $${e.toFixed(4)} USD!`);}else{app.lastConversion=Date.now();userRef.update({lastConversion:app.lastConversion});}startConversionTimer();}
-        function startConversionTimer(){if(conversionTimerInterval){clearInterval(conversionTimerInterval);conversionTimerInterval=null;}const ud=()=>{const n=Date.now(),l=app.lastConversion||n,nc=l+86400000,r=Math.max(0,nc-n);if(r<=0){if(conversionTimerInterval){clearInterval(conversionTimerInterval);conversionTimerInterval=null;}performConversion();return;}const h=Math.floor(r/3600000),m=Math.floor((r%3600000)/60000),s=Math.floor((r%60000)/1000);document.getElementById('conversionCountdown').textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;};ud();conversionTimerInterval=setInterval(ud,1000);}
-
-        // ================== NOTIFICATIONS ==================
-        function openNotificationPanel(){document.getElementById('notificationOverlay').classList.add('show');loadNotifications();}
-        function closeNotificationPanel(){document.getElementById('notificationOverlay').classList.remove('show');}
-        function loadNotifications(){const c=document.getElementById('notificationList');db.ref('notifications').orderByChild('createdAt').limitToLast(20).once('value',s=>{const ns=s.val()||{};const na=Object.values(ns).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));c.innerHTML=na.length?na.map(n=>{const d=n.createdAt?new Date(n.createdAt).toLocaleString():'';return `<div class="notification-item"><div class="notif-title">${n.title||'Notification'}</div><div class="notif-message">${n.message||''}</div><div class="notif-time">${d}</div></div>`;}).join(''):'<p style="color:#94a3b8;text-align:center;">No notifications</p>';});}
-
-        // ================== UI ==================
-        function updateUI(){document.getElementById('balance').textContent=Math.floor(app.balance);document.getElementById('walletBalance').textContent=Math.floor(app.balance);const usd=(app.balance/app.conversionRate).toFixed(4);document.getElementById('usdValue').textContent=`≈ $${usd} USD`;document.getElementById('walletUsd').textContent=`≈ $${usd} USD`;document.getElementById('walletTotalUsd').textContent=`$${app.usdBalance.toFixed(4)}`;document.getElementById('usdBalanceDisplay').textContent=`$${app.usdBalance.toFixed(4)}`;document.getElementById('totalBalanceDisplay').textContent=`${Math.floor(app.balance)} + $${app.usdBalance.toFixed(4)}`;updateWithdrawUI();updateSpeedBoostUI();startConversionTimer();}
-        function updateProgressUI(){const pct=(app.progressCoins/TOTAL_COINS*100);document.getElementById('miningCircle').style.background=`conic-gradient(#fbbf24 ${pct}%, #1e293b ${pct}%)`;document.getElementById('progressCoinCount').textContent=app.progressCoins;document.getElementById('progressPercent').textContent=Math.round(pct)+'%';const o=document.getElementById('circleStartOverlay'),c=document.getElementById('miningCircle');if(app.progressCoins===0){document.getElementById('progressStatus').textContent='🎯 Empty!';o.classList.remove('hidden');c.classList.remove('mining-active');}else if(miningInterval){document.getElementById('progressStatus').textContent='⚡ Mining...';o.classList.add('hidden');c.classList.add('mining-active');}else{document.getElementById('progressStatus').textContent='Ready';o.classList.remove('hidden');c.classList.remove('mining-active');}}
-
-        // ================== NAVIGATION ==================
-        function switchPage(p,el){document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));if(el)el.classList.add('active');document.querySelectorAll('.page').forEach(pg=>pg.classList.remove('active'));const t=document.getElementById('page'+p.charAt(0).toUpperCase()+p.slice(1));if(t)t.classList.add('active');if(p==='tasks')renderTasks();if(p==='refer')updateReferUI();if(p==='wallet'){updateWithdrawUI();updateWithdrawHistoryUI();}}
-        function showToast(m,ty='success'){const t=document.getElementById('toast');t.textContent=m;t.className='toast show'+(ty==='error'?' error':'');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3000);}
-        function closeModal(id){document.getElementById(id).classList.remove('active');}
-
-        // ================== BAN ==================
-        function checkBanStatus(){userRef.child('banned').on('value',s=>{if(s.val()===true){document.getElementById('bannedOverlay').classList.add('show');document.getElementById('mainContent').style.display='none';document.querySelector('.bottom-nav').style.display='none';}});}
-        function submitBanAppeal(){const msg=prompt('Write your appeal:');if(!msg)return;db.ref('banAppeals/'+userId).set({userId,username:displayName,message:msg,status:'pending',createdAt:Date.now()});showToast('📩 Submitted!');}
-
-        // ================== NETWORK ==================
+    // ===== INIT =====
+    function init(){
+        if(!navigator.onLine){document.getElementById('networkOverlay').classList.add('show');isOnline=false;}
         window.addEventListener('online',()=>{isOnline=true;document.getElementById('networkOverlay').classList.remove('show');});
         window.addEventListener('offline',()=>{isOnline=false;document.getElementById('networkOverlay').classList.add('show');});
-        function checkNetworkAndReload(){if(navigator.onLine)location.reload();else showToast('Still offline!','error');}
-
-        // ================== RULES ==================
-        function loadRules(){db.ref('rules').on('value',s=>{const r=s.val()||{};document.getElementById('miningRulesText').textContent=r.mining||'No rules set.';document.getElementById('taskRulesText').textContent=r.tasks||'No rules set.';document.getElementById('referRulesText').textContent=r.referral||'No rules set.';document.getElementById('withdrawRulesText').textContent=r.withdraw||'No rules set.';document.getElementById('levelRulesText').textContent=r.level||'No rules set.';document.getElementById('airdropRulesText').textContent=r.airdrop||'No rules set.';});}
-
-        // ================== INIT ==================
-        function initApp(){
-            if(!navigator.onLine){document.getElementById('networkOverlay').classList.add('show');isOnline=false;}
-            userRef.update({username:tg.initDataUnsafe?.user?.username||'',firstName:tg.initDataUnsafe?.user?.first_name||'',lastName:tg.initDataUnsafe?.user?.last_name||'',fullName:displayName,lastLogin:new Date().toISOString()});
-            document.getElementById('userName').textContent=displayName;
-            checkBanStatus();loadReferralConfigFromDB();loadRules();loadSpinData();loadSpinConfig();
-            buildPrizeData();buildWheel();watchMiningCoins();checkMaintenance();
-            db.ref('conversionRate').on('value',s=>{app.conversionRate=s.val()||1000;updateUI();});
-            show_11197472({type:'inApp',inAppSettings:{frequency:2,capping:0.1,interval:30,timeout:5,everyPage:false}});
-            let lt=setTimeout(()=>{document.getElementById('loadingPage').classList.add('hidden');},15000);
-            userRef.on('value',snap=>{
-                clearTimeout(lt);document.getElementById('loadingPage').classList.add('hidden');
-                const d=snap.val()||{};if(d.banned)return;
-                app.balance=d.balance||0;app.usdBalance=d.usdBalance||0;
-                app.referralCount=d.referCount||0;app.lastConversion=d.lastConversion||Date.now();
-                app.referCode=d.referCode||genRefCode();app.referTiers=d.referTiers||{};
-                app.progressCoins=d.progressCoins!==undefined?d.progressCoins:TOTAL_COINS;
-                app.speedBoostCooldown=d.speedBoostCooldown||0;app.mysteryBoxCooldown=d.mysteryBoxCooldown||0;
-                app.taskLastCompleted=d.taskLastCompleted||{};app.taskProgress=d.taskProgress||{};
-                app.xpPoints=d.xpPoints!==undefined?d.xpPoints:NEGATIVE_XP;
-                app.withdrawHistory=d.withdrawHistory||[];app.airdropClaimed=d.airdropClaimed||false;
-                app.dailyBonusClaimed=d.dailyBonusClaimed||'';
-                if(!window._lastReferCode||window._lastReferCode!==app.referCode){window._lastReferCode=app.referCode;document.getElementById('referLinkHome').textContent=`https://t.me/CoinQuist_bot?start=ref_${app.referCode}`;}
-                document.getElementById('userName').textContent=d.fullName||d.firstName||displayName;
-                if(d.lastLogin)document.getElementById('lastLoginDisplay').textContent=`📅 ${new Date(d.lastLogin).toLocaleString()}`;
-                document.getElementById('dailyBonusStatus').textContent=app.dailyBonusClaimed===new Date().toDateString()?'✅ Claimed':'🎯 Claim Now';
-                updateMysteryBoxUI();
-                if(!d.balance&&d.xpPoints===undefined)userRef.update({balance:0,usdBalance:0,referCode:app.referCode,progressCoins:TOTAL_COINS,xpPoints:NEGATIVE_XP,lastConversion:Date.now(),lastLogin:new Date().toISOString(),airdropClaimed:false,isCurrentlyMining:false,username:tg.initDataUnsafe?.user?.username||'',firstName:tg.initDataUnsafe?.user?.first_name||'',lastName:tg.initDataUnsafe?.user?.last_name||'',fullName:displayName});
-                updateUI();updateLevelUI();updateProgressUI();updateSpeedBoostUI();startConversionTimer();
-            });
-            db.ref('withdrawSettings').on('value',s=>{if(s.exists()){app.minWithdraw=s.val().minAmount||10;app.withdrawMethods=s.val().methods||['Nagad','Rocket'];if(!app.withdrawMethods.includes(app.selectedMethod))app.selectedMethod=app.withdrawMethods[0]||'Nagad';}updateWithdrawUI();});
-            loadTasks();loadAirdrop();
-        }
-        document.addEventListener('DOMContentLoaded',initApp);
+        ur.update({name:dn,lastLogin:new Date().toISOString()});
+        document.getElementById('userName').textContent=dn;
+        db.ref('maintenance').on('value',s=>{const d=s.val()||{};if(d.enabled){document.getElementById('maintenanceOverlay').classList.add('show');document.getElementById('maintenanceMessage').textContent=d.msg||'Under maintenance.';document.getElementById('mainContent').style.display='none';document.querySelector('.bottom-nav').style.display='none';}else{document.getElementById('maintenanceOverlay').classList.remove('show');document.getElementById('mainContent').style.display='block';document.querySelector('.bottom-nav').style.display='flex';}});
+        ur.on('value',s=>{
+            const d=s.val()||{};if(d.banned){document.getElementById('bannedOverlay').classList.add('show');document.getElementById('banReason').textContent='Reason: '+(d.banReason||'Violation');document.getElementById('mainContent').style.display='none';document.querySelector('.bottom-nav').style.display='none';return;}
+            app.bal=d.bal||0;app.usd=d.usd||0;app.xp=d.xp||-5000;app.pcoins=d.pcoins!==undefined?d.pcoins:1000;app.daily=d.daily||'';app.refs=d.refs||0;app.refCode=d.refCode||Array(8).fill(0).map(()=>'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random()*36)]).join('');app.boostCD=d.boostCD||0;app.mystCD=d.mystCD||0;app.convRate=d.convRate||1000;app.taskDone=d.taskDone||{};app.taskProg=d.taskProg||{};app.wHist=d.wHist||[];app.wMethod=d.wMethod||'Nagad';
+            if(!window._rc||window._rc!==app.refCode){window._rc=app.refCode;document.getElementById('refLink').textContent='https://t.me/CoinQuist_bot?start=ref_'+app.refCode;}
+            document.getElementById('dailyStatus').textContent=app.daily===new Date().toDateString()?'✅ Claimed':'🎯 Claim';
+            if(!d.bal&&!d.xp)ur.update({bal:0,usd:0,refCode:app.refCode,pcoins:1000,xp:-5000,lastConv:Date.now(),lastLogin:new Date().toISOString(),airClaimed:false,mining:false});
+            updateUI();updateLevel();updateMining();
+        });
+        db.ref('conversionRate').on('value',s=>{app.convRate=s.val()||1000;updateUI();});
+        db.ref('rules').on('value',s=>{const r=s.val()||{};document.getElementById('miningRules').textContent=r.mining||'No rules set.';});
+        loadTasks();
+        show_11197472({type:'inApp',inAppSettings:{frequency:2,capping:0.1,interval:30,timeout:5,everyPage:false}});
+    }
+    document.addEventListener('DOMContentLoaded',init);
     </script>
 </body>
 </html>
