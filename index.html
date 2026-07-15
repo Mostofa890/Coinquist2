@@ -594,7 +594,7 @@
 
         // ================== OPEN GAME ==================
         function openGame(type) {
-            if (type === 'xo') openXOGame('computer');
+            if (type === 'xo') openXOGame();
             else if (type === 'dice') openDiceGame();
             else if (type === 'target') openTargetGame();
             else if (type === 'card') openCardGame();
@@ -716,168 +716,1288 @@
         }
         function resetCardGame() { cardGameData.rewardGiven = false; document.getElementById('cardBetSection').style.display = 'block'; document.getElementById('cardGameBoard').style.display = 'none'; document.getElementById('cardGameBoard').querySelector('.restart').style.display = 'none'; document.getElementById('playerCard').innerHTML = '<span class="card-value">?</span><span class="card-suit">?</span>'; document.getElementById('opponentCard').innerHTML = '<span class="card-value">?</span><span class="card-suit">?</span>'; document.getElementById('playerCard').className = 'game-card-item'; document.getElementById('opponentCard').className = 'game-card-item'; }
 
-        // ================== XO GAME (unchanged) ==================
+        // ================== XO GAME (FIXED) ==================
         let xoGameData = { mode: null, betAmount: 100, board: Array(9).fill(''), mySymbol: 'X', opponentSymbol: 'O', gameActive: false, gameOver: false, winner: null, onlineGameId: null, isMyTurn: true, gameRef: null, rewardGiven: false, winningCombo: null, isFree: false };
         let xoAITimeout = null;
-        function openXOGame(m) { if (!isOnline) return; document.getElementById('xoGameOverlay').classList.add('show'); resetXOGame(); }
-        function closeXOGame() { document.getElementById('xoGameOverlay').classList.remove('show'); resetXOGame(); if (xoGameData.gameRef) { xoGameData.gameRef.remove(); xoGameData.gameRef = null; } if (xoAITimeout) { clearTimeout(xoAITimeout); xoAITimeout = null; } }
-        function startXOGame(m) { xoGameData.mode = m; document.getElementById('xoModeSelection').style.display = 'none'; document.getElementById('xoBetSection').style.display = 'block'; document.getElementById('xoGameBoard').style.display = 'none'; document.getElementById('xoBetAmount').value = 100; xoGameData.betAmount = 100; xoGameData.isFree = false; }
-        function setXOBet(a) { xoGameData.betAmount = Math.min(a, 500, Math.floor(app.balance)); document.getElementById('xoBetAmount').value = xoGameData.betAmount; }
-        function confirmXOGame() { let bet = parseInt(document.getElementById('xoBetAmount').value) || 100; bet = Math.max(100, Math.min(bet, 500)); if (bet > app.balance) { showToast('Insufficient!', 'error'); return; } xoGameData.betAmount = bet; xoGameData.isFree = false; app.balance -= bet; userRef.update({ balance: app.balance }); updateUI(); if (xoGameData.mode === 'computer') initComputerGame(); else initOnlineGame(); }
-        function playXOGameFree() { show_11197472().then(() => { xoGameData.betAmount = 100; xoGameData.isFree = true; if (xoGameData.mode === 'computer') initComputerGame(); else initOnlineGame(); }).catch(() => showToast('Ad not watched!', 'error')); }
-        function initComputerGame() { document.getElementById('xoBetSection').style.display = 'none'; document.getElementById('xoGameBoard').style.display = 'block'; xoGameData.board = Array(9).fill(''); xoGameData.mySymbol = 'X'; xoGameData.opponentSymbol = 'O'; xoGameData.gameActive = true; xoGameData.gameOver = false; xoGameData.winner = null; xoGameData.isMyTurn = true; xoGameData.rewardGiven = false; document.getElementById('xoStatus').textContent = 'Your turn!'; document.getElementById('xoStatus').className = 'xo-status'; document.getElementById('xoRewardInfo').textContent = ''; document.getElementById('xoRestartBtn').style.display = 'none'; document.getElementById('xoPlayer1Badge').querySelector('.player-symbol').textContent = 'X'; document.getElementById('xoPlayer2Badge').querySelector('.player-symbol').textContent = 'O'; document.getElementById('xoPlayersInfo').style.display = 'flex'; renderXOBoard(); }
-        function initOnlineGame() { document.getElementById('xoBetSection').style.display = 'none'; document.getElementById('xoGameBoard').style.display = 'none'; document.getElementById('xoOnlineInfo').style.display = 'block'; xoGameData.board = Array(9).fill(''); xoGameData.gameActive = false; findOnlineOpponent(); }
-        function findOnlineOpponent() { db.ref('xoWaitingGames').once('value', s => { const wg = s.val() || {}; let found = false; for (const [gid, gd] of Object.entries(wg)) { if (gd.player1Id !== userId && !gd.started && Date.now()-gd.createdAt < 30000) { found = true; joinOnlineGame(gid, gd); break; } } if (!found) createNewOnlineGame(); }); }
-        function createNewOnlineGame() { const gid = Date.now().toString(); xoGameData.onlineGameId = gid; xoGameData.mySymbol = 'X'; xoGameData.opponentSymbol = 'O'; xoGameData.isMyTurn = true; db.ref('xoWaitingGames/'+gid).set({ player1Id: userId, betAmount: xoGameData.betAmount, board: Array(9).fill(''), currentTurn: 'X', gameActive: false, started: false, createdAt: Date.now(), winner: null, isFree: xoGameData.isFree }).then(() => { setTimeout(() => { db.ref('xoWaitingGames/'+gid).once('value', s => { if (s.exists() && !s.val().player2Id) { db.ref('xoWaitingGames/'+gid).remove(); if (!xoGameData.isFree) { app.balance += xoGameData.betAmount; userRef.update({ balance: app.balance }); updateUI(); } showToast('No opponent! Refunded!'); closeXOGame(); } }); }, 30000); db.ref('xoWaitingGames/'+gid).on('value', s => { const d = s.val(); if (!d) { if (!xoGameData.gameActive) closeXOGame(); return; } if (d.player2Id && !xoGameData.gameActive) { xoGameData.onlineOpponentId = d.player2Id; xoGameData.gameRef = db.ref('xoGames/'+gid); startOnlineGame(gid, d); } }); }); }
-        function joinOnlineGame(gid, gd) { xoGameData.onlineGameId = gid; xoGameData.mySymbol = 'O'; xoGameData.opponentSymbol = 'X'; xoGameData.isMyTurn = false; xoGameData.gameRef = db.ref('xoGames/'+gid); db.ref('xoGames/'+gid).set({ ...gd, player2Id: userId, started: true, gameActive: true }).then(() => { db.ref('xoWaitingGames/'+gid).remove(); startOnlineGame(gid, { ...gd, player2Id: userId, started: true, gameActive: true }); }); }
-        function startOnlineGame(gid, gd) { document.getElementById('xoOnlineInfo').style.display = 'none'; document.getElementById('xoGameBoard').style.display = 'block'; xoGameData.board = gd.board || Array(9).fill(''); xoGameData.gameActive = true; xoGameData.isMyTurn = gd.currentTurn === xoGameData.mySymbol; document.getElementById('xoPlayer1Badge').querySelector('.player-symbol').textContent = xoGameData.mySymbol; document.getElementById('xoPlayer2Badge').querySelector('.player-symbol').textContent = xoGameData.opponentSymbol; document.getElementById('xoPlayersInfo').style.display = 'flex'; updateXOStatus(); renderXOBoard(); if (xoGameData.gameRef) xoGameData.gameRef.off(); xoGameData.gameRef = db.ref('xoGames/'+gid); xoGameData.gameRef.on('value', s => { const d = s.val(); if (!d) { if (xoGameData.gameActive) { xoGameData.gameActive = false; showToast('Opponent left!'); document.getElementById('xoStatus').textContent = 'Opponent left!'; document.getElementById('xoRestartBtn').style.display = 'block'; } return; } if (d.board && JSON.stringify(d.board) !== JSON.stringify(xoGameData.board)) { xoGameData.board = d.board; xoGameData.isMyTurn = d.currentTurn === xoGameData.mySymbol; xoGameData.gameActive = d.gameActive; xoGameData.winner = d.winner; xoGameData.winningCombo = d.winningCombo; renderXOBoard(); updateXOStatus(); if (d.winner && !xoGameData.rewardGiven) handleGameEnd(d.winner); } }); }
-        function renderXOBoard() { const b = document.getElementById('xoBoard'); b.innerHTML = ''; for (let i = 0; i < 9; i++) { const c = document.createElement('div'); c.className = 'xo-cell'; c.textContent = xoGameData.board[i]; if (xoGameData.board[i] === 'X') c.classList.add('x-player'); else if (xoGameData.board[i] === 'O') c.classList.add('o-player'); if (xoGameData.winner && xoGameData.winningCombo?.includes(i)) c.classList.add('win-cell'); c.onclick = () => makeXOMove(i); b.appendChild(c); } }
-        function makeXOMove(i) { if (!xoGameData.gameActive || xoGameData.gameOver || xoGameData.board[i] !== '' || !xoGameData.isMyTurn) return; xoGameData.board[i] = xoGameData.mySymbol; xoGameData.isMyTurn = false; const w = checkXOWinner(); if (xoGameData.mode === 'computer') { renderXOBoard(); updateXOStatus(); if (w) handleGameEnd(w); else if (!xoGameData.board.includes('')) handleGameEnd('draw'); else { xoAITimeout = setTimeout(makeAIMove, 500+Math.random()*1000); } } else { xoGameData.gameRef.update({ board: xoGameData.board, currentTurn: xoGameData.opponentSymbol, gameActive: !w, winner: w||null, winningCombo: xoGameData.winningCombo||null }); renderXOBoard(); updateXOStatus(); if (w) handleGameEnd(w); else if (!xoGameData.board.includes('')) { handleGameEnd('draw'); xoGameData.gameRef.update({ winner: 'draw', gameActive: false }); } } }
-        function makeAIMove() { if (!xoGameData.gameActive) return; const b = [...xoGameData.board]; for (let i = 0; i < 9; i++) { if (b[i]==='') { b[i]='O'; if (checkXOWinnerForSymbol(b,'O')) { finalizeAIMove(i); return; } b[i]=''; } } for (let i = 0; i < 9; i++) { if (b[i]==='') { b[i]='X'; if (checkXOWinnerForSymbol(b,'X')) { finalizeAIMove(i); return; } b[i]=''; } } if (b[4]==='') { finalizeAIMove(4); return; } const corners = [0,2,6,8].filter(i=>b[i]===''); if (corners.length) { finalizeAIMove(corners[Math.floor(Math.random()*corners.length)]); return; } const edges = [1,3,5,7].filter(i=>b[i]===''); if (edges.length) finalizeAIMove(edges[Math.floor(Math.random()*edges.length)]); }
-        function finalizeAIMove(i) { xoGameData.board[i] = 'O'; xoGameData.isMyTurn = true; const w = checkXOWinner(); renderXOBoard(); updateXOStatus(); if (w) handleGameEnd(w); else if (!xoGameData.board.includes('')) handleGameEnd('draw'); }
-        function checkXOWinner() { const wp = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]; for (const [a,b,c] of wp) { if (xoGameData.board[a] && xoGameData.board[a]===xoGameData.board[b] && xoGameData.board[a]===xoGameData.board[c]) { xoGameData.winningCombo=[a,b,c]; return xoGameData.board[a]; } } return null; }
-        function checkXOWinnerForSymbol(b,s) { const wp = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]; return wp.some(([a,b2,c])=>b[a]===s&&b[b2]===s&&b[c]===s); }
-        function handleGameEnd(r) { if (xoGameData.rewardGiven) return; xoGameData.rewardGiven=true; xoGameData.gameActive=false; xoGameData.gameOver=true; let reward=0,msg=''; if (r==='draw') { msg='🤝 Draw!'; document.getElementById('xoStatus').className='xo-status draw'; if (!xoGameData.isFree) { reward=xoGameData.betAmount; app.balance+=reward; } } else if (r===xoGameData.mySymbol) { msg='🎉 You win!'; document.getElementById('xoStatus').className='xo-status win'; reward=xoGameData.betAmount+Math.floor(xoGameData.betAmount*0.10); app.balance+=reward; app.xpPoints+=reward*2; } else { msg='😞 You lose!'; document.getElementById('xoStatus').className='xo-status lose'; } if (xoGameData.isFree) { reward=20; app.balance+=reward; } document.getElementById('xoStatus').textContent=msg; document.getElementById('xoRewardInfo').textContent=reward>0?`+${reward} Coins`:(xoGameData.isFree?'+20 Coins':`-${xoGameData.betAmount} Coins`); document.getElementById('xoRestartBtn').style.display='block'; userRef.update({balance:app.balance,xpPoints:app.xpPoints}); updateUI();updateLevelUI();renderXOBoard(); }
-        function updateXOStatus() { if (xoGameData.gameOver) return; document.getElementById('xoStatus').textContent=xoGameData.isMyTurn?'Your turn!':(xoGameData.mode==='computer'?'Computer thinking...':'Opponent\'s turn...'); }
-        function restartXOGame() { resetXOGame(); if (xoGameData.mode==='online') { if (xoGameData.gameRef){xoGameData.gameRef.remove();xoGameData.gameRef=null;} closeXOGame(); return; } if (!xoGameData.isFree&&app.balance<100){closeXOGame();showToast('Not enough!','error');return;} if(!xoGameData.isFree){app.balance-=xoGameData.betAmount;userRef.update({balance:app.balance});updateUI();} initComputerGame(); }
-        function resetXOGame() { xoGameData.board=Array(9).fill(''); xoGameData.gameActive=false; xoGameData.gameOver=false; xoGameData.winner=null; xoGameData.isMyTurn=true; xoGameData.rewardGiven=false; xoGameData.winningCombo=null; document.getElementById('xoGameBoard').style.display='none'; document.getElementById('xoModeSelection').style.display='block'; document.getElementById('xoBetSection').style.display='none'; document.getElementById('xoOnlineInfo').style.display='none'; if(xoAITimeout){clearTimeout(xoAITimeout);xoAITimeout=null;} }
+
+        function openXOGame() {
+            if (!isOnline) return;
+            document.getElementById('xoGameOverlay').classList.add('show');
+            resetXOGame();
+            document.getElementById('xoModeSelection').style.display = 'block';
+            document.getElementById('xoBetSection').style.display = 'none';
+            document.getElementById('xoGameBoard').style.display = 'none';
+        }
+
+        function closeXOGame() {
+            document.getElementById('xoGameOverlay').classList.remove('show');
+            resetXOGame();
+            if (xoGameData.gameRef) { xoGameData.gameRef.remove(); xoGameData.gameRef = null; }
+            if (xoAITimeout) { clearTimeout(xoAITimeout); xoAITimeout = null; }
+        }
+
+        function startXOGame(m) {
+            xoGameData.mode = m;
+            document.getElementById('xoModeSelection').style.display = 'none';
+            document.getElementById('xoBetSection').style.display = 'block';
+            document.getElementById('xoGameBoard').style.display = 'none';
+            document.getElementById('xoBetAmount').value = 100;
+            xoGameData.betAmount = 100;
+            xoGameData.isFree = false;
+        }
+
+        function setXOBet(a) {
+            xoGameData.betAmount = Math.min(a, 500, Math.floor(app.balance));
+            document.getElementById('xoBetAmount').value = xoGameData.betAmount;
+        }
+
+        function confirmXOGame() {
+            let bet = parseInt(document.getElementById('xoBetAmount').value) || 100;
+            bet = Math.max(100, Math.min(bet, 500));
+            if (bet > app.balance) { showToast('Insufficient!', 'error'); return; }
+            xoGameData.betAmount = bet;
+            xoGameData.isFree = false;
+            app.balance -= bet;
+            userRef.update({ balance: app.balance });
+            updateUI();
+
+            if (xoGameData.mode === 'computer') {
+                initComputerGame();
+            } else {
+                initOnlineGame();
+            }
+        }
+
+        function playXOGameFree() {
+            show_11197472().then(() => {
+                xoGameData.betAmount = 100;
+                xoGameData.isFree = true;
+                if (xoGameData.mode === 'computer') initComputerGame();
+                else initOnlineGame();
+            }).catch(() => showToast('Ad not watched!', 'error'));
+        }
+
+        function initComputerGame() {
+            document.getElementById('xoBetSection').style.display = 'none';
+            document.getElementById('xoGameBoard').style.display = 'block';
+            xoGameData.board = Array(9).fill('');
+            xoGameData.mySymbol = 'X';
+            xoGameData.opponentSymbol = 'O';
+            xoGameData.gameActive = true;
+            xoGameData.gameOver = false;
+            xoGameData.winner = null;
+            xoGameData.isMyTurn = true;
+            xoGameData.rewardGiven = false;
+            document.getElementById('xoStatus').textContent = 'Your turn!';
+            document.getElementById('xoStatus').className = 'xo-status';
+            document.getElementById('xoRewardInfo').textContent = '';
+            document.getElementById('xoRestartBtn').style.display = 'none';
+            document.getElementById('xoPlayer1Badge').querySelector('.player-symbol').textContent = 'X';
+            document.getElementById('xoPlayer2Badge').querySelector('.player-symbol').textContent = 'O';
+            document.getElementById('xoPlayersInfo').style.display = 'flex';
+            renderXOBoard();
+        }
+
+        function initOnlineGame() {
+            document.getElementById('xoBetSection').style.display = 'none';
+            document.getElementById('xoGameBoard').style.display = 'none';
+            document.getElementById('xoOnlineInfo').style.display = 'block';
+            xoGameData.board = Array(9).fill('');
+            xoGameData.gameActive = false;
+            findOnlineOpponent();
+        }
+
+        function findOnlineOpponent() {
+            db.ref('xoWaitingGames').once('value', s => {
+                const wg = s.val() || {};
+                let found = false;
+                for (const [gid, gd] of Object.entries(wg)) {
+                    if (gd.player1Id !== userId && !gd.started && Date.now() - gd.createdAt < 30000) {
+                        found = true;
+                        joinOnlineGame(gid, gd);
+                        break;
+                    }
+                }
+                if (!found) createNewOnlineGame();
+            });
+        }
+
+        function createNewOnlineGame() {
+            const gid = Date.now().toString();
+            xoGameData.onlineGameId = gid;
+            xoGameData.mySymbol = 'X';
+            xoGameData.opponentSymbol = 'O';
+            xoGameData.isMyTurn = true;
+            db.ref('xoWaitingGames/' + gid).set({
+                player1Id: userId,
+                betAmount: xoGameData.betAmount,
+                board: Array(9).fill(''),
+                currentTurn: 'X',
+                gameActive: false,
+                started: false,
+                createdAt: Date.now(),
+                winner: null,
+                isFree: xoGameData.isFree
+            }).then(() => {
+                setTimeout(() => {
+                    db.ref('xoWaitingGames/' + gid).once('value', s => {
+                        if (s.exists() && !s.val().player2Id) {
+                            db.ref('xoWaitingGames/' + gid).remove();
+                            if (!xoGameData.isFree) {
+                                app.balance += xoGameData.betAmount;
+                                userRef.update({ balance: app.balance });
+                                updateUI();
+                            }
+                            showToast('No opponent! Refunded!');
+                            closeXOGame();
+                        }
+                    });
+                }, 30000);
+                db.ref('xoWaitingGames/' + gid).on('value', s => {
+                    const d = s.val();
+                    if (!d) {
+                        if (!xoGameData.gameActive) closeXOGame();
+                        return;
+                    }
+                    if (d.player2Id && !xoGameData.gameActive) {
+                        xoGameData.onlineOpponentId = d.player2Id;
+                        xoGameData.gameRef = db.ref('xoGames/' + gid);
+                        startOnlineGame(gid, d);
+                    }
+                });
+            });
+        }
+
+        function joinOnlineGame(gid, gd) {
+            xoGameData.onlineGameId = gid;
+            xoGameData.mySymbol = 'O';
+            xoGameData.opponentSymbol = 'X';
+            xoGameData.isMyTurn = false;
+            xoGameData.gameRef = db.ref('xoGames/' + gid);
+            db.ref('xoGames/' + gid).set({ ...gd, player2Id: userId, started: true, gameActive: true }).then(() => {
+                db.ref('xoWaitingGames/' + gid).remove();
+                startOnlineGame(gid, { ...gd, player2Id: userId, started: true, gameActive: true });
+            });
+        }
+
+        function startOnlineGame(gid, gd) {
+            document.getElementById('xoOnlineInfo').style.display = 'none';
+            document.getElementById('xoGameBoard').style.display = 'block';
+            xoGameData.board = gd.board || Array(9).fill('');
+            xoGameData.gameActive = true;
+            xoGameData.isMyTurn = gd.currentTurn === xoGameData.mySymbol;
+            document.getElementById('xoPlayer1Badge').querySelector('.player-symbol').textContent = xoGameData.mySymbol;
+            document.getElementById('xoPlayer2Badge').querySelector('.player-symbol').textContent = xoGameData.opponentSymbol;
+            document.getElementById('xoPlayersInfo').style.display = 'flex';
+            updateXOStatus();
+            renderXOBoard();
+            if (xoGameData.gameRef) xoGameData.gameRef.off();
+            xoGameData.gameRef = db.ref('xoGames/' + gid);
+            xoGameData.gameRef.on('value', s => {
+                const d = s.val();
+                if (!d) {
+                    if (xoGameData.gameActive) {
+                        xoGameData.gameActive = false;
+                        showToast('Opponent left!');
+                        document.getElementById('xoStatus').textContent = 'Opponent left!';
+                        document.getElementById('xoRestartBtn').style.display = 'block';
+                    }
+                    return;
+                }
+                if (d.board && JSON.stringify(d.board) !== JSON.stringify(xoGameData.board)) {
+                    xoGameData.board = d.board;
+                    xoGameData.isMyTurn = d.currentTurn === xoGameData.mySymbol;
+                    xoGameData.gameActive = d.gameActive;
+                    xoGameData.winner = d.winner;
+                    xoGameData.winningCombo = d.winningCombo;
+                    renderXOBoard();
+                    updateXOStatus();
+                    if (d.winner && !xoGameData.rewardGiven) handleGameEnd(d.winner);
+                }
+            });
+        }
+
+        function renderXOBoard() {
+            const b = document.getElementById('xoBoard');
+            b.innerHTML = '';
+            for (let i = 0; i < 9; i++) {
+                const c = document.createElement('div');
+                c.className = 'xo-cell';
+                c.textContent = xoGameData.board[i];
+                if (xoGameData.board[i] === 'X') c.classList.add('x-player');
+                else if (xoGameData.board[i] === 'O') c.classList.add('o-player');
+                if (xoGameData.winner && xoGameData.winningCombo?.includes(i)) c.classList.add('win-cell');
+                c.onclick = () => makeXOMove(i);
+                b.appendChild(c);
+            }
+        }
+
+        function makeXOMove(i) {
+            if (!xoGameData.gameActive || xoGameData.gameOver || xoGameData.board[i] !== '' || !xoGameData.isMyTurn) return;
+            xoGameData.board[i] = xoGameData.mySymbol;
+            xoGameData.isMyTurn = false;
+            const w = checkXOWinner();
+            if (xoGameData.mode === 'computer') {
+                renderXOBoard();
+                updateXOStatus();
+                if (w) handleGameEnd(w);
+                else if (!xoGameData.board.includes('')) handleGameEnd('draw');
+                else {
+                    xoAITimeout = setTimeout(makeAIMove, 500 + Math.random() * 1000);
+                }
+            } else {
+                xoGameData.gameRef.update({
+                    board: xoGameData.board,
+                    currentTurn: xoGameData.opponentSymbol,
+                    gameActive: !w,
+                    winner: w || null,
+                    winningCombo: xoGameData.winningCombo || null
+                });
+                renderXOBoard();
+                updateXOStatus();
+                if (w) handleGameEnd(w);
+                else if (!xoGameData.board.includes('')) {
+                    handleGameEnd('draw');
+                    xoGameData.gameRef.update({ winner: 'draw', gameActive: false });
+                }
+            }
+        }
+
+        function makeAIMove() {
+            if (!xoGameData.gameActive) return;
+            const b = [...xoGameData.board];
+            for (let i = 0; i < 9; i++) {
+                if (b[i] === '') {
+                    b[i] = 'O';
+                    if (checkXOWinnerForSymbol(b, 'O')) { finalizeAIMove(i); return; }
+                    b[i] = '';
+                }
+            }
+            for (let i = 0; i < 9; i++) {
+                if (b[i] === '') {
+                    b[i] = 'X';
+                    if (checkXOWinnerForSymbol(b, 'X')) { finalizeAIMove(i); return; }
+                    b[i] = '';
+                }
+            }
+            if (b[4] === '') { finalizeAIMove(4); return; }
+            const corners = [0, 2, 6, 8].filter(i => b[i] === '');
+            if (corners.length) { finalizeAIMove(corners[Math.floor(Math.random() * corners.length)]); return; }
+            const edges = [1, 3, 5, 7].filter(i => b[i] === '');
+            if (edges.length) finalizeAIMove(edges[Math.floor(Math.random() * edges.length)]);
+        }
+
+        function finalizeAIMove(i) {
+            xoGameData.board[i] = 'O';
+            xoGameData.isMyTurn = true;
+            const w = checkXOWinner();
+            renderXOBoard();
+            updateXOStatus();
+            if (w) handleGameEnd(w);
+            else if (!xoGameData.board.includes('')) handleGameEnd('draw');
+        }
+
+        function checkXOWinner() {
+            const wp = [
+                [0, 1, 2],
+                [3, 4, 5],
+                [6, 7, 8],
+                [0, 3, 6],
+                [1, 4, 7],
+                [2, 5, 8],
+                [0, 4, 8],
+                [2, 4, 6]
+            ];
+            for (const [a, b, c] of wp) {
+                if (xoGameData.board[a] && xoGameData.board[a] === xoGameData.board[b] && xoGameData.board[a] === xoGameData.board[c]) {
+                    xoGameData.winningCombo = [a, b, c];
+                    return xoGameData.board[a];
+                }
+            }
+            return null;
+        }
+
+        function checkXOWinnerForSymbol(b, s) {
+            const wp = [
+                [0, 1, 2],
+                [3, 4, 5],
+                [6, 7, 8],
+                [0, 3, 6],
+                [1, 4, 7],
+                [2, 5, 8],
+                [0, 4, 8],
+                [2, 4, 6]
+            ];
+            return wp.some(([a, b2, c]) => b[a] === s && b[b2] === s && b[c] === s);
+        }
+
+        function handleGameEnd(r) {
+            if (xoGameData.rewardGiven) return;
+            xoGameData.rewardGiven = true;
+            xoGameData.gameActive = false;
+            xoGameData.gameOver = true;
+            let reward = 0,
+                msg = '';
+            if (r === 'draw') {
+                msg = '🤝 Draw!';
+                document.getElementById('xoStatus').className = 'xo-status draw';
+                if (!xoGameData.isFree) { reward = xoGameData.betAmount;
+                    app.balance += reward; }
+            } else if (r === xoGameData.mySymbol) {
+                msg = '🎉 You win!';
+                document.getElementById('xoStatus').className = 'xo-status win';
+                reward = xoGameData.betAmount + Math.floor(xoGameData.betAmount * 0.10);
+                app.balance += reward;
+                app.xpPoints += reward * 2;
+            } else {
+                msg = '😞 You lose!';
+                document.getElementById('xoStatus').className = 'xo-status lose';
+            }
+            if (xoGameData.isFree) { reward = 20;
+                app.balance += reward; }
+            document.getElementById('xoStatus').textContent = msg;
+            document.getElementById('xoRewardInfo').textContent = reward > 0 ? `+${reward} Coins` : (xoGameData.isFree ? '+20 Coins' : `-${xoGameData.betAmount} Coins`);
+            document.getElementById('xoRestartBtn').style.display = 'block';
+            userRef.update({ balance: app.balance, xpPoints: app.xpPoints });
+            updateUI();
+            updateLevelUI();
+            renderXOBoard();
+        }
+
+        function updateXOStatus() {
+            if (xoGameData.gameOver) return;
+            document.getElementById('xoStatus').textContent = xoGameData.isMyTurn ? 'Your turn!' : (xoGameData.mode === 'computer' ? 'Computer thinking...' : 'Opponent\'s turn...');
+        }
+
+        function restartXOGame() {
+            resetXOGame();
+            if (xoGameData.mode === 'online') {
+                if (xoGameData.gameRef) { xoGameData.gameRef.remove();
+                    xoGameData.gameRef = null; }
+                closeXOGame();
+                return;
+            }
+            if (!xoGameData.isFree && app.balance < 100) { closeXOGame();
+                showToast('Not enough!', 'error'); return; }
+            if (!xoGameData.isFree) { app.balance -= xoGameData.betAmount;
+                userRef.update({ balance: app.balance });
+                updateUI(); }
+            initComputerGame();
+        }
+
+        function resetXOGame() {
+            xoGameData.board = Array(9).fill('');
+            xoGameData.gameActive = false;
+            xoGameData.gameOver = false;
+            xoGameData.winner = null;
+            xoGameData.isMyTurn = true;
+            xoGameData.rewardGiven = false;
+            xoGameData.winningCombo = null;
+            document.getElementById('xoGameBoard').style.display = 'none';
+            document.getElementById('xoModeSelection').style.display = 'block';
+            document.getElementById('xoBetSection').style.display = 'none';
+            document.getElementById('xoOnlineInfo').style.display = 'none';
+            if (xoAITimeout) { clearTimeout(xoAITimeout);
+                xoAITimeout = null; }
+        }
 
         // ================== MAINTENANCE ==================
-        function checkMaintenance() { db.ref('maintenance').on('value', s => { const d=s.val()||{enabled:false}; if(d.enabled){document.getElementById('maintenanceOverlay').classList.add('show');document.getElementById('mainContent').style.display='none';document.querySelector('.bottom-nav').style.display='none';if(miningInterval)stopMining();} else{document.getElementById('maintenanceOverlay').classList.remove('show');document.getElementById('mainContent').style.display='block';document.querySelector('.bottom-nav').style.display='flex';} }); }
+        function checkMaintenance() {
+            db.ref('maintenance').on('value', s => {
+                const d = s.val() || { enabled: false };
+                if (d.enabled) {
+                    document.getElementById('maintenanceOverlay').classList.add('show');
+                    document.getElementById('mainContent').style.display = 'none';
+                    document.querySelector('.bottom-nav').style.display = 'none';
+                    if (miningInterval) stopMining();
+                } else {
+                    document.getElementById('maintenanceOverlay').classList.remove('show');
+                    document.getElementById('mainContent').style.display = 'block';
+                    document.querySelector('.bottom-nav').style.display = 'flex';
+                }
+            });
+        }
 
         // ================== SPIN WHEEL (unchanged) ==================
-        const SPIN_COUNT_LIMIT=20,SPIN_BUTTON_COOLDOWN_SECONDS=15;let spinCount=SPIN_COUNT_LIMIT,spinBtnCooldownInterval=null,isSpinning=false,currentRotation=0;
-        function buildWheel(){const sc=document.getElementById('wheelSegments');const ns=prizeData.length;const as=360/ns;sc.innerHTML='';const colors=['#FF6B6B','#4ECDC4','#45B7D1','#96CEB4','#FFEAA7','#DDA0DD','#FF9FF3','#54A0FF','#5F27CD','#FF6B6B','#4ECDC4','#45B7D1','#96CEB4','#FFEAA7','#DDA0DD'];for(let i=0;i<ns;i++){const s=document.createElement('div');s.className='wheel-segment';s.style.transform=`rotate(${i*as}deg)`;s.style.backgroundColor=colors[i%colors.length];s.innerHTML=`<span>${prizeData[i].label}</span>`;sc.appendChild(s);}const bc=document.getElementById('wheelBulbs');bc.innerHTML='';for(let i=0;i<20;i++){const b=document.createElement('div');b.className='wheel-bulb';const a=(i/20)*360;b.style.left=(140+140*Math.cos(a*Math.PI/180)-6)+'px';b.style.top=(140+140*Math.sin(a*Math.PI/180)-6)+'px';bc.appendChild(b);}}
-        function getPrizeByAngle(a){const ns=prizeData.length;let n=a%360;if(n<0)n+=360;return prizeData[Math.floor(n/(360/ns))%ns];}
-        function openSpinModal(){if(spinCount<=0){showToast('No spins!','error');return;}document.getElementById('spinModal').classList.add('show');updateSpinModalUI();}
-        function closeSpinModal(){document.getElementById('spinModal').classList.remove('show');}
-        function updateSpinModalUI(){document.getElementById('modalSpinCount').textContent=`Spins: ${spinCount}/${SPIN_COUNT_LIMIT}`;}
-        function spinWheelFromModal(){if(!isOnline||isSpinning||spinCount<=0)return;const btn=document.getElementById('modalSpinBtn');btn.disabled=true;isSpinning=true;let cd=SPIN_BUTTON_COOLDOWN_SECONDS;document.getElementById('modalSpinTimerBox').classList.add('show');document.getElementById('modalSpinTimerDisplay').textContent=`00:${String(cd).padStart(2,'0')}`;if(spinBtnCooldownInterval)clearInterval(spinBtnCooldownInterval);spinBtnCooldownInterval=setInterval(()=>{cd--;if(cd>0)document.getElementById('modalSpinTimerDisplay').textContent=`00:${String(cd).padStart(2,'0')}`;else{clearInterval(spinBtnCooldownInterval);spinBtnCooldownInterval=null;document.getElementById('modalSpinTimerBox').classList.remove('show');btn.disabled=false;}},1000);currentRotation+=(5+Math.floor(Math.random()*5))*360+Math.floor(Math.random()*360);document.getElementById('wheelSegments').style.transform=`rotate(${currentRotation}deg)`;show_11197472().then(()=>{const p=getPrizeByAngle(currentRotation);if(p.type==='coins')app.balance+=p.value;else app.usdBalance+=p.value;spinCount--;document.getElementById('spinBadge').textContent=spinCount;updateSpinModalUI();document.getElementById('rewardText').textContent=`You won ${p.label}!`;document.getElementById('successModal').classList.add('active');userRef.update({balance:app.balance,usdBalance:app.usdBalance,spinCount});updateUI();isSpinning=false;}).catch(()=>{btn.disabled=false;isSpinning=false;showToast('Ad not watched!','error');});}
-        function loadSpinData(){db.ref('users/'+userId+'/spinCount').on('value',s=>{spinCount=s.val()!==null?s.val():SPIN_COUNT_LIMIT;document.getElementById('spinBadge').textContent=spinCount;updateSpinModalUI();});}
-        function watchMiningCoins(){db.ref('users/'+userId+'/progressCoins').on('value',s=>{if(s.val()===0){spinCount=SPIN_COUNT_LIMIT;document.getElementById('spinBadge').textContent=spinCount;updateSpinModalUI();userRef.update({spinCount});showToast('🔄 Spins reset!');}});}
+        const SPIN_COUNT_LIMIT = 20,
+            SPIN_BUTTON_COOLDOWN_SECONDS = 15;
+        let spinCount = SPIN_COUNT_LIMIT,
+            spinBtnCooldownInterval = null,
+            isSpinning = false,
+            currentRotation = 0;
+
+        function buildWheel() {
+            const sc = document.getElementById('wheelSegments');
+            const ns = prizeData.length;
+            const as = 360 / ns;
+            sc.innerHTML = '';
+            const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#FF9FF3', '#54A0FF', '#5F27CD', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD'];
+            for (let i = 0; i < ns; i++) {
+                const s = document.createElement('div');
+                s.className = 'wheel-segment';
+                s.style.transform = `rotate(${i*as}deg)`;
+                s.style.backgroundColor = colors[i % colors.length];
+                s.innerHTML = `<span>${prizeData[i].label}</span>`;
+                sc.appendChild(s);
+            }
+            const bc = document.getElementById('wheelBulbs');
+            bc.innerHTML = '';
+            for (let i = 0; i < 20; i++) {
+                const b = document.createElement('div');
+                b.className = 'wheel-bulb';
+                const a = (i / 20) * 360;
+                b.style.left = (140 + 140 * Math.cos(a * Math.PI / 180) - 6) + 'px';
+                b.style.top = (140 + 140 * Math.sin(a * Math.PI / 180) - 6) + 'px';
+                bc.appendChild(b);
+            }
+        }
+
+        function getPrizeByAngle(a) {
+            const ns = prizeData.length;
+            let n = a % 360;
+            if (n < 0) n += 360;
+            return prizeData[Math.floor(n / (360 / ns)) % ns];
+        }
+
+        function openSpinModal() {
+            if (spinCount <= 0) { showToast('No spins!', 'error'); return; }
+            document.getElementById('spinModal').classList.add('show');
+            updateSpinModalUI();
+        }
+
+        function closeSpinModal() {
+            document.getElementById('spinModal').classList.remove('show');
+        }
+
+        function updateSpinModalUI() {
+            document.getElementById('modalSpinCount').textContent = `Spins: ${spinCount}/${SPIN_COUNT_LIMIT}`;
+        }
+
+        function spinWheelFromModal() {
+            if (!isOnline || isSpinning || spinCount <= 0) return;
+            const btn = document.getElementById('modalSpinBtn');
+            btn.disabled = true;
+            isSpinning = true;
+            let cd = SPIN_BUTTON_COOLDOWN_SECONDS;
+            document.getElementById('modalSpinTimerBox').classList.add('show');
+            document.getElementById('modalSpinTimerDisplay').textContent = `00:${String(cd).padStart(2,'0')}`;
+            if (spinBtnCooldownInterval) clearInterval(spinBtnCooldownInterval);
+            spinBtnCooldownInterval = setInterval(() => {
+                cd--;
+                if (cd > 0) document.getElementById('modalSpinTimerDisplay').textContent = `00:${String(cd).padStart(2,'0')}`;
+                else {
+                    clearInterval(spinBtnCooldownInterval);
+                    spinBtnCooldownInterval = null;
+                    document.getElementById('modalSpinTimerBox').classList.remove('show');
+                    btn.disabled = false;
+                }
+            }, 1000);
+            currentRotation += (5 + Math.floor(Math.random() * 5)) * 360 + Math.floor(Math.random() * 360);
+            document.getElementById('wheelSegments').style.transform = `rotate(${currentRotation}deg)`;
+            show_11197472().then(() => {
+                const p = getPrizeByAngle(currentRotation);
+                if (p.type === 'coins') app.balance += p.value;
+                else app.usdBalance += p.value;
+                spinCount--;
+                document.getElementById('spinBadge').textContent = spinCount;
+                updateSpinModalUI();
+                document.getElementById('rewardText').textContent = `You won ${p.label}!`;
+                document.getElementById('successModal').classList.add('active');
+                userRef.update({ balance: app.balance, usdBalance: app.usdBalance, spinCount });
+                updateUI();
+                isSpinning = false;
+            }).catch(() => {
+                btn.disabled = false;
+                isSpinning = false;
+                showToast('Ad not watched!', 'error');
+            });
+        }
+
+        function loadSpinData() {
+            db.ref('users/' + userId + '/spinCount').on('value', s => {
+                spinCount = s.val() !== null ? s.val() : SPIN_COUNT_LIMIT;
+                document.getElementById('spinBadge').textContent = spinCount;
+                updateSpinModalUI();
+            });
+        }
+
+        function watchMiningCoins() {
+            db.ref('users/' + userId + '/progressCoins').on('value', s => {
+                if (s.val() === 0) {
+                    spinCount = SPIN_COUNT_LIMIT;
+                    document.getElementById('spinBadge').textContent = spinCount;
+                    updateSpinModalUI();
+                    userRef.update({ spinCount });
+                    showToast('🔄 Spins reset!');
+                }
+            });
+        }
 
         // ================== DAILY BONUS ==================
-        function claimDailyBonus(){if(!isOnline)return;const today=new Date().toDateString();if(app.dailyBonusClaimed===today){showToast('Already claimed!','error');return;}const ba=app.dailyBonusMin+Math.floor(Math.random()*(app.dailyBonusMax-app.dailyBonusMin+1));app.balance+=ba;app.xpPoints+=ba*2;app.dailyBonusClaimed=today;userRef.update({balance:app.balance,xpPoints:app.xpPoints,dailyBonusClaimed:today});document.getElementById('dailyBonusStatus').textContent='✅ Claimed';updateUI();updateLevelUI();showToast(`🎁 +${ba} Coins!`);}
+        function claimDailyBonus() {
+            if (!isOnline) return;
+            const today = new Date().toDateString();
+            if (app.dailyBonusClaimed === today) { showToast('Already claimed!', 'error'); return; }
+            const ba = app.dailyBonusMin + Math.floor(Math.random() * (app.dailyBonusMax - app.dailyBonusMin + 1));
+            app.balance += ba;
+            app.xpPoints += ba * 2;
+            app.dailyBonusClaimed = today;
+            userRef.update({ balance: app.balance, xpPoints: app.xpPoints, dailyBonusClaimed: today });
+            document.getElementById('dailyBonusStatus').textContent = '✅ Claimed';
+            updateUI();
+            updateLevelUI();
+            showToast(`🎁 +${ba} Coins!`);
+        }
 
         // ================== MYSTERY BOX ==================
-        function updateMysteryBoxUI(){const te=document.getElementById('mysteryBoxTimer');if(app.mysteryBoxCooldown>Date.now()){te.textContent=`⏳ ${formatTime(Math.ceil((app.mysteryBoxCooldown-Date.now())/1000))}`;te.classList.add('cooldown');}else{te.textContent='🎯 Tap to open';te.classList.remove('cooldown');}}
-        function openMysteryBox(){if(!isOnline||app.mysteryBoxCooldown>Date.now())return;document.getElementById('boxLid').classList.add('open');document.getElementById('giftIcon').className='gift-icon opened';document.getElementById('giftIcon').textContent='✨';show_11197472().then(()=>{const rt=Math.random()>0.5?'usd':'coins';let rc=0,ru=0;if(rt==='coins'){rc=app.mysteryBoxMin+Math.floor(Math.random()*(app.mysteryBoxMax-app.mysteryBoxMin+1));app.balance+=rc;}else{ru=parseFloat((Math.random()*0.006+0.002).toFixed(4));app.usdBalance+=ru;}app.xpPoints+=(rc||ru*1000)*2;app.mysteryBoxCooldown=Date.now()+app.mysteryBoxDuration;userRef.update({balance:app.balance,usdBalance:app.usdBalance,xpPoints:app.xpPoints,mysteryBoxCooldown:app.mysteryBoxCooldown});const rt2=rt==='coins'?`+${rc} Coins`:`+$${ru.toFixed(4)} USD`;showToast(`🎁 ${rt2}!`);updateUI();updateLevelUI();updateMysteryBoxUI();setTimeout(()=>{document.getElementById('boxLid').classList.remove('open');document.getElementById('giftIcon').className='gift-icon';document.getElementById('giftIcon').textContent='🎁';},2000);}).catch(()=>{document.getElementById('boxLid').classList.remove('open');document.getElementById('giftIcon').className='gift-icon';document.getElementById('giftIcon').textContent='🎁';showToast('Ad not watched!','error');});}
+        function updateMysteryBoxUI() {
+            const te = document.getElementById('mysteryBoxTimer');
+            if (app.mysteryBoxCooldown > Date.now()) {
+                te.textContent = `⏳ ${formatTime(Math.ceil((app.mysteryBoxCooldown-Date.now())/1000))}`;
+                te.classList.add('cooldown');
+            } else {
+                te.textContent = '🎯 Tap to open';
+                te.classList.remove('cooldown');
+            }
+        }
+
+        function openMysteryBox() {
+            if (!isOnline || app.mysteryBoxCooldown > Date.now()) return;
+            document.getElementById('boxLid').classList.add('open');
+            document.getElementById('giftIcon').className = 'gift-icon opened';
+            document.getElementById('giftIcon').textContent = '✨';
+            show_11197472().then(() => {
+                const rt = Math.random() > 0.5 ? 'usd' : 'coins';
+                let rc = 0,
+                    ru = 0;
+                if (rt === 'coins') {
+                    rc = app.mysteryBoxMin + Math.floor(Math.random() * (app.mysteryBoxMax - app.mysteryBoxMin + 1));
+                    app.balance += rc;
+                } else {
+                    ru = parseFloat((Math.random() * 0.006 + 0.002).toFixed(4));
+                    app.usdBalance += ru;
+                }
+                app.xpPoints += (rc || ru * 1000) * 2;
+                app.mysteryBoxCooldown = Date.now() + app.mysteryBoxDuration;
+                userRef.update({ balance: app.balance, usdBalance: app.usdBalance, xpPoints: app.xpPoints, mysteryBoxCooldown: app.mysteryBoxCooldown });
+                const rt2 = rt === 'coins' ? `+${rc} Coins` : `+$${ru.toFixed(4)} USD`;
+                showToast(`🎁 ${rt2}!`);
+                updateUI();
+                updateLevelUI();
+                updateMysteryBoxUI();
+                setTimeout(() => {
+                    document.getElementById('boxLid').classList.remove('open');
+                    document.getElementById('giftIcon').className = 'gift-icon';
+                    document.getElementById('giftIcon').textContent = '🎁';
+                }, 2000);
+            }).catch(() => {
+                document.getElementById('boxLid').classList.remove('open');
+                document.getElementById('giftIcon').className = 'gift-icon';
+                document.getElementById('giftIcon').textContent = '🎁';
+                showToast('Ad not watched!', 'error');
+            });
+        }
 
         // ================== SPEED BOOST ==================
-        function updateSpeedBoostUI(){const bb=document.getElementById('speedBoostBtn');if(app.speedBoostCooldown>Date.now()){bb.disabled=true;bb.textContent=`⏳ ${formatTime(Math.ceil((app.speedBoostCooldown-Date.now())/1000))}`;}else{bb.disabled=false;bb.textContent='🚀 Speed Boost';}}
-        function activateSpeedBoost(){if(!isOnline||app.speedBoostCooldown>Date.now()||app.progressCoins<=0)return;show_11197472().then(()=>{const st=Date.now();let ta=0;const tc=Math.floor(Math.random()*11)+50;const bm=setInterval(()=>{if(Date.now()-st>=3000||ta>=tc){clearInterval(bm);app.speedBoostCooldown=Date.now()+3600000;userRef.update({speedBoostCooldown:app.speedBoostCooldown});updateSpeedBoostUI();showToast(`🚀 Done! +${ta} coins`);return;}const aa=Math.min(3,tc-ta);if(aa<=0){clearInterval(bm);return;}app.progressCoins-=1;app.balance+=aa;app.xpPoints+=aa*2;ta+=aa;userRef.update({balance:app.balance,progressCoins:app.progressCoins,xpPoints:app.xpPoints});updateProgressUI();updateUI();updateLevelUI();},100);showToast('⚡ Speed Boost!');}).catch(()=>showToast('Ad not watched!','error'));}
+        function updateSpeedBoostUI() {
+            const bb = document.getElementById('speedBoostBtn');
+            if (app.speedBoostCooldown > Date.now()) {
+                bb.disabled = true;
+                bb.textContent = `⏳ ${formatTime(Math.ceil((app.speedBoostCooldown-Date.now())/1000))}`;
+            } else {
+                bb.disabled = false;
+                bb.textContent = '🚀 Speed Boost';
+            }
+        }
+
+        function activateSpeedBoost() {
+            if (!isOnline || app.speedBoostCooldown > Date.now() || app.progressCoins <= 0) return;
+            show_11197472().then(() => {
+                const st = Date.now();
+                let ta = 0;
+                const tc = Math.floor(Math.random() * 11) + 50;
+                const bm = setInterval(() => {
+                    if (Date.now() - st >= 3000 || ta >= tc) {
+                        clearInterval(bm);
+                        app.speedBoostCooldown = Date.now() + 3600000;
+                        userRef.update({ speedBoostCooldown: app.speedBoostCooldown });
+                        updateSpeedBoostUI();
+                        showToast(`🚀 Done! +${ta} coins`);
+                        return;
+                    }
+                    const aa = Math.min(3, tc - ta);
+                    if (aa <= 0) { clearInterval(bm); return; }
+                    app.progressCoins -= 1;
+                    app.balance += aa;
+                    app.xpPoints += aa * 2;
+                    ta += aa;
+                    userRef.update({ balance: app.balance, progressCoins: app.progressCoins, xpPoints: app.xpPoints });
+                    updateProgressUI();
+                    updateUI();
+                    updateLevelUI();
+                }, 100);
+                showToast('⚡ Speed Boost!');
+            }).catch(() => showToast('Ad not watched!', 'error'));
+        }
 
         // ================== TIME ==================
-        function formatTime(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;}
+        function formatTime(s) {
+            const h = Math.floor(s / 3600),
+                m = Math.floor((s % 3600) / 60),
+                sec = s % 60;
+            return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+        }
 
         // ================== MINING ==================
-        function startMining(){if(!isOnline||miningInterval||app.progressCoins<=0)return;document.getElementById('circleStartOverlay').classList.add('hidden');userRef.update({isCurrentlyMining:true,lastMiningActivity:Date.now()});wasMiningBeforeOffline=true;function mnc(){if(!isOnline||isAdShowing||app.progressCoins<=0){stopMining();return;}const d=calculateLevel(app.xpPoints);let sm=1+(d.bonusPercent/100);app.progressCoins-=1;app.balance+=sm;app.xpPoints+=1;userRef.update({balance:app.balance,progressCoins:app.progressCoins,xpPoints:app.xpPoints});const coin=document.createElement('div');coin.className='floating-coin';coin.textContent=`+${sm.toFixed(0)} 🪙`;coin.style.left=(Math.random()*80+10)+'%';coin.style.top='35%';document.body.appendChild(coin);setTimeout(()=>coin.remove(),1000);updateProgressUI();updateUI();updateLevelUI();miningInterval=setTimeout(mnc,5000/sm);}mnc();showToast('⛏️ Mining!');}
-        function stopMining(){if(miningInterval){clearTimeout(miningInterval);miningInterval=null;}wasMiningBeforeOffline=false;userRef.update({isCurrentlyMining:false});updateProgressUI();}
+        function startMining() {
+            if (!isOnline || miningInterval || app.progressCoins <= 0) return;
+            document.getElementById('circleStartOverlay').classList.add('hidden');
+            userRef.update({ isCurrentlyMining: true, lastMiningActivity: Date.now() });
+            wasMiningBeforeOffline = true;
+
+            function mnc() {
+                if (!isOnline || isAdShowing || app.progressCoins <= 0) { stopMining(); return; }
+                const d = calculateLevel(app.xpPoints);
+                let sm = 1 + (d.bonusPercent / 100);
+                app.progressCoins -= 1;
+                app.balance += sm;
+                app.xpPoints += 1;
+                userRef.update({ balance: app.balance, progressCoins: app.progressCoins, xpPoints: app.xpPoints });
+                const coin = document.createElement('div');
+                coin.className = 'floating-coin';
+                coin.textContent = `+${sm.toFixed(0)} 🪙`;
+                coin.style.left = (Math.random() * 80 + 10) + '%';
+                coin.style.top = '35%';
+                document.body.appendChild(coin);
+                setTimeout(() => coin.remove(), 1000);
+                updateProgressUI();
+                updateUI();
+                updateLevelUI();
+                miningInterval = setTimeout(mnc, 5000 / sm);
+            }
+            mnc();
+            showToast('⛏️ Mining!');
+        }
+
+        function stopMining() {
+            if (miningInterval) { clearTimeout(miningInterval);
+                miningInterval = null; }
+            wasMiningBeforeOffline = false;
+            userRef.update({ isCurrentlyMining: false });
+            updateProgressUI();
+        }
 
         // ================== LEVEL (unchanged) ==================
-        function getLevelConfig(l){if(l===0)return{tier:'unlocking',tierName:'Unlocking',tierEmoji:'🔒',bonusPercent:0,xpForLevel:5000};let tier,tn,te,bonus;if(l>=1&&l<=20){tier='bronze';tn='Bronze';te='🥉';bonus=10;}else if(l>=21&&l<=40){tier='silver';tn='Silver';te='🥈';bonus=20;}else if(l>=41&&l<=60){tier='gold';tn='Gold';te='🥇';bonus=30;}else if(l>=61&&l<=80){tier='platinum';tn='Platinum';te='💎';bonus=40;}else if(l>=81&&l<=100){tier='diamond';tn='Diamond';te='👑';bonus=50;}else{tier='max';tn='MAX';te='⭐';bonus=50;}return{tier,tierName:tn,tierEmoji:te,bonusPercent:bonus,xpForLevel:Math.floor(l===1?1800:1800*Math.pow(2,l-1))};}
-        function calculateLevel(xp){xp=xp||NEGATIVE_XP;if(xp<0){const b=5000;return{level:0,xp,progress:Math.min(100,Math.floor((xp+b)/b*100)),tierName:'Unlocking',tierEmoji:'🔒',bonusPercent:0,xpForLevel:b};}let l=1,xn=1800,tx=0;while(l<=100){if(xp<tx+xn)break;tx+=xn;l++;if(l>100)break;xn=1800*Math.pow(2,l-1);}if(l>100){l=100;xn=1800*Math.pow(2,99);tx=0;for(let i=1;i<100;i++)tx+=1800*Math.pow(2,i-1);}const c=getLevelConfig(l);return{level:l,xp,progress:Math.min(100,Math.floor(((xp-tx)/xn)*100)),tierName:c.tierName,tierEmoji:c.tierEmoji,bonusPercent:c.bonusPercent,xpForLevel:xn};}
-        function updateLevelUI(){const d=calculateLevel(app.xpPoints);if(d.level===0){document.getElementById('levelTitle').textContent='🔒 Unlocking';document.getElementById('levelNumber').textContent='Level 0';document.getElementById('levelProgressFill').style.width=d.progress+'%';document.getElementById('levelCurrentPoints').textContent=`${d.xp} XP`;document.getElementById('levelNextPoints').textContent=`/ ${d.xpForLevel} XP`;document.getElementById('userLevelBadge').textContent='🔒 Unlocking';}else{document.getElementById('levelTitle').textContent=`${d.tierEmoji} ${d.tierName}`;document.getElementById('levelNumber').textContent=`Level ${d.level}`;document.getElementById('levelProgressFill').style.width=d.progress+'%';document.getElementById('levelCurrentPoints').textContent=`${d.xp} XP`;document.getElementById('levelNextPoints').textContent=d.level>=100?'⭐ MAX':`/ ${d.xpForLevel} XP`;document.getElementById('userLevelBadge').textContent=`${d.tierEmoji} Lv.${d.level}`;}}
-        function openLevelPage(){document.getElementById('levelOverlay').classList.add('show');updateLevelPageUI();renderLevelGrid();}
-        function closeLevelPage(){document.getElementById('levelOverlay').classList.remove('show');}
-        function updateLevelPageUI(){const d=calculateLevel(app.xpPoints);document.getElementById('lvlEmoji').textContent=d.tierEmoji;document.getElementById('lvlNumber').textContent=d.level===0?'Level 0':`Level ${d.level}`;document.getElementById('lvlName').textContent=d.tierName;document.getElementById('lvlXP').textContent=d.level===0?`${d.xp} / ${d.xpForLevel} XP`:`${d.xp} XP (${d.progress}%)`;document.getElementById('lvlProgressFill').style.width=d.progress+'%';document.getElementById('lvlBonus').textContent=`Mining Bonus: +${d.bonusPercent}%`;}
-        function renderLevelGrid(){const g=document.getElementById('levelGrid'),cl=calculateLevel(app.xpPoints);let h='';for(let i=0;i<=100;i++){if(currentLevelFilter!=='all'){const r={bronze:[1,20],silver:[21,40],gold:[41,60],platinum:[61,80],diamond:[81,100]};if(i>0&&(i<r[currentLevelFilter][0]||i>r[currentLevelFilter][1]))continue;if(i===0&&currentLevelFilter!=='bronze')continue;}const c=getLevelConfig(i);const isC=cl.level===i,isU=cl.level>=i;h+=`<div class="level-card ${isC?'current':isU?'unlocked':'locked'}"><div style="font-size:18px;font-weight:900;color:#fbbf24;">${c.tierEmoji} ${i}</div><div style="font-size:11px;color:#94a3b8;">${c.tierName}</div><div style="font-size:12px;color:#10b981;">+${c.bonusPercent}%</div><div style="font-size:10px;color:#94a3b8;">${isC?'👈':isU?'✅':'🔒'}</div></div>`;}g.innerHTML=h;}
-        function filterLevels(f,b){currentLevelFilter=f;document.querySelectorAll('.lvl-filter-btn').forEach(x=>x.classList.remove('active'));if(b)b.classList.add('active');renderLevelGrid();}
+        function getLevelConfig(l) {
+            if (l === 0) return { tier: 'unlocking', tierName: 'Unlocking', tierEmoji: '🔒', bonusPercent: 0, xpForLevel: 5000 };
+            let tier, tn, te, bonus;
+            if (l >= 1 && l <= 20) { tier = 'bronze';
+                tn = 'Bronze';
+                te = '🥉';
+                bonus = 10; } else if (l >= 21 && l <= 40) { tier = 'silver';
+                tn = 'Silver';
+                te = '🥈';
+                bonus = 20; } else if (l >= 41 && l <= 60) { tier = 'gold';
+                tn = 'Gold';
+                te = '🥇';
+                bonus = 30; } else if (l >= 61 && l <= 80) { tier = 'platinum';
+                tn = 'Platinum';
+                te = '💎';
+                bonus = 40; } else if (l >= 81 && l <= 100) { tier = 'diamond';
+                tn = 'Diamond';
+                te = '👑';
+                bonus = 50; } else { tier = 'max';
+                tn = 'MAX';
+                te = '⭐';
+                bonus = 50; }
+            return { tier, tierName: tn, tierEmoji: te, bonusPercent: bonus, xpForLevel: Math.floor(l === 1 ? 1800 : 1800 * Math.pow(2, l - 1)) };
+        }
+
+        function calculateLevel(xp) {
+            xp = xp || NEGATIVE_XP;
+            if (xp < 0) {
+                const b = 5000;
+                return { level: 0, xp, progress: Math.min(100, Math.floor((xp + b) / b * 100)), tierName: 'Unlocking', tierEmoji: '🔒', bonusPercent: 0, xpForLevel: b };
+            }
+            let l = 1,
+                xn = 1800,
+                tx = 0;
+            while (l <= 100) {
+                if (xp < tx + xn) break;
+                tx += xn;
+                l++;
+                if (l > 100) break;
+                xn = 1800 * Math.pow(2, l - 1);
+            }
+            if (l > 100) { l = 100;
+                xn = 1800 * Math.pow(2, 99);
+                tx = 0; for (let i = 1; i < 100; i++) tx += 1800 * Math.pow(2, i - 1); }
+            const c = getLevelConfig(l);
+            return { level: l, xp, progress: Math.min(100, Math.floor(((xp - tx) / xn) * 100)), tierName: c.tierName, tierEmoji: c.tierEmoji, bonusPercent: c.bonusPercent, xpForLevel: xn };
+        }
+
+        function updateLevelUI() {
+            const d = calculateLevel(app.xpPoints);
+            if (d.level === 0) {
+                document.getElementById('levelTitle').textContent = '🔒 Unlocking';
+                document.getElementById('levelNumber').textContent = 'Level 0';
+                document.getElementById('levelProgressFill').style.width = d.progress + '%';
+                document.getElementById('levelCurrentPoints').textContent = `${d.xp} XP`;
+                document.getElementById('levelNextPoints').textContent = `/ ${d.xpForLevel} XP`;
+                document.getElementById('userLevelBadge').textContent = '🔒 Unlocking';
+            } else {
+                document.getElementById('levelTitle').textContent = `${d.tierEmoji} ${d.tierName}`;
+                document.getElementById('levelNumber').textContent = `Level ${d.level}`;
+                document.getElementById('levelProgressFill').style.width = d.progress + '%';
+                document.getElementById('levelCurrentPoints').textContent = `${d.xp} XP`;
+                document.getElementById('levelNextPoints').textContent = d.level >= 100 ? '⭐ MAX' : `/ ${d.xpForLevel} XP`;
+                document.getElementById('userLevelBadge').textContent = `${d.tierEmoji} Lv.${d.level}`;
+            }
+        }
+
+        function openLevelPage() {
+            document.getElementById('levelOverlay').classList.add('show');
+            updateLevelPageUI();
+            renderLevelGrid();
+        }
+
+        function closeLevelPage() {
+            document.getElementById('levelOverlay').classList.remove('show');
+        }
+
+        function updateLevelPageUI() {
+            const d = calculateLevel(app.xpPoints);
+            document.getElementById('lvlEmoji').textContent = d.tierEmoji;
+            document.getElementById('lvlNumber').textContent = d.level === 0 ? 'Level 0' : `Level ${d.level}`;
+            document.getElementById('lvlName').textContent = d.tierName;
+            document.getElementById('lvlXP').textContent = d.level === 0 ? `${d.xp} / ${d.xpForLevel} XP` : `${d.xp} XP (${d.progress}%)`;
+            document.getElementById('lvlProgressFill').style.width = d.progress + '%';
+            document.getElementById('lvlBonus').textContent = `Mining Bonus: +${d.bonusPercent}%`;
+        }
+
+        function renderLevelGrid() {
+            const g = document.getElementById('levelGrid'),
+                cl = calculateLevel(app.xpPoints);
+            let h = '';
+            for (let i = 0; i <= 100; i++) {
+                if (currentLevelFilter !== 'all') {
+                    const r = { bronze: [1, 20], silver: [21, 40], gold: [41, 60], platinum: [61, 80], diamond: [81, 100] };
+                    if (i > 0 && (i < r[currentLevelFilter][0] || i > r[currentLevelFilter][1])) continue;
+                    if (i === 0 && currentLevelFilter !== 'bronze') continue;
+                }
+                const c = getLevelConfig(i);
+                const isC = cl.level === i,
+                    isU = cl.level >= i;
+                h += `<div class="level-card ${isC?'current':isU?'unlocked':'locked'}"><div style="font-size:18px;font-weight:900;color:#fbbf24;">${c.tierEmoji} ${i}</div><div style="font-size:11px;color:#94a3b8;">${c.tierName}</div><div style="font-size:12px;color:#10b981;">+${c.bonusPercent}%</div><div style="font-size:10px;color:#94a3b8;">${isC?'👈':isU?'✅':'🔒'}</div></div>`;
+            }
+            g.innerHTML = h;
+        }
+
+        function filterLevels(f, b) {
+            currentLevelFilter = f;
+            document.querySelectorAll('.lvl-filter-btn').forEach(x => x.classList.remove('active'));
+            if (b) b.classList.add('active');
+            renderLevelGrid();
+        }
 
         // ================== TASKS (unchanged) ==================
-        function loadTasks(){db.ref('tasks').on('value',s=>{tasks=s.exists()?Object.keys(s.val()).map(k=>({id:k,...s.val()[k]})):[];renderTasks();});}
-        function renderTasks(){const c=document.getElementById('tasksContainer'),f=currentFilter==='all'?tasks:tasks.filter(t=>t.type===currentFilter);c.innerHTML=f.length?f.map(t=>{const done=app.taskLastCompleted[t.id]===new Date().toDateString();const p=app.taskProgress[t.id]||0;const l=t.limit||1;const ic=p>=l;let st='',bh='';if(done&&ic)st='<span style="color:#10b981;">✅ Done</span>';else if(ic)st='<span style="color:#10b981;">✅ Completed</span>';else{const r=l-p;if(t.type==='video')bh=`<button class="task-btn" onclick="completeTask('${t.id}',${t.reward},'${t.type}')">📺 Watch (${r} left)</button>`;else if(t.type==='link')bh=`<button class="task-btn" onclick="openWebViewTask('${t.id}','${t.link||'#'}',${t.reward},${t.waitTime||60})">🔗 Open (${r} left)</button>`;else bh=`<button class="task-btn" onclick="completeTask('${t.id}',${t.reward},'${t.type}')">🔗 Open (${r} left)</button>`;}return `<div class="task-card"><div class="task-header"><span class="task-title">${t.title}</span><span class="task-reward">+${t.reward} 🪙</span></div><div style="font-size:11px;">${t.description||''}</div><div class="task-progress">Progress: ${p}/${l}</div><div style="display:flex;justify-content:space-between;margin-top:6px;">${st||bh}</div></div>`;}).join(''):'<p style="color:#94a3b8;text-align:center;">📭 No tasks</p>';}
-        function filterTasks(f,b){currentFilter=f;document.querySelectorAll('.task-filters .filter-btn').forEach(x=>x.classList.remove('active'));if(b)b.classList.add('active');renderTasks();}
-        function openWebViewTask(tid,url,rw,wt){if(!isOnline)return;if(app.taskProgress[tid]>=(tasks.find(t=>t.id===tid)?.limit||1)){showToast('Completed!','error');return;}webViewTaskId=tid;webViewTaskReward=rw;webViewRequiredTime=wt||60;webViewSeconds=0;document.getElementById('webviewIframe').src=url;document.getElementById('webviewUrlText').textContent=url;document.getElementById('webviewOverlay').classList.add('show');if(webViewTimerInterval)clearInterval(webViewTimerInterval);webViewTimerInterval=setInterval(()=>{webViewSeconds++;const r=Math.max(0,webViewRequiredTime-webViewSeconds);document.getElementById('webviewTimer').textContent=`⏱ ${r}s`;if(r<=0){clearInterval(webViewTimerInterval);webViewTimerInterval=null;document.getElementById('webviewClaimBtn').disabled=false;document.getElementById('webviewClaimBtn').textContent='✅ Claim';}else document.getElementById('webviewClaimBtn').textContent=`⏳ ${r}s`;},1000);}
-        function closeWebView(){document.getElementById('webviewOverlay').classList.remove('show');if(webViewTimerInterval){clearInterval(webViewTimerInterval);webViewTimerInterval=null;}document.getElementById('webviewIframe').src='about:blank';webViewTaskId=null;}
-        function claimWebViewTask(){if(!webViewTaskId)return;app.taskProgress[webViewTaskId]=(app.taskProgress[webViewTaskId]||0)+1;if(app.taskProgress[webViewTaskId]>=(tasks.find(t=>t.id===webViewTaskId)?.limit||1))app.taskLastCompleted[webViewTaskId]=new Date().toDateString();app.balance+=webViewTaskReward;app.xpPoints+=webViewTaskReward*2;userRef.update({balance:app.balance,xpPoints:app.xpPoints,taskProgress:app.taskProgress,taskLastCompleted:app.taskLastCompleted});closeWebView();updateUI();updateLevelUI();renderTasks();showToast(`🎉 +${webViewTaskReward} Coins!`);}
-        function completeTask(tid,rw,type){if(!isOnline)return;const t=tasks.find(t=>t.id===tid);if(!t||(app.taskProgress[tid]||0)>=(t.limit||1))return;if(type==='video')show_11197472().then(()=>finishTaskProgress(tid,rw,t.limit||1)).catch(()=>showToast('Ad not watched!','error'));else finishTaskProgress(tid,rw,t.limit||1);}
-        function finishTaskProgress(tid,rw,l){app.taskProgress[tid]=(app.taskProgress[tid]||0)+1;if(app.taskProgress[tid]>=l)app.taskLastCompleted[tid]=new Date().toDateString();app.balance+=rw;app.xpPoints+=rw*2;userRef.update({balance:app.balance,xpPoints:app.xpPoints,taskLastCompleted:app.taskLastCompleted,taskProgress:app.taskProgress});updateUI();updateLevelUI();renderTasks();showToast(`🎉 +${rw} Coins!`);}
+        function loadTasks() {
+            db.ref('tasks').on('value', s => {
+                tasks = s.exists() ? Object.keys(s.val()).map(k => ({ id: k, ...s.val()[k] })) : [];
+                renderTasks();
+            });
+        }
+
+        function renderTasks() {
+            const c = document.getElementById('tasksContainer'),
+                f = currentFilter === 'all' ? tasks : tasks.filter(t => t.type === currentFilter);
+            c.innerHTML = f.length ? f.map(t => {
+                const done = app.taskLastCompleted[t.id] === new Date().toDateString();
+                const p = app.taskProgress[t.id] || 0;
+                const l = t.limit || 1;
+                const ic = p >= l;
+                let st = '',
+                    bh = '';
+                if (done && ic) st = '<span style="color:#10b981;">✅ Done</span>';
+                else if (ic) st = '<span style="color:#10b981;">✅ Completed</span>';
+                else {
+                    const r = l - p;
+                    if (t.type === 'video') bh = `<button class="task-btn" onclick="completeTask('${t.id}',${t.reward},'${t.type}')">📺 Watch (${r} left)</button>`;
+                    else if (t.type === 'link') bh = `<button class="task-btn" onclick="openWebViewTask('${t.id}','${t.link||'#'}',${t.reward},${t.waitTime||60})">🔗 Open (${r} left)</button>`;
+                    else bh = `<button class="task-btn" onclick="completeTask('${t.id}',${t.reward},'${t.type}')">🔗 Open (${r} left)</button>`;
+                }
+                return `<div class="task-card"><div class="task-header"><span class="task-title">${t.title}</span><span class="task-reward">+${t.reward} 🪙</span></div><div style="font-size:11px;">${t.description||''}</div><div class="task-progress">Progress: ${p}/${l}</div><div style="display:flex;justify-content:space-between;margin-top:6px;">${st||bh}</div></div>`;
+            }).join('') : '<p style="color:#94a3b8;text-align:center;">📭 No tasks</p>';
+        }
+
+        function filterTasks(f, b) {
+            currentFilter = f;
+            document.querySelectorAll('.task-filters .filter-btn').forEach(x => x.classList.remove('active'));
+            if (b) b.classList.add('active');
+            renderTasks();
+        }
+
+        function openWebViewTask(tid, url, rw, wt) {
+            if (!isOnline) return;
+            if (app.taskProgress[tid] >= (tasks.find(t => t.id === tid)?.limit || 1)) { showToast('Completed!', 'error'); return; }
+            webViewTaskId = tid;
+            webViewTaskReward = rw;
+            webViewRequiredTime = wt || 60;
+            webViewSeconds = 0;
+            document.getElementById('webviewIframe').src = url;
+            document.getElementById('webviewUrlText').textContent = url;
+            document.getElementById('webviewOverlay').classList.add('show');
+            if (webViewTimerInterval) clearInterval(webViewTimerInterval);
+            webViewTimerInterval = setInterval(() => {
+                webViewSeconds++;
+                const r = Math.max(0, webViewRequiredTime - webViewSeconds);
+                document.getElementById('webviewTimer').textContent = `⏱ ${r}s`;
+                if (r <= 0) {
+                    clearInterval(webViewTimerInterval);
+                    webViewTimerInterval = null;
+                    document.getElementById('webviewClaimBtn').disabled = false;
+                    document.getElementById('webviewClaimBtn').textContent = '✅ Claim';
+                } else document.getElementById('webviewClaimBtn').textContent = `⏳ ${r}s`;
+            }, 1000);
+        }
+
+        function closeWebView() {
+            document.getElementById('webviewOverlay').classList.remove('show');
+            if (webViewTimerInterval) { clearInterval(webViewTimerInterval);
+                webViewTimerInterval = null; }
+            document.getElementById('webviewIframe').src = 'about:blank';
+            webViewTaskId = null;
+        }
+
+        function claimWebViewTask() {
+            if (!webViewTaskId) return;
+            app.taskProgress[webViewTaskId] = (app.taskProgress[webViewTaskId] || 0) + 1;
+            if (app.taskProgress[webViewTaskId] >= (tasks.find(t => t.id === webViewTaskId)?.limit || 1)) app.taskLastCompleted[webViewTaskId] = new Date().toDateString();
+            app.balance += webViewTaskReward;
+            app.xpPoints += webViewTaskReward * 2;
+            userRef.update({ balance: app.balance, xpPoints: app.xpPoints, taskProgress: app.taskProgress, taskLastCompleted: app.taskLastCompleted });
+            closeWebView();
+            updateUI();
+            updateLevelUI();
+            renderTasks();
+            showToast(`🎉 +${webViewTaskReward} Coins!`);
+        }
+
+        function completeTask(tid, rw, type) {
+            if (!isOnline) return;
+            const t = tasks.find(t => t.id === tid);
+            if (!t || (app.taskProgress[tid] || 0) >= (t.limit || 1)) return;
+            if (type === 'video') show_11197472().then(() => finishTaskProgress(tid, rw, t.limit || 1)).catch(() => showToast('Ad not watched!', 'error'));
+            else finishTaskProgress(tid, rw, t.limit || 1);
+        }
+
+        function finishTaskProgress(tid, rw, l) {
+            app.taskProgress[tid] = (app.taskProgress[tid] || 0) + 1;
+            if (app.taskProgress[tid] >= l) app.taskLastCompleted[tid] = new Date().toDateString();
+            app.balance += rw;
+            app.xpPoints += rw * 2;
+            userRef.update({ balance: app.balance, xpPoints: app.xpPoints, taskLastCompleted: app.taskLastCompleted, taskProgress: app.taskProgress });
+            updateUI();
+            updateLevelUI();
+            renderTasks();
+            showToast(`🎉 +${rw} Coins!`);
+        }
 
         // ================== REFERRAL (unchanged) ==================
-        function loadReferralConfigFromDB(){db.ref('referralConfig').on('value',s=>{referralConfigCache=s.val()||{perReferralCoins:50,xpPerReferral:100};updateReferUI();});}
-        function updateReferUI(){const t=app.referralCount||0;document.getElementById('referTotal').textContent=t;document.getElementById('referEarned').textContent=t*(referralConfigCache.perReferralCoins||50);document.getElementById('referBonus').textContent=Math.floor(t/10)*50;const tiers=[{l:1,c:referralConfigCache.tier1?.count||10,b:referralConfigCache.tier1?.bonus||50,n:'🥉 Bronze'},{l:2,c:referralConfigCache.tier2?.count||25,b:referralConfigCache.tier2?.bonus||150,n:'🥈 Silver'},{l:3,c:referralConfigCache.tier3?.count||50,b:referralConfigCache.tier3?.bonus||300,n:'🥇 Gold'},{l:4,c:referralConfigCache.tier4?.count||100,b:referralConfigCache.tier4?.bonus||500,n:'💎 Platinum'},{l:5,c:referralConfigCache.tier5?.count||200,b:referralConfigCache.tier5?.bonus||1000,n:'👑 Diamond'}];document.getElementById('referTierList').innerHTML=tiers.map(r=>{const cl=app.referTiers?.[r.l]===1,av=t>=r.c&&!cl;return `<div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;"><div><div style="font-size:13px;">${r.n}</div><div style="font-size:10px;color:#94a3b8;">${r.c} refs • +${r.b} 🪙</div></div><span style="color:${av?'#fbbf24':'#64748b'};" ${av?`onclick="claimTier(${r.l},${r.b})"`:''}>${cl?'✅':av?'🎁':'🔒'}</span></div>`;}).join('');}
-        function claimTier(l,b){if(app.referTiers?.[l]===1)return;app.balance+=b;app.xpPoints+=b*2;if(!app.referTiers)app.referTiers={};app.referTiers[l]=1;userRef.update({balance:app.balance,xpPoints:app.xpPoints,referTiers:app.referTiers});updateUI();updateLevelUI();updateReferUI();showToast(`🎁 +${b} Coins!`);}
-        function genRefCode(){return Array(8).fill(0).map(()=>'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random()*36)]).join('');}
-        function submitReferCode(){if(!isOnline)return;const code=document.getElementById('referCodeInput').value.trim().toUpperCase();if(!code){showToast('Enter code!','error');return;}userRef.once('value',s=>{if((s.val()||{}).referCodeSubmitted){showToast('Already used!','error');return;}db.ref('users').orderByChild('referCode').equalTo(code).once('value',sn=>{if(!sn.exists()){showToast('Invalid!','error');return;}sn.forEach(c=>{if(c.key===userId){showToast('Own code!','error');return;}const b=referralConfigCache.perReferralCoins||50;db.ref('referrals/'+userId).set({referredBy:c.key,referredAt:Date.now(),username:displayName,bonus:b,userId}).then(()=>{db.ref('users/'+c.key).transaction(cur=>({...(cur||{}),referCount:(cur?.referCount||0)+1}));app.balance+=b;app.xpPoints+=referralConfigCache.xpPerReferral||100;userRef.update({balance:app.balance,xpPoints:app.xpPoints,referCodeSubmitted:true});document.getElementById('referCodeSubmitBtn').disabled=true;document.getElementById('referCodeInput').disabled=true;updateUI();updateLevelUI();showToast(`🎉 +${b} Coins!`);});});});});}
-        function copyReferLink(){const l=document.getElementById('referLinkHome').textContent;if(l&&l!=='Loading...')navigator.clipboard.writeText(l).then(()=>showToast('📋 Copied!')).catch(()=>showToast('Copy manually','error'));}
+        function loadReferralConfigFromDB() {
+            db.ref('referralConfig').on('value', s => {
+                referralConfigCache = s.val() || { perReferralCoins: 50, xpPerReferral: 100 };
+                updateReferUI();
+            });
+        }
+
+        function updateReferUI() {
+            const t = app.referralCount || 0;
+            document.getElementById('referTotal').textContent = t;
+            document.getElementById('referEarned').textContent = t * (referralConfigCache.perReferralCoins || 50);
+            document.getElementById('referBonus').textContent = Math.floor(t / 10) * 50;
+            const tiers = [{ l: 1, c: referralConfigCache.tier1?.count || 10, b: referralConfigCache.tier1?.bonus || 50, n: '🥉 Bronze' }, { l: 2, c: referralConfigCache.tier2?.count || 25, b: referralConfigCache.tier2?.bonus || 150, n: '🥈 Silver' }, { l: 3, c: referralConfigCache.tier3?.count || 50, b: referralConfigCache.tier3?.bonus || 300, n: '🥇 Gold' }, { l: 4, c: referralConfigCache.tier4?.count || 100, b: referralConfigCache.tier4?.bonus || 500, n: '💎 Platinum' }, { l: 5, c: referralConfigCache.tier5?.count || 200, b: referralConfigCache.tier5?.bonus || 1000, n: '👑 Diamond' }];
+            document.getElementById('referTierList').innerHTML = tiers.map(r => {
+                const cl = app.referTiers?.[r.l] === 1,
+                    av = t >= r.c && !cl;
+                return `<div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;"><div><div style="font-size:13px;">${r.n}</div><div style="font-size:10px;color:#94a3b8;">${r.c} refs • +${r.b} 🪙</div></div><span style="color:${av?'#fbbf24':'#64748b'};" ${av?`onclick="claimTier(${r.l},${r.b})"`:''}>${cl?'✅':av?'🎁':'🔒'}</span></div>`;
+            }).join('');
+        }
+
+        function claimTier(l, b) {
+            if (app.referTiers?.[l] === 1) return;
+            app.balance += b;
+            app.xpPoints += b * 2;
+            if (!app.referTiers) app.referTiers = {};
+            app.referTiers[l] = 1;
+            userRef.update({ balance: app.balance, xpPoints: app.xpPoints, referTiers: app.referTiers });
+            updateUI();
+            updateLevelUI();
+            updateReferUI();
+            showToast(`🎁 +${b} Coins!`);
+        }
+
+        function genRefCode() {
+            return Array(8).fill(0).map(() => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random() * 36)]).join('');
+        }
+
+        function submitReferCode() {
+            if (!isOnline) return;
+            const code = document.getElementById('referCodeInput').value.trim().toUpperCase();
+            if (!code) { showToast('Enter code!', 'error'); return; }
+            userRef.once('value', s => {
+                if ((s.val() || {}).referCodeSubmitted) { showToast('Already used!', 'error'); return; }
+                db.ref('users').orderByChild('referCode').equalTo(code).once('value', sn => {
+                    if (!sn.exists()) { showToast('Invalid!', 'error'); return; }
+                    sn.forEach(c => {
+                        if (c.key === userId) { showToast('Own code!', 'error'); return; }
+                        const b = referralConfigCache.perReferralCoins || 50;
+                        db.ref('referrals/' + userId).set({ referredBy: c.key, referredAt: Date.now(), username: displayName, bonus: b, userId }).then(() => {
+                            db.ref('users/' + c.key).transaction(cur => ({ ...(cur || {}), referCount: (cur?.referCount || 0) + 1 }));
+                            app.balance += b;
+                            app.xpPoints += referralConfigCache.xpPerReferral || 100;
+                            userRef.update({ balance: app.balance, xpPoints: app.xpPoints, referCodeSubmitted: true });
+                            document.getElementById('referCodeSubmitBtn').disabled = true;
+                            document.getElementById('referCodeInput').disabled = true;
+                            updateUI();
+                            updateLevelUI();
+                            showToast(`🎉 +${b} Coins!`);
+                        });
+                    });
+                });
+            });
+        }
+
+        function copyReferLink() {
+            const l = document.getElementById('referLinkHome').textContent;
+            if (l && l !== 'Loading...') navigator.clipboard.writeText(l).then(() => showToast('📋 Copied!')).catch(() => showToast('Copy manually', 'error'));
+        }
 
         // ================== AIRDROP (unchanged) ==================
-        function loadAirdrop(){db.ref('airdropConfig').on('value',s=>{const c=s.val()||{};document.getElementById('airdropPoolDisplay').textContent=`$${(c.poolAmount||50).toFixed(4)}`;if(c.startTime)startAirdropCountdown(c.startTime,c.endTime);});}
-        function startAirdropCountdown(st,et){if(airdropTimer)clearInterval(airdropTimer);const endTime=et||st+300000;airdropTimer=setInterval(()=>{const r=Math.max(0,endTime-Date.now()),h=Math.floor(r/3600000),m=Math.floor((r%3600000)/60000),s=Math.floor((r%60000)/1000);document.getElementById('airdropCountdown').textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;const btn=document.getElementById('airdropClaimBtn');if(r>0&&!app.airdropClaimed){btn.disabled=false;btn.textContent='🎁 Claim';}else{btn.disabled=true;btn.textContent=app.airdropClaimed?'✅ Claimed':'⛔ Ended';}if(r<=0){clearInterval(airdropTimer);airdropTimer=null;}},1000);}
-        function claimAirdrop(){if(!isOnline||app.airdropClaimed)return;show_11197472().then(()=>{const amt=Math.random()*1.5+0.5,coins=Math.floor(amt*app.conversionRate);app.balance+=coins;app.airdropClaimed=true;app.xpPoints+=coins;db.ref('airdropList/'+Date.now()).set({userId,username:displayName,amount:amt,coins,timestamp:Date.now()});userRef.update({balance:app.balance,airdropClaimed:true,xpPoints:app.xpPoints});document.getElementById('airdropModalText').textContent=`+${coins} Coins!`;document.getElementById('airdropModal').classList.add('active');updateUI();updateLevelUI();showToast(`🎉 +${coins} Coins!`);}).catch(()=>showToast('Ad not watched!','error'));}
+        function loadAirdrop() {
+            db.ref('airdropConfig').on('value', s => {
+                const c = s.val() || {};
+                document.getElementById('airdropPoolDisplay').textContent = `$${(c.poolAmount||50).toFixed(4)}`;
+                if (c.startTime) startAirdropCountdown(c.startTime, c.endTime);
+            });
+        }
+
+        function startAirdropCountdown(st, et) {
+            if (airdropTimer) clearInterval(airdropTimer);
+            const endTime = et || st + 300000;
+            airdropTimer = setInterval(() => {
+                const r = Math.max(0, endTime - Date.now()),
+                    h = Math.floor(r / 3600000),
+                    m = Math.floor((r % 3600000) / 60000),
+                    s = Math.floor((r % 60000) / 1000);
+                document.getElementById('airdropCountdown').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+                const btn = document.getElementById('airdropClaimBtn');
+                if (r > 0 && !app.airdropClaimed) { btn.disabled = false;
+                    btn.textContent = '🎁 Claim'; } else { btn.disabled = true;
+                    btn.textContent = app.airdropClaimed ? '✅ Claimed' : '⛔ Ended'; }
+                if (r <= 0) { clearInterval(airdropTimer);
+                    airdropTimer = null; }
+            }, 1000);
+        }
+
+        function claimAirdrop() {
+            if (!isOnline || app.airdropClaimed) return;
+            show_11197472().then(() => {
+                const amt = Math.random() * 1.5 + 0.5,
+                    coins = Math.floor(amt * app.conversionRate);
+                app.balance += coins;
+                app.airdropClaimed = true;
+                app.xpPoints += coins;
+                db.ref('airdropList/' + Date.now()).set({ userId, username: displayName, amount: amt, coins, timestamp: Date.now() });
+                userRef.update({ balance: app.balance, airdropClaimed: true, xpPoints: app.xpPoints });
+                document.getElementById('airdropModalText').textContent = `+${coins} Coins!`;
+                document.getElementById('airdropModal').classList.add('active');
+                updateUI();
+                updateLevelUI();
+                showToast(`🎉 +${coins} Coins!`);
+            }).catch(() => showToast('Ad not watched!', 'error'));
+        }
 
         // ================== WITHDRAW (unchanged) ==================
-        function updateWithdrawUI(){const b=app.usdBalance||0,m=app.minWithdraw||10;document.getElementById('withdrawInfo').textContent=`Min: $${m.toFixed(4)}`;document.getElementById('withdrawStatus').textContent=`You have: $${b.toFixed(4)}`;const c=document.getElementById('methodSelector');const mt=app.withdrawMethods||['Nagad','Rocket'];if(!mt.includes(app.selectedMethod))app.selectedMethod=mt[0]||'Nagad';c.innerHTML=mt.map(m=>`<button class="method-btn ${m===app.selectedMethod?'active':''}" onclick="selectMethod('${m}')"><i class="fas ${m.toLowerCase()==='nagad'?'fa-mobile-alt':m.toLowerCase()==='rocket'?'fa-rocket':'fa-wallet'}"></i> ${m}</button>`).join('');document.getElementById('withdrawBtn').disabled=b<m||!isOnline;document.getElementById('withdrawBtn').textContent=!isOnline?'No Internet':(b<m?`Need $${(m-b).toFixed(4)} more`:'Withdraw Now');}
-        function selectMethod(m){app.selectedMethod=m;updateWithdrawUI();}
-        function withdraw(){if(!isOnline)return;const b=app.usdBalance||0;if(b<(app.minWithdraw||10)){showToast('Insufficient!','error');return;}const mt=app.selectedMethod,ac=document.getElementById('withdrawAccount').value.trim();if(!ac){showToast('Enter account!','error');return;}const id=Date.now().toString();db.ref('withdrawRequests/'+id).set({userId,username:displayName,amount:b,method:mt,account:ac,status:'pending',requestedAt:new Date().toISOString()});app.usdBalance=0;app.withdrawHistory=[...(app.withdrawHistory||[]),{id,amount:b,method:mt,account:ac,status:'pending',date:new Date().toISOString()}];userRef.update({usdBalance:0,withdrawHistory:app.withdrawHistory});document.getElementById('withdrawModalTitle').textContent='Sent!';document.getElementById('withdrawModalText').textContent=`$${b.toFixed(4)} via ${mt}`;document.getElementById('withdrawModal').classList.add('active');document.getElementById('withdrawAccount').value='';updateUI();updateWithdrawUI();updateWithdrawHistoryUI();showToast(`$${b.toFixed(4)} requested!`);}
-        function updateWithdrawHistoryUI(){const c=document.getElementById('withdrawHistoryList'),h=app.withdrawHistory||[];c.innerHTML=h.length?h.slice(-20).reverse().map(h=>`<div class="history-item"><div><b>$${h.amount?.toFixed(4)||'0.0000'}</b> <small>${h.method||''}</small></div><div style="text-align:right;"><span>${h.status==='approved'?'✅':h.status==='cancelled'?'❌':'⏳'} ${h.status}</span><div style="font-size:9px;">${h.date?new Date(h.date).toLocaleDateString():''}</div></div></div>`).join(''):'<span style="color:#94a3b8;font-size:11px;">No history</span>';}
+        function updateWithdrawUI() {
+            const b = app.usdBalance || 0,
+                m = app.minWithdraw || 10;
+            document.getElementById('withdrawInfo').textContent = `Min: $${m.toFixed(4)}`;
+            document.getElementById('withdrawStatus').textContent = `You have: $${b.toFixed(4)}`;
+            const c = document.getElementById('methodSelector');
+            const mt = app.withdrawMethods || ['Nagad', 'Rocket'];
+            if (!mt.includes(app.selectedMethod)) app.selectedMethod = mt[0] || 'Nagad';
+            c.innerHTML = mt.map(m => `<button class="method-btn ${m===app.selectedMethod?'active':''}" onclick="selectMethod('${m}')"><i class="fas ${m.toLowerCase()==='nagad'?'fa-mobile-alt':m.toLowerCase()==='rocket'?'fa-rocket':'fa-wallet'}"></i> ${m}</button>`).join('');
+            document.getElementById('withdrawBtn').disabled = b < m || !isOnline;
+            document.getElementById('withdrawBtn').textContent = !isOnline ? 'No Internet' : (b < m ? `Need $${(m-b).toFixed(4)} more` : 'Withdraw Now');
+        }
+
+        function selectMethod(m) { app.selectedMethod = m;
+            updateWithdrawUI(); }
+
+        function withdraw() {
+            if (!isOnline) return;
+            const b = app.usdBalance || 0;
+            if (b < (app.minWithdraw || 10)) { showToast('Insufficient!', 'error'); return; }
+            const mt = app.selectedMethod,
+                ac = document.getElementById('withdrawAccount').value.trim();
+            if (!ac) { showToast('Enter account!', 'error'); return; }
+            const id = Date.now().toString();
+            db.ref('withdrawRequests/' + id).set({ userId, username: displayName, amount: b, method: mt, account: ac, status: 'pending', requestedAt: new Date().toISOString() });
+            app.usdBalance = 0;
+            app.withdrawHistory = [...(app.withdrawHistory || []), { id, amount: b, method: mt, account: ac, status: 'pending', date: new Date().toISOString() }];
+            userRef.update({ usdBalance: 0, withdrawHistory: app.withdrawHistory });
+            document.getElementById('withdrawModalTitle').textContent = 'Sent!';
+            document.getElementById('withdrawModalText').textContent = `$${b.toFixed(4)} via ${mt}`;
+            document.getElementById('withdrawModal').classList.add('active');
+            document.getElementById('withdrawAccount').value = '';
+            updateUI();
+            updateWithdrawUI();
+            updateWithdrawHistoryUI();
+            showToast(`$${b.toFixed(4)} requested!`);
+        }
+
+        function updateWithdrawHistoryUI() {
+            const c = document.getElementById('withdrawHistoryList'),
+                h = app.withdrawHistory || [];
+            c.innerHTML = h.length ? h.slice(-20).reverse().map(h => `<div class="history-item"><div><b>$${h.amount?.toFixed(4)||'0.0000'}</b> <small>${h.method||''}</small></div><div style="text-align:right;"><span>${h.status==='approved'?'✅':h.status==='cancelled'?'❌':'⏳'} ${h.status}</span><div style="font-size:9px;">${h.date?new Date(h.date).toLocaleDateString():''}</div></div></div>`).join('') : '<span style="color:#94a3b8;font-size:11px;">No history</span>';
+        }
 
         // ================== CONVERSION (unchanged) ==================
-        let conversionTimerInterval=null;
-        function performConversion(){if(app.balance>0){const e=app.balance/app.conversionRate;app.usdBalance+=e;const c=app.balance;app.balance=0;app.lastConversion=Date.now();userRef.update({balance:0,usdBalance:app.usdBalance,lastConversion:app.lastConversion});document.getElementById('conversionText').textContent=`${c} Coins → $${e.toFixed(4)} USD`;document.getElementById('conversionModal').classList.add('active');updateUI();showToast(`💰 Converted to $${e.toFixed(4)} USD!`);}else{app.lastConversion=Date.now();userRef.update({lastConversion:app.lastConversion});}startConversionTimer();}
-        function startConversionTimer(){if(conversionTimerInterval){clearInterval(conversionTimerInterval);conversionTimerInterval=null;}const ud=()=>{const n=Date.now(),l=app.lastConversion||n,nc=l+86400000,r=Math.max(0,nc-n);if(r<=0){if(conversionTimerInterval){clearInterval(conversionTimerInterval);conversionTimerInterval=null;}performConversion();return;}const h=Math.floor(r/3600000),m=Math.floor((r%3600000)/60000),s=Math.floor((r%60000)/1000);document.getElementById('conversionCountdown').textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;};ud();conversionTimerInterval=setInterval(ud,1000);}
+        let conversionTimerInterval = null;
+
+        function performConversion() {
+            if (app.balance > 0) {
+                const e = app.balance / app.conversionRate;
+                app.usdBalance += e;
+                const c = app.balance;
+                app.balance = 0;
+                app.lastConversion = Date.now();
+                userRef.update({ balance: 0, usdBalance: app.usdBalance, lastConversion: app.lastConversion });
+                document.getElementById('conversionText').textContent = `${c} Coins → $${e.toFixed(4)} USD`;
+                document.getElementById('conversionModal').classList.add('active');
+                updateUI();
+                showToast(`💰 Converted to $${e.toFixed(4)} USD!`);
+            } else {
+                app.lastConversion = Date.now();
+                userRef.update({ lastConversion: app.lastConversion });
+            }
+            startConversionTimer();
+        }
+
+        function startConversionTimer() {
+            if (conversionTimerInterval) { clearInterval(conversionTimerInterval);
+                conversionTimerInterval = null; }
+            const ud = () => {
+                const n = Date.now(),
+                    l = app.lastConversion || n,
+                    nc = l + 86400000,
+                    r = Math.max(0, nc - n);
+                if (r <= 0) {
+                    if (conversionTimerInterval) { clearInterval(conversionTimerInterval);
+                        conversionTimerInterval = null; }
+                    performConversion();
+                    return;
+                }
+                const h = Math.floor(r / 3600000),
+                    m = Math.floor((r % 3600000) / 60000),
+                    s = Math.floor((r % 60000) / 1000);
+                document.getElementById('conversionCountdown').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            };
+            ud();
+            conversionTimerInterval = setInterval(ud, 1000);
+        }
 
         // ================== NOTIFICATIONS ==================
-        function openNotificationPanel(){document.getElementById('notificationOverlay').classList.add('show');loadNotifications();}
-        function closeNotificationPanel(){document.getElementById('notificationOverlay').classList.remove('show');}
-        function loadNotifications(){const c=document.getElementById('notificationList');db.ref('notifications').orderByChild('createdAt').limitToLast(20).once('value',s=>{const ns=s.val()||{};const na=Object.values(ns).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));c.innerHTML=na.length?na.map(n=>{const d=n.createdAt?new Date(n.createdAt).toLocaleString():'';return `<div class="notification-item"><div class="notif-title">${n.title||'Notification'}</div><div class="notif-message">${n.message||''}</div><div class="notif-time">${d}</div></div>`;}).join(''):'<p style="color:#94a3b8;text-align:center;">No notifications</p>';});}
+        function openNotificationPanel() {
+            document.getElementById('notificationOverlay').classList.add('show');
+            loadNotifications();
+        }
+
+        function closeNotificationPanel() {
+            document.getElementById('notificationOverlay').classList.remove('show');
+        }
+
+        function loadNotifications() {
+            const c = document.getElementById('notificationList');
+            db.ref('notifications').orderByChild('createdAt').limitToLast(20).once('value', s => {
+                const ns = s.val() || {};
+                const na = Object.values(ns).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                c.innerHTML = na.length ? na.map(n => {
+                    const d = n.createdAt ? new Date(n.createdAt).toLocaleString() : '';
+                    return `<div class="notification-item"><div class="notif-title">${n.title||'Notification'}</div><div class="notif-message">${n.message||''}</div><div class="notif-time">${d}</div></div>`;
+                }).join('') : '<p style="color:#94a3b8;text-align:center;">No notifications</p>';
+            });
+        }
 
         // ================== UI ==================
-        function updateUI(){document.getElementById('balance').textContent=Math.floor(app.balance);document.getElementById('walletBalance').textContent=Math.floor(app.balance);const usd=(app.balance/app.conversionRate).toFixed(4);document.getElementById('usdValue').textContent=`≈ $${usd} USD`;document.getElementById('walletUsd').textContent=`≈ $${usd} USD`;document.getElementById('walletTotalUsd').textContent=`$${app.usdBalance.toFixed(4)}`;document.getElementById('usdBalanceDisplay').textContent=`$${app.usdBalance.toFixed(4)}`;document.getElementById('totalBalanceDisplay').textContent=`${Math.floor(app.balance)} + $${app.usdBalance.toFixed(4)}`;updateWithdrawUI();updateSpeedBoostUI();startConversionTimer();}
-        function updateProgressUI(){const pct=(app.progressCoins/TOTAL_COINS*100);document.getElementById('miningCircle').style.background=`conic-gradient(#fbbf24 ${pct}%, #1e293b ${pct}%)`;document.getElementById('progressCoinCount').textContent=app.progressCoins;document.getElementById('progressPercent').textContent=Math.round(pct)+'%';const o=document.getElementById('circleStartOverlay'),c=document.getElementById('miningCircle');if(app.progressCoins===0){document.getElementById('progressStatus').textContent='🎯 Empty!';o.classList.remove('hidden');c.classList.remove('mining-active');}else if(miningInterval){document.getElementById('progressStatus').textContent='⚡ Mining...';o.classList.add('hidden');c.classList.add('mining-active');}else{document.getElementById('progressStatus').textContent='Ready';o.classList.remove('hidden');c.classList.remove('mining-active');}}
+        function updateUI() {
+            document.getElementById('balance').textContent = Math.floor(app.balance);
+            document.getElementById('walletBalance').textContent = Math.floor(app.balance);
+            const usd = (app.balance / app.conversionRate).toFixed(4);
+            document.getElementById('usdValue').textContent = `≈ $${usd} USD`;
+            document.getElementById('walletUsd').textContent = `≈ $${usd} USD`;
+            document.getElementById('walletTotalUsd').textContent = `$${app.usdBalance.toFixed(4)}`;
+            document.getElementById('usdBalanceDisplay').textContent = `$${app.usdBalance.toFixed(4)}`;
+            document.getElementById('totalBalanceDisplay').textContent = `${Math.floor(app.balance)} + $${app.usdBalance.toFixed(4)}`;
+            updateWithdrawUI();
+            updateSpeedBoostUI();
+            startConversionTimer();
+        }
+
+        function updateProgressUI() {
+            const pct = (app.progressCoins / TOTAL_COINS * 100);
+            document.getElementById('miningCircle').style.background = `conic-gradient(#fbbf24 ${pct}%, #1e293b ${pct}%)`;
+            document.getElementById('progressCoinCount').textContent = app.progressCoins;
+            document.getElementById('progressPercent').textContent = Math.round(pct) + '%';
+            const o = document.getElementById('circleStartOverlay'),
+                c = document.getElementById('miningCircle');
+            if (app.progressCoins === 0) {
+                document.getElementById('progressStatus').textContent = '🎯 Empty!';
+                o.classList.remove('hidden');
+                c.classList.remove('mining-active');
+            } else if (miningInterval) {
+                document.getElementById('progressStatus').textContent = '⚡ Mining...';
+                o.classList.add('hidden');
+                c.classList.add('mining-active');
+            } else {
+                document.getElementById('progressStatus').textContent = 'Ready';
+                o.classList.remove('hidden');
+                c.classList.remove('mining-active');
+            }
+        }
 
         // ================== NAVIGATION ==================
-        function switchPage(p,el){document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));if(el)el.classList.add('active');document.querySelectorAll('.page').forEach(pg=>pg.classList.remove('active'));const t=document.getElementById('page'+p.charAt(0).toUpperCase()+p.slice(1));if(t)t.classList.add('active');if(p==='tasks')renderTasks();if(p==='refer')updateReferUI();if(p==='wallet'){updateWithdrawUI();updateWithdrawHistoryUI();}}
-        function showToast(m,ty='success'){const t=document.getElementById('toast');t.textContent=m;t.className='toast show'+(ty==='error'?' error':'');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3000);}
-        function closeModal(id){document.getElementById(id).classList.remove('active');}
+        function switchPage(p, el) {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            if (el) el.classList.add('active');
+            document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
+            const t = document.getElementById('page' + p.charAt(0).toUpperCase() + p.slice(1));
+            if (t) t.classList.add('active');
+            if (p === 'tasks') renderTasks();
+            if (p === 'refer') updateReferUI();
+            if (p === 'wallet') { updateWithdrawUI();
+                updateWithdrawHistoryUI(); }
+        }
+
+        function showToast(m, ty = 'success') {
+            const t = document.getElementById('toast');
+            t.textContent = m;
+            t.className = 'toast show' + (ty === 'error' ? ' error' : '');
+            clearTimeout(t._t);
+            t._t = setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
         // ================== BAN ==================
-        function checkBanStatus(){userRef.child('banned').on('value',s=>{if(s.val()===true){document.getElementById('bannedOverlay').classList.add('show');document.getElementById('mainContent').style.display='none';document.querySelector('.bottom-nav').style.display='none';}});}
-        function submitBanAppeal(){const msg=prompt('Write your appeal:');if(!msg)return;db.ref('banAppeals/'+userId).set({userId,username:displayName,message:msg,status:'pending',createdAt:Date.now()});showToast('📩 Submitted!');}
+        function checkBanStatus() {
+            userRef.child('banned').on('value', s => {
+                if (s.val() === true) {
+                    document.getElementById('bannedOverlay').classList.add('show');
+                    document.getElementById('mainContent').style.display = 'none';
+                    document.querySelector('.bottom-nav').style.display = 'none';
+                }
+            });
+        }
+
+        function submitBanAppeal() {
+            const msg = prompt('Write your appeal:');
+            if (!msg) return;
+            db.ref('banAppeals/' + userId).set({ userId, username: displayName, message: msg, status: 'pending', createdAt: Date.now() });
+            showToast('📩 Submitted!');
+        }
 
         // ================== NETWORK ==================
-        window.addEventListener('online',()=>{isOnline=true;document.getElementById('networkOverlay').classList.remove('show');});
-        window.addEventListener('offline',()=>{isOnline=false;document.getElementById('networkOverlay').classList.add('show');});
-        function checkNetworkAndReload(){if(navigator.onLine)location.reload();else showToast('Still offline!','error');}
+        window.addEventListener('online', () => { isOnline = true;
+            document.getElementById('networkOverlay').classList.remove('show'); });
+        window.addEventListener('offline', () => { isOnline = false;
+            document.getElementById('networkOverlay').classList.add('show'); });
+
+        function checkNetworkAndReload() {
+            if (navigator.onLine) location.reload();
+            else showToast('Still offline!', 'error');
+        }
 
         // ================== RULES ==================
-        function loadRules(){db.ref('rules').on('value',s=>{const r=s.val()||{};document.getElementById('miningRulesText').textContent=r.mining||'No rules set.';document.getElementById('taskRulesText').textContent=r.tasks||'No rules set.';document.getElementById('referRulesText').textContent=r.referral||'No rules set.';document.getElementById('withdrawRulesText').textContent=r.withdraw||'No rules set.';document.getElementById('levelRulesText').textContent=r.level||'No rules set.';document.getElementById('airdropRulesText').textContent=r.airdrop||'No rules set.';});}
+        function loadRules() {
+            db.ref('rules').on('value', s => {
+                const r = s.val() || {};
+                document.getElementById('miningRulesText').textContent = r.mining || 'No rules set.';
+                document.getElementById('taskRulesText').textContent = r.tasks || 'No rules set.';
+                document.getElementById('referRulesText').textContent = r.referral || 'No rules set.';
+                document.getElementById('withdrawRulesText').textContent = r.withdraw || 'No rules set.';
+                document.getElementById('levelRulesText').textContent = r.level || 'No rules set.';
+                document.getElementById('airdropRulesText').textContent = r.airdrop || 'No rules set.';
+            });
+        }
 
         // ================== INIT ==================
-        function initApp(){
-            if(!navigator.onLine){document.getElementById('networkOverlay').classList.add('show');isOnline=false;}
-            userRef.update({username:tg.initDataUnsafe?.user?.username||'',firstName:tg.initDataUnsafe?.user?.first_name||'',lastName:tg.initDataUnsafe?.user?.last_name||'',fullName:displayName,lastLogin:new Date().toISOString()});
-            document.getElementById('userName').textContent=displayName;
-            checkBanStatus();loadReferralConfigFromDB();loadRules();loadSpinData();loadSpinConfig();
-            buildPrizeData();buildWheel();watchMiningCoins();checkMaintenance();
-            db.ref('conversionRate').on('value',s=>{app.conversionRate=s.val()||1000;updateUI();});
-            show_11197472({type:'inApp',inAppSettings:{frequency:2,capping:0.1,interval:30,timeout:5,everyPage:false}});
-            let lt=setTimeout(()=>{document.getElementById('loadingPage').classList.add('hidden');},15000);
-            userRef.on('value',snap=>{
-                clearTimeout(lt);document.getElementById('loadingPage').classList.add('hidden');
-                const d=snap.val()||{};if(d.banned)return;
-                app.balance=d.balance||0;app.usdBalance=d.usdBalance||0;
-                app.referralCount=d.referCount||0;app.lastConversion=d.lastConversion||Date.now();
-                app.referCode=d.referCode||genRefCode();app.referTiers=d.referTiers||{};
-                app.progressCoins=d.progressCoins!==undefined?d.progressCoins:TOTAL_COINS;
-                app.speedBoostCooldown=d.speedBoostCooldown||0;app.mysteryBoxCooldown=d.mysteryBoxCooldown||0;
-                app.taskLastCompleted=d.taskLastCompleted||{};app.taskProgress=d.taskProgress||{};
-                app.xpPoints=d.xpPoints!==undefined?d.xpPoints:NEGATIVE_XP;
-                app.withdrawHistory=d.withdrawHistory||[];app.airdropClaimed=d.airdropClaimed||false;
-                app.dailyBonusClaimed=d.dailyBonusClaimed||'';
-                if(!window._lastReferCode||window._lastReferCode!==app.referCode){window._lastReferCode=app.referCode;document.getElementById('referLinkHome').textContent=`https://t.me/CoinQuist_bot?start=ref_${app.referCode}`;}
-                document.getElementById('userName').textContent=d.fullName||d.firstName||displayName;
-                if(d.lastLogin)document.getElementById('lastLoginDisplay').textContent=`📅 ${new Date(d.lastLogin).toLocaleString()}`;
-                document.getElementById('dailyBonusStatus').textContent=app.dailyBonusClaimed===new Date().toDateString()?'✅ Claimed':'🎯 Claim Now';
+        function initApp() {
+            if (!navigator.onLine) { document.getElementById('networkOverlay').classList.add('show');
+                isOnline = false; }
+            userRef.update({ username: tg.initDataUnsafe?.user?.username || '', firstName: tg.initDataUnsafe?.user?.first_name || '', lastName: tg.initDataUnsafe?.user?.last_name || '', fullName: displayName, lastLogin: new Date().toISOString() });
+            document.getElementById('userName').textContent = displayName;
+            checkBanStatus();
+            loadReferralConfigFromDB();
+            loadRules();
+            loadSpinData();
+            loadSpinConfig();
+            buildPrizeData();
+            buildWheel();
+            watchMiningCoins();
+            checkMaintenance();
+            db.ref('conversionRate').on('value', s => { app.conversionRate = s.val() || 1000;
+                updateUI(); });
+            show_11197472({ type: 'inApp', inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false } });
+            let lt = setTimeout(() => { document.getElementById('loadingPage').classList.add('hidden'); }, 15000);
+            userRef.on('value', snap => {
+                clearTimeout(lt);
+                document.getElementById('loadingPage').classList.add('hidden');
+                const d = snap.val() || {};
+                if (d.banned) return;
+                app.balance = d.balance || 0;
+                app.usdBalance = d.usdBalance || 0;
+                app.referralCount = d.referCount || 0;
+                app.lastConversion = d.lastConversion || Date.now();
+                app.referCode = d.referCode || genRefCode();
+                app.referTiers = d.referTiers || {};
+                app.progressCoins = d.progressCoins !== undefined ? d.progressCoins : TOTAL_COINS;
+                app.speedBoostCooldown = d.speedBoostCooldown || 0;
+                app.mysteryBoxCooldown = d.mysteryBoxCooldown || 0;
+                app.taskLastCompleted = d.taskLastCompleted || {};
+                app.taskProgress = d.taskProgress || {};
+                app.xpPoints = d.xpPoints !== undefined ? d.xpPoints : NEGATIVE_XP;
+                app.withdrawHistory = d.withdrawHistory || [];
+                app.airdropClaimed = d.airdropClaimed || false;
+                app.dailyBonusClaimed = d.dailyBonusClaimed || '';
+                if (!window._lastReferCode || window._lastReferCode !== app.referCode) {
+                    window._lastReferCode = app.referCode;
+                    document.getElementById('referLinkHome').textContent = `https://t.me/CoinQuist_bot?start=ref_${app.referCode}`;
+                }
+                document.getElementById('userName').textContent = d.fullName || d.firstName || displayName;
+                if (d.lastLogin) document.getElementById('lastLoginDisplay').textContent = `📅 ${new Date(d.lastLogin).toLocaleString()}`;
+                document.getElementById('dailyBonusStatus').textContent = app.dailyBonusClaimed === new Date().toDateString() ? '✅ Claimed' : '🎯 Claim Now';
                 updateMysteryBoxUI();
-                if(!d.balance&&d.xpPoints===undefined)userRef.update({balance:0,usdBalance:0,referCode:app.referCode,progressCoins:TOTAL_COINS,xpPoints:NEGATIVE_XP,lastConversion:Date.now(),lastLogin:new Date().toISOString(),airdropClaimed:false,isCurrentlyMining:false,username:tg.initDataUnsafe?.user?.username||'',firstName:tg.initDataUnsafe?.user?.first_name||'',lastName:tg.initDataUnsafe?.user?.last_name||'',fullName:displayName});
-                updateUI();updateLevelUI();updateProgressUI();updateSpeedBoostUI();startConversionTimer();
+                if (!d.balance && d.xpPoints === undefined) userRef.update({ balance: 0, usdBalance: 0, referCode: app.referCode, progressCoins: TOTAL_COINS, xpPoints: NEGATIVE_XP, lastConversion: Date.now(), lastLogin: new Date().toISOString(), airdropClaimed: false, isCurrentlyMining: false, username: tg.initDataUnsafe?.user?.username || '', firstName: tg.initDataUnsafe?.user?.first_name || '', lastName: tg.initDataUnsafe?.user?.last_name || '', fullName: displayName });
+                updateUI();
+                updateLevelUI();
+                updateProgressUI();
+                updateSpeedBoostUI();
+                startConversionTimer();
             });
-            db.ref('withdrawSettings').on('value',s=>{if(s.exists()){app.minWithdraw=s.val().minAmount||10;app.withdrawMethods=s.val().methods||['Nagad','Rocket'];if(!app.withdrawMethods.includes(app.selectedMethod))app.selectedMethod=app.withdrawMethods[0]||'Nagad';}updateWithdrawUI();});
-            loadTasks();loadAirdrop();
+            db.ref('withdrawSettings').on('value', s => {
+                if (s.exists()) {
+                    app.minWithdraw = s.val().minAmount || 10;
+                    app.withdrawMethods = s.val().methods || ['Nagad', 'Rocket'];
+                    if (!app.withdrawMethods.includes(app.selectedMethod)) app.selectedMethod = app.withdrawMethods[0] || 'Nagad';
+                }
+                updateWithdrawUI();
+            });
+            loadTasks();
+            loadAirdrop();
         }
-        document.addEventListener('DOMContentLoaded',initApp);
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
