@@ -124,7 +124,7 @@
         /* ================== GAME OVERLAY ================== */
         .game-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 20px; }
         .game-overlay.show { display: flex; }
-        .game-container { background: rgba(30,41,59,0.98); padding: 20px; border-radius: 20px; width: 90%; max-width: 380px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+        .game-container { background: rgba(30,41,59,0.98); padding: 20px; border-radius: 20px; width: 90%; max-width: 380px; text-align: center; border: 1px solid rgba(255,255,255,0.1); max-height: 90vh; overflow-y: auto; }
         .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .game-header .back-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; }
         .game-header .game-info { color: #94a3b8; font-size: 12px; }
@@ -227,6 +227,15 @@
         .rps-options button { padding: 16px 24px; border-radius: 12px; border: 2px solid #334155; background: #1e293b; color: #fff; font-size: 40px; cursor: pointer; transition: 0.3s; }
         .rps-options button:hover { border-color: #fbbf24; transform: scale(1.05); }
         .rps-options button:disabled { opacity: 0.5; transform: none; }
+
+        /* ================== AVIATRIX GAME ================== */
+        .aviatrix-multiplier { font-size: 52px; font-weight: 900; text-align: center; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 16px; border: 2px solid rgba(251,191,36,0.2); margin: 10px 0; }
+        .aviatrix-stats { display: flex; justify-content: space-between; margin: 10px 0; background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 10px; }
+        .aviatrix-stats span { font-size: 13px; }
+        .aviatrix-stats .stat-value { font-weight: 700; }
+        .aviatrix-history-item { display: flex; justify-content: space-between; padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px; }
+        .aviatrix-history-item .win { color: #10b981; }
+        .aviatrix-history-item .loss { color: #ef4444; }
 
         /* ================== BOTTOM NAV ================== */
         .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; background: rgba(15,23,42,0.95); backdrop-filter: blur(24px); display: flex; justify-content: space-around; padding: 10px 4px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
@@ -681,6 +690,59 @@
         </div>
     </div>
 
+    <!-- ================== AVIATRIX GAME OVERLAY ================== -->
+    <div class="game-overlay" id="aviatrixOverlay">
+        <div class="game-container">
+            <div class="game-header">
+                <button class="back-btn" onclick="closeAviatrixGame()"><i class="fas fa-arrow-left"></i> Back</button>
+                <span class="game-info">✈️ Aviatrix</span>
+            </div>
+            
+            <div id="aviatrixBetSection" class="xo-bet-section">
+                <label>💰 Entry Fee (100-500) | Win: +15% Bonus</label>
+                <div class="xo-bet-input">
+                    <span class="bet-preset" onclick="setAviatrixBet(100)">100</span>
+                    <span class="bet-preset" onclick="setAviatrixBet(200)">200</span>
+                    <input type="number" id="aviatrixBetAmount" value="100" min="100" max="500" step="50">
+                    <span class="bet-preset" onclick="setAviatrixBet(300)">300</span>
+                    <span class="bet-preset" onclick="setAviatrixBet(500)">500</span>
+                </div>
+                <button class="xo-action-btn" onclick="playAviatrixPaid()">✈️ Pay & Fly</button>
+                <button class="xo-action-btn free" onclick="playAviatrixFree()">📺 Watch Ad (Get 20 🪙)</button>
+            </div>
+            
+            <div id="aviatrixGameBoard" style="display:none;">
+                <!-- Live Stats -->
+                <div class="aviatrix-stats">
+                    <span>🛫 Flights: <span class="stat-value" id="aviatrixTotalFlights" style="color:#fbbf24;">0</span></span>
+                    <span>💥 Crashes: <span class="stat-value" id="aviatrixTotalCrashes" style="color:#ef4444;">0</span></span>
+                    <span>💰 Bet: <span class="stat-value" id="aviatrixBetDisplay" style="color:#10b981;">0</span></span>
+                </div>
+                
+                <!-- Multiplier -->
+                <div class="aviatrix-multiplier" id="aviatrixMultiplier">1.00x</div>
+                
+                <!-- Status -->
+                <div class="xo-status" id="aviatrixStatus">✈️ Ready to fly!</div>
+                <div id="aviatrixRewardInfo" style="color:#10b981;font-size:14px;font-weight:700;margin:8px 0;"></div>
+                
+                <!-- Action Buttons -->
+                <button class="xo-action-btn" id="aviatrixCashoutBtn" onclick="cashoutAviatrix()" style="background:linear-gradient(135deg,#10b981,#059669);">
+                    💰 Cashout Now
+                </button>
+                <button class="xo-action-btn restart" id="aviatrixRestartBtn" onclick="resetAviatrixGame()" style="display:none;">
+                    ✈️ Fly Again
+                </button>
+                
+                <!-- History -->
+                <div class="history-card" style="margin-top:15px;">
+                    <div style="font-size:11px;color:#94a3b8;margin-bottom:8px;">📜 Flight History</div>
+                    <div id="aviatrixHistoryList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ============================================================ -->
     <!-- ================== MAIN CONTENT ============================= -->
     <!-- ============================================================ -->
@@ -795,6 +857,7 @@
                     <div class="game-card" onclick="openGame('bowling')"><div class="game-icon">🎳</div><div class="game-name">Bowling</div><div class="game-desc">Knock down pins!</div><div class="game-bet">Entry: 100-500 🪙 | Win: 15%</div></div>
                     <div class="game-card" onclick="openGame('coinflip')"><div class="game-icon">🪙</div><div class="game-name">Coin Flip</div><div class="game-desc">Heads or Tails?</div><div class="game-bet">Entry: 100-500 🪙 | Win: 12%</div></div>
                     <div class="game-card" onclick="openGame('rps')"><div class="game-icon">✊</div><div class="game-name">RPS</div><div class="game-desc">Rock Paper Scissors</div><div class="game-bet">Entry: 100-500 🪙 | Win: 18%</div></div>
+                    <div class="game-card" onclick="openGame('aviatrix')"><div class="game-icon">✈️</div><div class="game-name">Aviatrix</div><div class="game-desc">Fly & cashout!</div><div class="game-bet">Entry: 100-500 🪙 | Win: 15%</div></div>
                 </div>
             </div>
         </div>
@@ -840,7 +903,7 @@
         let isOnline = navigator.onLine, wasMiningBeforeOffline = false, isAdShowing = false;
         let webViewTaskId = null, webViewTaskReward = 0, webViewRequiredTime = 60, webViewSeconds = 0, webViewTimerInterval = null;
 
-        // ================== CONFIG LOAD (FIXED - USING once INSTEAD OF on) ==================
+        // ================== CONFIG LOAD (FIXED - USING once) ==================
         let gameConfigs = {};
 
         function loadGameConfigs() {
@@ -854,9 +917,8 @@
         }
 
         function updateGameUIConfigs() {
-            // Games page UI update
             const cards = document.querySelectorAll('.game-card');
-            const gameKeys = ['xo', 'dice', 'target', 'card', 'memory', 'flappy', 'puzzle', 'bowling', 'coinflip', 'rps'];
+            const gameKeys = ['xo', 'dice', 'target', 'card', 'memory', 'flappy', 'puzzle', 'bowling', 'coinflip', 'rps', 'aviatrix'];
             
             cards.forEach((card, index) => {
                 if (gameKeys[index]) {
@@ -864,41 +926,256 @@
                     const minEntry = config.minEntry || 100;
                     const maxEntry = config.maxEntry || 500;
                     const bonus = config.bonus || 10;
-                    card.querySelector('.game-bet').textContent = `Entry: ${minEntry}-${maxEntry} 🪙 | Win: ${bonus}%`;
+                    const betEl = card.querySelector('.game-bet');
+                    if (betEl) betEl.textContent = `Entry: ${minEntry}-${maxEntry} 🪙 | Win: ${bonus}%`;
                 }
             });
-
-            // Update individual game overlays (if open)
-            updateGameOverlayUI('diceBetSection', 'dice');
-            updateGameOverlayUI('targetBetSection', 'target');
-            updateGameOverlayUI('cardBetSection', 'card');
-            updateGameOverlayUI('memoryBetSection', 'memory');
-            updateGameOverlayUI('flappyBetSection', 'flappy');
-            updateGameOverlayUI('puzzleBetSection', 'puzzle');
-            updateGameOverlayUI('bowlingBetSection', 'bowling');
-            updateGameOverlayUI('coinflipBetSection', 'coinflip');
-            updateGameOverlayUI('rpsBetSection', 'rps');
         }
 
-        function updateGameOverlayUI(sectionId, gameKey) {
-            const section = document.getElementById(sectionId);
-            if (section && section.style.display !== 'none') {
-                const config = gameConfigs[gameKey] || {};
-                const minEntry = config.minEntry || 100;
-                const maxEntry = config.maxEntry || 500;
-                const bonus = config.bonus || 10;
-                const label = section.querySelector('label');
-                if (label) label.textContent = `💰 Entry Fee (${minEntry}-${maxEntry}) | Win: +${bonus}% Bonus`;
-                
-                // Update input min/max
-                const input = section.querySelector('input[type="number"]');
-                if (input) {
-                    input.min = minEntry;
-                    input.max = maxEntry;
-                    if (parseInt(input.value) < minEntry) input.value = minEntry;
-                    if (parseInt(input.value) > maxEntry) input.value = maxEntry;
-                }
+        // ================== AVIATRIX GAME ==================
+        let aviatrixData = {
+            betAmount: 100,
+            isFree: false,
+            gameActive: false,
+            multiplier: 1.00,
+            crashed: false,
+            history: [],
+            totalFlights: 0,
+            totalCrashes: 0,
+            currentFlight: null
+        };
+
+        function openAviatrixGame() {
+            document.getElementById('aviatrixOverlay').classList.add('show');
+            document.getElementById('aviatrixBetSection').style.display = 'block';
+            document.getElementById('aviatrixGameBoard').style.display = 'none';
+        }
+
+        function closeAviatrixGame() {
+            document.getElementById('aviatrixOverlay').classList.remove('show');
+            if (aviatrixData.currentFlight) {
+                clearInterval(aviatrixData.currentFlight);
+                aviatrixData.currentFlight = null;
             }
+        }
+
+        function setAviatrixBet(a) {
+            const config = gameConfigs.aviatrix || {};
+            const max = config.maxEntry || 500;
+            aviatrixData.betAmount = Math.min(a, max);
+            document.getElementById('aviatrixBetAmount').value = aviatrixData.betAmount;
+        }
+
+        function playAviatrixPaid() {
+            const config = gameConfigs.aviatrix || {};
+            let min = config.minEntry || 100, max = config.maxEntry || 500;
+            let bet = parseInt(document.getElementById('aviatrixBetAmount').value) || min;
+            bet = Math.max(min, Math.min(bet, max));
+            
+            if (bet > app.balance) {
+                showToast('Insufficient balance!', 'error');
+                return;
+            }
+            
+            aviatrixData.betAmount = bet;
+            aviatrixData.isFree = false;
+            app.balance -= bet;
+            userRef.update({ balance: app.balance });
+            updateUI();
+            
+            document.getElementById('aviatrixBetSection').style.display = 'none';
+            document.getElementById('aviatrixGameBoard').style.display = 'block';
+            startAviatrixFlight();
+        }
+
+        function playAviatrixFree() {
+            show_11197472().then(() => {
+                aviatrixData.betAmount = 100;
+                aviatrixData.isFree = true;
+                document.getElementById('aviatrixBetSection').style.display = 'none';
+                document.getElementById('aviatrixGameBoard').style.display = 'block';
+                startAviatrixFlight();
+            }).catch(() => showToast('Ad not watched!', 'error'));
+        }
+
+        function startAviatrixFlight() {
+            if (aviatrixData.currentFlight) {
+                clearInterval(aviatrixData.currentFlight);
+                aviatrixData.currentFlight = null;
+            }
+            
+            aviatrixData.multiplier = 1.00;
+            aviatrixData.crashed = false;
+            aviatrixData.gameActive = true;
+            document.getElementById('aviatrixStatus').textContent = '✈️ Flying...';
+            document.getElementById('aviatrixStatus').className = 'xo-status';
+            document.getElementById('aviatrixRewardInfo').textContent = '';
+            document.getElementById('aviatrixCashoutBtn').style.display = 'block';
+            document.getElementById('aviatrixCashoutBtn').disabled = false;
+            document.getElementById('aviatrixRestartBtn').style.display = 'none';
+            
+            updateAviatrixUI();
+            
+            const speed = 0.05 + Math.random() * 0.05;
+            const crashPoint = 1.5 + Math.random() * 8.5;
+            
+            aviatrixData.currentFlight = setInterval(() => {
+                if (!aviatrixData.gameActive) return;
+                
+                aviatrixData.multiplier += speed;
+                aviatrixData.multiplier = Math.round(aviatrixData.multiplier * 100) / 100;
+                
+                if (aviatrixData.multiplier >= crashPoint) {
+                    crashAviatrix();
+                    return;
+                }
+                
+                updateAviatrixUI();
+            }, 100);
+        }
+
+        function cashoutAviatrix() {
+            if (!aviatrixData.gameActive || aviatrixData.crashed) return;
+            
+            aviatrixData.gameActive = false;
+            if (aviatrixData.currentFlight) {
+                clearInterval(aviatrixData.currentFlight);
+                aviatrixData.currentFlight = null;
+            }
+            
+            let reward = 0;
+            const bonus = (gameConfigs.aviatrix?.bonus || 15);
+            const multiplier = aviatrixData.multiplier;
+            
+            if (aviatrixData.isFree) {
+                reward = 20;
+                app.balance += reward;
+            } else {
+                reward = Math.floor(aviatrixData.betAmount * multiplier);
+                app.balance += reward;
+                app.xpPoints += reward * 2;
+            }
+            
+            aviatrixData.totalFlights++;
+            aviatrixData.history.push({
+                bet: aviatrixData.betAmount,
+                multiplier: multiplier,
+                reward: reward,
+                result: 'win',
+                time: new Date().toISOString()
+            });
+            
+            document.getElementById('aviatrixStatus').textContent = `🎉 Cashed out at ${multiplier.toFixed(2)}x!`;
+            document.getElementById('aviatrixStatus').className = 'xo-status win';
+            document.getElementById('aviatrixRewardInfo').textContent = `+${reward} Coins`;
+            document.getElementById('aviatrixCashoutBtn').style.display = 'none';
+            document.getElementById('aviatrixRestartBtn').style.display = 'block';
+            
+            userRef.update({ balance: app.balance, xpPoints: app.xpPoints });
+            updateUI();
+            updateLevelUI();
+            updateAviatrixUI();
+            updateAviatrixHistory();
+            showToast(`✈️ +${reward} Coins!`);
+        }
+
+        function crashAviatrix() {
+            aviatrixData.crashed = true;
+            aviatrixData.gameActive = false;
+            aviatrixData.totalFlights++;
+            aviatrixData.totalCrashes++;
+            
+            if (aviatrixData.currentFlight) {
+                clearInterval(aviatrixData.currentFlight);
+                aviatrixData.currentFlight = null;
+            }
+            
+            let reward = 0;
+            if (aviatrixData.isFree) {
+                reward = 20;
+                app.balance += reward;
+            }
+            
+            aviatrixData.history.push({
+                bet: aviatrixData.betAmount,
+                multiplier: aviatrixData.multiplier,
+                reward: aviatrixData.isFree ? 20 : 0,
+                result: 'crash',
+                time: new Date().toISOString()
+            });
+            
+            document.getElementById('aviatrixStatus').textContent = `💥 Crashed at ${aviatrixData.multiplier.toFixed(2)}x!`;
+            document.getElementById('aviatrixStatus').className = 'xo-status lose';
+            document.getElementById('aviatrixRewardInfo').textContent = aviatrixData.isFree ? '+20 Coins' : `-${aviatrixData.betAmount} Coins`;
+            document.getElementById('aviatrixCashoutBtn').style.display = 'none';
+            document.getElementById('aviatrixRestartBtn').style.display = 'block';
+            
+            if (aviatrixData.isFree) {
+                userRef.update({ balance: app.balance });
+                updateUI();
+            }
+            
+            updateAviatrixUI();
+            updateAviatrixHistory();
+        }
+
+        function updateAviatrixUI() {
+            document.getElementById('aviatrixMultiplier').textContent = aviatrixData.multiplier.toFixed(2) + 'x';
+            document.getElementById('aviatrixBetDisplay').textContent = aviatrixData.betAmount;
+            document.getElementById('aviatrixTotalFlights').textContent = aviatrixData.totalFlights;
+            document.getElementById('aviatrixTotalCrashes').textContent = aviatrixData.totalCrashes;
+            
+            const multiplierEl = document.getElementById('aviatrixMultiplier');
+            if (aviatrixData.multiplier >= 5) {
+                multiplierEl.style.color = '#10b981';
+            } else if (aviatrixData.multiplier >= 2) {
+                multiplierEl.style.color = '#fbbf24';
+            } else {
+                multiplierEl.style.color = '#fff';
+            }
+        }
+
+        function updateAviatrixHistory() {
+            const container = document.getElementById('aviatrixHistoryList');
+            const history = aviatrixData.history.slice(-10).reverse();
+            
+            if (history.length === 0) {
+                container.innerHTML = '<span style="color:#94a3b8;font-size:11px;">No history yet</span>';
+                return;
+            }
+            
+            container.innerHTML = history.map(h => `
+                <div class="history-item">
+                    <div>
+                        <b>${h.bet} 🪙</b>
+                        <span style="color:${h.result === 'win' ? '#10b981' : '#ef4444'}">
+                            ${h.result === 'win' ? '✅' : '❌'} ${h.multiplier.toFixed(2)}x
+                        </span>
+                    </div>
+                    <div style="text-align:right;">
+                        <span style="color:${h.result === 'win' ? '#10b981' : '#ef4444'};">
+                            ${h.result === 'win' ? '+' : ''}${h.reward} 🪙
+                        </span>
+                        <div style="font-size:9px;color:#64748b;">${new Date(h.time).toLocaleTimeString()}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function resetAviatrixGame() {
+            if (aviatrixData.currentFlight) {
+                clearInterval(aviatrixData.currentFlight);
+                aviatrixData.currentFlight = null;
+            }
+            aviatrixData.gameActive = false;
+            aviatrixData.crashed = false;
+            aviatrixData.multiplier = 1.00;
+            document.getElementById('aviatrixBetSection').style.display = 'block';
+            document.getElementById('aviatrixGameBoard').style.display = 'none';
+            document.getElementById('aviatrixRestartBtn').style.display = 'none';
+            document.getElementById('aviatrixCashoutBtn').style.display = 'block';
+            document.getElementById('aviatrixCashoutBtn').disabled = false;
+            updateAviatrixUI();
         }
 
         // ================== OPEN GAME ==================
@@ -913,6 +1190,7 @@
             else if (type === 'bowling') openBowlingGame();
             else if (type === 'coinflip') openCoinFlipGame();
             else if (type === 'rps') openRPSGame();
+            else if (type === 'aviatrix') openAviatrixGame();
         }
 
         // ================== DICE GAME ==================
@@ -922,15 +1200,9 @@
             document.getElementById('diceBetSection').style.display = 'block'; 
             document.getElementById('diceGameBoard').style.display = 'none'; 
             diceGameData.rewardGiven = false;
-            updateGameOverlayUI('diceBetSection', 'dice');
         }
         function closeDiceGame() { document.getElementById('diceGameOverlay').classList.remove('show'); }
-        function setDiceBet(a) { 
-            const config = gameConfigs.dice || {};
-            const max = config.maxEntry || 500;
-            diceGameData.betAmount = Math.min(a, max); 
-            document.getElementById('diceBetAmount').value = diceGameData.betAmount; 
-        }
+        function setDiceBet(a) { const config = gameConfigs.dice || {}; const max = config.maxEntry || 500; diceGameData.betAmount = Math.min(a, max); document.getElementById('diceBetAmount').value = diceGameData.betAmount; }
         function playDiceGamePaid() {
             const config = gameConfigs.dice || {};
             let min = config.minEntry || 100, max = config.maxEntry || 500;
@@ -969,13 +1241,11 @@
                 userRef.update({ balance: app.balance }); updateUI();
             }, 1000);
         }
-        function resetDiceGame() { diceGameData.rewardGiven = false; document.getElementById('diceBetSection').style.display = 'block'; document.getElementById('diceGameBoard').style.display = 'none'; document.getElementById('diceGameBoard').querySelector('.restart').style.display = 'none'; document.getElementById('playerDice').textContent = '🎲'; document.getElementById('opponentDice').textContent = '🎲'; document.getElementById('playerDice').className = 'game-dice'; document.getElementById('opponentDice').className = 'game-dice'; 
-            updateGameOverlayUI('diceBetSection', 'dice');
-        }
+        function resetDiceGame() { diceGameData.rewardGiven = false; document.getElementById('diceBetSection').style.display = 'block'; document.getElementById('diceGameBoard').style.display = 'none'; document.getElementById('diceGameBoard').querySelector('.restart').style.display = 'none'; document.getElementById('playerDice').textContent = '🎲'; document.getElementById('opponentDice').textContent = '🎲'; document.getElementById('playerDice').className = 'game-dice'; document.getElementById('opponentDice').className = 'game-dice'; }
 
         // ================== TARGET GAME ==================
         let targetGameData = { betAmount: 100, isFree: false, rewardGiven: false };
-        function openTargetGame() { document.getElementById('targetGameOverlay').classList.add('show'); document.getElementById('targetBetSection').style.display = 'block'; document.getElementById('targetGameBoard').style.display = 'none'; targetGameData.rewardGiven = false; updateGameOverlayUI('targetBetSection', 'target'); }
+        function openTargetGame() { document.getElementById('targetGameOverlay').classList.add('show'); document.getElementById('targetBetSection').style.display = 'block'; document.getElementById('targetGameBoard').style.display = 'none'; targetGameData.rewardGiven = false; }
         function closeTargetGame() { document.getElementById('targetGameOverlay').classList.remove('show'); }
         function setTargetBet(a) { const config = gameConfigs.target || {}; const max = config.maxEntry || 500; targetGameData.betAmount = Math.min(a, max); document.getElementById('targetBetAmount').value = targetGameData.betAmount; }
         function playTargetGamePaid() {
@@ -1010,11 +1280,11 @@
                 userRef.update({ balance: app.balance }); updateUI();
             }, 800);
         }
-        function resetTargetGame() { targetGameData.rewardGiven = false; document.getElementById('targetBetSection').style.display = 'block'; document.getElementById('targetGameBoard').style.display = 'none'; document.getElementById('targetGameBoard').querySelector('.restart').style.display = 'none'; document.getElementById('targetStatus').textContent = 'Shoot the target!'; updateGameOverlayUI('targetBetSection', 'target'); }
+        function resetTargetGame() { targetGameData.rewardGiven = false; document.getElementById('targetBetSection').style.display = 'block'; document.getElementById('targetGameBoard').style.display = 'none'; document.getElementById('targetGameBoard').querySelector('.restart').style.display = 'none'; document.getElementById('targetStatus').textContent = 'Shoot the target!'; }
 
         // ================== CARD GAME ==================
         let cardGameData = { betAmount: 100, isFree: false, rewardGiven: false };
-        function openCardGame() { document.getElementById('cardGameOverlay').classList.add('show'); document.getElementById('cardBetSection').style.display = 'block'; document.getElementById('cardGameBoard').style.display = 'none'; cardGameData.rewardGiven = false; updateGameOverlayUI('cardBetSection', 'card'); }
+        function openCardGame() { document.getElementById('cardGameOverlay').classList.add('show'); document.getElementById('cardBetSection').style.display = 'block'; document.getElementById('cardGameBoard').style.display = 'none'; cardGameData.rewardGiven = false; }
         function closeCardGame() { document.getElementById('cardGameOverlay').classList.remove('show'); }
         function setCardBet(a) { const config = gameConfigs.card || {}; const max = config.maxEntry || 500; cardGameData.betAmount = Math.min(a, max); document.getElementById('cardBetAmount').value = cardGameData.betAmount; }
         function playCardGamePaid() {
@@ -1055,7 +1325,7 @@
                 userRef.update({ balance: app.balance }); updateUI();
             }, 800);
         }
-        function resetCardGame() { cardGameData.rewardGiven = false; document.getElementById('cardBetSection').style.display = 'block'; document.getElementById('cardGameBoard').style.display = 'none'; document.getElementById('cardGameBoard').querySelector('.restart').style.display = 'none'; document.getElementById('playerCard').innerHTML = '<span class="card-value">?</span><span class="card-suit">?</span>'; document.getElementById('opponentCard').innerHTML = '<span class="card-value">?</span><span class="card-suit">?</span>'; document.getElementById('playerCard').className = 'game-card-item'; document.getElementById('opponentCard').className = 'game-card-item'; updateGameOverlayUI('cardBetSection', 'card'); }
+        function resetCardGame() { cardGameData.rewardGiven = false; document.getElementById('cardBetSection').style.display = 'block'; document.getElementById('cardGameBoard').style.display = 'none'; document.getElementById('cardGameBoard').querySelector('.restart').style.display = 'none'; document.getElementById('playerCard').innerHTML = '<span class="card-value">?</span><span class="card-suit">?</span>'; document.getElementById('opponentCard').innerHTML = '<span class="card-value">?</span><span class="card-suit">?</span>'; document.getElementById('playerCard').className = 'game-card-item'; document.getElementById('opponentCard').className = 'game-card-item'; }
 
         // ================== MEMORY GAME ==================
         let memoryGameData = { betAmount: 100, isFree: false, rewardGiven: false };
@@ -1065,7 +1335,6 @@
             document.getElementById('memoryBetSection').style.display = 'block';
             document.getElementById('memoryGameBoard').style.display = 'none';
             memoryGameData.rewardGiven = false;
-            updateGameOverlayUI('memoryBetSection', 'memory');
         }
         function closeMemoryGame() {
             document.getElementById('memoryGameOverlay').classList.remove('show');
@@ -1129,14 +1398,13 @@
         function resetMemoryGame() {
             memoryGameData.rewardGiven = false; if (memoryTimeout) clearTimeout(memoryTimeout);
             document.getElementById('memoryBetSection').style.display = 'block'; document.getElementById('memoryGameBoard').style.display = 'none'; document.getElementById('memoryGameBoard').querySelector('.restart').style.display = 'none';
-            updateGameOverlayUI('memoryBetSection', 'memory');
         }
 
         // ================== FLAPPY BIRD GAME ==================
         let flappyGameData = { betAmount: 100, isFree: false, rewardGiven: false };
         let flappyGameLoop = null; let flappyBird = { x: 50, y: 200, velocity: 0 }; let flappyPipes = []; let flappyScore = 0; let flappyGameOver = false;
         function openFlappyGame() {
-            document.getElementById('flappyGameOverlay').classList.add('show'); document.getElementById('flappyBetSection').style.display = 'block'; document.getElementById('flappyGameBoard').style.display = 'none'; flappyGameData.rewardGiven = false; updateGameOverlayUI('flappyBetSection', 'flappy');
+            document.getElementById('flappyGameOverlay').classList.add('show'); document.getElementById('flappyBetSection').style.display = 'block'; document.getElementById('flappyGameBoard').style.display = 'none'; flappyGameData.rewardGiven = false;
         }
         function closeFlappyGame() { document.getElementById('flappyGameOverlay').classList.remove('show'); if (flappyGameLoop) { cancelAnimationFrame(flappyGameLoop); flappyGameLoop = null; } }
         function setFlappyBet(a) { const config = gameConfigs.flappy || {}; const max = config.maxEntry || 500; flappyGameData.betAmount = Math.min(a, max); document.getElementById('flappyBetAmount').value = flappyGameData.betAmount; }
@@ -1195,14 +1463,13 @@
         function resetFlappyGame() {
             flappyGameData.rewardGiven = false; if (flappyGameLoop) { cancelAnimationFrame(flappyGameLoop); flappyGameLoop = null; }
             document.getElementById('flappyBetSection').style.display = 'block'; document.getElementById('flappyGameBoard').style.display = 'none'; document.getElementById('flappyGameBoard').querySelector('.restart').style.display = 'none';
-            updateGameOverlayUI('flappyBetSection', 'flappy');
         }
 
         // ================== PUZZLE GAME ==================
         let puzzleGameData = { betAmount: 100, isFree: false, rewardGiven: false };
         let puzzleTiles = []; let puzzleEmpty = 8;
         function openPuzzleGame() {
-            document.getElementById('puzzleGameOverlay').classList.add('show'); document.getElementById('puzzleBetSection').style.display = 'block'; document.getElementById('puzzleGameBoard').style.display = 'none'; puzzleGameData.rewardGiven = false; updateGameOverlayUI('puzzleBetSection', 'puzzle');
+            document.getElementById('puzzleGameOverlay').classList.add('show'); document.getElementById('puzzleBetSection').style.display = 'block'; document.getElementById('puzzleGameBoard').style.display = 'none'; puzzleGameData.rewardGiven = false;
         }
         function closePuzzleGame() { document.getElementById('puzzleGameOverlay').classList.remove('show'); }
         function setPuzzleBet(a) { const config = gameConfigs.puzzle || {}; const max = config.maxEntry || 500; puzzleGameData.betAmount = Math.min(a, max); document.getElementById('puzzleBetAmount').value = puzzleGameData.betAmount; }
@@ -1252,7 +1519,6 @@
         function checkPuzzleWin() { for (let i = 0; i < 8; i++) { if (puzzleTiles[i] !== i + 1) return false; } return puzzleTiles[8] === null; }
         function resetPuzzleGame() {
             puzzleGameData.rewardGiven = false; document.getElementById('puzzleBetSection').style.display = 'block'; document.getElementById('puzzleGameBoard').style.display = 'none'; document.getElementById('puzzleGameBoard').querySelector('.restart').style.display = 'none';
-            updateGameOverlayUI('puzzleBetSection', 'puzzle');
         }
 
         // ================== BOWLING GAME ==================
@@ -1262,7 +1528,6 @@
             document.getElementById('bowlingBetSection').style.display = 'block';
             document.getElementById('bowlingGameBoard').style.display = 'none';
             bowlingGameData.rewardGiven = false;
-            updateGameOverlayUI('bowlingBetSection', 'bowling');
         }
         function closeBowlingGame() { document.getElementById('bowlingOverlay').classList.remove('show'); }
         function setBowlingBet(a) { const config = gameConfigs.bowling || {}; const max = config.maxEntry || 500; bowlingGameData.betAmount = Math.min(a, max); document.getElementById('bowlingBetAmount').value = bowlingGameData.betAmount; }
@@ -1327,7 +1592,7 @@
             if (reward > 0) showToast(`🎳 +${reward} Coins!`);
             userRef.update({ balance: app.balance }); updateUI();
         }
-        function resetBowlingGame() { bowlingGameData.rewardGiven = false; document.getElementById('bowlingBetSection').style.display = 'block'; document.getElementById('bowlingGameBoard').style.display = 'none'; document.getElementById('bowlingGameBoard').querySelector('.restart').style.display = 'none'; updateGameOverlayUI('bowlingBetSection', 'bowling'); }
+        function resetBowlingGame() { bowlingGameData.rewardGiven = false; document.getElementById('bowlingBetSection').style.display = 'block'; document.getElementById('bowlingGameBoard').style.display = 'none'; document.getElementById('bowlingGameBoard').querySelector('.restart').style.display = 'none'; }
 
         // ================== COIN FLIP GAME ==================
         let coinFlipGameData = { betAmount: 100, isFree: false, rewardGiven: false, choice: null };
@@ -1336,7 +1601,6 @@
             document.getElementById('coinflipBetSection').style.display = 'block';
             document.getElementById('coinflipGameBoard').style.display = 'none';
             coinFlipGameData.rewardGiven = false;
-            updateGameOverlayUI('coinflipBetSection', 'coinflip');
         }
         function closeCoinFlipGame() { document.getElementById('coinflipOverlay').classList.remove('show'); }
         function setCoinFlipBet(a) { const config = gameConfigs.coinflip || {}; const max = config.maxEntry || 500; coinFlipGameData.betAmount = Math.min(a, max); document.getElementById('coinflipBetAmount').value = coinFlipGameData.betAmount; }
@@ -1393,7 +1657,6 @@
             document.getElementById('coinflipBetSection').style.display = 'block';
             document.getElementById('coinflipGameBoard').style.display = 'none';
             document.getElementById('coinflipGameBoard').querySelector('.restart').style.display = 'none';
-            updateGameOverlayUI('coinflipBetSection', 'coinflip');
         }
 
         // ================== RPS GAME ==================
@@ -1403,7 +1666,6 @@
             document.getElementById('rpsBetSection').style.display = 'block';
             document.getElementById('rpsGameBoard').style.display = 'none';
             rpsGameData.rewardGiven = false;
-            updateGameOverlayUI('rpsBetSection', 'rps');
         }
         function closeRPSGame() { document.getElementById('rpsOverlay').classList.remove('show'); }
         function setRPSBet(a) { const config = gameConfigs.rps || {}; const max = config.maxEntry || 500; rpsGameData.betAmount = Math.min(a, max); document.getElementById('rpsBetAmount').value = rpsGameData.betAmount; }
@@ -1463,7 +1725,6 @@
             document.getElementById('rpsBetSection').style.display = 'block';
             document.getElementById('rpsGameBoard').style.display = 'none';
             document.getElementById('rpsGameBoard').querySelector('.restart').style.display = 'none';
-            updateGameOverlayUI('rpsBetSection', 'rps');
         }
 
         // ================== XO GAME ==================
@@ -1478,7 +1739,6 @@
             document.getElementById('xoModeSelection').style.display = 'block';
             document.getElementById('xoBetSection').style.display = 'none';
             document.getElementById('xoGameBoard').style.display = 'none';
-            updateGameOverlayUI('xoBetSection', 'xo');
         }
 
         function closeXOGame() {
@@ -1497,7 +1757,6 @@
             document.getElementById('xoBetAmount').value = config.minEntry || 100;
             xoGameData.betAmount = config.minEntry || 100;
             xoGameData.isFree = false;
-            updateGameOverlayUI('xoBetSection', 'xo');
         }
 
         function setXOBet(a) {
@@ -1952,7 +2211,7 @@
             conversionTimerInterval = setInterval(ud, 1000);
         }
 
-        // ================== SPIN WHEEL (UPDATED - MAX 1000) ==================
+        // ================== SPIN WHEEL ==================
         const SPIN_COUNT_LIMIT = 20, SPIN_BUTTON_COOLDOWN_SECONDS = 15;
         let spinCount = SPIN_COUNT_LIMIT, spinBtnCooldownInterval = null, isSpinning = false, currentRotation = 0;
 
@@ -2088,12 +2347,31 @@
             userRef.update({ isCurrentlyMining: true, lastMiningActivity: Date.now() }); wasMiningBeforeOffline = true;
             function mnc() {
                 if (!isOnline || isAdShowing || app.progressCoins <= 0) { stopMining(); return; }
-                const d = calculateLevel(app.xpPoints); let sm = 1 + (d.bonusPercent / 100);
-                app.progressCoins -= 1; app.balance += sm; app.xpPoints += 1;
-                userRef.update({ balance: app.balance, progressCoins: app.progressCoins, xpPoints: app.xpPoints });
-                const coin = document.createElement('div'); coin.className = 'floating-coin'; coin.textContent = `+${sm.toFixed(0)} 🪙`;
-                coin.style.left = (Math.random() * 80 + 10) + '%'; coin.style.top = '35%'; document.body.appendChild(coin);
-                setTimeout(() => coin.remove(), 1000); updateProgressUI(); updateUI(); updateLevelUI();
+                // LEVEL BONUS CALCULATION - NOW WORKING
+                const d = calculateLevel(app.xpPoints);
+                let sm = 1 + (d.bonusPercent / 100);
+                
+                app.progressCoins -= 1;
+                app.balance += sm;
+                app.xpPoints += 1;
+                
+                userRef.update({
+                    balance: app.balance,
+                    progressCoins: app.progressCoins,
+                    xpPoints: app.xpPoints
+                });
+                
+                const coin = document.createElement('div');
+                coin.className = 'floating-coin';
+                coin.textContent = `+${sm.toFixed(0)} 🪙`;
+                coin.style.left = (Math.random() * 80 + 10) + '%';
+                coin.style.top = '35%';
+                document.body.appendChild(coin);
+                setTimeout(() => coin.remove(), 1000);
+                
+                updateProgressUI();
+                updateUI();
+                updateLevelUI();
                 miningInterval = setTimeout(mnc, 5000 / sm);
             }
             mnc(); showToast('⛏️ Mining!');
