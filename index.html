@@ -1031,7 +1031,7 @@
             renderXOBoard();
         }
 
-        // ================== LOCAL 2 PLAYER MODE (NEW) ==================
+        // ================== LOCAL 2 PLAYER MODE ==================
         function initLocal2PGame() {
             document.getElementById('xoBetSection').style.display = 'none';
             document.getElementById('xoGameBoard').style.display = 'block';
@@ -1055,7 +1055,7 @@
             renderXOBoard();
         }
 
-        // ================== ONLINE MODE (FIXED) ==================
+        // ================== ONLINE MODE (FIXED WITH NAMES) ==================
         function initOnlineGame() {
             document.getElementById('xoBetSection').style.display = 'none';
             document.getElementById('xoGameBoard').style.display = 'none';
@@ -1088,6 +1088,7 @@
             xoGameData.isMyTurn = true;
             db.ref('xoWaitingGames/' + gid).set({
                 player1Id: userId,
+                player1Name: displayName,
                 betAmount: xoGameData.betAmount,
                 board: Array(9).fill(''),
                 currentTurn: 'X',
@@ -1137,6 +1138,7 @@
             db.ref('xoGames/' + gid).set({ 
                 ...gd, 
                 player2Id: userId, 
+                player2Name: displayName,
                 started: true, 
                 gameActive: true 
             }).then(() => {
@@ -1144,6 +1146,7 @@
                 startOnlineGame(gid, { 
                     ...gd, 
                     player2Id: userId, 
+                    player2Name: displayName,
                     started: true, 
                     gameActive: true 
                 });
@@ -1158,8 +1161,14 @@
             xoGameData.isMyTurn = gd.currentTurn === xoGameData.mySymbol;
             xoGameData.gameOver = false;
             xoGameData.winner = gd.winner || null;
-            document.getElementById('xoPlayer1Badge').querySelector('.player-symbol').textContent = xoGameData.mySymbol;
-            document.getElementById('xoPlayer2Badge').querySelector('.player-symbol').textContent = xoGameData.opponentSymbol;
+            
+            // Show names
+            const p1Name = gd.player1Name || 'Player 1';
+            const p2Name = gd.player2Name || 'Player 2';
+            
+            document.getElementById('xoPlayer1Badge').innerHTML = `<div style="font-size:11px;">${p1Name} (${xoGameData.mySymbol})</div><div class="player-symbol ${xoGameData.mySymbol === 'X' ? 'x-player' : 'o-player'}">${xoGameData.mySymbol}</div>`;
+            document.getElementById('xoPlayer2Badge').innerHTML = `<div style="font-size:11px;">${p2Name} (${xoGameData.opponentSymbol})</div><div class="player-symbol ${xoGameData.opponentSymbol === 'X' ? 'x-player' : 'o-player'}">${xoGameData.opponentSymbol}</div>`;
+            
             document.getElementById('xoPlayersInfo').style.display = 'flex';
             document.getElementById('xoStatus').textContent = xoGameData.isMyTurn ? 'Your turn!' : 'Opponent\'s turn...';
             document.getElementById('xoStatus').className = 'xo-status';
@@ -1614,7 +1623,7 @@
             });
         }
 
-        // ================== SPIN WHEEL (UPDATED) ==================
+        // ================== SPIN WHEEL (UPDATED - MAX 1000) ==================
         const SPIN_COUNT_LIMIT = 20, SPIN_BUTTON_COOLDOWN_SECONDS = 15;
         let spinCount = SPIN_COUNT_LIMIT, spinBtnCooldownInterval = null, isSpinning = false, currentRotation = 0;
 
@@ -1651,8 +1660,10 @@
             show_11197472().then(() => {
                 const p = getPrizeByAngle(currentRotation);
                 if (p.type === 'coins') {
-                    // Coins পেলে mining coins (progressCoins) এ যোগ হবে
-                    app.progressCoins += p.value;
+                    // Coins পেলে mining coins (progressCoins) এ যোগ হবে, কিন্তু MAX 1000 এর বেশি হবে না
+                    let newProgress = app.progressCoins + p.value;
+                    if (newProgress > TOTAL_COINS) newProgress = TOTAL_COINS;
+                    app.progressCoins = newProgress;
                     app.xpPoints += p.value * 2;
                     updateProgressUI(); updateLevelUI();
                 } else {
