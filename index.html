@@ -229,13 +229,82 @@
         .rps-options button:disabled { opacity: 0.5; transform: none; }
 
         /* ================== AVIATRIX GAME ================== */
-        .aviatrix-multiplier { font-size: 52px; font-weight: 900; text-align: center; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 16px; border: 2px solid rgba(251,191,36,0.2); margin: 10px 0; }
-        .aviatrix-stats { display: flex; justify-content: space-between; margin: 10px 0; background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 10px; }
-        .aviatrix-stats span { font-size: 13px; }
-        .aviatrix-stats .stat-value { font-weight: 700; }
-        .aviatrix-history-item { display: flex; justify-content: space-between; padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px; }
-        .aviatrix-history-item .win { color: #10b981; }
-        .aviatrix-history-item .loss { color: #ef4444; }
+        .aviatrix-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 20px; }
+        .aviatrix-overlay.show { display: flex; }
+        .aviatrix-container { background: linear-gradient(145deg, #1a1a2e, #16213e); padding: 20px; border-radius: 20px; width: 95%; max-width: 420px; text-align: center; border: 1px solid rgba(255,255,255,0.08); max-height: 95vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
+        
+        /* AVIATRIX HEADER */
+        .aviatrix-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .aviatrix-header .back-btn { background: rgba(255,255,255,0.08); border: none; color: #fff; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; }
+        .aviatrix-header .game-title { font-size: 18px; font-weight: 800; color: #fbbf24; }
+        .aviatrix-header .game-title i { margin-right: 8px; }
+        
+        /* AVIATRIX STATS BAR */
+        .aviatrix-stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; background: rgba(255,255,255,0.03); border-radius: 12px; padding: 8px 6px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); }
+        .aviatrix-stats-bar .stat-item { text-align: center; }
+        .aviatrix-stats-bar .stat-item .stat-label { font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+        .aviatrix-stats-bar .stat-item .stat-value { font-size: 14px; font-weight: 700; color: #fbbf24; display: block; margin-top: 2px; }
+        .aviatrix-stats-bar .stat-item .stat-value.green { color: #10b981; }
+        .aviatrix-stats-bar .stat-item .stat-value.red { color: #ef4444; }
+        .aviatrix-stats-bar .stat-item .stat-value.blue { color: #3b82f6; }
+        
+        /* AVIATRIX GRAPH AREA */
+        .aviatrix-graph { position: relative; background: rgba(0,0,0,0.4); border-radius: 16px; padding: 10px; margin: 8px 0; height: 280px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
+        .aviatrix-graph canvas { width: 100%; height: 100%; border-radius: 10px; }
+        
+        /* AVIATRIX MULTIPLIER DISPLAY */
+        .aviatrix-multiplier-display { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 5; pointer-events: none; }
+        .aviatrix-multiplier-display .multiplier-value { font-size: 52px; font-weight: 900; color: #fff; text-shadow: 0 0 30px rgba(251,191,36,0.3); transition: all 0.2s ease; }
+        .aviatrix-multiplier-display .multiplier-value.high { color: #10b981; text-shadow: 0 0 30px rgba(16,185,129,0.4); }
+        .aviatrix-multiplier-display .multiplier-value.medium { color: #fbbf24; text-shadow: 0 0 30px rgba(251,191,36,0.4); }
+        .aviatrix-multiplier-display .multiplier-value.low { color: #ef4444; text-shadow: 0 0 30px rgba(239,68,68,0.4); }
+        .aviatrix-multiplier-display .multiplier-label { font-size: 12px; color: #94a3b8; margin-top: -5px; }
+        
+        /* AVIATRIX BET SECTION */
+        .aviatrix-bet-section { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 12px; margin: 8px 0; border: 1px solid rgba(255,255,255,0.05); }
+        .aviatrix-bet-section .bet-row { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; margin: 6px 0; }
+        .aviatrix-bet-section .bet-row input { width: 80px; padding: 8px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #fff; text-align: center; font-size: 16px; }
+        .aviatrix-bet-section .bet-row .bet-preset { background: rgba(255,255,255,0.08); padding: 4px 12px; border-radius: 6px; cursor: pointer; color: #94a3b8; font-weight: 600; font-size: 12px; transition: 0.3s; }
+        .aviatrix-bet-section .bet-row .bet-preset:hover { background: #fbbf24; color: #0f172a; }
+        
+        /* AVIATRIX ACTIONS */
+        .aviatrix-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 8px 0; }
+        .aviatrix-actions .action-btn { padding: 12px; border: none; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.3s ease; }
+        .aviatrix-actions .action-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+        .aviatrix-actions .action-btn.pay { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; }
+        .aviatrix-actions .action-btn.pay:hover:not(:disabled) { transform: scale(1.02); }
+        .aviatrix-actions .action-btn.free { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
+        .aviatrix-actions .action-btn.free:hover:not(:disabled) { transform: scale(1.02); }
+        .aviatrix-actions .action-btn.cashout { background: linear-gradient(135deg, #f59e0b, #d97706); color: #0f172a; }
+        .aviatrix-actions .action-btn.cashout:hover:not(:disabled) { transform: scale(1.02); }
+        .aviatrix-actions .action-btn.cashout:disabled { background: #334155; color: #64748b; }
+        .aviatrix-actions .action-btn.restart { background: linear-gradient(135deg, #ec4899, #f472b6); color: #fff; }
+        .aviatrix-actions .action-btn.restart:hover:not(:disabled) { transform: scale(1.02); }
+        
+        /* AVIATRIX STATUS */
+        .aviatrix-status { font-size: 16px; font-weight: 700; margin: 8px 0; padding: 8px; border-radius: 8px; }
+        .aviatrix-status.win { color: #10b981; background: rgba(16,185,129,0.1); }
+        .aviatrix-status.lose { color: #ef4444; background: rgba(239,68,68,0.1); }
+        .aviatrix-status.waiting { color: #fbbf24; background: rgba(251,191,36,0.1); }
+        .aviatrix-status.flying { color: #3b82f6; background: rgba(59,130,246,0.1); animation: pulseStatus 1s infinite; }
+        @keyframes pulseStatus { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        
+        /* AVIATRIX HISTORY */
+        .aviatrix-history { margin-top: 10px; max-height: 150px; overflow-y: auto; }
+        .aviatrix-history .history-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 12px; }
+        .aviatrix-history .history-item .h-bet { color: #94a3b8; }
+        .aviatrix-history .history-item .h-mult { font-weight: 700; }
+        .aviatrix-history .history-item .h-mult.win { color: #10b981; }
+        .aviatrix-history .history-item .h-mult.lose { color: #ef4444; }
+        .aviatrix-history .history-item .h-reward { font-weight: 700; }
+        .aviatrix-history .history-item .h-reward.win { color: #10b981; }
+        .aviatrix-history .history-item .h-reward.lose { color: #ef4444; }
+        
+        /* AVIATRIX REALTIME STATS */
+        .aviatrix-realtime { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 8px 0; }
+        .aviatrix-realtime .rt-item { background: rgba(255,255,255,0.03); border-radius: 8px; padding: 6px; text-align: center; }
+        .aviatrix-realtime .rt-item .rt-label { font-size: 8px; color: #94a3b8; text-transform: uppercase; }
+        .aviatrix-realtime .rt-item .rt-value { font-size: 14px; font-weight: 700; color: #fbbf24; }
 
         /* ================== BOTTOM NAV ================== */
         .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; background: rgba(15,23,42,0.95); backdrop-filter: blur(24px); display: flex; justify-content: space-around; padding: 10px 4px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
@@ -690,55 +759,93 @@
         </div>
     </div>
 
-    <!-- ================== AVIATRIX GAME OVERLAY ================== -->
-    <div class="game-overlay" id="aviatrixOverlay">
-        <div class="game-container">
-            <div class="game-header">
+    <!-- ================== AVIATRIX GAME OVERLAY (LIVE CASINO STYLE) ================== -->
+    <div class="aviatrix-overlay" id="aviatrixOverlay">
+        <div class="aviatrix-container">
+            <!-- Header -->
+            <div class="aviatrix-header">
                 <button class="back-btn" onclick="closeAviatrixGame()"><i class="fas fa-arrow-left"></i> Back</button>
-                <span class="game-info">✈️ Aviatrix</span>
+                <span class="game-title"><i class="fas fa-plane"></i> Aviatrix</span>
+                <span style="color:#94a3b8;font-size:12px;" id="aviatrixGameId">#LIVE</span>
             </div>
-            
-            <div id="aviatrixBetSection" class="xo-bet-section">
-                <label>💰 Entry Fee (100-500) | Win: +15% Bonus</label>
-                <div class="xo-bet-input">
+
+            <!-- Stats Bar -->
+            <div class="aviatrix-stats-bar">
+                <div class="stat-item">
+                    <span class="stat-label">🛫 Flights</span>
+                    <span class="stat-value" id="aviatrixTotalFlights">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">💥 Crashes</span>
+                    <span class="stat-value red" id="aviatrixTotalCrashes">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">📈 Avg</span>
+                    <span class="stat-value blue" id="aviatrixAvgMultiplier">0.00x</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">💰 Profit</span>
+                    <span class="stat-value green" id="aviatrixTotalProfit">+0</span>
+                </div>
+            </div>
+
+            <!-- Graph / Flight Display -->
+            <div class="aviatrix-graph" id="aviatrixGraph">
+                <canvas id="aviatrixCanvas"></canvas>
+                <!-- Multiplier Overlay -->
+                <div class="aviatrix-multiplier-display" id="multiplierDisplay">
+                    <div class="multiplier-value" id="aviatrixMultiplier">1.00x</div>
+                    <div class="multiplier-label">MULTIPLIER</div>
+                </div>
+            </div>
+
+            <!-- Status -->
+            <div class="aviatrix-status waiting" id="aviatrixStatus">✈️ Waiting for next round...</div>
+
+            <!-- Realtime Stats -->
+            <div class="aviatrix-realtime" id="aviatrixRealtime">
+                <div class="rt-item">
+                    <span class="rt-label">🟢 Total Up</span>
+                    <span class="rt-value" id="rtTotalUp">0</span>
+                </div>
+                <div class="rt-item">
+                    <span class="rt-label">🔴 Total Down</span>
+                    <span class="rt-value" id="rtTotalDown">0</span>
+                </div>
+                <div class="rt-item">
+                    <span class="rt-label">📊 Win Rate</span>
+                    <span class="rt-value" id="rtWinRate">0%</span>
+                </div>
+            </div>
+
+            <!-- Bet Section -->
+            <div class="aviatrix-bet-section" id="aviatrixBetSection">
+                <div class="bet-row">
+                    <span class="bet-preset" onclick="setAviatrixBet(50)">50</span>
                     <span class="bet-preset" onclick="setAviatrixBet(100)">100</span>
-                    <span class="bet-preset" onclick="setAviatrixBet(200)">200</span>
-                    <input type="number" id="aviatrixBetAmount" value="100" min="100" max="500" step="50">
+                    <input type="number" id="aviatrixBetAmount" value="100" min="50" max="500" step="10">
                     <span class="bet-preset" onclick="setAviatrixBet(300)">300</span>
                     <span class="bet-preset" onclick="setAviatrixBet(500)">500</span>
                 </div>
-                <button class="xo-action-btn" onclick="playAviatrixPaid()">✈️ Pay & Fly</button>
-                <button class="xo-action-btn free" onclick="playAviatrixFree()">📺 Watch Ad (Get 20 🪙)</button>
+                <div class="aviatrix-actions">
+                    <button class="action-btn pay" id="aviatrixPayBtn" onclick="playAviatrixPaid()">✈️ Pay & Fly</button>
+                    <button class="action-btn free" id="aviatrixFreeBtn" onclick="playAviatrixFree()">📺 Ad (20 🪙)</button>
+                </div>
             </div>
-            
+
+            <!-- Game Board (shows during flight) -->
             <div id="aviatrixGameBoard" style="display:none;">
-                <!-- Live Stats -->
-                <div class="aviatrix-stats">
-                    <span>🛫 Flights: <span class="stat-value" id="aviatrixTotalFlights" style="color:#fbbf24;">0</span></span>
-                    <span>💥 Crashes: <span class="stat-value" id="aviatrixTotalCrashes" style="color:#ef4444;">0</span></span>
-                    <span>💰 Bet: <span class="stat-value" id="aviatrixBetDisplay" style="color:#10b981;">0</span></span>
+                <div class="aviatrix-actions">
+                    <button class="action-btn cashout" id="aviatrixCashoutBtn" onclick="cashoutAviatrix()">💰 Cashout Now</button>
+                    <button class="action-btn restart" id="aviatrixRestartBtn" onclick="resetAviatrixGame()" style="display:none;">✈️ Fly Again</button>
                 </div>
-                
-                <!-- Multiplier -->
-                <div class="aviatrix-multiplier" id="aviatrixMultiplier">1.00x</div>
-                
-                <!-- Status -->
-                <div class="xo-status" id="aviatrixStatus">✈️ Ready to fly!</div>
-                <div id="aviatrixRewardInfo" style="color:#10b981;font-size:14px;font-weight:700;margin:8px 0;"></div>
-                
-                <!-- Action Buttons -->
-                <button class="xo-action-btn" id="aviatrixCashoutBtn" onclick="cashoutAviatrix()" style="background:linear-gradient(135deg,#10b981,#059669);">
-                    💰 Cashout Now
-                </button>
-                <button class="xo-action-btn restart" id="aviatrixRestartBtn" onclick="resetAviatrixGame()" style="display:none;">
-                    ✈️ Fly Again
-                </button>
-                
-                <!-- History -->
-                <div class="history-card" style="margin-top:15px;">
-                    <div style="font-size:11px;color:#94a3b8;margin-bottom:8px;">📜 Flight History</div>
-                    <div id="aviatrixHistoryList"></div>
-                </div>
+                <div id="aviatrixRewardInfo" style="color:#10b981;font-size:14px;font-weight:700;margin:8px 0;text-align:center;"></div>
+            </div>
+
+            <!-- History -->
+            <div class="aviatrix-history" id="aviatrixHistory">
+                <div style="font-size:11px;color:#94a3b8;margin-bottom:6px;">📜 Flight History</div>
+                <div id="aviatrixHistoryList"><span style="color:#94a3b8;font-size:12px;">No history yet</span></div>
             </div>
         </div>
     </div>
@@ -857,7 +964,7 @@
                     <div class="game-card" onclick="openGame('bowling')"><div class="game-icon">🎳</div><div class="game-name">Bowling</div><div class="game-desc">Knock down pins!</div><div class="game-bet">Entry: 100-500 🪙 | Win: 15%</div></div>
                     <div class="game-card" onclick="openGame('coinflip')"><div class="game-icon">🪙</div><div class="game-name">Coin Flip</div><div class="game-desc">Heads or Tails?</div><div class="game-bet">Entry: 100-500 🪙 | Win: 12%</div></div>
                     <div class="game-card" onclick="openGame('rps')"><div class="game-icon">✊</div><div class="game-name">RPS</div><div class="game-desc">Rock Paper Scissors</div><div class="game-bet">Entry: 100-500 🪙 | Win: 18%</div></div>
-                    <div class="game-card" onclick="openGame('aviatrix')"><div class="game-icon">✈️</div><div class="game-name">Aviatrix</div><div class="game-desc">Fly & cashout!</div><div class="game-bet">Entry: 100-500 🪙 | Win: 15%</div></div>
+                    <div class="game-card" onclick="openGame('aviatrix')"><div class="game-icon">✈️</div><div class="game-name">Aviatrix</div><div class="game-desc">Live Casino Flight</div><div class="game-bet">Entry: 50-500 🪙 | Win: 15%</div></div>
                 </div>
             </div>
         </div>
@@ -903,7 +1010,7 @@
         let isOnline = navigator.onLine, wasMiningBeforeOffline = false, isAdShowing = false;
         let webViewTaskId = null, webViewTaskReward = 0, webViewRequiredTime = 60, webViewSeconds = 0, webViewTimerInterval = null;
 
-        // ================== CONFIG LOAD (FIXED - USING once) ==================
+        // ================== CONFIG LOAD ==================
         let gameConfigs = {};
 
         function loadGameConfigs() {
@@ -919,7 +1026,6 @@
         function updateGameUIConfigs() {
             const cards = document.querySelectorAll('.game-card');
             const gameKeys = ['xo', 'dice', 'target', 'card', 'memory', 'flappy', 'puzzle', 'bowling', 'coinflip', 'rps', 'aviatrix'];
-            
             cards.forEach((card, index) => {
                 if (gameKeys[index]) {
                     const config = gameConfigs[gameKeys[index]] || {};
@@ -932,7 +1038,7 @@
             });
         }
 
-        // ================== AVIATRIX GAME ==================
+        // ================== AVIATRIX GAME (LIVE CASINO STYLE) ==================
         let aviatrixData = {
             betAmount: 100,
             isFree: false,
@@ -942,13 +1048,39 @@
             history: [],
             totalFlights: 0,
             totalCrashes: 0,
-            currentFlight: null
+            totalProfit: 0,
+            totalUp: 0,
+            totalDown: 0,
+            currentFlight: null,
+            canvas: null,
+            ctx: null,
+            points: [],
+            flightStartTime: 0
         };
 
         function openAviatrixGame() {
-            document.getElementById('aviatrixOverlay').classList.add('show');
+            const overlay = document.getElementById('aviatrixOverlay');
+            overlay.classList.add('show');
             document.getElementById('aviatrixBetSection').style.display = 'block';
             document.getElementById('aviatrixGameBoard').style.display = 'none';
+            document.getElementById('aviatrixStatus').className = 'aviatrix-status waiting';
+            document.getElementById('aviatrixStatus').textContent = '✈️ Waiting for next round...';
+            document.getElementById('aviatrixRestartBtn').style.display = 'none';
+            document.getElementById('aviatrixCashoutBtn').style.display = 'none';
+            
+            // Initialize canvas
+            const canvas = document.getElementById('aviatrixCanvas');
+            canvas.width = canvas.parentElement.clientWidth - 20 || 350;
+            canvas.height = 260;
+            aviatrixData.canvas = canvas;
+            aviatrixData.ctx = canvas.getContext('2d');
+            aviatrixData.points = [];
+            aviatrixData.flightStartTime = 0;
+            
+            drawAviatrixGraph();
+            updateAviatrixUI();
+            updateAviatrixHistory();
+            startAviatrixLoop();
         }
 
         function closeAviatrixGame() {
@@ -962,13 +1094,14 @@
         function setAviatrixBet(a) {
             const config = gameConfigs.aviatrix || {};
             const max = config.maxEntry || 500;
-            aviatrixData.betAmount = Math.min(a, max);
+            const min = config.minEntry || 50;
+            aviatrixData.betAmount = Math.min(Math.max(a, min), max);
             document.getElementById('aviatrixBetAmount').value = aviatrixData.betAmount;
         }
 
         function playAviatrixPaid() {
             const config = gameConfigs.aviatrix || {};
-            let min = config.minEntry || 100, max = config.maxEntry || 500;
+            let min = config.minEntry || 50, max = config.maxEntry || 500;
             let bet = parseInt(document.getElementById('aviatrixBetAmount').value) || min;
             bet = Math.max(min, Math.min(bet, max));
             
@@ -985,6 +1118,11 @@
             
             document.getElementById('aviatrixBetSection').style.display = 'none';
             document.getElementById('aviatrixGameBoard').style.display = 'block';
+            document.getElementById('aviatrixCashoutBtn').style.display = 'block';
+            document.getElementById('aviatrixCashoutBtn').disabled = false;
+            document.getElementById('aviatrixRestartBtn').style.display = 'none';
+            document.getElementById('aviatrixRewardInfo').textContent = '';
+            
             startAviatrixFlight();
         }
 
@@ -994,6 +1132,10 @@
                 aviatrixData.isFree = true;
                 document.getElementById('aviatrixBetSection').style.display = 'none';
                 document.getElementById('aviatrixGameBoard').style.display = 'block';
+                document.getElementById('aviatrixCashoutBtn').style.display = 'block';
+                document.getElementById('aviatrixCashoutBtn').disabled = false;
+                document.getElementById('aviatrixRestartBtn').style.display = 'none';
+                document.getElementById('aviatrixRewardInfo').textContent = '';
                 startAviatrixFlight();
             }).catch(() => showToast('Ad not watched!', 'error'));
         }
@@ -1007,17 +1149,19 @@
             aviatrixData.multiplier = 1.00;
             aviatrixData.crashed = false;
             aviatrixData.gameActive = true;
+            aviatrixData.points = [{x: 0, y: 260}];
+            aviatrixData.flightStartTime = Date.now();
+            
+            document.getElementById('aviatrixStatus').className = 'aviatrix-status flying';
             document.getElementById('aviatrixStatus').textContent = '✈️ Flying...';
-            document.getElementById('aviatrixStatus').className = 'xo-status';
-            document.getElementById('aviatrixRewardInfo').textContent = '';
-            document.getElementById('aviatrixCashoutBtn').style.display = 'block';
+            document.getElementById('aviatrixMultiplier').textContent = '1.00x';
+            document.getElementById('aviatrixMultiplier').className = 'multiplier-value low';
             document.getElementById('aviatrixCashoutBtn').disabled = false;
-            document.getElementById('aviatrixRestartBtn').style.display = 'none';
             
             updateAviatrixUI();
             
-            const speed = 0.05 + Math.random() * 0.05;
-            const crashPoint = 1.5 + Math.random() * 8.5;
+            const speed = 0.04 + Math.random() * 0.06;
+            let crashPoint = 1.2 + Math.random() * 8.8;
             
             aviatrixData.currentFlight = setInterval(() => {
                 if (!aviatrixData.gameActive) return;
@@ -1025,13 +1169,105 @@
                 aviatrixData.multiplier += speed;
                 aviatrixData.multiplier = Math.round(aviatrixData.multiplier * 100) / 100;
                 
+                // Update graph
+                const elapsed = (Date.now() - aviatrixData.flightStartTime) / 1000;
+                const x = elapsed * 80;
+                const y = 260 - (aviatrixData.multiplier - 1) * 40;
+                aviatrixData.points.push({x: Math.min(x, 350), y: Math.max(y, 10)});
+                
+                // Update multiplier display
+                const multEl = document.getElementById('aviatrixMultiplier');
+                multEl.textContent = aviatrixData.multiplier.toFixed(2) + 'x';
+                if (aviatrixData.multiplier >= 5) {
+                    multEl.className = 'multiplier-value high';
+                } else if (aviatrixData.multiplier >= 2) {
+                    multEl.className = 'multiplier-value medium';
+                } else {
+                    multEl.className = 'multiplier-value low';
+                }
+                
+                drawAviatrixGraph();
+                
+                // Check crash
                 if (aviatrixData.multiplier >= crashPoint) {
                     crashAviatrix();
                     return;
                 }
                 
                 updateAviatrixUI();
-            }, 100);
+            }, 80);
+        }
+
+        function drawAviatrixGraph() {
+            const canvas = aviatrixData.canvas;
+            const ctx = aviatrixData.ctx;
+            if (!canvas || !ctx) return;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Grid lines
+            ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < 10; i++) {
+                const y = (i / 10) * canvas.height;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+            
+            // Draw flight path
+            if (aviatrixData.points.length > 1) {
+                ctx.beginPath();
+                ctx.moveTo(aviatrixData.points[0].x, aviatrixData.points[0].y);
+                for (let i = 1; i < aviatrixData.points.length; i++) {
+                    ctx.lineTo(aviatrixData.points[i].x, aviatrixData.points[i].y);
+                }
+                
+                // Gradient for the line
+                const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+                if (aviatrixData.crashed) {
+                    gradient.addColorStop(0, '#ef4444');
+                    gradient.addColorStop(1, '#dc2626');
+                } else {
+                    gradient.addColorStop(0, '#10b981');
+                    gradient.addColorStop(0.5, '#fbbf24');
+                    gradient.addColorStop(1, '#ef4444');
+                }
+                ctx.strokeStyle = gradient;
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                
+                // Glow effect
+                ctx.shadowColor = aviatrixData.crashed ? 'rgba(239,68,68,0.3)' : 'rgba(16,185,129,0.3)';
+                ctx.shadowBlur = 15;
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+                
+                // Current position dot
+                if (!aviatrixData.crashed && aviatrixData.points.length > 0) {
+                    const last = aviatrixData.points[aviatrixData.points.length - 1];
+                    ctx.beginPath();
+                    ctx.arc(last.x, last.y, 6, 0, Math.PI * 2);
+                    ctx.fillStyle = '#fbbf24';
+                    ctx.shadowColor = 'rgba(251,191,36,0.5)';
+                    ctx.shadowBlur = 20;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                }
+            }
+            
+            // Crash indicator
+            if (aviatrixData.crashed) {
+                ctx.fillStyle = 'rgba(239,68,68,0.15)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#ef4444';
+                ctx.font = 'bold 24px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('💥 CRASHED', canvas.width/2, canvas.height/2 - 10);
+                ctx.font = '16px sans-serif';
+                ctx.fillText('@ ' + aviatrixData.multiplier.toFixed(2) + 'x', canvas.width/2, canvas.height/2 + 30);
+            }
         }
 
         function cashoutAviatrix() {
@@ -1044,7 +1280,6 @@
             }
             
             let reward = 0;
-            const bonus = (gameConfigs.aviatrix?.bonus || 15);
             const multiplier = aviatrixData.multiplier;
             
             if (aviatrixData.isFree) {
@@ -1054,6 +1289,8 @@
                 reward = Math.floor(aviatrixData.betAmount * multiplier);
                 app.balance += reward;
                 app.xpPoints += reward * 2;
+                aviatrixData.totalProfit += reward - aviatrixData.betAmount;
+                aviatrixData.totalUp++;
             }
             
             aviatrixData.totalFlights++;
@@ -1065,8 +1302,8 @@
                 time: new Date().toISOString()
             });
             
+            document.getElementById('aviatrixStatus').className = 'aviatrix-status win';
             document.getElementById('aviatrixStatus').textContent = `🎉 Cashed out at ${multiplier.toFixed(2)}x!`;
-            document.getElementById('aviatrixStatus').className = 'xo-status win';
             document.getElementById('aviatrixRewardInfo').textContent = `+${reward} Coins`;
             document.getElementById('aviatrixCashoutBtn').style.display = 'none';
             document.getElementById('aviatrixRestartBtn').style.display = 'block';
@@ -1076,6 +1313,7 @@
             updateLevelUI();
             updateAviatrixUI();
             updateAviatrixHistory();
+            drawAviatrixGraph();
             showToast(`✈️ +${reward} Coins!`);
         }
 
@@ -1084,6 +1322,7 @@
             aviatrixData.gameActive = false;
             aviatrixData.totalFlights++;
             aviatrixData.totalCrashes++;
+            aviatrixData.totalDown++;
             
             if (aviatrixData.currentFlight) {
                 clearInterval(aviatrixData.currentFlight);
@@ -1094,6 +1333,9 @@
             if (aviatrixData.isFree) {
                 reward = 20;
                 app.balance += reward;
+                aviatrixData.totalProfit += 20;
+            } else {
+                aviatrixData.totalProfit -= aviatrixData.betAmount;
             }
             
             aviatrixData.history.push({
@@ -1104,8 +1346,8 @@
                 time: new Date().toISOString()
             });
             
+            document.getElementById('aviatrixStatus').className = 'aviatrix-status lose';
             document.getElementById('aviatrixStatus').textContent = `💥 Crashed at ${aviatrixData.multiplier.toFixed(2)}x!`;
-            document.getElementById('aviatrixStatus').className = 'xo-status lose';
             document.getElementById('aviatrixRewardInfo').textContent = aviatrixData.isFree ? '+20 Coins' : `-${aviatrixData.betAmount} Coins`;
             document.getElementById('aviatrixCashoutBtn').style.display = 'none';
             document.getElementById('aviatrixRestartBtn').style.display = 'block';
@@ -1115,51 +1357,63 @@
                 updateUI();
             }
             
+            drawAviatrixGraph();
             updateAviatrixUI();
             updateAviatrixHistory();
         }
 
         function updateAviatrixUI() {
-            document.getElementById('aviatrixMultiplier').textContent = aviatrixData.multiplier.toFixed(2) + 'x';
-            document.getElementById('aviatrixBetDisplay').textContent = aviatrixData.betAmount;
             document.getElementById('aviatrixTotalFlights').textContent = aviatrixData.totalFlights;
             document.getElementById('aviatrixTotalCrashes').textContent = aviatrixData.totalCrashes;
+            document.getElementById('aviatrixTotalProfit').textContent = (aviatrixData.totalProfit >= 0 ? '+' : '') + aviatrixData.totalProfit;
+            document.getElementById('aviatrixTotalProfit').className = 'stat-value ' + (aviatrixData.totalProfit >= 0 ? 'green' : 'red');
             
-            const multiplierEl = document.getElementById('aviatrixMultiplier');
-            if (aviatrixData.multiplier >= 5) {
-                multiplierEl.style.color = '#10b981';
-            } else if (aviatrixData.multiplier >= 2) {
-                multiplierEl.style.color = '#fbbf24';
-            } else {
-                multiplierEl.style.color = '#fff';
-            }
+            const totalGames = aviatrixData.totalUp + aviatrixData.totalDown || 1;
+            const winRate = Math.round((aviatrixData.totalUp / totalGames) * 100);
+            document.getElementById('rtTotalUp').textContent = aviatrixData.totalUp;
+            document.getElementById('rtTotalDown').textContent = aviatrixData.totalDown;
+            document.getElementById('rtWinRate').textContent = winRate + '%';
+            
+            // Average multiplier
+            const avg = aviatrixData.history.length > 0 
+                ? aviatrixData.history.reduce((sum, h) => sum + h.multiplier, 0) / aviatrixData.history.length 
+                : 0;
+            document.getElementById('aviatrixAvgMultiplier').textContent = avg.toFixed(2) + 'x';
         }
 
         function updateAviatrixHistory() {
             const container = document.getElementById('aviatrixHistoryList');
-            const history = aviatrixData.history.slice(-10).reverse();
+            const history = aviatrixData.history.slice(-15).reverse();
             
             if (history.length === 0) {
-                container.innerHTML = '<span style="color:#94a3b8;font-size:11px;">No history yet</span>';
+                container.innerHTML = '<span style="color:#94a3b8;font-size:12px;">No history yet</span>';
                 return;
             }
             
             container.innerHTML = history.map(h => `
                 <div class="history-item">
-                    <div>
-                        <b>${h.bet} 🪙</b>
-                        <span style="color:${h.result === 'win' ? '#10b981' : '#ef4444'}">
-                            ${h.result === 'win' ? '✅' : '❌'} ${h.multiplier.toFixed(2)}x
-                        </span>
-                    </div>
-                    <div style="text-align:right;">
-                        <span style="color:${h.result === 'win' ? '#10b981' : '#ef4444'};">
-                            ${h.result === 'win' ? '+' : ''}${h.reward} 🪙
-                        </span>
-                        <div style="font-size:9px;color:#64748b;">${new Date(h.time).toLocaleTimeString()}</div>
-                    </div>
+                    <span class="h-bet">${h.bet} 🪙</span>
+                    <span class="h-mult ${h.result === 'win' ? 'win' : 'lose'}">${h.multiplier.toFixed(2)}x</span>
+                    <span class="h-reward ${h.result === 'win' ? 'win' : 'lose'}">${h.result === 'win' ? '+' : ''}${h.reward}</span>
+                    <span style="font-size:9px;color:#64748b;">${new Date(h.time).toLocaleTimeString()}</span>
                 </div>
             `).join('');
+        }
+
+        function startAviatrixLoop() {
+            // Auto-start rounds if not active
+            if (!aviatrixData.gameActive && !aviatrixData.crashed) {
+                // Check if we should auto-start a new round
+                const status = document.getElementById('aviatrixStatus');
+                if (status.textContent.includes('Waiting') || status.textContent.includes('Crashed')) {
+                    // Auto-start after 3 seconds
+                    setTimeout(() => {
+                        if (!aviatrixData.gameActive && !aviatrixData.crashed) {
+                            // Show waiting status
+                        }
+                    }, 3000);
+                }
+            }
         }
 
         function resetAviatrixGame() {
@@ -1170,11 +1424,19 @@
             aviatrixData.gameActive = false;
             aviatrixData.crashed = false;
             aviatrixData.multiplier = 1.00;
+            aviatrixData.points = [];
+            
             document.getElementById('aviatrixBetSection').style.display = 'block';
             document.getElementById('aviatrixGameBoard').style.display = 'none';
             document.getElementById('aviatrixRestartBtn').style.display = 'none';
-            document.getElementById('aviatrixCashoutBtn').style.display = 'block';
-            document.getElementById('aviatrixCashoutBtn').disabled = false;
+            document.getElementById('aviatrixCashoutBtn').style.display = 'none';
+            document.getElementById('aviatrixStatus').className = 'aviatrix-status waiting';
+            document.getElementById('aviatrixStatus').textContent = '✈️ Waiting for next round...';
+            document.getElementById('aviatrixMultiplier').textContent = '1.00x';
+            document.getElementById('aviatrixMultiplier').className = 'multiplier-value low';
+            document.getElementById('aviatrixRewardInfo').textContent = '';
+            
+            drawAviatrixGraph();
             updateAviatrixUI();
         }
 
@@ -2347,7 +2609,6 @@
             userRef.update({ isCurrentlyMining: true, lastMiningActivity: Date.now() }); wasMiningBeforeOffline = true;
             function mnc() {
                 if (!isOnline || isAdShowing || app.progressCoins <= 0) { stopMining(); return; }
-                // LEVEL BONUS CALCULATION - NOW WORKING
                 const d = calculateLevel(app.xpPoints);
                 let sm = 1 + (d.bonusPercent / 100);
                 
