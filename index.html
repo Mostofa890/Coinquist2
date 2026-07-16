@@ -397,6 +397,7 @@
                 <h3 style="color:#fbbf24;margin-bottom:10px;">Select Game Mode</h3>
                 <div class="game-grid" style="grid-template-columns:1fr 1fr;">
                     <div class="game-card" onclick="startXOGame('computer')"><div class="game-icon">🤖</div><div class="game-name">vs Computer</div><div class="game-desc">Play against AI</div><div class="game-bet">Entry: 100-500 🪙 | Win: 10%</div></div>
+                    <div class="game-card" onclick="startXOGame('local2p')"><div class="game-icon">👥</div><div class="game-name">Local 2 Players</div><div class="game-desc">Play with friend (same device)</div><div class="game-bet">Entry: 100-500 🪙 | Win: 10%</div></div>
                     <div class="game-card" onclick="startXOGame('online')"><div class="game-icon">🌐</div><div class="game-name">Online</div><div class="game-desc">Real players</div><div class="game-bet">Entry: 100-500 🪙 | Win: 10%</div></div>
                 </div>
             </div>
@@ -936,9 +937,10 @@
         }
         function resetCardGame() { cardGameData.rewardGiven = false; document.getElementById('cardBetSection').style.display = 'block'; document.getElementById('cardGameBoard').style.display = 'none'; document.getElementById('cardGameBoard').querySelector('.restart').style.display = 'none'; document.getElementById('playerCard').innerHTML = '<span class="card-value">?</span><span class="card-suit">?</span>'; document.getElementById('opponentCard').innerHTML = '<span class="card-value">?</span><span class="card-suit">?</span>'; document.getElementById('playerCard').className = 'game-card-item'; document.getElementById('opponentCard').className = 'game-card-item'; updateGameOverlayUI('cardBetSection', 'card'); }
 
-        // ================== XO GAME (UPDATED) ==================
+        // ================== XO GAME (UPDATED & FIXED) ==================
         let xoGameData = { mode: null, betAmount: 100, board: Array(9).fill(''), mySymbol: 'X', opponentSymbol: 'O', gameActive: false, gameOver: false, winner: null, onlineGameId: null, isMyTurn: true, gameRef: null, rewardGiven: false, winningCombo: null, isFree: false };
         let xoAITimeout = null;
+        let xoLocal2P = { currentPlayer: 'X', gameActive: false };
 
         function openXOGame() {
             if (!isOnline) return;
@@ -990,6 +992,8 @@
 
             if (xoGameData.mode === 'computer') {
                 initComputerGame();
+            } else if (xoGameData.mode === 'local2p') {
+                initLocal2PGame();
             } else {
                 initOnlineGame();
             }
@@ -1000,10 +1004,12 @@
                 xoGameData.betAmount = 100;
                 xoGameData.isFree = true;
                 if (xoGameData.mode === 'computer') initComputerGame();
+                else if (xoGameData.mode === 'local2p') initLocal2PGame();
                 else initOnlineGame();
             }).catch(() => showToast('Ad not watched!', 'error'));
         }
 
+        // ================== COMPUTER MODE ==================
         function initComputerGame() {
             document.getElementById('xoBetSection').style.display = 'none';
             document.getElementById('xoGameBoard').style.display = 'block';
@@ -1025,6 +1031,31 @@
             renderXOBoard();
         }
 
+        // ================== LOCAL 2 PLAYER MODE (NEW) ==================
+        function initLocal2PGame() {
+            document.getElementById('xoBetSection').style.display = 'none';
+            document.getElementById('xoGameBoard').style.display = 'block';
+            xoGameData.board = Array(9).fill('');
+            xoGameData.mySymbol = 'X'; // Player 1
+            xoGameData.opponentSymbol = 'O'; // Player 2
+            xoGameData.gameActive = true;
+            xoGameData.gameOver = false;
+            xoGameData.winner = null;
+            xoGameData.isMyTurn = true;
+            xoGameData.rewardGiven = false;
+            xoLocal2P.currentPlayer = 'X';
+            xoLocal2P.gameActive = true;
+            document.getElementById('xoStatus').textContent = 'Player 1 (X) turn!';
+            document.getElementById('xoStatus').className = 'xo-status';
+            document.getElementById('xoRewardInfo').textContent = '';
+            document.getElementById('xoRestartBtn').style.display = 'none';
+            document.getElementById('xoPlayer1Badge').querySelector('.player-symbol').textContent = 'X';
+            document.getElementById('xoPlayer2Badge').querySelector('.player-symbol').textContent = 'O';
+            document.getElementById('xoPlayersInfo').style.display = 'flex';
+            renderXOBoard();
+        }
+
+        // ================== ONLINE MODE (FIXED) ==================
         function initOnlineGame() {
             document.getElementById('xoBetSection').style.display = 'none';
             document.getElementById('xoGameBoard').style.display = 'none';
@@ -1066,6 +1097,7 @@
                 winner: null,
                 isFree: xoGameData.isFree
             }).then(() => {
+                // Waiting for opponent
                 setTimeout(() => {
                     db.ref('xoWaitingGames/' + gid).once('value', s => {
                         if (s.exists() && !s.val().player2Id) {
@@ -1080,6 +1112,7 @@
                         }
                     });
                 }, 30000);
+                
                 db.ref('xoWaitingGames/' + gid).on('value', s => {
                     const d = s.val();
                     if (!d) {
@@ -1101,9 +1134,19 @@
             xoGameData.opponentSymbol = 'X';
             xoGameData.isMyTurn = false;
             xoGameData.gameRef = db.ref('xoGames/' + gid);
-            db.ref('xoGames/' + gid).set({ ...gd, player2Id: userId, started: true, gameActive: true }).then(() => {
+            db.ref('xoGames/' + gid).set({ 
+                ...gd, 
+                player2Id: userId, 
+                started: true, 
+                gameActive: true 
+            }).then(() => {
                 db.ref('xoWaitingGames/' + gid).remove();
-                startOnlineGame(gid, { ...gd, player2Id: userId, started: true, gameActive: true });
+                startOnlineGame(gid, { 
+                    ...gd, 
+                    player2Id: userId, 
+                    started: true, 
+                    gameActive: true 
+                });
             });
         }
 
@@ -1113,11 +1156,17 @@
             xoGameData.board = gd.board || Array(9).fill('');
             xoGameData.gameActive = true;
             xoGameData.isMyTurn = gd.currentTurn === xoGameData.mySymbol;
+            xoGameData.gameOver = false;
+            xoGameData.winner = gd.winner || null;
             document.getElementById('xoPlayer1Badge').querySelector('.player-symbol').textContent = xoGameData.mySymbol;
             document.getElementById('xoPlayer2Badge').querySelector('.player-symbol').textContent = xoGameData.opponentSymbol;
             document.getElementById('xoPlayersInfo').style.display = 'flex';
-            updateXOStatus();
+            document.getElementById('xoStatus').textContent = xoGameData.isMyTurn ? 'Your turn!' : 'Opponent\'s turn...';
+            document.getElementById('xoStatus').className = 'xo-status';
+            document.getElementById('xoRewardInfo').textContent = '';
+            document.getElementById('xoRestartBtn').style.display = 'none';
             renderXOBoard();
+            
             if (xoGameData.gameRef) xoGameData.gameRef.off();
             xoGameData.gameRef = db.ref('xoGames/' + gid);
             xoGameData.gameRef.on('value', s => {
@@ -1131,6 +1180,7 @@
                     }
                     return;
                 }
+                // Update board only if changed
                 if (d.board && JSON.stringify(d.board) !== JSON.stringify(xoGameData.board)) {
                     xoGameData.board = d.board;
                     xoGameData.isMyTurn = d.currentTurn === xoGameData.mySymbol;
@@ -1138,8 +1188,10 @@
                     xoGameData.winner = d.winner;
                     xoGameData.winningCombo = d.winningCombo;
                     renderXOBoard();
-                    updateXOStatus();
                     if (d.winner && !xoGameData.rewardGiven) handleGameEnd(d.winner);
+                    else {
+                        document.getElementById('xoStatus').textContent = xoGameData.isMyTurn ? 'Your turn!' : 'Opponent\'s turn...';
+                    }
                 }
             });
         }
@@ -1160,19 +1212,35 @@
         }
 
         function makeXOMove(i) {
-            if (!xoGameData.gameActive || xoGameData.gameOver || xoGameData.board[i] !== '' || !xoGameData.isMyTurn) return;
-            xoGameData.board[i] = xoGameData.mySymbol;
-            xoGameData.isMyTurn = false;
+            if (!xoGameData.gameActive || xoGameData.gameOver || xoGameData.board[i] !== '') return;
+            
+            // Check turn logic
+            if (xoGameData.mode === 'local2p') {
+                if (xoLocal2P.currentPlayer === 'X' && xoGameData.board[i] !== '') return;
+                if (xoLocal2P.currentPlayer === 'O' && xoGameData.board[i] !== '') return;
+                xoGameData.board[i] = xoLocal2P.currentPlayer;
+                xoLocal2P.currentPlayer = xoLocal2P.currentPlayer === 'X' ? 'O' : 'X';
+                document.getElementById('xoStatus').textContent = `Player ${xoLocal2P.currentPlayer} turn!`;
+            } else {
+                if (!xoGameData.isMyTurn) return;
+                xoGameData.board[i] = xoGameData.mySymbol;
+                xoGameData.isMyTurn = false;
+            }
+            
             const w = checkXOWinner();
             if (xoGameData.mode === 'computer') {
                 renderXOBoard();
-                updateXOStatus();
                 if (w) handleGameEnd(w);
                 else if (!xoGameData.board.includes('')) handleGameEnd('draw');
                 else {
                     xoAITimeout = setTimeout(makeAIMove, 500 + Math.random() * 1000);
                 }
+            } else if (xoGameData.mode === 'local2p') {
+                renderXOBoard();
+                if (w) handleGameEnd(w);
+                else if (!xoGameData.board.includes('')) handleGameEnd('draw');
             } else {
+                // Online mode
                 xoGameData.gameRef.update({
                     board: xoGameData.board,
                     currentTurn: xoGameData.opponentSymbol,
@@ -1181,7 +1249,6 @@
                     winningCombo: xoGameData.winningCombo || null
                 });
                 renderXOBoard();
-                updateXOStatus();
                 if (w) handleGameEnd(w);
                 else if (!xoGameData.board.includes('')) {
                     handleGameEnd('draw');
@@ -1193,6 +1260,7 @@
         function makeAIMove() {
             if (!xoGameData.gameActive) return;
             const b = [...xoGameData.board];
+            // Win if possible
             for (let i = 0; i < 9; i++) {
                 if (b[i] === '') {
                     b[i] = 'O';
@@ -1200,6 +1268,7 @@
                     b[i] = '';
                 }
             }
+            // Block opponent win
             for (let i = 0; i < 9; i++) {
                 if (b[i] === '') {
                     b[i] = 'X';
@@ -1207,9 +1276,12 @@
                     b[i] = '';
                 }
             }
+            // Center
             if (b[4] === '') { finalizeAIMove(4); return; }
+            // Corners
             const corners = [0, 2, 6, 8].filter(i => b[i] === '');
             if (corners.length) { finalizeAIMove(corners[Math.floor(Math.random() * corners.length)]); return; }
+            // Edges
             const edges = [1, 3, 5, 7].filter(i => b[i] === '');
             if (edges.length) finalizeAIMove(edges[Math.floor(Math.random() * edges.length)]);
         }
@@ -1219,21 +1291,15 @@
             xoGameData.isMyTurn = true;
             const w = checkXOWinner();
             renderXOBoard();
-            updateXOStatus();
             if (w) handleGameEnd(w);
             else if (!xoGameData.board.includes('')) handleGameEnd('draw');
         }
 
         function checkXOWinner() {
             const wp = [
-                [0, 1, 2],
-                [3, 4, 5],
-                [6, 7, 8],
-                [0, 3, 6],
-                [1, 4, 7],
-                [2, 5, 8],
-                [0, 4, 8],
-                [2, 4, 6]
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
             ];
             for (const [a, b, c] of wp) {
                 if (xoGameData.board[a] && xoGameData.board[a] === xoGameData.board[b] && xoGameData.board[a] === xoGameData.board[c]) {
@@ -1246,14 +1312,9 @@
 
         function checkXOWinnerForSymbol(b, s) {
             const wp = [
-                [0, 1, 2],
-                [3, 4, 5],
-                [6, 7, 8],
-                [0, 3, 6],
-                [1, 4, 7],
-                [2, 5, 8],
-                [0, 4, 8],
-                [2, 4, 6]
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
             ];
             return wp.some(([a, b2, c]) => b[a] === s && b[b2] === s && b[c] === s);
         }
@@ -1263,15 +1324,14 @@
             xoGameData.rewardGiven = true;
             xoGameData.gameActive = false;
             xoGameData.gameOver = true;
-            let reward = 0,
-                msg = '';
+            let reward = 0, msg = '';
             const bonus = (gameConfigs.xo?.bonus || 10);
+            
             if (r === 'draw') {
                 msg = '🤝 Draw!';
                 document.getElementById('xoStatus').className = 'xo-status draw';
-                if (!xoGameData.isFree) { reward = xoGameData.betAmount;
-                    app.balance += reward; }
-            } else if (r === xoGameData.mySymbol) {
+                if (!xoGameData.isFree) { reward = xoGameData.betAmount; app.balance += reward; }
+            } else if (r === xoGameData.mySymbol || (xoGameData.mode === 'local2p' && r === 'X')) {
                 msg = '🎉 You win!';
                 document.getElementById('xoStatus').className = 'xo-status win';
                 reward = xoGameData.betAmount + Math.floor(xoGameData.betAmount * (bonus/100));
@@ -1281,38 +1341,38 @@
                 msg = '😞 You lose!';
                 document.getElementById('xoStatus').className = 'xo-status lose';
             }
-            if (xoGameData.isFree) { reward = 20;
-                app.balance += reward; }
+            if (xoGameData.isFree) { reward = 20; app.balance += reward; }
             document.getElementById('xoStatus').textContent = msg;
             document.getElementById('xoRewardInfo').textContent = reward > 0 ? `+${reward} Coins` : (xoGameData.isFree ? '+20 Coins' : `-${xoGameData.betAmount} Coins`);
             document.getElementById('xoRestartBtn').style.display = 'block';
             userRef.update({ balance: app.balance, xpPoints: app.xpPoints });
-            updateUI();
-            updateLevelUI();
-            renderXOBoard();
-        }
-
-        function updateXOStatus() {
-            if (xoGameData.gameOver) return;
-            document.getElementById('xoStatus').textContent = xoGameData.isMyTurn ? 'Your turn!' : (xoGameData.mode === 'computer' ? 'Computer thinking...' : 'Opponent\'s turn...');
+            updateUI(); updateLevelUI(); renderXOBoard();
         }
 
         function restartXOGame() {
             resetXOGame();
             if (xoGameData.mode === 'online') {
-                if (xoGameData.gameRef) { xoGameData.gameRef.remove();
-                    xoGameData.gameRef = null; }
+                if (xoGameData.gameRef) { 
+                    xoGameData.gameRef.remove(); 
+                    xoGameData.gameRef = null; 
+                }
                 closeXOGame();
                 return;
             }
             const config = gameConfigs.xo || {};
             let minEntry = config.minEntry || 100;
-            if (!xoGameData.isFree && app.balance < minEntry) { closeXOGame();
-                showToast('Not enough!', 'error'); return; }
-            if (!xoGameData.isFree) { app.balance -= xoGameData.betAmount;
-                userRef.update({ balance: app.balance });
-                updateUI(); }
-            initComputerGame();
+            if (!xoGameData.isFree && app.balance < minEntry) { 
+                closeXOGame(); 
+                showToast('Not enough!', 'error'); 
+                return; 
+            }
+            if (!xoGameData.isFree) { 
+                app.balance -= xoGameData.betAmount; 
+                userRef.update({ balance: app.balance }); 
+                updateUI(); 
+            }
+            if (xoGameData.mode === 'computer') initComputerGame();
+            else if (xoGameData.mode === 'local2p') initLocal2PGame();
         }
 
         function resetXOGame() {
@@ -1323,12 +1383,13 @@
             xoGameData.isMyTurn = true;
             xoGameData.rewardGiven = false;
             xoGameData.winningCombo = null;
+            xoLocal2P.currentPlayer = 'X';
+            xoLocal2P.gameActive = false;
             document.getElementById('xoGameBoard').style.display = 'none';
             document.getElementById('xoModeSelection').style.display = 'block';
             document.getElementById('xoBetSection').style.display = 'none';
             document.getElementById('xoOnlineInfo').style.display = 'none';
-            if (xoAITimeout) { clearTimeout(xoAITimeout);
-                xoAITimeout = null; }
+            if (xoAITimeout) { clearTimeout(xoAITimeout); xoAITimeout = null; }
         }
 
         // ================== MEMORY GAME (UPDATED) ==================
@@ -1575,7 +1636,6 @@
         function closeSpinModal() { document.getElementById('spinModal').classList.remove('show'); }
         function updateSpinModalUI() { document.getElementById('modalSpinCount').textContent = `Spins: ${spinCount}/${SPIN_COUNT_LIMIT}`; }
         
-        // ================== UPDATED SPIN FUNCTION ==================
         function spinWheelFromModal() {
             if (!isOnline || isSpinning || spinCount <= 0) return;
             const btn = document.getElementById('modalSpinBtn'); btn.disabled = true; isSpinning = true;
@@ -1594,16 +1654,13 @@
                     // Coins পেলে mining coins (progressCoins) এ যোগ হবে
                     app.progressCoins += p.value;
                     app.xpPoints += p.value * 2;
-                    // UI আপডেট
-                    updateProgressUI();
-                    updateLevelUI();
+                    updateProgressUI(); updateLevelUI();
                 } else {
                     // USD পেলে usdBalance এ যোগ হবে
                     app.usdBalance += p.value;
                 }
                 spinCount--;
-                document.getElementById('spinBadge').textContent = spinCount;
-                updateSpinModalUI();
+                document.getElementById('spinBadge').textContent = spinCount; updateSpinModalUI();
                 document.getElementById('rewardText').textContent = `You won ${p.label}!`;
                 document.getElementById('successModal').classList.add('active');
                 userRef.update({ 
@@ -1616,9 +1673,7 @@
                 updateUI();
                 isSpinning = false;
             }).catch(() => {
-                btn.disabled = false;
-                isSpinning = false;
-                showToast('Ad not watched!', 'error');
+                btn.disabled = false; isSpinning = false; showToast('Ad not watched!', 'error');
             });
         }
 
