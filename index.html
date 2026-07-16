@@ -130,39 +130,34 @@
         .game-header .game-info { color: #94a3b8; font-size: 12px; }
         .game-content { padding: 10px 0; }
         
-        /* ================== XO GAME (Fixed CSS) ================== */
+        /* ================== XO GAME ================== */
         .xo-game-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: none; align-items: center; justify-content: center; }
         .xo-game-overlay.show { display: flex; }
         .xo-game-container { background: rgba(30,41,59,0.98); padding: 20px; border-radius: 20px; width: 90%; max-width: 380px; text-align: center; border: 1px solid rgba(255,255,255,0.1); max-height: 90vh; overflow-y: auto; }
         .xo-game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .xo-game-header .back-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; }
-        
         .xo-bet-section { margin: 10px 0; }
         .xo-bet-section label { font-size: 14px; color: #fbbf24; display: block; margin-bottom: 8px; }
         .xo-bet-input { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
         .bet-preset { background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 8px; cursor: pointer; color: #94a3b8; font-weight: 600; transition: 0.3s; }
         .bet-preset:hover { background: #fbbf24; color: #0f172a; }
         .xo-bet-input input { width: 80px; padding: 8px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #fff; text-align: center; font-size: 16px; }
-        
         .xo-action-btn { width: 100%; padding: 12px; border: none; border-radius: 12px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; font-weight: 700; font-size: 15px; cursor: pointer; margin: 6px 0; transition: 0.3s; }
         .xo-action-btn.free { background: linear-gradient(135deg, #10b981, #059669); }
         .xo-action-btn.restart { background: linear-gradient(135deg, #f59e0b, #d97706); }
         .xo-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        
         .xo-online-info { color: #fbbf24; font-size: 16px; padding: 20px; animation: pulse 1.5s infinite; }
         .xo-online-players { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; }
         .xo-player-badge { background: rgba(255,255,255,0.05); padding: 8px 15px; border-radius: 12px; text-align: center; }
         .player-symbol { font-size: 28px; font-weight: 900; }
         .x-player { color: #3b82f6; }
         .o-player { color: #ef4444; }
-        
         .xo-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; max-width: 240px; margin: 15px auto; }
         .xo-cell { background: rgba(255,255,255,0.05); aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 900; border-radius: 12px; cursor: pointer; border: 2px solid rgba(255,255,255,0.1); transition: 0.3s; }
         .xo-cell:hover { background: rgba(255,255,255,0.1); }
         .xo-cell.x-player { color: #3b82f6; }
         .xo-cell.o-player { color: #ef4444; }
         .xo-cell.win-cell { background: rgba(16,185,129,0.2); border-color: #10b981; animation: pulse 1s infinite; }
-        
         .xo-status { font-size: 18px; font-weight: 700; margin: 10px 0; }
         .xo-status.win { color: #10b981; }
         .xo-status.lose { color: #ef4444; }
@@ -650,7 +645,28 @@
         <div class="page" id="pageWallet">
             <h2 class="page-header">💰 Wallet</h2>
             <div class="wallet-card"><p>Coins Balance</p><div class="wallet-balance" id="walletBalance">0</div><div id="walletUsd" style="color:#10b981;font-size:18px;font-weight:bold;">≈ $0.0000</div><div style="background:rgba(16,185,129,0.1);border-radius:10px;padding:10px;margin-top:15px;"><div>💵 Total USD</div><div id="walletTotalUsd" style="font-size:18px;font-weight:bold;color:#10b981;">$0.0000</div></div>
-                <div class="withdraw-section"><p id="withdrawInfo" style="font-weight:bold;color:#fbbf24;">Min: $10.0000</p><div class="form-group"><label>Payment Method</label><div class="method-selector" id="methodSelector"></div></div><div class="form-group"><label>Account Number</label><input type="text" id="withdrawAccount" placeholder="Enter your account number..."></div><p id="withdrawStatus" style="font-size:11px;color:#94a3b8;">You have: $0.0000</p><button class="withdraw-btn" id="withdrawBtn" onclick="withdraw()">Withdraw Now</button></div>
+                <div class="withdraw-section">
+                    <p id="withdrawInfo" style="font-weight:bold;color:#fbbf24;">Min: $1.0000</p>
+                    <div class="form-group">
+                        <label>Payment Method</label>
+                        <div class="method-selector" id="methodSelector"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Amount ($)</label>
+                        <select id="withdrawAmountSelect" style="width:100%;padding:10px;background:#1e293b;color:#fff;border:1px solid #334155;border-radius:8px;font-size:14px;">
+                            <option value="1">$1.00</option>
+                            <option value="3">$3.00</option>
+                            <option value="5">$5.00</option>
+                            <option value="10">$10.00</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Account Number</label>
+                        <input type="text" id="withdrawAccount" placeholder="Enter your account number...">
+                    </div>
+                    <p id="withdrawStatus" style="font-size:11px;color:#94a3b8;">You have: $0.0000</p>
+                    <button class="withdraw-btn" id="withdrawBtn" onclick="withdraw()">Withdraw Now</button>
+                </div>
                 <div class="history-card"><div style="font-size:11px;color:#94a3b8;margin-bottom:8px;">📜 History</div><div id="withdrawHistoryList"></div></div>
                 <div class="rules-text"><div class="rule-title">📋 Withdraw Rules</div><div id="withdrawRulesText">Loading rules...</div></div>
             </div>
@@ -709,20 +725,69 @@
         function loadSpinConfig() { db.ref('spinConfig').on('value', snap => { const c = snap.val() || {}; if (c.usdPrizes) spinConfig.usdPrizes = c.usdPrizes; if (c.coinPrizes) spinConfig.coinPrizes = c.coinPrizes; buildPrizeData(); buildWheel(); }); }
         function buildPrizeData() { prizeData = [...spinConfig.coinPrizes.map(v => ({ label: `${v} 🎁`, value: v, type: 'coins' })), ...spinConfig.usdPrizes.map(v => ({ label: `$${v.toFixed(2)} 🎁`, value: v, type: 'usd' }))]; }
 
-        let app = { balance: 0, usdBalance: 0, referralCount: 0, lastConversion: null, conversionRate: 1000, minWithdraw: 10, withdrawHistory: [], referCode: '', referTiers: {}, progressCoins: TOTAL_COINS, speedBoostCooldown: 0, taskLastCompleted: {}, taskProgress: {}, airdropClaimed: false, xpPoints: NEGATIVE_XP, withdrawMethods: ['Nagad','Rocket'], selectedMethod: 'Nagad', isBanned: false, dailyBonusClaimed: 0, mysteryBoxCooldown: 0, dailyBonusMin: 50, dailyBonusMax: 100, mysteryBoxMin: 20, mysteryBoxMax: 100, mysteryBoxDuration: 1800000 };
+        let app = { balance: 0, usdBalance: 0, referralCount: 0, lastConversion: null, conversionRate: 1000, minWithdraw: 1, withdrawHistory: [], referCode: '', referTiers: {}, progressCoins: TOTAL_COINS, speedBoostCooldown: 0, taskLastCompleted: {}, taskProgress: {}, airdropClaimed: false, xpPoints: NEGATIVE_XP, withdrawMethods: ['Nagad','Rocket'], selectedMethod: 'Nagad', isBanned: false, dailyBonusClaimed: 0, mysteryBoxCooldown: 0, dailyBonusMin: 50, dailyBonusMax: 100, mysteryBoxMin: 20, mysteryBoxMax: 100, mysteryBoxDuration: 1800000 };
         let tasks = [], conversionTimer = null, miningInterval = null, airdropTimer = null, currentFilter = 'all', currentLevelFilter = 'all', referralConfigCache = {};
         let isOnline = navigator.onLine, wasMiningBeforeOffline = false, isAdShowing = false;
         let webViewTaskId = null, webViewTaskReward = 0, webViewRequiredTime = 60, webViewSeconds = 0, webViewTimerInterval = null;
 
-        // ================== GAME DATA ==================
-        let diceGameData = { betAmount: 100, isFree: false, rewardGiven: false };
-        let targetGameData = { betAmount: 100, isFree: false, rewardGiven: false };
-        let cardGameData = { betAmount: 100, isFree: false, rewardGiven: false };
-        let memoryGameData = { betAmount: 100, isFree: false, rewardGiven: false };
-        let flappyGameData = { betAmount: 100, isFree: false, rewardGiven: false };
-        let puzzleGameData = { betAmount: 100, isFree: false, rewardGiven: false };
+        // ================== CONFIG LOAD (DB থেকে সেটিংস লোড) ==================
+        let gameConfigs = {};
 
-        // ================== OPEN GAME ==================
+        function loadGameConfigs() {
+            db.ref('gameConfigs').on('value', snap => {
+                gameConfigs = snap.val() || {};
+                updateGameUIConfigs();
+            });
+        }
+
+        function updateGameUIConfigs() {
+            // Games page UI update
+            const cards = document.querySelectorAll('.game-card');
+            const gameKeys = ['xo', 'dice', 'target', 'card', 'memory', 'flappy', 'puzzle'];
+            const bonusKeys = ['xoBonus', 'diceBonus', 'targetBonus', 'cardBonus', 'memoryBonus', 'flappyBonus', 'puzzleBonus'];
+            
+            cards.forEach((card, index) => {
+                if (gameKeys[index]) {
+                    const config = gameConfigs[gameKeys[index]] || {};
+                    const minEntry = config.minEntry || 100;
+                    const maxEntry = config.maxEntry || 500;
+                    const bonus = config.bonus || 10;
+                    card.querySelector('.game-bet').textContent = `Entry: ${minEntry}-${maxEntry} 🪙 | Win: ${bonus}%`;
+                }
+            });
+
+            // Update individual game overlays (if open)
+            updateGameOverlayUI('xoBetSection', 'xo');
+            updateGameOverlayUI('diceBetSection', 'dice');
+            updateGameOverlayUI('targetBetSection', 'target');
+            updateGameOverlayUI('cardBetSection', 'card');
+            updateGameOverlayUI('memoryBetSection', 'memory');
+            updateGameOverlayUI('flappyBetSection', 'flappy');
+            updateGameOverlayUI('puzzleBetSection', 'puzzle');
+        }
+
+        function updateGameOverlayUI(sectionId, gameKey) {
+            const section = document.getElementById(sectionId);
+            if (section && section.style.display !== 'none') {
+                const config = gameConfigs[gameKey] || {};
+                const minEntry = config.minEntry || 100;
+                const maxEntry = config.maxEntry || 500;
+                const bonus = config.bonus || 10;
+                const label = section.querySelector('label');
+                if (label) label.textContent = `💰 Entry Fee (${minEntry}-${maxEntry}) | Win: +${bonus}% Bonus`;
+                
+                // Update input min/max
+                const input = section.querySelector('input[type="number"]');
+                if (input) {
+                    input.min = minEntry;
+                    input.max = maxEntry;
+                    if (parseInt(input.value) < minEntry) input.value = minEntry;
+                    if (parseInt(input.value) > maxEntry) input.value = maxEntry;
+                }
+            }
+        }
+
+        // ================== OPEN GAME (UPDATED) ==================
         function openGame(type) {
             if (type === 'xo') openXOGame();
             else if (type === 'dice') openDiceGame();
@@ -733,12 +798,26 @@
             else if (type === 'puzzle') openPuzzleGame();
         }
 
-        // ================== DICE GAME ==================
-        function openDiceGame() { document.getElementById('diceGameOverlay').classList.add('show'); document.getElementById('diceBetSection').style.display = 'block'; document.getElementById('diceGameBoard').style.display = 'none'; diceGameData.rewardGiven = false; }
+        // ================== DICE GAME (UPDATED) ==================
+        function openDiceGame() { 
+            document.getElementById('diceGameOverlay').classList.add('show'); 
+            document.getElementById('diceBetSection').style.display = 'block'; 
+            document.getElementById('diceGameBoard').style.display = 'none'; 
+            diceGameData.rewardGiven = false;
+            updateGameOverlayUI('diceBetSection', 'dice');
+        }
         function closeDiceGame() { document.getElementById('diceGameOverlay').classList.remove('show'); }
-        function setDiceBet(a) { diceGameData.betAmount = Math.min(a, 500); document.getElementById('diceBetAmount').value = diceGameData.betAmount; }
+        function setDiceBet(a) { 
+            const config = gameConfigs.dice || {};
+            const max = config.maxEntry || 500;
+            diceGameData.betAmount = Math.min(a, max); 
+            document.getElementById('diceBetAmount').value = diceGameData.betAmount; 
+        }
         function playDiceGamePaid() {
-            let bet = parseInt(document.getElementById('diceBetAmount').value) || 100; bet = Math.max(100, Math.min(bet, 500));
+            const config = gameConfigs.dice || {};
+            let min = config.minEntry || 100, max = config.maxEntry || 500;
+            let bet = parseInt(document.getElementById('diceBetAmount').value) || min; 
+            bet = Math.max(min, Math.min(bet, max));
             if (bet > app.balance) { showToast('Insufficient balance!', 'error'); return; }
             diceGameData.betAmount = bet; diceGameData.isFree = false; app.balance -= bet;
             userRef.update({ balance: app.balance }); updateUI();
@@ -761,7 +840,8 @@
                 const diceFaces = ['⚀','⚁','⚂','⚃','⚄','⚅'];
                 pd.textContent = diceFaces[pr-1]; od.textContent = diceFaces[or-1];
                 let reward = 0, msg = '';
-                if (pr > or) { msg = '🎉 You win!'; reward = diceGameData.betAmount + Math.floor(diceGameData.betAmount*0.15); app.balance += reward; pd.classList.add('win'); od.classList.add('lose'); }
+                const bonus = (gameConfigs.dice?.bonus || 15);
+                if (pr > or) { msg = '🎉 You win!'; reward = diceGameData.betAmount + Math.floor(diceGameData.betAmount * (bonus/100)); app.balance += reward; pd.classList.add('win'); od.classList.add('lose'); }
                 else if (pr < or) { msg = '😞 You lose!'; od.classList.add('win'); pd.classList.add('lose'); }
                 else { msg = '🤝 Draw!'; if (!diceGameData.isFree) { reward = diceGameData.betAmount; app.balance += reward; } }
                 if (diceGameData.isFree) { reward = 20; app.balance += reward; }
@@ -771,14 +851,18 @@
                 userRef.update({ balance: app.balance }); updateUI();
             }, 1000);
         }
-        function resetDiceGame() { diceGameData.rewardGiven = false; document.getElementById('diceBetSection').style.display = 'block'; document.getElementById('diceGameBoard').style.display = 'none'; document.getElementById('diceGameBoard').querySelector('.restart').style.display = 'none'; document.getElementById('playerDice').textContent = '🎲'; document.getElementById('opponentDice').textContent = '🎲'; document.getElementById('playerDice').className = 'game-dice'; document.getElementById('opponentDice').className = 'game-dice'; }
+        function resetDiceGame() { diceGameData.rewardGiven = false; document.getElementById('diceBetSection').style.display = 'block'; document.getElementById('diceGameBoard').style.display = 'none'; document.getElementById('diceGameBoard').querySelector('.restart').style.display = 'none'; document.getElementById('playerDice').textContent = '🎲'; document.getElementById('opponentDice').textContent = '🎲'; document.getElementById('playerDice').className = 'game-dice'; document.getElementById('opponentDice').className = 'game-dice'; 
+            updateGameOverlayUI('diceBetSection', 'dice');
+        }
 
-        // ================== TARGET GAME ==================
-        function openTargetGame() { document.getElementById('targetGameOverlay').classList.add('show'); document.getElementById('targetBetSection').style.display = 'block'; document.getElementById('targetGameBoard').style.display = 'none'; targetGameData.rewardGiven = false; }
+        // ================== TARGET GAME (UPDATED) ==================
+        function openTargetGame() { document.getElementById('targetGameOverlay').classList.add('show'); document.getElementById('targetBetSection').style.display = 'block'; document.getElementById('targetGameBoard').style.display = 'none'; targetGameData.rewardGiven = false; updateGameOverlayUI('targetBetSection', 'target'); }
         function closeTargetGame() { document.getElementById('targetGameOverlay').classList.remove('show'); }
-        function setTargetBet(a) { targetGameData.betAmount = Math.min(a, 500); document.getElementById('targetBetAmount').value = targetGameData.betAmount; }
+        function setTargetBet(a) { const config = gameConfigs.target || {}; const max = config.maxEntry || 500; targetGameData.betAmount = Math.min(a, max); document.getElementById('targetBetAmount').value = targetGameData.betAmount; }
         function playTargetGamePaid() {
-            let bet = parseInt(document.getElementById('targetBetAmount').value) || 100; bet = Math.max(100, Math.min(bet, 500));
+            const config = gameConfigs.target || {};
+            let min = config.minEntry || 100, max = config.maxEntry || 500;
+            let bet = parseInt(document.getElementById('targetBetAmount').value) || min; bet = Math.max(min, Math.min(bet, max));
             if (bet > app.balance) { showToast('Insufficient balance!', 'error'); return; }
             targetGameData.betAmount = bet; targetGameData.isFree = false; app.balance -= bet;
             userRef.update({ balance: app.balance }); updateUI();
@@ -797,7 +881,8 @@
             document.getElementById('targetRewardInfo').textContent = '';
             setTimeout(() => {
                 let reward = 0, msg = '';
-                if (accuracy > 80) { msg = '🎯 Bullseye!'; reward = targetGameData.betAmount + Math.floor(targetGameData.betAmount*0.20); app.balance += reward; }
+                const bonus = (gameConfigs.target?.bonus || 20);
+                if (accuracy > 80) { msg = '🎯 Bullseye!'; reward = targetGameData.betAmount + Math.floor(targetGameData.betAmount * (bonus/100)); app.balance += reward; }
                 else if (accuracy > 50) { msg = '🎯 Close!'; if (!targetGameData.isFree) { /* Lost */ } else { reward = 20; app.balance += reward; } }
                 else { msg = '💨 Missed!'; if (targetGameData.isFree) { reward = 20; app.balance += reward; } }
                 document.getElementById('targetStatus').textContent = `${msg} (Accuracy: ${accuracy}%)`;
@@ -806,14 +891,16 @@
                 userRef.update({ balance: app.balance }); updateUI();
             }, 800);
         }
-        function resetTargetGame() { targetGameData.rewardGiven = false; document.getElementById('targetBetSection').style.display = 'block'; document.getElementById('targetGameBoard').style.display = 'none'; document.getElementById('targetGameBoard').querySelector('.restart').style.display = 'none'; document.getElementById('targetStatus').textContent = 'Shoot the target!'; }
+        function resetTargetGame() { targetGameData.rewardGiven = false; document.getElementById('targetBetSection').style.display = 'block'; document.getElementById('targetGameBoard').style.display = 'none'; document.getElementById('targetGameBoard').querySelector('.restart').style.display = 'none'; document.getElementById('targetStatus').textContent = 'Shoot the target!'; updateGameOverlayUI('targetBetSection', 'target'); }
 
-        // ================== CARD GAME ==================
-        function openCardGame() { document.getElementById('cardGameOverlay').classList.add('show'); document.getElementById('cardBetSection').style.display = 'block'; document.getElementById('cardGameBoard').style.display = 'none'; cardGameData.rewardGiven = false; }
+        // ================== CARD GAME (UPDATED) ==================
+        function openCardGame() { document.getElementById('cardGameOverlay').classList.add('show'); document.getElementById('cardBetSection').style.display = 'block'; document.getElementById('cardGameBoard').style.display = 'none'; cardGameData.rewardGiven = false; updateGameOverlayUI('cardBetSection', 'card'); }
         function closeCardGame() { document.getElementById('cardGameOverlay').classList.remove('show'); }
-        function setCardBet(a) { cardGameData.betAmount = Math.min(a, 500); document.getElementById('cardBetAmount').value = cardGameData.betAmount; }
+        function setCardBet(a) { const config = gameConfigs.card || {}; const max = config.maxEntry || 500; cardGameData.betAmount = Math.min(a, max); document.getElementById('cardBetAmount').value = cardGameData.betAmount; }
         function playCardGamePaid() {
-            let bet = parseInt(document.getElementById('cardBetAmount').value) || 100; bet = Math.max(100, Math.min(bet, 500));
+            const config = gameConfigs.card || {};
+            let min = config.minEntry || 100, max = config.maxEntry || 500;
+            let bet = parseInt(document.getElementById('cardBetAmount').value) || min; bet = Math.max(min, Math.min(bet, max));
             if (bet > app.balance) { showToast('Insufficient balance!', 'error'); return; }
             cardGameData.betAmount = bet; cardGameData.isFree = false; app.balance -= bet;
             userRef.update({ balance: app.balance }); updateUI();
@@ -837,7 +924,8 @@
                 document.getElementById('playerCard').innerHTML = `<span class="card-value">${vals[pv]}</span><span class="card-suit">${suits[ps]}</span>`;
                 document.getElementById('opponentCard').innerHTML = `<span class="card-value">${vals[ov]}</span><span class="card-suit">${suits[os]}</span>`;
                 let reward = 0, msg = '';
-                if (pv > ov) { msg = '🎉 You win!'; reward = cardGameData.betAmount + Math.floor(cardGameData.betAmount*0.12); app.balance += reward; document.getElementById('playerCard').classList.add('win'); document.getElementById('opponentCard').classList.add('lose'); }
+                const bonus = (gameConfigs.card?.bonus || 12);
+                if (pv > ov) { msg = '🎉 You win!'; reward = cardGameData.betAmount + Math.floor(cardGameData.betAmount * (bonus/100)); app.balance += reward; document.getElementById('playerCard').classList.add('win'); document.getElementById('opponentCard').classList.add('lose'); }
                 else if (pv < ov) { msg = '😞 You lose!'; document.getElementById('opponentCard').classList.add('win'); document.getElementById('playerCard').classList.add('lose'); }
                 else { msg = '🤝 Draw!'; if (!cardGameData.isFree) { reward = cardGameData.betAmount; app.balance += reward; } }
                 if (cardGameData.isFree) { reward = 20; app.balance += reward; }
@@ -847,9 +935,9 @@
                 userRef.update({ balance: app.balance }); updateUI();
             }, 800);
         }
-        function resetCardGame() { cardGameData.rewardGiven = false; document.getElementById('cardBetSection').style.display = 'block'; document.getElementById('cardGameBoard').style.display = 'none'; document.getElementById('cardGameBoard').querySelector('.restart').style.display = 'none'; document.getElementById('playerCard').innerHTML = '<span class="card-value">?</span><span class="card-suit">?</span>'; document.getElementById('opponentCard').innerHTML = '<span class="card-value">?</span><span class="card-suit">?</span>'; document.getElementById('playerCard').className = 'game-card-item'; document.getElementById('opponentCard').className = 'game-card-item'; }
+        function resetCardGame() { cardGameData.rewardGiven = false; document.getElementById('cardBetSection').style.display = 'block'; document.getElementById('cardGameBoard').style.display = 'none'; document.getElementById('cardGameBoard').querySelector('.restart').style.display = 'none'; document.getElementById('playerCard').innerHTML = '<span class="card-value">?</span><span class="card-suit">?</span>'; document.getElementById('opponentCard').innerHTML = '<span class="card-value">?</span><span class="card-suit">?</span>'; document.getElementById('playerCard').className = 'game-card-item'; document.getElementById('opponentCard').className = 'game-card-item'; updateGameOverlayUI('cardBetSection', 'card'); }
 
-        // ================== XO GAME ==================
+        // ================== XO GAME (UPDATED) ==================
         let xoGameData = { mode: null, betAmount: 100, board: Array(9).fill(''), mySymbol: 'X', opponentSymbol: 'O', gameActive: false, gameOver: false, winner: null, onlineGameId: null, isMyTurn: true, gameRef: null, rewardGiven: false, winningCombo: null, isFree: false };
         let xoAITimeout = null;
 
@@ -860,6 +948,7 @@
             document.getElementById('xoModeSelection').style.display = 'block';
             document.getElementById('xoBetSection').style.display = 'none';
             document.getElementById('xoGameBoard').style.display = 'none';
+            updateGameOverlayUI('xoBetSection', 'xo');
         }
 
         function closeXOGame() {
@@ -874,19 +963,25 @@
             document.getElementById('xoModeSelection').style.display = 'none';
             document.getElementById('xoBetSection').style.display = 'block';
             document.getElementById('xoGameBoard').style.display = 'none';
-            document.getElementById('xoBetAmount').value = 100;
-            xoGameData.betAmount = 100;
+            const config = gameConfigs.xo || {};
+            document.getElementById('xoBetAmount').value = config.minEntry || 100;
+            xoGameData.betAmount = config.minEntry || 100;
             xoGameData.isFree = false;
+            updateGameOverlayUI('xoBetSection', 'xo');
         }
 
         function setXOBet(a) {
-            xoGameData.betAmount = Math.min(a, 500, Math.floor(app.balance));
+            const config = gameConfigs.xo || {};
+            const max = config.maxEntry || 500;
+            xoGameData.betAmount = Math.min(a, max, Math.floor(app.balance));
             document.getElementById('xoBetAmount').value = xoGameData.betAmount;
         }
 
         function confirmXOGame() {
-            let bet = parseInt(document.getElementById('xoBetAmount').value) || 100;
-            bet = Math.max(100, Math.min(bet, 500));
+            const config = gameConfigs.xo || {};
+            let min = config.minEntry || 100, max = config.maxEntry || 500;
+            let bet = parseInt(document.getElementById('xoBetAmount').value) || min;
+            bet = Math.max(min, Math.min(bet, max));
             if (bet > app.balance) { showToast('Insufficient!', 'error'); return; }
             xoGameData.betAmount = bet;
             xoGameData.isFree = false;
@@ -1171,6 +1266,7 @@
             xoGameData.gameOver = true;
             let reward = 0,
                 msg = '';
+            const bonus = (gameConfigs.xo?.bonus || 10);
             if (r === 'draw') {
                 msg = '🤝 Draw!';
                 document.getElementById('xoStatus').className = 'xo-status draw';
@@ -1179,7 +1275,7 @@
             } else if (r === xoGameData.mySymbol) {
                 msg = '🎉 You win!';
                 document.getElementById('xoStatus').className = 'xo-status win';
-                reward = xoGameData.betAmount + Math.floor(xoGameData.betAmount * 0.10);
+                reward = xoGameData.betAmount + Math.floor(xoGameData.betAmount * (bonus/100));
                 app.balance += reward;
                 app.xpPoints += reward * 2;
             } else {
@@ -1210,7 +1306,9 @@
                 closeXOGame();
                 return;
             }
-            if (!xoGameData.isFree && app.balance < 100) { closeXOGame();
+            const config = gameConfigs.xo || {};
+            let minEntry = config.minEntry || 100;
+            if (!xoGameData.isFree && app.balance < minEntry) { closeXOGame();
                 showToast('Not enough!', 'error'); return; }
             if (!xoGameData.isFree) { app.balance -= xoGameData.betAmount;
                 userRef.update({ balance: app.balance });
@@ -1234,7 +1332,7 @@
                 xoAITimeout = null; }
         }
 
-        // ================== MEMORY GAME ==================
+        // ================== MEMORY GAME (UPDATED) ==================
         let memoryCards = [];
         let memoryFlipped = [];
         let memoryMatched = [];
@@ -1246,6 +1344,7 @@
             document.getElementById('memoryBetSection').style.display = 'block';
             document.getElementById('memoryGameBoard').style.display = 'none';
             memoryGameData.rewardGiven = false;
+            updateGameOverlayUI('memoryBetSection', 'memory');
         }
 
         function closeMemoryGame() {
@@ -1253,88 +1352,52 @@
             if (memoryTimeout) clearTimeout(memoryTimeout);
         }
 
-        function setMemoryBet(a) {
-            memoryGameData.betAmount = Math.min(a, 500);
-            document.getElementById('memoryBetAmount').value = memoryGameData.betAmount;
-        }
+        function setMemoryBet(a) { const config = gameConfigs.memory || {}; const max = config.maxEntry || 500; memoryGameData.betAmount = Math.min(a, max); document.getElementById('memoryBetAmount').value = memoryGameData.betAmount; }
 
         function playMemoryGamePaid() {
-            let bet = parseInt(document.getElementById('memoryBetAmount').value) || 100;
-            bet = Math.max(100, Math.min(bet, 500));
+            const config = gameConfigs.memory || {};
+            let min = config.minEntry || 100, max = config.maxEntry || 500;
+            let bet = parseInt(document.getElementById('memoryBetAmount').value) || min; bet = Math.max(min, Math.min(bet, max));
             if (bet > app.balance) { showToast('Insufficient balance!', 'error'); return; }
-            memoryGameData.betAmount = bet;
-            memoryGameData.isFree = false;
-            app.balance -= bet;
-            userRef.update({ balance: app.balance });
-            updateUI();
-            document.getElementById('memoryBetSection').style.display = 'none';
-            document.getElementById('memoryGameBoard').style.display = 'block';
+            memoryGameData.betAmount = bet; memoryGameData.isFree = false; app.balance -= bet;
+            userRef.update({ balance: app.balance }); updateUI();
+            document.getElementById('memoryBetSection').style.display = 'none'; document.getElementById('memoryGameBoard').style.display = 'block';
             startMemoryGame();
         }
 
         function playMemoryGameFree() {
             show_11197472().then(() => {
-                memoryGameData.betAmount = 100;
-                memoryGameData.isFree = true;
-                document.getElementById('memoryBetSection').style.display = 'none';
-                document.getElementById('memoryGameBoard').style.display = 'block';
+                memoryGameData.betAmount = 100; memoryGameData.isFree = true;
+                document.getElementById('memoryBetSection').style.display = 'none'; document.getElementById('memoryGameBoard').style.display = 'block';
                 startMemoryGame();
             }).catch(() => showToast('Ad not watched!', 'error'));
         }
 
         function startMemoryGame() {
             if (memoryGameData.rewardGiven) return;
-            memoryFlipped = [];
-            memoryMatched = [];
-            memoryLockBoard = false;
+            memoryFlipped = []; memoryMatched = []; memoryLockBoard = false;
             const icons = ['🍎','🍌','🍒','🍇','🍊','🍓','🍉','🍋'];
-            memoryCards = [...icons, ...icons];
-            memoryCards.sort(() => Math.random() - 0.5);
-            const grid = document.getElementById('memoryGrid');
-            grid.innerHTML = '';
+            memoryCards = [...icons, ...icons]; memoryCards.sort(() => Math.random() - 0.5);
+            const grid = document.getElementById('memoryGrid'); grid.innerHTML = '';
             memoryCards.forEach((icon, idx) => {
-                const card = document.createElement('div');
-                card.className = 'memory-card';
-                card.dataset.index = idx;
-                card.dataset.icon = icon;
-                card.textContent = '❓';
+                const card = document.createElement('div'); card.className = 'memory-card'; card.dataset.index = idx; card.dataset.icon = icon; card.textContent = '❓';
                 card.style.cssText = 'background:#1e293b;padding:20px;border-radius:10px;font-size:24px;cursor:pointer;text-align:center;color:#fff;border:2px solid #334155;';
-                card.onclick = () => flipMemoryCard(idx);
-                grid.appendChild(card);
+                card.onclick = () => flipMemoryCard(idx); grid.appendChild(card);
             });
-            document.getElementById('memoryStatus').textContent = 'Match all pairs!';
-            document.getElementById('memoryRewardInfo').textContent = '';
-            document.getElementById('memoryGameBoard').querySelector('.restart').style.display = 'none';
+            document.getElementById('memoryStatus').textContent = 'Match all pairs!'; document.getElementById('memoryRewardInfo').textContent = ''; document.getElementById('memoryGameBoard').querySelector('.restart').style.display = 'none';
         }
 
         function flipMemoryCard(idx) {
             if (memoryLockBoard || memoryFlipped.length >= 2 || memoryMatched.includes(idx)) return;
-            const cards = document.querySelectorAll('.memory-card');
-            const card = cards[idx];
-            if (card.textContent !== '❓') return;
-            card.textContent = card.dataset.icon;
-            memoryFlipped.push(idx);
-
+            const cards = document.querySelectorAll('.memory-card'); const card = cards[idx];
+            if (card.textContent !== '❓') return; card.textContent = card.dataset.icon; memoryFlipped.push(idx);
             if (memoryFlipped.length === 2) {
-                memoryLockBoard = true;
-                const idx1 = memoryFlipped[0];
-                const idx2 = memoryFlipped[1];
-                const card1 = cards[idx1];
-                const card2 = cards[idx2];
-
+                memoryLockBoard = true; const idx1 = memoryFlipped[0]; const idx2 = memoryFlipped[1];
+                const card1 = cards[idx1]; const card2 = cards[idx2];
                 if (card1.dataset.icon === card2.dataset.icon) {
-                    memoryMatched.push(idx1, idx2);
-                    memoryFlipped = [];
-                    memoryLockBoard = false;
-                    checkMemoryWin();
+                    memoryMatched.push(idx1, idx2); memoryFlipped = []; memoryLockBoard = false; checkMemoryWin();
                 } else {
-                    memoryTimeout = setTimeout(() => {
-                        card1.textContent = '❓';
-                        card2.textContent = '❓';
-                        memoryFlipped = [];
-                        memoryLockBoard = false;
-                        memoryTimeout = null;
-                    }, 1000);
+                    memoryTimeout = setTimeout(() => { card1.textContent = '❓'; card2.textContent = '❓'; memoryFlipped = []; memoryLockBoard = false; memoryTimeout = null; }, 1000);
                 }
             }
         }
@@ -1342,308 +1405,140 @@
         function checkMemoryWin() {
             if (memoryMatched.length === memoryCards.length) {
                 let reward = 0;
-                if (memoryGameData.isFree) {
-                    reward = 20;
-                    app.balance += reward;
-                } else {
-                    reward = memoryGameData.betAmount + Math.floor(memoryGameData.betAmount * 0.15);
-                    app.balance += reward;
-                }
-                document.getElementById('memoryStatus').textContent = '🎉 You win!';
-                document.getElementById('memoryRewardInfo').textContent = `+${reward} Coins`;
-                document.getElementById('memoryGameBoard').querySelector('.restart').style.display = 'block';
-                userRef.update({ balance: app.balance });
-                updateUI();
+                const bonus = (gameConfigs.memory?.bonus || 15);
+                if (memoryGameData.isFree) { reward = 20; app.balance += reward; }
+                else { reward = memoryGameData.betAmount + Math.floor(memoryGameData.betAmount * (bonus/100)); app.balance += reward; }
+                document.getElementById('memoryStatus').textContent = '🎉 You win!'; document.getElementById('memoryRewardInfo').textContent = `+${reward} Coins`; document.getElementById('memoryGameBoard').querySelector('.restart').style.display = 'block';
+                userRef.update({ balance: app.balance }); updateUI();
             }
         }
 
         function resetMemoryGame() {
-            memoryGameData.rewardGiven = false;
-            if (memoryTimeout) clearTimeout(memoryTimeout);
-            document.getElementById('memoryBetSection').style.display = 'block';
-            document.getElementById('memoryGameBoard').style.display = 'none';
-            document.getElementById('memoryGameBoard').querySelector('.restart').style.display = 'none';
+            memoryGameData.rewardGiven = false; if (memoryTimeout) clearTimeout(memoryTimeout);
+            document.getElementById('memoryBetSection').style.display = 'block'; document.getElementById('memoryGameBoard').style.display = 'none'; document.getElementById('memoryGameBoard').querySelector('.restart').style.display = 'none';
+            updateGameOverlayUI('memoryBetSection', 'memory');
         }
 
-        // ================== FLAPPY BIRD GAME ==================
-        let flappyGameLoop = null;
-        let flappyBird = { x: 50, y: 200, velocity: 0 };
-        let flappyPipes = [];
-        let flappyScore = 0;
-        let flappyGameOver = false;
+        // ================== FLAPPY BIRD GAME (UPDATED) ==================
+        let flappyGameLoop = null; let flappyBird = { x: 50, y: 200, velocity: 0 }; let flappyPipes = []; let flappyScore = 0; let flappyGameOver = false;
 
         function openFlappyGame() {
-            document.getElementById('flappyGameOverlay').classList.add('show');
-            document.getElementById('flappyBetSection').style.display = 'block';
-            document.getElementById('flappyGameBoard').style.display = 'none';
-            flappyGameData.rewardGiven = false;
+            document.getElementById('flappyGameOverlay').classList.add('show'); document.getElementById('flappyBetSection').style.display = 'block'; document.getElementById('flappyGameBoard').style.display = 'none'; flappyGameData.rewardGiven = false; updateGameOverlayUI('flappyBetSection', 'flappy');
         }
-
-        function closeFlappyGame() {
-            document.getElementById('flappyGameOverlay').classList.remove('show');
-            if (flappyGameLoop) { cancelAnimationFrame(flappyGameLoop);
-                flappyGameLoop = null; }
-        }
-
-        function setFlappyBet(a) {
-            flappyGameData.betAmount = Math.min(a, 500);
-            document.getElementById('flappyBetAmount').value = flappyGameData.betAmount;
-        }
-
+        function closeFlappyGame() { document.getElementById('flappyGameOverlay').classList.remove('show'); if (flappyGameLoop) { cancelAnimationFrame(flappyGameLoop); flappyGameLoop = null; } }
+        function setFlappyBet(a) { const config = gameConfigs.flappy || {}; const max = config.maxEntry || 500; flappyGameData.betAmount = Math.min(a, max); document.getElementById('flappyBetAmount').value = flappyGameData.betAmount; }
         function playFlappyGamePaid() {
-            let bet = parseInt(document.getElementById('flappyBetAmount').value) || 100;
-            bet = Math.max(100, Math.min(bet, 500));
+            const config = gameConfigs.flappy || {};
+            let min = config.minEntry || 100, max = config.maxEntry || 500;
+            let bet = parseInt(document.getElementById('flappyBetAmount').value) || min; bet = Math.max(min, Math.min(bet, max));
             if (bet > app.balance) { showToast('Insufficient balance!', 'error'); return; }
-            flappyGameData.betAmount = bet;
-            flappyGameData.isFree = false;
-            app.balance -= bet;
-            userRef.update({ balance: app.balance });
-            updateUI();
-            document.getElementById('flappyBetSection').style.display = 'none';
-            document.getElementById('flappyGameBoard').style.display = 'block';
+            flappyGameData.betAmount = bet; flappyGameData.isFree = false; app.balance -= bet;
+            userRef.update({ balance: app.balance }); updateUI();
+            document.getElementById('flappyBetSection').style.display = 'none'; document.getElementById('flappyGameBoard').style.display = 'block';
             startFlappyGame();
         }
-
         function playFlappyGameFree() {
-            show_11197472().then(() => {
-                flappyGameData.betAmount = 100;
-                flappyGameData.isFree = true;
-                document.getElementById('flappyBetSection').style.display = 'none';
-                document.getElementById('flappyGameBoard').style.display = 'block';
-                startFlappyGame();
-            }).catch(() => showToast('Ad not watched!', 'error'));
+            show_11197472().then(() => { flappyGameData.betAmount = 100; flappyGameData.isFree = true;
+                document.getElementById('flappyBetSection').style.display = 'none'; document.getElementById('flappyGameBoard').style.display = 'block';
+                startFlappyGame(); }).catch(() => showToast('Ad not watched!', 'error'));
         }
-
         function startFlappyGame() {
             if (flappyGameData.rewardGiven) return;
-            flappyBird = { x: 50, y: 200, velocity: 0 };
-            flappyPipes = [];
-            flappyScore = 0;
-            flappyGameOver = false;
-            document.getElementById('flappyStatus').textContent = 'Tap to fly!';
-            document.getElementById('flappyRewardInfo').textContent = '';
-            document.getElementById('flappyGameBoard').querySelector('.restart').style.display = 'none';
-            const canvas = document.getElementById('flappyCanvas');
-            canvas.width = 300;
-            canvas.height = 400;
-            if (flappyGameLoop) cancelAnimationFrame(flappyGameLoop);
+            flappyBird = { x: 50, y: 200, velocity: 0 }; flappyPipes = []; flappyScore = 0; flappyGameOver = false;
+            document.getElementById('flappyStatus').textContent = 'Tap to fly!'; document.getElementById('flappyRewardInfo').textContent = ''; document.getElementById('flappyGameBoard').querySelector('.restart').style.display = 'none';
+            const canvas = document.getElementById('flappyCanvas'); canvas.width = 300; canvas.height = 400; if (flappyGameLoop) cancelAnimationFrame(flappyGameLoop);
             updateFlappyGame();
         }
-
         function updateFlappyGame() {
             if (flappyGameOver) return;
-            const canvas = document.getElementById('flappyCanvas');
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Gravity
-            flappyBird.velocity += 0.5;
-            flappyBird.y += flappyBird.velocity;
-
-            // Pipes
+            const canvas = document.getElementById('flappyCanvas'); const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height);
+            flappyBird.velocity += 0.5; flappyBird.y += flappyBird.velocity;
             if (flappyPipes.length === 0 || flappyPipes[flappyPipes.length - 1].x < canvas.width - 200) {
-                const gap = 120;
-                const height = Math.random() * (canvas.height - gap - 40) + 20;
+                const gap = 120; const height = Math.random() * (canvas.height - gap - 40) + 20;
                 flappyPipes.push({ x: canvas.width, topHeight: height, gap: gap });
             }
-
-            flappyPipes = flappyPipes.filter(p => p.x > -50);
-            flappyPipes.forEach(p => p.x -= 3);
-
-            // Draw pipes
-            flappyPipes.forEach(p => {
-                ctx.fillStyle = '#2e7d32';
-                ctx.fillRect(p.x, 0, 40, p.topHeight);
-                ctx.fillRect(p.x, p.topHeight + p.gap, 40, canvas.height - p.topHeight - p.gap);
-            });
-
-            // Draw bird
-            ctx.fillStyle = '#fbbf24';
-            ctx.beginPath();
-            ctx.arc(flappyBird.x, flappyBird.y, 15, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Collision
+            flappyPipes = flappyPipes.filter(p => p.x > -50); flappyPipes.forEach(p => p.x -= 3);
+            flappyPipes.forEach(p => { ctx.fillStyle = '#2e7d32'; ctx.fillRect(p.x, 0, 40, p.topHeight); ctx.fillRect(p.x, p.topHeight + p.gap, 40, canvas.height - p.topHeight - p.gap); });
+            ctx.fillStyle = '#fbbf24'; ctx.beginPath(); ctx.arc(flappyBird.x, flappyBird.y, 15, 0, Math.PI * 2); ctx.fill();
             const birdRect = { x: flappyBird.x - 15, y: flappyBird.y - 15, w: 30, h: 30 };
             flappyPipes.forEach(p => {
                 const topPipe = { x: p.x, y: 0, w: 40, h: p.topHeight };
                 const bottomPipe = { x: p.x, y: p.topHeight + p.gap, w: 40, h: canvas.height - p.topHeight - p.gap };
-                if (rectCollide(birdRect, topPipe) || rectCollide(birdRect, bottomPipe)) {
-                    flappyGameOver = true;
-                }
+                if (rectCollide(birdRect, topPipe) || rectCollide(birdRect, bottomPipe)) flappyGameOver = true;
             });
-
-            if (flappyBird.y < 0 || flappyBird.y > canvas.height) {
-                flappyGameOver = true;
-            }
-
+            if (flappyBird.y < 0 || flappyBird.y > canvas.height) flappyGameOver = true;
             if (flappyGameOver) {
-                document.getElementById('flappyStatus').textContent = '💥 Game Over!';
-                let reward = 0;
-                if (flappyGameData.isFree) {
-                    reward = 20;
-                    app.balance += reward;
-                } else {
-                    reward = flappyGameData.betAmount + Math.floor(flappyGameData.betAmount * 0.20);
-                    app.balance += reward;
-                }
-                document.getElementById('flappyRewardInfo').textContent = `+${reward} Coins`;
-                document.getElementById('flappyGameBoard').querySelector('.restart').style.display = 'block';
-                userRef.update({ balance: app.balance });
-                updateUI();
-                return;
+                document.getElementById('flappyStatus').textContent = '💥 Game Over!'; let reward = 0;
+                const bonus = (gameConfigs.flappy?.bonus || 20);
+                if (flappyGameData.isFree) { reward = 20; app.balance += reward; }
+                else { reward = flappyGameData.betAmount + Math.floor(flappyGameData.betAmount * (bonus/100)); app.balance += reward; }
+                document.getElementById('flappyRewardInfo').textContent = `+${reward} Coins`; document.getElementById('flappyGameBoard').querySelector('.restart').style.display = 'block';
+                userRef.update({ balance: app.balance }); updateUI(); return;
             }
-
             flappyGameLoop = requestAnimationFrame(updateFlappyGame);
         }
-
-        function rectCollide(r1, r2) {
-            return r1.x < r2.x + r2.w && r1.x + r1.w > r2.x &&
-                r1.y < r2.y + r2.h && r1.y + r1.h > r2.y;
-        }
-
-        function flappyJump() {
-            if (!flappyGameOver) {
-                flappyBird.velocity = -8;
-                document.getElementById('flappyStatus').textContent = `Score: ${flappyScore}`;
-            }
-        }
-
+        function rectCollide(r1, r2) { return r1.x < r2.x + r2.w && r1.x + r1.w > r2.x && r1.y < r2.y + r2.h && r1.y + r1.h > r2.y; }
+        function flappyJump() { if (!flappyGameOver) { flappyBird.velocity = -8; document.getElementById('flappyStatus').textContent = `Score: ${flappyScore}`; } }
         function resetFlappyGame() {
-            flappyGameData.rewardGiven = false;
-            if (flappyGameLoop) { cancelAnimationFrame(flappyGameLoop);
-                flappyGameLoop = null; }
-            document.getElementById('flappyBetSection').style.display = 'block';
-            document.getElementById('flappyGameBoard').style.display = 'none';
-            document.getElementById('flappyGameBoard').querySelector('.restart').style.display = 'none';
+            flappyGameData.rewardGiven = false; if (flappyGameLoop) { cancelAnimationFrame(flappyGameLoop); flappyGameLoop = null; }
+            document.getElementById('flappyBetSection').style.display = 'block'; document.getElementById('flappyGameBoard').style.display = 'none'; document.getElementById('flappyGameBoard').querySelector('.restart').style.display = 'none';
+            updateGameOverlayUI('flappyBetSection', 'flappy');
         }
 
-        // ================== PUZZLE GAME ==================
-        let puzzleTiles = [];
-        let puzzleEmpty = 8;
-
+        // ================== PUZZLE GAME (UPDATED) ==================
+        let puzzleTiles = []; let puzzleEmpty = 8;
         function openPuzzleGame() {
-            document.getElementById('puzzleGameOverlay').classList.add('show');
-            document.getElementById('puzzleBetSection').style.display = 'block';
-            document.getElementById('puzzleGameBoard').style.display = 'none';
-            puzzleGameData.rewardGiven = false;
+            document.getElementById('puzzleGameOverlay').classList.add('show'); document.getElementById('puzzleBetSection').style.display = 'block'; document.getElementById('puzzleGameBoard').style.display = 'none'; puzzleGameData.rewardGiven = false; updateGameOverlayUI('puzzleBetSection', 'puzzle');
         }
-
-        function closePuzzleGame() {
-            document.getElementById('puzzleGameOverlay').classList.remove('show');
-        }
-
-        function setPuzzleBet(a) {
-            puzzleGameData.betAmount = Math.min(a, 500);
-            document.getElementById('puzzleBetAmount').value = puzzleGameData.betAmount;
-        }
-
+        function closePuzzleGame() { document.getElementById('puzzleGameOverlay').classList.remove('show'); }
+        function setPuzzleBet(a) { const config = gameConfigs.puzzle || {}; const max = config.maxEntry || 500; puzzleGameData.betAmount = Math.min(a, max); document.getElementById('puzzleBetAmount').value = puzzleGameData.betAmount; }
         function playPuzzleGamePaid() {
-            let bet = parseInt(document.getElementById('puzzleBetAmount').value) || 100;
-            bet = Math.max(100, Math.min(bet, 500));
+            const config = gameConfigs.puzzle || {};
+            let min = config.minEntry || 100, max = config.maxEntry || 500;
+            let bet = parseInt(document.getElementById('puzzleBetAmount').value) || min; bet = Math.max(min, Math.min(bet, max));
             if (bet > app.balance) { showToast('Insufficient balance!', 'error'); return; }
-            puzzleGameData.betAmount = bet;
-            puzzleGameData.isFree = false;
-            app.balance -= bet;
-            userRef.update({ balance: app.balance });
-            updateUI();
-            document.getElementById('puzzleBetSection').style.display = 'none';
-            document.getElementById('puzzleGameBoard').style.display = 'block';
+            puzzleGameData.betAmount = bet; puzzleGameData.isFree = false; app.balance -= bet;
+            userRef.update({ balance: app.balance }); updateUI();
+            document.getElementById('puzzleBetSection').style.display = 'none'; document.getElementById('puzzleGameBoard').style.display = 'block';
             startPuzzleGame();
         }
-
         function playPuzzleGameFree() {
-            show_11197472().then(() => {
-                puzzleGameData.betAmount = 100;
-                puzzleGameData.isFree = true;
-                document.getElementById('puzzleBetSection').style.display = 'none';
-                document.getElementById('puzzleGameBoard').style.display = 'block';
-                startPuzzleGame();
-            }).catch(() => showToast('Ad not watched!', 'error'));
+            show_11197472().then(() => { puzzleGameData.betAmount = 100; puzzleGameData.isFree = true;
+                document.getElementById('puzzleBetSection').style.display = 'none'; document.getElementById('puzzleGameBoard').style.display = 'block';
+                startPuzzleGame(); }).catch(() => showToast('Ad not watched!', 'error'));
         }
-
         function startPuzzleGame() {
-            if (puzzleGameData.rewardGiven) return;
-            puzzleTiles = [1, 2, 3, 4, 5, 6, 7, 8, null];
-            puzzleEmpty = 8;
-            shufflePuzzle();
-            renderPuzzle();
-            document.getElementById('puzzleStatus').textContent = 'Arrange numbers 1-8!';
-            document.getElementById('puzzleRewardInfo').textContent = '';
-            document.getElementById('puzzleGameBoard').querySelector('.restart').style.display = 'none';
+            if (puzzleGameData.rewardGiven) return; puzzleTiles = [1, 2, 3, 4, 5, 6, 7, 8, null]; puzzleEmpty = 8; shufflePuzzle(); renderPuzzle();
+            document.getElementById('puzzleStatus').textContent = 'Arrange numbers 1-8!'; document.getElementById('puzzleRewardInfo').textContent = ''; document.getElementById('puzzleGameBoard').querySelector('.restart').style.display = 'none';
         }
-
-        function shufflePuzzle() {
-            for (let i = 0; i < 100; i++) {
-                const neighbors = getNeighbors(puzzleEmpty);
-                const randomNeighbor = neighbors[Math.floor(Math.random() * neighbors.length)];
-                swapPuzzle(puzzleEmpty, randomNeighbor);
-            }
-        }
-
-        function getNeighbors(empty) {
-            const neighbors = [];
-            if (empty % 3 !== 0) neighbors.push(empty - 1);
-            if (empty % 3 !== 2) neighbors.push(empty + 1);
-            if (empty >= 3) neighbors.push(empty - 3);
-            if (empty < 6) neighbors.push(empty + 3);
-            return neighbors;
-        }
-
-        function swapPuzzle(i, j) {
-            [puzzleTiles[i], puzzleTiles[j]] = [puzzleTiles[j], puzzleTiles[i]];
-            if (puzzleTiles[i] === null) puzzleEmpty = i;
-            if (puzzleTiles[j] === null) puzzleEmpty = j;
-        }
-
+        function shufflePuzzle() { for (let i = 0; i < 100; i++) { const neighbors = getNeighbors(puzzleEmpty); const randomNeighbor = neighbors[Math.floor(Math.random() * neighbors.length)]; swapPuzzle(puzzleEmpty, randomNeighbor); } }
+        function getNeighbors(empty) { const neighbors = []; if (empty % 3 !== 0) neighbors.push(empty - 1); if (empty % 3 !== 2) neighbors.push(empty + 1); if (empty >= 3) neighbors.push(empty - 3); if (empty < 6) neighbors.push(empty + 3); return neighbors; }
+        function swapPuzzle(i, j) { [puzzleTiles[i], puzzleTiles[j]] = [puzzleTiles[j], puzzleTiles[i]]; if (puzzleTiles[i] === null) puzzleEmpty = i; if (puzzleTiles[j] === null) puzzleEmpty = j; }
         function renderPuzzle() {
-            const grid = document.getElementById('puzzleGrid');
-            grid.innerHTML = '';
+            const grid = document.getElementById('puzzleGrid'); grid.innerHTML = '';
             puzzleTiles.forEach((tile, idx) => {
-                const cell = document.createElement('div');
-                cell.textContent = tile || '';
+                const cell = document.createElement('div'); cell.textContent = tile || '';
                 cell.style.cssText = `background:${tile ? '#fbbf24' : '#1e293b'};display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;border-radius:8px;cursor:pointer;color:#0f172a;`;
-                cell.onclick = () => movePuzzleTile(idx);
-                grid.appendChild(cell);
+                cell.onclick = () => movePuzzleTile(idx); grid.appendChild(cell);
             });
         }
-
         function movePuzzleTile(idx) {
-            if (puzzleGameData.rewardGiven) return;
-            const neighbors = getNeighbors(puzzleEmpty);
+            if (puzzleGameData.rewardGiven) return; const neighbors = getNeighbors(puzzleEmpty);
             if (neighbors.includes(idx)) {
-                swapPuzzle(idx, puzzleEmpty);
-                renderPuzzle();
+                swapPuzzle(idx, puzzleEmpty); renderPuzzle();
                 if (checkPuzzleWin()) {
-                    let reward = 0;
-                    if (puzzleGameData.isFree) {
-                        reward = 20;
-                        app.balance += reward;
-                    } else {
-                        reward = puzzleGameData.betAmount + Math.floor(puzzleGameData.betAmount * 0.18);
-                        app.balance += reward;
-                    }
-                    document.getElementById('puzzleStatus').textContent = '🎉 You win!';
-                    document.getElementById('puzzleRewardInfo').textContent = `+${reward} Coins`;
-                    document.getElementById('puzzleGameBoard').querySelector('.restart').style.display = 'block';
-                    userRef.update({ balance: app.balance });
-                    updateUI();
+                    let reward = 0; const bonus = (gameConfigs.puzzle?.bonus || 18);
+                    if (puzzleGameData.isFree) { reward = 20; app.balance += reward; }
+                    else { reward = puzzleGameData.betAmount + Math.floor(puzzleGameData.betAmount * (bonus/100)); app.balance += reward; }
+                    document.getElementById('puzzleStatus').textContent = '🎉 You win!'; document.getElementById('puzzleRewardInfo').textContent = `+${reward} Coins`; document.getElementById('puzzleGameBoard').querySelector('.restart').style.display = 'block';
+                    userRef.update({ balance: app.balance }); updateUI();
                 }
             }
         }
-
-        function checkPuzzleWin() {
-            for (let i = 0; i < 8; i++) {
-                if (puzzleTiles[i] !== i + 1) return false;
-            }
-            return puzzleTiles[8] === null;
-        }
-
+        function checkPuzzleWin() { for (let i = 0; i < 8; i++) { if (puzzleTiles[i] !== i + 1) return false; } return puzzleTiles[8] === null; }
         function resetPuzzleGame() {
-            puzzleGameData.rewardGiven = false;
-            document.getElementById('puzzleBetSection').style.display = 'block';
-            document.getElementById('puzzleGameBoard').style.display = 'none';
-            document.getElementById('puzzleGameBoard').querySelector('.restart').style.display = 'none';
+            puzzleGameData.rewardGiven = false; document.getElementById('puzzleBetSection').style.display = 'block'; document.getElementById('puzzleGameBoard').style.display = 'none'; document.getElementById('puzzleGameBoard').querySelector('.restart').style.display = 'none';
+            updateGameOverlayUI('puzzleBetSection', 'puzzle');
         }
 
         // ================== MAINTENANCE ==================
@@ -1651,418 +1546,200 @@
             db.ref('maintenance').on('value', s => {
                 const d = s.val() || { enabled: false };
                 if (d.enabled) {
-                    document.getElementById('maintenanceOverlay').classList.add('show');
-                    document.getElementById('mainContent').style.display = 'none';
-                    document.querySelector('.bottom-nav').style.display = 'none';
+                    document.getElementById('maintenanceOverlay').classList.add('show'); document.getElementById('mainContent').style.display = 'none'; document.querySelector('.bottom-nav').style.display = 'none';
                     if (miningInterval) stopMining();
                 } else {
-                    document.getElementById('maintenanceOverlay').classList.remove('show');
-                    document.getElementById('mainContent').style.display = 'block';
-                    document.querySelector('.bottom-nav').style.display = 'flex';
+                    document.getElementById('maintenanceOverlay').classList.remove('show'); document.getElementById('mainContent').style.display = 'block'; document.querySelector('.bottom-nav').style.display = 'flex';
                 }
             });
         }
 
         // ================== SPIN WHEEL ==================
-        const SPIN_COUNT_LIMIT = 20,
-            SPIN_BUTTON_COOLDOWN_SECONDS = 15;
-        let spinCount = SPIN_COUNT_LIMIT,
-            spinBtnCooldownInterval = null,
-            isSpinning = false,
-            currentRotation = 0;
+        const SPIN_COUNT_LIMIT = 20, SPIN_BUTTON_COOLDOWN_SECONDS = 15;
+        let spinCount = SPIN_COUNT_LIMIT, spinBtnCooldownInterval = null, isSpinning = false, currentRotation = 0;
 
         function buildWheel() {
-            const sc = document.getElementById('wheelSegments');
-            const ns = prizeData.length;
-            const as = 360 / ns;
-            sc.innerHTML = '';
+            const sc = document.getElementById('wheelSegments'); const ns = prizeData.length; const as = 360 / ns; sc.innerHTML = '';
             const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#FF9FF3', '#54A0FF', '#5F27CD', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD'];
             for (let i = 0; i < ns; i++) {
-                const s = document.createElement('div');
-                s.className = 'wheel-segment';
-                s.style.transform = `rotate(${i*as}deg)`;
-                s.style.backgroundColor = colors[i % colors.length];
-                s.innerHTML = `<span>${prizeData[i].label}</span>`;
-                sc.appendChild(s);
+                const s = document.createElement('div'); s.className = 'wheel-segment'; s.style.transform = `rotate(${i*as}deg)`;
+                s.style.backgroundColor = colors[i % colors.length]; s.innerHTML = `<span>${prizeData[i].label}</span>`; sc.appendChild(s);
             }
-            const bc = document.getElementById('wheelBulbs');
-            bc.innerHTML = '';
+            const bc = document.getElementById('wheelBulbs'); bc.innerHTML = '';
             for (let i = 0; i < 20; i++) {
-                const b = document.createElement('div');
-                b.className = 'wheel-bulb';
-                const a = (i / 20) * 360;
-                b.style.left = (140 + 140 * Math.cos(a * Math.PI / 180) - 6) + 'px';
-                b.style.top = (140 + 140 * Math.sin(a * Math.PI / 180) - 6) + 'px';
-                bc.appendChild(b);
+                const b = document.createElement('div'); b.className = 'wheel-bulb'; const a = (i / 20) * 360;
+                b.style.left = (140 + 140 * Math.cos(a * Math.PI / 180) - 6) + 'px'; b.style.top = (140 + 140 * Math.sin(a * Math.PI / 180) - 6) + 'px'; bc.appendChild(b);
             }
         }
-
-        function getPrizeByAngle(a) {
-            const ns = prizeData.length;
-            let n = a % 360;
-            if (n < 0) n += 360;
-            return prizeData[Math.floor(n / (360 / ns)) % ns];
-        }
-
-        function openSpinModal() {
-            if (spinCount <= 0) { showToast('No spins!', 'error'); return; }
-            document.getElementById('spinModal').classList.add('show');
-            updateSpinModalUI();
-        }
-
-        function closeSpinModal() {
-            document.getElementById('spinModal').classList.remove('show');
-        }
-
-        function updateSpinModalUI() {
-            document.getElementById('modalSpinCount').textContent = `Spins: ${spinCount}/${SPIN_COUNT_LIMIT}`;
-        }
-
+        function getPrizeByAngle(a) { const ns = prizeData.length; let n = a % 360; if (n < 0) n += 360; return prizeData[Math.floor(n / (360 / ns)) % ns]; }
+        function openSpinModal() { if (spinCount <= 0) { showToast('No spins!', 'error'); return; } document.getElementById('spinModal').classList.add('show'); updateSpinModalUI(); }
+        function closeSpinModal() { document.getElementById('spinModal').classList.remove('show'); }
+        function updateSpinModalUI() { document.getElementById('modalSpinCount').textContent = `Spins: ${spinCount}/${SPIN_COUNT_LIMIT}`; }
         function spinWheelFromModal() {
             if (!isOnline || isSpinning || spinCount <= 0) return;
-            const btn = document.getElementById('modalSpinBtn');
-            btn.disabled = true;
-            isSpinning = true;
+            const btn = document.getElementById('modalSpinBtn'); btn.disabled = true; isSpinning = true;
             let cd = SPIN_BUTTON_COOLDOWN_SECONDS;
-            document.getElementById('modalSpinTimerBox').classList.add('show');
-            document.getElementById('modalSpinTimerDisplay').textContent = `00:${String(cd).padStart(2,'0')}`;
+            document.getElementById('modalSpinTimerBox').classList.add('show'); document.getElementById('modalSpinTimerDisplay').textContent = `00:${String(cd).padStart(2,'0')}`;
             if (spinBtnCooldownInterval) clearInterval(spinBtnCooldownInterval);
             spinBtnCooldownInterval = setInterval(() => {
-                cd--;
-                if (cd > 0) document.getElementById('modalSpinTimerDisplay').textContent = `00:${String(cd).padStart(2,'0')}`;
-                else {
-                    clearInterval(spinBtnCooldownInterval);
-                    spinBtnCooldownInterval = null;
-                    document.getElementById('modalSpinTimerBox').classList.remove('show');
-                    btn.disabled = false;
-                }
+                cd--; if (cd > 0) document.getElementById('modalSpinTimerDisplay').textContent = `00:${String(cd).padStart(2,'0')}`;
+                else { clearInterval(spinBtnCooldownInterval); spinBtnCooldownInterval = null; document.getElementById('modalSpinTimerBox').classList.remove('show'); btn.disabled = false; }
             }, 1000);
             currentRotation += (5 + Math.floor(Math.random() * 5)) * 360 + Math.floor(Math.random() * 360);
             document.getElementById('wheelSegments').style.transform = `rotate(${currentRotation}deg)`;
             show_11197472().then(() => {
                 const p = getPrizeByAngle(currentRotation);
-                if (p.type === 'coins') app.balance += p.value;
-                else app.usdBalance += p.value;
-                spinCount--;
-                document.getElementById('spinBadge').textContent = spinCount;
-                updateSpinModalUI();
-                document.getElementById('rewardText').textContent = `You won ${p.label}!`;
-                document.getElementById('successModal').classList.add('active');
-                userRef.update({ balance: app.balance, usdBalance: app.usdBalance, spinCount });
-                updateUI();
-                isSpinning = false;
-            }).catch(() => {
-                btn.disabled = false;
-                isSpinning = false;
-                showToast('Ad not watched!', 'error');
-            });
+                if (p.type === 'coins') app.balance += p.value; else app.usdBalance += p.value;
+                spinCount--; document.getElementById('spinBadge').textContent = spinCount; updateSpinModalUI();
+                document.getElementById('rewardText').textContent = `You won ${p.label}!`; document.getElementById('successModal').classList.add('active');
+                userRef.update({ balance: app.balance, usdBalance: app.usdBalance, spinCount }); updateUI(); isSpinning = false;
+            }).catch(() => { btn.disabled = false; isSpinning = false; showToast('Ad not watched!', 'error'); });
         }
-
         function loadSpinData() {
             db.ref('users/' + userId + '/spinCount').on('value', s => {
-                spinCount = s.val() !== null ? s.val() : SPIN_COUNT_LIMIT;
-                document.getElementById('spinBadge').textContent = spinCount;
-                updateSpinModalUI();
+                spinCount = s.val() !== null ? s.val() : SPIN_COUNT_LIMIT; document.getElementById('spinBadge').textContent = spinCount; updateSpinModalUI();
             });
         }
-
         function watchMiningCoins() {
             db.ref('users/' + userId + '/progressCoins').on('value', s => {
-                if (s.val() === 0) {
-                    spinCount = SPIN_COUNT_LIMIT;
-                    document.getElementById('spinBadge').textContent = spinCount;
-                    updateSpinModalUI();
-                    userRef.update({ spinCount });
-                    showToast('🔄 Spins reset!');
-                }
+                if (s.val() === 0) { spinCount = SPIN_COUNT_LIMIT; document.getElementById('spinBadge').textContent = spinCount; updateSpinModalUI(); userRef.update({ spinCount }); showToast('🔄 Spins reset!'); }
             });
         }
 
         // ================== DAILY BONUS ==================
         function claimDailyBonus() {
-            if (!isOnline) return;
-            const today = new Date().toDateString();
+            if (!isOnline) return; const today = new Date().toDateString();
             if (app.dailyBonusClaimed === today) { showToast('Already claimed!', 'error'); return; }
             const ba = app.dailyBonusMin + Math.floor(Math.random() * (app.dailyBonusMax - app.dailyBonusMin + 1));
-            app.balance += ba;
-            app.xpPoints += ba * 2;
-            app.dailyBonusClaimed = today;
+            app.balance += ba; app.xpPoints += ba * 2; app.dailyBonusClaimed = today;
             userRef.update({ balance: app.balance, xpPoints: app.xpPoints, dailyBonusClaimed: today });
-            document.getElementById('dailyBonusStatus').textContent = '✅ Claimed';
-            updateUI();
-            updateLevelUI();
-            showToast(`🎁 +${ba} Coins!`);
+            document.getElementById('dailyBonusStatus').textContent = '✅ Claimed'; updateUI(); updateLevelUI(); showToast(`🎁 +${ba} Coins!`);
         }
 
         // ================== MYSTERY BOX ==================
         function updateMysteryBoxUI() {
             const te = document.getElementById('mysteryBoxTimer');
             if (app.mysteryBoxCooldown > Date.now()) {
-                te.textContent = `⏳ ${formatTime(Math.ceil((app.mysteryBoxCooldown-Date.now())/1000))}`;
-                te.classList.add('cooldown');
-            } else {
-                te.textContent = '🎯 Tap to open';
-                te.classList.remove('cooldown');
-            }
+                te.textContent = `⏳ ${formatTime(Math.ceil((app.mysteryBoxCooldown-Date.now())/1000))}`; te.classList.add('cooldown');
+            } else { te.textContent = '🎯 Tap to open'; te.classList.remove('cooldown'); }
         }
-
         function openMysteryBox() {
             if (!isOnline || app.mysteryBoxCooldown > Date.now()) return;
-            document.getElementById('boxLid').classList.add('open');
-            document.getElementById('giftIcon').className = 'gift-icon opened';
-            document.getElementById('giftIcon').textContent = '✨';
+            document.getElementById('boxLid').classList.add('open'); document.getElementById('giftIcon').className = 'gift-icon opened'; document.getElementById('giftIcon').textContent = '✨';
             show_11197472().then(() => {
-                const rt = Math.random() > 0.5 ? 'usd' : 'coins';
-                let rc = 0,
-                    ru = 0;
-                if (rt === 'coins') {
-                    rc = app.mysteryBoxMin + Math.floor(Math.random() * (app.mysteryBoxMax - app.mysteryBoxMin + 1));
-                    app.balance += rc;
-                } else {
-                    ru = parseFloat((Math.random() * 0.006 + 0.002).toFixed(4));
-                    app.usdBalance += ru;
-                }
-                app.xpPoints += (rc || ru * 1000) * 2;
-                app.mysteryBoxCooldown = Date.now() + app.mysteryBoxDuration;
+                const rt = Math.random() > 0.5 ? 'usd' : 'coins'; let rc = 0, ru = 0;
+                if (rt === 'coins') { rc = app.mysteryBoxMin + Math.floor(Math.random() * (app.mysteryBoxMax - app.mysteryBoxMin + 1)); app.balance += rc; }
+                else { ru = parseFloat((Math.random() * 0.006 + 0.002).toFixed(4)); app.usdBalance += ru; }
+                app.xpPoints += (rc || ru * 1000) * 2; app.mysteryBoxCooldown = Date.now() + app.mysteryBoxDuration;
                 userRef.update({ balance: app.balance, usdBalance: app.usdBalance, xpPoints: app.xpPoints, mysteryBoxCooldown: app.mysteryBoxCooldown });
                 const rt2 = rt === 'coins' ? `+${rc} Coins` : `+$${ru.toFixed(4)} USD`;
-                showToast(`🎁 ${rt2}!`);
-                updateUI();
-                updateLevelUI();
-                updateMysteryBoxUI();
-                setTimeout(() => {
-                    document.getElementById('boxLid').classList.remove('open');
-                    document.getElementById('giftIcon').className = 'gift-icon';
-                    document.getElementById('giftIcon').textContent = '🎁';
-                }, 2000);
-            }).catch(() => {
-                document.getElementById('boxLid').classList.remove('open');
-                document.getElementById('giftIcon').className = 'gift-icon';
-                document.getElementById('giftIcon').textContent = '🎁';
-                showToast('Ad not watched!', 'error');
-            });
+                showToast(`🎁 ${rt2}!`); updateUI(); updateLevelUI(); updateMysteryBoxUI();
+                setTimeout(() => { document.getElementById('boxLid').classList.remove('open'); document.getElementById('giftIcon').className = 'gift-icon'; document.getElementById('giftIcon').textContent = '🎁'; }, 2000);
+            }).catch(() => { document.getElementById('boxLid').classList.remove('open'); document.getElementById('giftIcon').className = 'gift-icon'; document.getElementById('giftIcon').textContent = '🎁'; showToast('Ad not watched!', 'error'); });
         }
 
         // ================== SPEED BOOST ==================
         function updateSpeedBoostUI() {
             const bb = document.getElementById('speedBoostBtn');
-            if (app.speedBoostCooldown > Date.now()) {
-                bb.disabled = true;
-                bb.textContent = `⏳ ${formatTime(Math.ceil((app.speedBoostCooldown-Date.now())/1000))}`;
-            } else {
-                bb.disabled = false;
-                bb.textContent = '🚀 Speed Boost';
-            }
+            if (app.speedBoostCooldown > Date.now()) { bb.disabled = true; bb.textContent = `⏳ ${formatTime(Math.ceil((app.speedBoostCooldown-Date.now())/1000))}`; }
+            else { bb.disabled = false; bb.textContent = '🚀 Speed Boost'; }
         }
-
         function activateSpeedBoost() {
             if (!isOnline || app.speedBoostCooldown > Date.now() || app.progressCoins <= 0) return;
             show_11197472().then(() => {
-                const st = Date.now();
-                let ta = 0;
-                const tc = Math.floor(Math.random() * 11) + 50;
+                const st = Date.now(); let ta = 0; const tc = Math.floor(Math.random() * 11) + 50;
                 const bm = setInterval(() => {
-                    if (Date.now() - st >= 3000 || ta >= tc) {
-                        clearInterval(bm);
-                        app.speedBoostCooldown = Date.now() + 3600000;
-                        userRef.update({ speedBoostCooldown: app.speedBoostCooldown });
-                        updateSpeedBoostUI();
-                        showToast(`🚀 Done! +${ta} coins`);
-                        return;
-                    }
-                    const aa = Math.min(3, tc - ta);
-                    if (aa <= 0) { clearInterval(bm); return; }
-                    app.progressCoins -= 1;
-                    app.balance += aa;
-                    app.xpPoints += aa * 2;
-                    ta += aa;
+                    if (Date.now() - st >= 3000 || ta >= tc) { clearInterval(bm); app.speedBoostCooldown = Date.now() + 3600000; userRef.update({ speedBoostCooldown: app.speedBoostCooldown }); updateSpeedBoostUI(); showToast(`🚀 Done! +${ta} coins`); return; }
+                    const aa = Math.min(3, tc - ta); if (aa <= 0) { clearInterval(bm); return; }
+                    app.progressCoins -= 1; app.balance += aa; app.xpPoints += aa * 2; ta += aa;
                     userRef.update({ balance: app.balance, progressCoins: app.progressCoins, xpPoints: app.xpPoints });
-                    updateProgressUI();
-                    updateUI();
-                    updateLevelUI();
-                }, 100);
-                showToast('⚡ Speed Boost!');
+                    updateProgressUI(); updateUI(); updateLevelUI();
+                }, 100); showToast('⚡ Speed Boost!');
             }).catch(() => showToast('Ad not watched!', 'error'));
         }
 
         // ================== TIME ==================
-        function formatTime(s) {
-            const h = Math.floor(s / 3600),
-                m = Math.floor((s % 3600) / 60),
-                sec = s % 60;
-            return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
-        }
+        function formatTime(s) { const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60; return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`; }
 
         // ================== MINING ==================
         function startMining() {
             if (!isOnline || miningInterval || app.progressCoins <= 0) return;
             document.getElementById('circleStartOverlay').classList.add('hidden');
-            userRef.update({ isCurrentlyMining: true, lastMiningActivity: Date.now() });
-            wasMiningBeforeOffline = true;
-
+            userRef.update({ isCurrentlyMining: true, lastMiningActivity: Date.now() }); wasMiningBeforeOffline = true;
             function mnc() {
                 if (!isOnline || isAdShowing || app.progressCoins <= 0) { stopMining(); return; }
-                const d = calculateLevel(app.xpPoints);
-                let sm = 1 + (d.bonusPercent / 100);
-                app.progressCoins -= 1;
-                app.balance += sm;
-                app.xpPoints += 1;
+                const d = calculateLevel(app.xpPoints); let sm = 1 + (d.bonusPercent / 100);
+                app.progressCoins -= 1; app.balance += sm; app.xpPoints += 1;
                 userRef.update({ balance: app.balance, progressCoins: app.progressCoins, xpPoints: app.xpPoints });
-                const coin = document.createElement('div');
-                coin.className = 'floating-coin';
-                coin.textContent = `+${sm.toFixed(0)} 🪙`;
-                coin.style.left = (Math.random() * 80 + 10) + '%';
-                coin.style.top = '35%';
-                document.body.appendChild(coin);
-                setTimeout(() => coin.remove(), 1000);
-                updateProgressUI();
-                updateUI();
-                updateLevelUI();
+                const coin = document.createElement('div'); coin.className = 'floating-coin'; coin.textContent = `+${sm.toFixed(0)} 🪙`;
+                coin.style.left = (Math.random() * 80 + 10) + '%'; coin.style.top = '35%'; document.body.appendChild(coin);
+                setTimeout(() => coin.remove(), 1000); updateProgressUI(); updateUI(); updateLevelUI();
                 miningInterval = setTimeout(mnc, 5000 / sm);
             }
-            mnc();
-            showToast('⛏️ Mining!');
+            mnc(); showToast('⛏️ Mining!');
         }
-
-        function stopMining() {
-            if (miningInterval) { clearTimeout(miningInterval);
-                miningInterval = null; }
-            wasMiningBeforeOffline = false;
-            userRef.update({ isCurrentlyMining: false });
-            updateProgressUI();
-        }
+        function stopMining() { if (miningInterval) { clearTimeout(miningInterval); miningInterval = null; } wasMiningBeforeOffline = false; userRef.update({ isCurrentlyMining: false }); updateProgressUI(); }
 
         // ================== LEVEL ==================
         function getLevelConfig(l) {
             if (l === 0) return { tier: 'unlocking', tierName: 'Unlocking', tierEmoji: '🔒', bonusPercent: 0, xpForLevel: 5000 };
             let tier, tn, te, bonus;
-            if (l >= 1 && l <= 20) { tier = 'bronze';
-                tn = 'Bronze';
-                te = '🥉';
-                bonus = 10; } else if (l >= 21 && l <= 40) { tier = 'silver';
-                tn = 'Silver';
-                te = '🥈';
-                bonus = 20; } else if (l >= 41 && l <= 60) { tier = 'gold';
-                tn = 'Gold';
-                te = '🥇';
-                bonus = 30; } else if (l >= 61 && l <= 80) { tier = 'platinum';
-                tn = 'Platinum';
-                te = '💎';
-                bonus = 40; } else if (l >= 81 && l <= 100) { tier = 'diamond';
-                tn = 'Diamond';
-                te = '👑';
-                bonus = 50; } else { tier = 'max';
-                tn = 'MAX';
-                te = '⭐';
-                bonus = 50; }
+            if (l >= 1 && l <= 20) { tier = 'bronze'; tn = 'Bronze'; te = '🥉'; bonus = 10; }
+            else if (l >= 21 && l <= 40) { tier = 'silver'; tn = 'Silver'; te = '🥈'; bonus = 20; }
+            else if (l >= 41 && l <= 60) { tier = 'gold'; tn = 'Gold'; te = '🥇'; bonus = 30; }
+            else if (l >= 61 && l <= 80) { tier = 'platinum'; tn = 'Platinum'; te = '💎'; bonus = 40; }
+            else if (l >= 81 && l <= 100) { tier = 'diamond'; tn = 'Diamond'; te = '👑'; bonus = 50; }
+            else { tier = 'max'; tn = 'MAX'; te = '⭐'; bonus = 50; }
             return { tier, tierName: tn, tierEmoji: te, bonusPercent: bonus, xpForLevel: Math.floor(l === 1 ? 1800 : 1800 * Math.pow(2, l - 1)) };
         }
-
         function calculateLevel(xp) {
             xp = xp || NEGATIVE_XP;
-            if (xp < 0) {
-                const b = 5000;
-                return { level: 0, xp, progress: Math.min(100, Math.floor((xp + b) / b * 100)), tierName: 'Unlocking', tierEmoji: '🔒', bonusPercent: 0, xpForLevel: b };
-            }
-            let l = 1,
-                xn = 1800,
-                tx = 0;
-            while (l <= 100) {
-                if (xp < tx + xn) break;
-                tx += xn;
-                l++;
-                if (l > 100) break;
-                xn = 1800 * Math.pow(2, l - 1);
-            }
-            if (l > 100) { l = 100;
-                xn = 1800 * Math.pow(2, 99);
-                tx = 0; for (let i = 1; i < 100; i++) tx += 1800 * Math.pow(2, i - 1); }
-            const c = getLevelConfig(l);
-            return { level: l, xp, progress: Math.min(100, Math.floor(((xp - tx) / xn) * 100)), tierName: c.tierName, tierEmoji: c.tierEmoji, bonusPercent: c.bonusPercent, xpForLevel: xn };
+            if (xp < 0) { const b = 5000; return { level: 0, xp, progress: Math.min(100, Math.floor((xp + b) / b * 100)), tierName: 'Unlocking', tierEmoji: '🔒', bonusPercent: 0, xpForLevel: b }; }
+            let l = 1, xn = 1800, tx = 0;
+            while (l <= 100) { if (xp < tx + xn) break; tx += xn; l++; if (l > 100) break; xn = 1800 * Math.pow(2, l - 1); }
+            if (l > 100) { l = 100; xn = 1800 * Math.pow(2, 99); tx = 0; for (let i = 1; i < 100; i++) tx += 1800 * Math.pow(2, i - 1); }
+            const c = getLevelConfig(l); return { level: l, xp, progress: Math.min(100, Math.floor(((xp - tx) / xn) * 100)), tierName: c.tierName, tierEmoji: c.tierEmoji, bonusPercent: c.bonusPercent, xpForLevel: xn };
         }
-
         function updateLevelUI() {
             const d = calculateLevel(app.xpPoints);
             if (d.level === 0) {
-                document.getElementById('levelTitle').textContent = '🔒 Unlocking';
-                document.getElementById('levelNumber').textContent = 'Level 0';
-                document.getElementById('levelProgressFill').style.width = d.progress + '%';
-                document.getElementById('levelCurrentPoints').textContent = `${d.xp} XP`;
-                document.getElementById('levelNextPoints').textContent = `/ ${d.xpForLevel} XP`;
-                document.getElementById('userLevelBadge').textContent = '🔒 Unlocking';
+                document.getElementById('levelTitle').textContent = '🔒 Unlocking'; document.getElementById('levelNumber').textContent = 'Level 0'; document.getElementById('levelProgressFill').style.width = d.progress + '%';
+                document.getElementById('levelCurrentPoints').textContent = `${d.xp} XP`; document.getElementById('levelNextPoints').textContent = `/ ${d.xpForLevel} XP`; document.getElementById('userLevelBadge').textContent = '🔒 Unlocking';
             } else {
-                document.getElementById('levelTitle').textContent = `${d.tierEmoji} ${d.tierName}`;
-                document.getElementById('levelNumber').textContent = `Level ${d.level}`;
-                document.getElementById('levelProgressFill').style.width = d.progress + '%';
-                document.getElementById('levelCurrentPoints').textContent = `${d.xp} XP`;
-                document.getElementById('levelNextPoints').textContent = d.level >= 100 ? '⭐ MAX' : `/ ${d.xpForLevel} XP`;
-                document.getElementById('userLevelBadge').textContent = `${d.tierEmoji} Lv.${d.level}`;
+                document.getElementById('levelTitle').textContent = `${d.tierEmoji} ${d.tierName}`; document.getElementById('levelNumber').textContent = `Level ${d.level}`; document.getElementById('levelProgressFill').style.width = d.progress + '%';
+                document.getElementById('levelCurrentPoints').textContent = `${d.xp} XP`; document.getElementById('levelNextPoints').textContent = d.level >= 100 ? '⭐ MAX' : `/ ${d.xpForLevel} XP`; document.getElementById('userLevelBadge').textContent = `${d.tierEmoji} Lv.${d.level}`;
             }
         }
-
-        function openLevelPage() {
-            document.getElementById('levelOverlay').classList.add('show');
-            updateLevelPageUI();
-            renderLevelGrid();
-        }
-
-        function closeLevelPage() {
-            document.getElementById('levelOverlay').classList.remove('show');
-        }
-
+        function openLevelPage() { document.getElementById('levelOverlay').classList.add('show'); updateLevelPageUI(); renderLevelGrid(); }
+        function closeLevelPage() { document.getElementById('levelOverlay').classList.remove('show'); }
         function updateLevelPageUI() {
             const d = calculateLevel(app.xpPoints);
-            document.getElementById('lvlEmoji').textContent = d.tierEmoji;
-            document.getElementById('lvlNumber').textContent = d.level === 0 ? 'Level 0' : `Level ${d.level}`;
-            document.getElementById('lvlName').textContent = d.tierName;
-            document.getElementById('lvlXP').textContent = d.level === 0 ? `${d.xp} / ${d.xpForLevel} XP` : `${d.xp} XP (${d.progress}%)`;
-            document.getElementById('lvlProgressFill').style.width = d.progress + '%';
-            document.getElementById('lvlBonus').textContent = `Mining Bonus: +${d.bonusPercent}%`;
+            document.getElementById('lvlEmoji').textContent = d.tierEmoji; document.getElementById('lvlNumber').textContent = d.level === 0 ? 'Level 0' : `Level ${d.level}`;
+            document.getElementById('lvlName').textContent = d.tierName; document.getElementById('lvlXP').textContent = d.level === 0 ? `${d.xp} / ${d.xpForLevel} XP` : `${d.xp} XP (${d.progress}%)`;
+            document.getElementById('lvlProgressFill').style.width = d.progress + '%'; document.getElementById('lvlBonus').textContent = `Mining Bonus: +${d.bonusPercent}%`;
         }
-
         function renderLevelGrid() {
-            const g = document.getElementById('levelGrid'),
-                cl = calculateLevel(app.xpPoints);
-            let h = '';
+            const g = document.getElementById('levelGrid'), cl = calculateLevel(app.xpPoints); let h = '';
             for (let i = 0; i <= 100; i++) {
                 if (currentLevelFilter !== 'all') {
                     const r = { bronze: [1, 20], silver: [21, 40], gold: [41, 60], platinum: [61, 80], diamond: [81, 100] };
                     if (i > 0 && (i < r[currentLevelFilter][0] || i > r[currentLevelFilter][1])) continue;
                     if (i === 0 && currentLevelFilter !== 'bronze') continue;
                 }
-                const c = getLevelConfig(i);
-                const isC = cl.level === i,
-                    isU = cl.level >= i;
+                const c = getLevelConfig(i); const isC = cl.level === i, isU = cl.level >= i;
                 h += `<div class="level-card ${isC?'current':isU?'unlocked':'locked'}"><div style="font-size:18px;font-weight:900;color:#fbbf24;">${c.tierEmoji} ${i}</div><div style="font-size:11px;color:#94a3b8;">${c.tierName}</div><div style="font-size:12px;color:#10b981;">+${c.bonusPercent}%</div><div style="font-size:10px;color:#94a3b8;">${isC?'👈':isU?'✅':'🔒'}</div></div>`;
             }
             g.innerHTML = h;
         }
-
-        function filterLevels(f, b) {
-            currentLevelFilter = f;
-            document.querySelectorAll('.lvl-filter-btn').forEach(x => x.classList.remove('active'));
-            if (b) b.classList.add('active');
-            renderLevelGrid();
-        }
+        function filterLevels(f, b) { currentLevelFilter = f; document.querySelectorAll('.lvl-filter-btn').forEach(x => x.classList.remove('active')); if (b) b.classList.add('active'); renderLevelGrid(); }
 
         // ================== TASKS ==================
-        function loadTasks() {
-            db.ref('tasks').on('value', s => {
-                tasks = s.exists() ? Object.keys(s.val()).map(k => ({ id: k, ...s.val()[k] })) : [];
-                renderTasks();
-            });
-        }
-
+        function loadTasks() { db.ref('tasks').on('value', s => { tasks = s.exists() ? Object.keys(s.val()).map(k => ({ id: k, ...s.val()[k] })) : []; renderTasks(); }); }
         function renderTasks() {
-            const c = document.getElementById('tasksContainer'),
-                f = currentFilter === 'all' ? tasks : tasks.filter(t => t.type === currentFilter);
+            const c = document.getElementById('tasksContainer'), f = currentFilter === 'all' ? tasks : tasks.filter(t => t.type === currentFilter);
             c.innerHTML = f.length ? f.map(t => {
-                const done = app.taskLastCompleted[t.id] === new Date().toDateString();
-                const p = app.taskProgress[t.id] || 0;
-                const l = t.limit || 1;
-                const ic = p >= l;
-                let st = '',
-                    bh = '';
+                const done = app.taskLastCompleted[t.id] === new Date().toDateString(); const p = app.taskProgress[t.id] || 0; const l = t.limit || 1; const ic = p >= l;
+                let st = '', bh = '';
                 if (done && ic) st = '<span style="color:#10b981;">✅ Done</span>';
                 else if (ic) st = '<span style="color:#10b981;">✅ Completed</span>';
                 else {
@@ -2074,121 +1751,48 @@
                 return `<div class="task-card"><div class="task-header"><span class="task-title">${t.title}</span><span class="task-reward">+${t.reward} 🪙</span></div><div style="font-size:11px;">${t.description||''}</div><div class="task-progress">Progress: ${p}/${l}</div><div style="display:flex;justify-content:space-between;margin-top:6px;">${st||bh}</div></div>`;
             }).join('') : '<p style="color:#94a3b8;text-align:center;">📭 No tasks</p>';
         }
-
-        function filterTasks(f, b) {
-            currentFilter = f;
-            document.querySelectorAll('.task-filters .filter-btn').forEach(x => x.classList.remove('active'));
-            if (b) b.classList.add('active');
-            renderTasks();
-        }
-
+        function filterTasks(f, b) { currentFilter = f; document.querySelectorAll('.task-filters .filter-btn').forEach(x => x.classList.remove('active')); if (b) b.classList.add('active'); renderTasks(); }
         function openWebViewTask(tid, url, rw, wt) {
-            if (!isOnline) return;
-            if (app.taskProgress[tid] >= (tasks.find(t => t.id === tid)?.limit || 1)) { showToast('Completed!', 'error'); return; }
-            webViewTaskId = tid;
-            webViewTaskReward = rw;
-            webViewRequiredTime = wt || 60;
-            webViewSeconds = 0;
-            document.getElementById('webviewIframe').src = url;
-            document.getElementById('webviewUrlText').textContent = url;
-            document.getElementById('webviewOverlay').classList.add('show');
+            if (!isOnline) return; if (app.taskProgress[tid] >= (tasks.find(t => t.id === tid)?.limit || 1)) { showToast('Completed!', 'error'); return; }
+            webViewTaskId = tid; webViewTaskReward = rw; webViewRequiredTime = wt || 60; webViewSeconds = 0;
+            document.getElementById('webviewIframe').src = url; document.getElementById('webviewUrlText').textContent = url; document.getElementById('webviewOverlay').classList.add('show');
             if (webViewTimerInterval) clearInterval(webViewTimerInterval);
             webViewTimerInterval = setInterval(() => {
-                webViewSeconds++;
-                const r = Math.max(0, webViewRequiredTime - webViewSeconds);
+                webViewSeconds++; const r = Math.max(0, webViewRequiredTime - webViewSeconds);
                 document.getElementById('webviewTimer').textContent = `⏱ ${r}s`;
-                if (r <= 0) {
-                    clearInterval(webViewTimerInterval);
-                    webViewTimerInterval = null;
-                    document.getElementById('webviewClaimBtn').disabled = false;
-                    document.getElementById('webviewClaimBtn').textContent = '✅ Claim';
-                } else document.getElementById('webviewClaimBtn').textContent = `⏳ ${r}s`;
+                if (r <= 0) { clearInterval(webViewTimerInterval); webViewTimerInterval = null; document.getElementById('webviewClaimBtn').disabled = false; document.getElementById('webviewClaimBtn').textContent = '✅ Claim'; }
+                else document.getElementById('webviewClaimBtn').textContent = `⏳ ${r}s`;
             }, 1000);
         }
-
-        function closeWebView() {
-            document.getElementById('webviewOverlay').classList.remove('show');
-            if (webViewTimerInterval) { clearInterval(webViewTimerInterval);
-                webViewTimerInterval = null; }
-            document.getElementById('webviewIframe').src = 'about:blank';
-            webViewTaskId = null;
-        }
-
+        function closeWebView() { document.getElementById('webviewOverlay').classList.remove('show'); if (webViewTimerInterval) { clearInterval(webViewTimerInterval); webViewTimerInterval = null; } document.getElementById('webviewIframe').src = 'about:blank'; webViewTaskId = null; }
         function claimWebViewTask() {
-            if (!webViewTaskId) return;
-            app.taskProgress[webViewTaskId] = (app.taskProgress[webViewTaskId] || 0) + 1;
+            if (!webViewTaskId) return; app.taskProgress[webViewTaskId] = (app.taskProgress[webViewTaskId] || 0) + 1;
             if (app.taskProgress[webViewTaskId] >= (tasks.find(t => t.id === webViewTaskId)?.limit || 1)) app.taskLastCompleted[webViewTaskId] = new Date().toDateString();
-            app.balance += webViewTaskReward;
-            app.xpPoints += webViewTaskReward * 2;
+            app.balance += webViewTaskReward; app.xpPoints += webViewTaskReward * 2;
             userRef.update({ balance: app.balance, xpPoints: app.xpPoints, taskProgress: app.taskProgress, taskLastCompleted: app.taskLastCompleted });
-            closeWebView();
-            updateUI();
-            updateLevelUI();
-            renderTasks();
-            showToast(`🎉 +${webViewTaskReward} Coins!`);
+            closeWebView(); updateUI(); updateLevelUI(); renderTasks(); showToast(`🎉 +${webViewTaskReward} Coins!`);
         }
-
         function completeTask(tid, rw, type) {
-            if (!isOnline) return;
-            const t = tasks.find(t => t.id === tid);
-            if (!t || (app.taskProgress[tid] || 0) >= (t.limit || 1)) return;
+            if (!isOnline) return; const t = tasks.find(t => t.id === tid); if (!t || (app.taskProgress[tid] || 0) >= (t.limit || 1)) return;
             if (type === 'video') show_11197472().then(() => finishTaskProgress(tid, rw, t.limit || 1)).catch(() => showToast('Ad not watched!', 'error'));
             else finishTaskProgress(tid, rw, t.limit || 1);
         }
-
-        function finishTaskProgress(tid, rw, l) {
-            app.taskProgress[tid] = (app.taskProgress[tid] || 0) + 1;
-            if (app.taskProgress[tid] >= l) app.taskLastCompleted[tid] = new Date().toDateString();
-            app.balance += rw;
-            app.xpPoints += rw * 2;
-            userRef.update({ balance: app.balance, xpPoints: app.xpPoints, taskLastCompleted: app.taskLastCompleted, taskProgress: app.taskProgress });
-            updateUI();
-            updateLevelUI();
-            renderTasks();
-            showToast(`🎉 +${rw} Coins!`);
-        }
+        function finishTaskProgress(tid, rw, l) { app.taskProgress[tid] = (app.taskProgress[tid] || 0) + 1; if (app.taskProgress[tid] >= l) app.taskLastCompleted[tid] = new Date().toDateString(); app.balance += rw; app.xpPoints += rw * 2; userRef.update({ balance: app.balance, xpPoints: app.xpPoints, taskLastCompleted: app.taskLastCompleted, taskProgress: app.taskProgress }); updateUI(); updateLevelUI(); renderTasks(); showToast(`🎉 +${rw} Coins!`); }
 
         // ================== REFERRAL ==================
-        function loadReferralConfigFromDB() {
-            db.ref('referralConfig').on('value', s => {
-                referralConfigCache = s.val() || { perReferralCoins: 50, xpPerReferral: 100 };
-                updateReferUI();
-            });
-        }
-
+        function loadReferralConfigFromDB() { db.ref('referralConfig').on('value', s => { referralConfigCache = s.val() || { perReferralCoins: 50, xpPerReferral: 100 }; updateReferUI(); }); }
         function updateReferUI() {
-            const t = app.referralCount || 0;
-            document.getElementById('referTotal').textContent = t;
-            document.getElementById('referEarned').textContent = t * (referralConfigCache.perReferralCoins || 50);
-            document.getElementById('referBonus').textContent = Math.floor(t / 10) * 50;
+            const t = app.referralCount || 0; document.getElementById('referTotal').textContent = t; document.getElementById('referEarned').textContent = t * (referralConfigCache.perReferralCoins || 50); document.getElementById('referBonus').textContent = Math.floor(t / 10) * 50;
             const tiers = [{ l: 1, c: referralConfigCache.tier1?.count || 10, b: referralConfigCache.tier1?.bonus || 50, n: '🥉 Bronze' }, { l: 2, c: referralConfigCache.tier2?.count || 25, b: referralConfigCache.tier2?.bonus || 150, n: '🥈 Silver' }, { l: 3, c: referralConfigCache.tier3?.count || 50, b: referralConfigCache.tier3?.bonus || 300, n: '🥇 Gold' }, { l: 4, c: referralConfigCache.tier4?.count || 100, b: referralConfigCache.tier4?.bonus || 500, n: '💎 Platinum' }, { l: 5, c: referralConfigCache.tier5?.count || 200, b: referralConfigCache.tier5?.bonus || 1000, n: '👑 Diamond' }];
             document.getElementById('referTierList').innerHTML = tiers.map(r => {
-                const cl = app.referTiers?.[r.l] === 1,
-                    av = t >= r.c && !cl;
+                const cl = app.referTiers?.[r.l] === 1, av = t >= r.c && !cl;
                 return `<div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;"><div><div style="font-size:13px;">${r.n}</div><div style="font-size:10px;color:#94a3b8;">${r.c} refs • +${r.b} 🪙</div></div><span style="color:${av?'#fbbf24':'#64748b'};" ${av?`onclick="claimTier(${r.l},${r.b})"`:''}>${cl?'✅':av?'🎁':'🔒'}</span></div>`;
             }).join('');
         }
-
-        function claimTier(l, b) {
-            if (app.referTiers?.[l] === 1) return;
-            app.balance += b;
-            app.xpPoints += b * 2;
-            if (!app.referTiers) app.referTiers = {};
-            app.referTiers[l] = 1;
-            userRef.update({ balance: app.balance, xpPoints: app.xpPoints, referTiers: app.referTiers });
-            updateUI();
-            updateLevelUI();
-            updateReferUI();
-            showToast(`🎁 +${b} Coins!`);
-        }
-
-        function genRefCode() {
-            return Array(8).fill(0).map(() => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random() * 36)]).join('');
-        }
-
+        function claimTier(l, b) { if (app.referTiers?.[l] === 1) return; app.balance += b; app.xpPoints += b * 2; if (!app.referTiers) app.referTiers = {}; app.referTiers[l] = 1; userRef.update({ balance: app.balance, xpPoints: app.xpPoints, referTiers: app.referTiers }); updateUI(); updateLevelUI(); updateReferUI(); showToast(`🎁 +${b} Coins!`); }
+        function genRefCode() { return Array(8).fill(0).map(() => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random() * 36)]).join(''); }
         function submitReferCode() {
-            if (!isOnline) return;
-            const code = document.getElementById('referCodeInput').value.trim().toUpperCase();
+            if (!isOnline) return; const code = document.getElementById('referCodeInput').value.trim().toUpperCase();
             if (!code) { showToast('Enter code!', 'error'); return; }
             userRef.once('value', s => {
                 if ((s.val() || {}).referCodeSubmitted) { showToast('Already used!', 'error'); return; }
@@ -2199,112 +1803,88 @@
                         const b = referralConfigCache.perReferralCoins || 50;
                         db.ref('referrals/' + userId).set({ referredBy: c.key, referredAt: Date.now(), username: displayName, bonus: b, userId }).then(() => {
                             db.ref('users/' + c.key).transaction(cur => ({ ...(cur || {}), referCount: (cur?.referCount || 0) + 1 }));
-                            app.balance += b;
-                            app.xpPoints += referralConfigCache.xpPerReferral || 100;
+                            app.balance += b; app.xpPoints += referralConfigCache.xpPerReferral || 100;
                             userRef.update({ balance: app.balance, xpPoints: app.xpPoints, referCodeSubmitted: true });
-                            document.getElementById('referCodeSubmitBtn').disabled = true;
-                            document.getElementById('referCodeInput').disabled = true;
-                            updateUI();
-                            updateLevelUI();
-                            showToast(`🎉 +${b} Coins!`);
+                            document.getElementById('referCodeSubmitBtn').disabled = true; document.getElementById('referCodeInput').disabled = true;
+                            updateUI(); updateLevelUI(); showToast(`🎉 +${b} Coins!`);
                         });
                     });
                 });
             });
         }
-
-        function copyReferLink() {
-            const l = document.getElementById('referLinkHome').textContent;
-            if (l && l !== 'Loading...') navigator.clipboard.writeText(l).then(() => showToast('📋 Copied!')).catch(() => showToast('Copy manually', 'error'));
-        }
+        function copyReferLink() { const l = document.getElementById('referLinkHome').textContent; if (l && l !== 'Loading...') navigator.clipboard.writeText(l).then(() => showToast('📋 Copied!')).catch(() => showToast('Copy manually', 'error')); }
 
         // ================== AIRDROP ==================
         function loadAirdrop() {
             db.ref('airdropConfig').on('value', s => {
-                const c = s.val() || {};
-                document.getElementById('airdropPoolDisplay').textContent = `$${(c.poolAmount||50).toFixed(4)}`;
+                const c = s.val() || {}; document.getElementById('airdropPoolDisplay').textContent = `$${(c.poolAmount||50).toFixed(4)}`;
                 if (c.startTime) startAirdropCountdown(c.startTime, c.endTime);
             });
         }
-
         function startAirdropCountdown(st, et) {
-            if (airdropTimer) clearInterval(airdropTimer);
-            const endTime = et || st + 300000;
+            if (airdropTimer) clearInterval(airdropTimer); const endTime = et || st + 300000;
             airdropTimer = setInterval(() => {
-                const r = Math.max(0, endTime - Date.now()),
-                    h = Math.floor(r / 3600000),
-                    m = Math.floor((r % 3600000) / 60000),
-                    s = Math.floor((r % 60000) / 1000);
+                const r = Math.max(0, endTime - Date.now()), h = Math.floor(r / 3600000), m = Math.floor((r % 3600000) / 60000), s = Math.floor((r % 60000) / 1000);
                 document.getElementById('airdropCountdown').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
                 const btn = document.getElementById('airdropClaimBtn');
-                if (r > 0 && !app.airdropClaimed) { btn.disabled = false;
-                    btn.textContent = '🎁 Claim'; } else { btn.disabled = true;
-                    btn.textContent = app.airdropClaimed ? '✅ Claimed' : '⛔ Ended'; }
-                if (r <= 0) { clearInterval(airdropTimer);
-                    airdropTimer = null; }
+                if (r > 0 && !app.airdropClaimed) { btn.disabled = false; btn.textContent = '🎁 Claim'; }
+                else { btn.disabled = true; btn.textContent = app.airdropClaimed ? '✅ Claimed' : '⛔ Ended'; }
+                if (r <= 0) { clearInterval(airdropTimer); airdropTimer = null; }
             }, 1000);
         }
-
         function claimAirdrop() {
             if (!isOnline || app.airdropClaimed) return;
             show_11197472().then(() => {
-                const amt = Math.random() * 1.5 + 0.5,
-                    coins = Math.floor(amt * app.conversionRate);
-                app.balance += coins;
-                app.airdropClaimed = true;
-                app.xpPoints += coins;
+                const amt = Math.random() * 1.5 + 0.5, coins = Math.floor(amt * app.conversionRate);
+                app.balance += coins; app.airdropClaimed = true; app.xpPoints += coins;
                 db.ref('airdropList/' + Date.now()).set({ userId, username: displayName, amount: amt, coins, timestamp: Date.now() });
                 userRef.update({ balance: app.balance, airdropClaimed: true, xpPoints: app.xpPoints });
-                document.getElementById('airdropModalText').textContent = `+${coins} Coins!`;
-                document.getElementById('airdropModal').classList.add('active');
-                updateUI();
-                updateLevelUI();
-                showToast(`🎉 +${coins} Coins!`);
+                document.getElementById('airdropModalText').textContent = `+${coins} Coins!`; document.getElementById('airdropModal').classList.add('active');
+                updateUI(); updateLevelUI(); showToast(`🎉 +${coins} Coins!`);
             }).catch(() => showToast('Ad not watched!', 'error'));
         }
 
-        // ================== WITHDRAW ==================
+        // ================== WITHDRAW (UPDATED) ==================
         function updateWithdrawUI() {
             const b = app.usdBalance || 0,
-                m = app.minWithdraw || 10;
+                m = app.minWithdraw || 1;
             document.getElementById('withdrawInfo').textContent = `Min: $${m.toFixed(4)}`;
             document.getElementById('withdrawStatus').textContent = `You have: $${b.toFixed(4)}`;
             const c = document.getElementById('methodSelector');
             const mt = app.withdrawMethods || ['Nagad', 'Rocket'];
             if (!mt.includes(app.selectedMethod)) app.selectedMethod = mt[0] || 'Nagad';
             c.innerHTML = mt.map(m => `<button class="method-btn ${m===app.selectedMethod?'active':''}" onclick="selectMethod('${m}')"><i class="fas ${m.toLowerCase()==='nagad'?'fa-mobile-alt':m.toLowerCase()==='rocket'?'fa-rocket':'fa-wallet'}"></i> ${m}</button>`).join('');
+            
+            // Enable/Disable button based on balance
             document.getElementById('withdrawBtn').disabled = b < m || !isOnline;
             document.getElementById('withdrawBtn').textContent = !isOnline ? 'No Internet' : (b < m ? `Need $${(m-b).toFixed(4)} more` : 'Withdraw Now');
         }
 
-        function selectMethod(m) { app.selectedMethod = m;
-            updateWithdrawUI(); }
+        function selectMethod(m) { app.selectedMethod = m; updateWithdrawUI(); }
 
         function withdraw() {
             if (!isOnline) return;
             const b = app.usdBalance || 0;
-            if (b < (app.minWithdraw || 10)) { showToast('Insufficient!', 'error'); return; }
+            const selectedAmount = parseFloat(document.getElementById('withdrawAmountSelect').value);
+            if (b < selectedAmount) { showToast('Insufficient!', 'error'); return; }
             const mt = app.selectedMethod,
                 ac = document.getElementById('withdrawAccount').value.trim();
             if (!ac) { showToast('Enter account!', 'error'); return; }
             const id = Date.now().toString();
-            db.ref('withdrawRequests/' + id).set({ userId, username: displayName, amount: b, method: mt, account: ac, status: 'pending', requestedAt: new Date().toISOString() });
-            app.usdBalance = 0;
-            app.withdrawHistory = [...(app.withdrawHistory || []), { id, amount: b, method: mt, account: ac, status: 'pending', date: new Date().toISOString() }];
-            userRef.update({ usdBalance: 0, withdrawHistory: app.withdrawHistory });
+            db.ref('withdrawRequests/' + id).set({ userId, username: displayName, amount: selectedAmount, method: mt, account: ac, status: 'pending', requestedAt: new Date().toISOString() });
+            app.usdBalance = b - selectedAmount;
+            app.withdrawHistory = [...(app.withdrawHistory || []), { id, amount: selectedAmount, method: mt, account: ac, status: 'pending', date: new Date().toISOString() }];
+            userRef.update({ usdBalance: app.usdBalance, withdrawHistory: app.withdrawHistory });
             document.getElementById('withdrawModalTitle').textContent = 'Sent!';
-            document.getElementById('withdrawModalText').textContent = `$${b.toFixed(4)} via ${mt}`;
+            document.getElementById('withdrawModalText').textContent = `$${selectedAmount.toFixed(4)} via ${mt}`;
             document.getElementById('withdrawModal').classList.add('active');
             document.getElementById('withdrawAccount').value = '';
-            updateUI();
-            updateWithdrawUI();
-            updateWithdrawHistoryUI();
-            showToast(`$${b.toFixed(4)} requested!`);
+            updateUI(); updateWithdrawUI(); updateWithdrawHistoryUI();
+            showToast(`$${selectedAmount.toFixed(4)} requested!`);
         }
 
         function updateWithdrawHistoryUI() {
-            const c = document.getElementById('withdrawHistoryList'),
-                h = app.withdrawHistory || [];
+            const c = document.getElementById('withdrawHistoryList'), h = app.withdrawHistory || [];
             c.innerHTML = h.length ? h.slice(-20).reverse().map(h => `<div class="history-item"><div><b>$${h.amount?.toFixed(4)||'0.0000'}</b> <small>${h.method||''}</small></div><div style="text-align:right;"><span>${h.status==='approved'?'✅':h.status==='cancelled'?'❌':'⏳'} ${h.status}</span><div style="font-size:9px;">${h.date?new Date(h.date).toLocaleDateString():''}</div></div></div>`).join('') : '<span style="color:#94a3b8;font-size:11px;">No history</span>';
         }
 
@@ -2312,8 +1892,10 @@
         let conversionTimerInterval = null;
 
         function performConversion() {
+            // রেট DB থেকে নেওয়া হবে
+            const rate = app.conversionRate || 1000;
             if (app.balance > 0) {
-                const e = app.balance / app.conversionRate;
+                const e = app.balance / rate;
                 app.usdBalance += e;
                 const c = app.balance;
                 app.balance = 0;
@@ -2331,22 +1913,11 @@
         }
 
         function startConversionTimer() {
-            if (conversionTimerInterval) { clearInterval(conversionTimerInterval);
-                conversionTimerInterval = null; }
+            if (conversionTimerInterval) { clearInterval(conversionTimerInterval); conversionTimerInterval = null; }
             const ud = () => {
-                const n = Date.now(),
-                    l = app.lastConversion || n,
-                    nc = l + 86400000,
-                    r = Math.max(0, nc - n);
-                if (r <= 0) {
-                    if (conversionTimerInterval) { clearInterval(conversionTimerInterval);
-                        conversionTimerInterval = null; }
-                    performConversion();
-                    return;
-                }
-                const h = Math.floor(r / 3600000),
-                    m = Math.floor((r % 3600000) / 60000),
-                    s = Math.floor((r % 60000) / 1000);
+                const n = Date.now(), l = app.lastConversion || n, nc = l + 86400000, r = Math.max(0, nc - n);
+                if (r <= 0) { if (conversionTimerInterval) { clearInterval(conversionTimerInterval); conversionTimerInterval = null; } performConversion(); return; }
+                const h = Math.floor(r / 3600000), m = Math.floor((r % 3600000) / 60000), s = Math.floor((r % 60000) / 1000);
                 document.getElementById('conversionCountdown').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
             };
             ud();
@@ -2354,20 +1925,12 @@
         }
 
         // ================== NOTIFICATIONS ==================
-        function openNotificationPanel() {
-            document.getElementById('notificationOverlay').classList.add('show');
-            loadNotifications();
-        }
-
-        function closeNotificationPanel() {
-            document.getElementById('notificationOverlay').classList.remove('show');
-        }
-
+        function openNotificationPanel() { document.getElementById('notificationOverlay').classList.add('show'); loadNotifications(); }
+        function closeNotificationPanel() { document.getElementById('notificationOverlay').classList.remove('show'); }
         function loadNotifications() {
             const c = document.getElementById('notificationList');
             db.ref('notifications').orderByChild('createdAt').limitToLast(20).once('value', s => {
-                const ns = s.val() || {};
-                const na = Object.values(ns).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                const ns = s.val() || {}; const na = Object.values(ns).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
                 c.innerHTML = na.length ? na.map(n => {
                     const d = n.createdAt ? new Date(n.createdAt).toLocaleString() : '';
                     return `<div class="notification-item"><div class="notif-title">${n.title||'Notification'}</div><div class="notif-message">${n.message||''}</div><div class="notif-time">${d}</div></div>`;
@@ -2385,162 +1948,77 @@
             document.getElementById('walletTotalUsd').textContent = `$${app.usdBalance.toFixed(4)}`;
             document.getElementById('usdBalanceDisplay').textContent = `$${app.usdBalance.toFixed(4)}`;
             document.getElementById('totalBalanceDisplay').textContent = `${Math.floor(app.balance)} + $${app.usdBalance.toFixed(4)}`;
-            updateWithdrawUI();
-            updateSpeedBoostUI();
-            startConversionTimer();
+            updateWithdrawUI(); updateSpeedBoostUI(); startConversionTimer();
         }
-
         function updateProgressUI() {
             const pct = (app.progressCoins / TOTAL_COINS * 100);
             document.getElementById('miningCircle').style.background = `conic-gradient(#fbbf24 ${pct}%, #1e293b ${pct}%)`;
-            document.getElementById('progressCoinCount').textContent = app.progressCoins;
-            document.getElementById('progressPercent').textContent = Math.round(pct) + '%';
-            const o = document.getElementById('circleStartOverlay'),
-                c = document.getElementById('miningCircle');
-            if (app.progressCoins === 0) {
-                document.getElementById('progressStatus').textContent = '🎯 Empty!';
-                o.classList.remove('hidden');
-                c.classList.remove('mining-active');
-            } else if (miningInterval) {
-                document.getElementById('progressStatus').textContent = '⚡ Mining...';
-                o.classList.add('hidden');
-                c.classList.add('mining-active');
-            } else {
-                document.getElementById('progressStatus').textContent = 'Ready';
-                o.classList.remove('hidden');
-                c.classList.remove('mining-active');
-            }
+            document.getElementById('progressCoinCount').textContent = app.progressCoins; document.getElementById('progressPercent').textContent = Math.round(pct) + '%';
+            const o = document.getElementById('circleStartOverlay'), c = document.getElementById('miningCircle');
+            if (app.progressCoins === 0) { document.getElementById('progressStatus').textContent = '🎯 Empty!'; o.classList.remove('hidden'); c.classList.remove('mining-active'); }
+            else if (miningInterval) { document.getElementById('progressStatus').textContent = '⚡ Mining...'; o.classList.add('hidden'); c.classList.add('mining-active'); }
+            else { document.getElementById('progressStatus').textContent = 'Ready'; o.classList.remove('hidden'); c.classList.remove('mining-active'); }
         }
 
         // ================== NAVIGATION ==================
         function switchPage(p, el) {
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            if (el) el.classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active')); if (el) el.classList.add('active');
             document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
             const t = document.getElementById('page' + p.charAt(0).toUpperCase() + p.slice(1));
             if (t) t.classList.add('active');
-            if (p === 'tasks') renderTasks();
-            if (p === 'refer') updateReferUI();
-            if (p === 'wallet') { updateWithdrawUI();
-                updateWithdrawHistoryUI(); }
+            if (p === 'tasks') renderTasks(); if (p === 'refer') updateReferUI(); if (p === 'wallet') { updateWithdrawUI(); updateWithdrawHistoryUI(); }
         }
-
-        function showToast(m, ty = 'success') {
-            const t = document.getElementById('toast');
-            t.textContent = m;
-            t.className = 'toast show' + (ty === 'error' ? ' error' : '');
-            clearTimeout(t._t);
-            t._t = setTimeout(() => t.classList.remove('show'), 3000);
-        }
-
+        function showToast(m, ty = 'success') { const t = document.getElementById('toast'); t.textContent = m; t.className = 'toast show' + (ty === 'error' ? ' error' : ''); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 3000); }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
         // ================== BAN ==================
-        function checkBanStatus() {
-            userRef.child('banned').on('value', s => {
-                if (s.val() === true) {
-                    document.getElementById('bannedOverlay').classList.add('show');
-                    document.getElementById('mainContent').style.display = 'none';
-                    document.querySelector('.bottom-nav').style.display = 'none';
-                }
-            });
-        }
-
-        function submitBanAppeal() {
-            const msg = prompt('Write your appeal:');
-            if (!msg) return;
-            db.ref('banAppeals/' + userId).set({ userId, username: displayName, message: msg, status: 'pending', createdAt: Date.now() });
-            showToast('📩 Submitted!');
-        }
+        function checkBanStatus() { userRef.child('banned').on('value', s => { if (s.val() === true) { document.getElementById('bannedOverlay').classList.add('show'); document.getElementById('mainContent').style.display = 'none'; document.querySelector('.bottom-nav').style.display = 'none'; } }); }
+        function submitBanAppeal() { const msg = prompt('Write your appeal:'); if (!msg) return; db.ref('banAppeals/' + userId).set({ userId, username: displayName, message: msg, status: 'pending', createdAt: Date.now() }); showToast('📩 Submitted!'); }
 
         // ================== NETWORK ==================
-        window.addEventListener('online', () => { isOnline = true;
-            document.getElementById('networkOverlay').classList.remove('show'); });
-        window.addEventListener('offline', () => { isOnline = false;
-            document.getElementById('networkOverlay').classList.add('show'); });
-
-        function checkNetworkAndReload() {
-            if (navigator.onLine) location.reload();
-            else showToast('Still offline!', 'error');
-        }
+        window.addEventListener('online', () => { isOnline = true; document.getElementById('networkOverlay').classList.remove('show'); });
+        window.addEventListener('offline', () => { isOnline = false; document.getElementById('networkOverlay').classList.add('show'); });
+        function checkNetworkAndReload() { if (navigator.onLine) location.reload(); else showToast('Still offline!', 'error'); }
 
         // ================== RULES ==================
-        function loadRules() {
-            db.ref('rules').on('value', s => {
-                const r = s.val() || {};
-                document.getElementById('miningRulesText').textContent = r.mining || 'No rules set.';
-                document.getElementById('taskRulesText').textContent = r.tasks || 'No rules set.';
-                document.getElementById('referRulesText').textContent = r.referral || 'No rules set.';
-                document.getElementById('withdrawRulesText').textContent = r.withdraw || 'No rules set.';
-                document.getElementById('levelRulesText').textContent = r.level || 'No rules set.';
-                document.getElementById('airdropRulesText').textContent = r.airdrop || 'No rules set.';
-            });
-        }
+        function loadRules() { db.ref('rules').on('value', s => { const r = s.val() || {}; document.getElementById('miningRulesText').textContent = r.mining || 'No rules set.'; document.getElementById('taskRulesText').textContent = r.tasks || 'No rules set.'; document.getElementById('referRulesText').textContent = r.referral || 'No rules set.'; document.getElementById('withdrawRulesText').textContent = r.withdraw || 'No rules set.'; document.getElementById('levelRulesText').textContent = r.level || 'No rules set.'; document.getElementById('airdropRulesText').textContent = r.airdrop || 'No rules set.'; }); }
 
         // ================== INIT ==================
         function initApp() {
-            if (!navigator.onLine) { document.getElementById('networkOverlay').classList.add('show');
-                isOnline = false; }
+            if (!navigator.onLine) { document.getElementById('networkOverlay').classList.add('show'); isOnline = false; }
             userRef.update({ username: tg.initDataUnsafe?.user?.username || '', firstName: tg.initDataUnsafe?.user?.first_name || '', lastName: tg.initDataUnsafe?.user?.last_name || '', fullName: displayName, lastLogin: new Date().toISOString() });
             document.getElementById('userName').textContent = displayName;
-            checkBanStatus();
-            loadReferralConfigFromDB();
-            loadRules();
-            loadSpinData();
-            loadSpinConfig();
-            buildPrizeData();
-            buildWheel();
-            watchMiningCoins();
-            checkMaintenance();
-            db.ref('conversionRate').on('value', s => { app.conversionRate = s.val() || 1000;
-                updateUI(); });
+            checkBanStatus(); loadReferralConfigFromDB(); loadRules(); loadSpinData(); loadSpinConfig(); buildPrizeData(); buildWheel(); watchMiningCoins(); checkMaintenance();
+            
+            // Config load from DB
+            loadGameConfigs();
+
+            db.ref('conversionRate').on('value', s => { app.conversionRate = s.val() || 1000; document.getElementById('rateInfo').textContent = `1 USD = ${app.conversionRate} Coins`; updateUI(); });
+            db.ref('minWithdraw').on('value', s => { app.minWithdraw = s.val() || 1; updateWithdrawUI(); });
+            db.ref('dailyBonus').on('value', s => { const d = s.val() || {}; app.dailyBonusMin = d.min || 50; app.dailyBonusMax = d.max || 100; });
+            db.ref('mysteryBox').on('value', s => { const d = s.val() || {}; app.mysteryBoxMin = d.min || 20; app.mysteryBoxMax = d.max || 100; app.mysteryBoxDuration = d.duration || 1800000; });
+
             show_11197472({ type: 'inApp', inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false } });
             let lt = setTimeout(() => { document.getElementById('loadingPage').classList.add('hidden'); }, 15000);
             userRef.on('value', snap => {
-                clearTimeout(lt);
-                document.getElementById('loadingPage').classList.add('hidden');
-                const d = snap.val() || {};
-                if (d.banned) return;
-                app.balance = d.balance || 0;
-                app.usdBalance = d.usdBalance || 0;
-                app.referralCount = d.referCount || 0;
-                app.lastConversion = d.lastConversion || Date.now();
-                app.referCode = d.referCode || genRefCode();
-                app.referTiers = d.referTiers || {};
-                app.progressCoins = d.progressCoins !== undefined ? d.progressCoins : TOTAL_COINS;
-                app.speedBoostCooldown = d.speedBoostCooldown || 0;
-                app.mysteryBoxCooldown = d.mysteryBoxCooldown || 0;
-                app.taskLastCompleted = d.taskLastCompleted || {};
-                app.taskProgress = d.taskProgress || {};
-                app.xpPoints = d.xpPoints !== undefined ? d.xpPoints : NEGATIVE_XP;
-                app.withdrawHistory = d.withdrawHistory || [];
-                app.airdropClaimed = d.airdropClaimed || false;
-                app.dailyBonusClaimed = d.dailyBonusClaimed || '';
-                if (!window._lastReferCode || window._lastReferCode !== app.referCode) {
-                    window._lastReferCode = app.referCode;
-                    document.getElementById('referLinkHome').textContent = `https://t.me/CoinQuist_bot?start=ref_${app.referCode}`;
-                }
+                clearTimeout(lt); document.getElementById('loadingPage').classList.add('hidden');
+                const d = snap.val() || {}; if (d.banned) return;
+                app.balance = d.balance || 0; app.usdBalance = d.usdBalance || 0; app.referralCount = d.referCount || 0; app.lastConversion = d.lastConversion || Date.now(); app.referCode = d.referCode || genRefCode(); app.referTiers = d.referTiers || {};
+                app.progressCoins = d.progressCoins !== undefined ? d.progressCoins : TOTAL_COINS; app.speedBoostCooldown = d.speedBoostCooldown || 0; app.mysteryBoxCooldown = d.mysteryBoxCooldown || 0;
+                app.taskLastCompleted = d.taskLastCompleted || {}; app.taskProgress = d.taskProgress || {}; app.xpPoints = d.xpPoints !== undefined ? d.xpPoints : NEGATIVE_XP;
+                app.withdrawHistory = d.withdrawHistory || []; app.airdropClaimed = d.airdropClaimed || false; app.dailyBonusClaimed = d.dailyBonusClaimed || '';
+                if (!window._lastReferCode || window._lastReferCode !== app.referCode) { window._lastReferCode = app.referCode; document.getElementById('referLinkHome').textContent = `https://t.me/CoinQuist_bot?start=ref_${app.referCode}`; }
                 document.getElementById('userName').textContent = d.fullName || d.firstName || displayName;
                 if (d.lastLogin) document.getElementById('lastLoginDisplay').textContent = `📅 ${new Date(d.lastLogin).toLocaleString()}`;
                 document.getElementById('dailyBonusStatus').textContent = app.dailyBonusClaimed === new Date().toDateString() ? '✅ Claimed' : '🎯 Claim Now';
                 updateMysteryBoxUI();
                 if (!d.balance && d.xpPoints === undefined) userRef.update({ balance: 0, usdBalance: 0, referCode: app.referCode, progressCoins: TOTAL_COINS, xpPoints: NEGATIVE_XP, lastConversion: Date.now(), lastLogin: new Date().toISOString(), airdropClaimed: false, isCurrentlyMining: false, username: tg.initDataUnsafe?.user?.username || '', firstName: tg.initDataUnsafe?.user?.first_name || '', lastName: tg.initDataUnsafe?.user?.last_name || '', fullName: displayName });
-                updateUI();
-                updateLevelUI();
-                updateProgressUI();
-                updateSpeedBoostUI();
-                startConversionTimer();
+                updateUI(); updateLevelUI(); updateProgressUI(); updateSpeedBoostUI(); startConversionTimer();
             });
             db.ref('withdrawSettings').on('value', s => {
-                if (s.exists()) {
-                    app.minWithdraw = s.val().minAmount || 10;
-                    app.withdrawMethods = s.val().methods || ['Nagad', 'Rocket'];
-                    if (!app.withdrawMethods.includes(app.selectedMethod)) app.selectedMethod = app.withdrawMethods[0] || 'Nagad';
-                }
-                updateWithdrawUI();
+                if (s.exists()) { app.minWithdraw = s.val().minAmount || 1; app.withdrawMethods = s.val().methods || ['Nagad', 'Rocket']; if (!app.withdrawMethods.includes(app.selectedMethod)) app.selectedMethod = app.withdrawMethods[0] || 'Nagad'; } updateWithdrawUI();
             });
-            loadTasks();
-            loadAirdrop();
+            loadTasks(); loadAirdrop();
         }
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
