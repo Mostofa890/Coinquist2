@@ -844,9 +844,12 @@
         let gameConfigs = {};
 
         function loadGameConfigs() {
-            db.ref('gameConfigs').on('value', snap => {
-                gameConfigs = snap.val() || {};
-                updateGameUIConfigs();
+            return new Promise((resolve) => {
+                db.ref('gameConfigs').on('value', snap => {
+                    gameConfigs = snap.val() || {};
+                    updateGameUIConfigs();
+                    resolve();
+                });
             });
         }
 
@@ -2344,34 +2347,35 @@
             document.getElementById('userName').textContent = displayName;
             checkBanStatus(); loadReferralConfigFromDB(); loadRules(); loadSpinData(); loadSpinConfig(); buildPrizeData(); buildWheel(); watchMiningCoins(); checkMaintenance();
             
-            loadGameConfigs();
+            // Game config load first, then user data
+            loadGameConfigs().then(() => {
+                db.ref('conversionRate').on('value', s => { app.conversionRate = s.val() || 1000; document.getElementById('rateInfo').textContent = `1 USD = ${app.conversionRate} Coins`; updateUI(); });
+                db.ref('minWithdraw').on('value', s => { app.minWithdraw = s.val() || 1; updateWithdrawUI(); });
+                db.ref('dailyBonus').on('value', s => { const d = s.val() || {}; app.dailyBonusMin = d.min || 50; app.dailyBonusMax = d.max || 100; });
+                db.ref('mysteryBox').on('value', s => { const d = s.val() || {}; app.mysteryBoxMin = d.min || 20; app.mysteryBoxMax = d.max || 100; app.mysteryBoxDuration = d.duration || 1800000; });
 
-            db.ref('conversionRate').on('value', s => { app.conversionRate = s.val() || 1000; document.getElementById('rateInfo').textContent = `1 USD = ${app.conversionRate} Coins`; updateUI(); });
-            db.ref('minWithdraw').on('value', s => { app.minWithdraw = s.val() || 1; updateWithdrawUI(); });
-            db.ref('dailyBonus').on('value', s => { const d = s.val() || {}; app.dailyBonusMin = d.min || 50; app.dailyBonusMax = d.max || 100; });
-            db.ref('mysteryBox').on('value', s => { const d = s.val() || {}; app.mysteryBoxMin = d.min || 20; app.mysteryBoxMax = d.max || 100; app.mysteryBoxDuration = d.duration || 1800000; });
-
-            show_11197472({ type: 'inApp', inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false } });
-            let lt = setTimeout(() => { document.getElementById('loadingPage').classList.add('hidden'); }, 15000);
-            userRef.on('value', snap => {
-                clearTimeout(lt); document.getElementById('loadingPage').classList.add('hidden');
-                const d = snap.val() || {}; if (d.banned) return;
-                app.balance = d.balance || 0; app.usdBalance = d.usdBalance || 0; app.referralCount = d.referCount || 0; app.lastConversion = d.lastConversion || Date.now(); app.referCode = d.referCode || genRefCode(); app.referTiers = d.referTiers || {};
-                app.progressCoins = d.progressCoins !== undefined ? d.progressCoins : TOTAL_COINS; app.speedBoostCooldown = d.speedBoostCooldown || 0; app.mysteryBoxCooldown = d.mysteryBoxCooldown || 0;
-                app.taskLastCompleted = d.taskLastCompleted || {}; app.taskProgress = d.taskProgress || {}; app.xpPoints = d.xpPoints !== undefined ? d.xpPoints : NEGATIVE_XP;
-                app.withdrawHistory = d.withdrawHistory || []; app.airdropClaimed = d.airdropClaimed || false; app.dailyBonusClaimed = d.dailyBonusClaimed || '';
-                if (!window._lastReferCode || window._lastReferCode !== app.referCode) { window._lastReferCode = app.referCode; document.getElementById('referLinkHome').textContent = `https://t.me/CoinQuist_bot?start=ref_${app.referCode}`; }
-                document.getElementById('userName').textContent = d.fullName || d.firstName || displayName;
-                if (d.lastLogin) document.getElementById('lastLoginDisplay').textContent = `📅 ${new Date(d.lastLogin).toLocaleString()}`;
-                document.getElementById('dailyBonusStatus').textContent = app.dailyBonusClaimed === new Date().toDateString() ? '✅ Claimed' : '🎯 Claim Now';
-                updateMysteryBoxUI();
-                if (!d.balance && d.xpPoints === undefined) userRef.update({ balance: 0, usdBalance: 0, referCode: app.referCode, progressCoins: TOTAL_COINS, xpPoints: NEGATIVE_XP, lastConversion: Date.now(), lastLogin: new Date().toISOString(), airdropClaimed: false, isCurrentlyMining: false, username: tg.initDataUnsafe?.user?.username || '', firstName: tg.initDataUnsafe?.user?.first_name || '', lastName: tg.initDataUnsafe?.user?.last_name || '', fullName: displayName });
-                updateUI(); updateLevelUI(); updateProgressUI(); updateSpeedBoostUI(); startConversionTimer();
+                show_11197472({ type: 'inApp', inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false } });
+                let lt = setTimeout(() => { document.getElementById('loadingPage').classList.add('hidden'); }, 15000);
+                userRef.on('value', snap => {
+                    clearTimeout(lt); document.getElementById('loadingPage').classList.add('hidden');
+                    const d = snap.val() || {}; if (d.banned) return;
+                    app.balance = d.balance || 0; app.usdBalance = d.usdBalance || 0; app.referralCount = d.referCount || 0; app.lastConversion = d.lastConversion || Date.now(); app.referCode = d.referCode || genRefCode(); app.referTiers = d.referTiers || {};
+                    app.progressCoins = d.progressCoins !== undefined ? d.progressCoins : TOTAL_COINS; app.speedBoostCooldown = d.speedBoostCooldown || 0; app.mysteryBoxCooldown = d.mysteryBoxCooldown || 0;
+                    app.taskLastCompleted = d.taskLastCompleted || {}; app.taskProgress = d.taskProgress || {}; app.xpPoints = d.xpPoints !== undefined ? d.xpPoints : NEGATIVE_XP;
+                    app.withdrawHistory = d.withdrawHistory || []; app.airdropClaimed = d.airdropClaimed || false; app.dailyBonusClaimed = d.dailyBonusClaimed || '';
+                    if (!window._lastReferCode || window._lastReferCode !== app.referCode) { window._lastReferCode = app.referCode; document.getElementById('referLinkHome').textContent = `https://t.me/CoinQuist_bot?start=ref_${app.referCode}`; }
+                    document.getElementById('userName').textContent = d.fullName || d.firstName || displayName;
+                    if (d.lastLogin) document.getElementById('lastLoginDisplay').textContent = `📅 ${new Date(d.lastLogin).toLocaleString()}`;
+                    document.getElementById('dailyBonusStatus').textContent = app.dailyBonusClaimed === new Date().toDateString() ? '✅ Claimed' : '🎯 Claim Now';
+                    updateMysteryBoxUI();
+                    if (!d.balance && d.xpPoints === undefined) userRef.update({ balance: 0, usdBalance: 0, referCode: app.referCode, progressCoins: TOTAL_COINS, xpPoints: NEGATIVE_XP, lastConversion: Date.now(), lastLogin: new Date().toISOString(), airdropClaimed: false, isCurrentlyMining: false, username: tg.initDataUnsafe?.user?.username || '', firstName: tg.initDataUnsafe?.user?.first_name || '', lastName: tg.initDataUnsafe?.user?.last_name || '', fullName: displayName });
+                    updateUI(); updateLevelUI(); updateProgressUI(); updateSpeedBoostUI(); startConversionTimer();
+                });
+                db.ref('withdrawSettings').on('value', s => {
+                    if (s.exists()) { app.minWithdraw = s.val().minAmount || 1; app.withdrawMethods = s.val().methods || ['Nagad', 'Rocket']; if (!app.withdrawMethods.includes(app.selectedMethod)) app.selectedMethod = app.withdrawMethods[0] || 'Nagad'; } updateWithdrawUI();
+                });
+                loadTasks(); loadAirdrop();
             });
-            db.ref('withdrawSettings').on('value', s => {
-                if (s.exists()) { app.minWithdraw = s.val().minAmount || 1; app.withdrawMethods = s.val().methods || ['Nagad', 'Rocket']; if (!app.withdrawMethods.includes(app.selectedMethod)) app.selectedMethod = app.withdrawMethods[0] || 'Nagad'; } updateWithdrawUI();
-            });
-            loadTasks(); loadAirdrop();
         }
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
