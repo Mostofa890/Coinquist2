@@ -1553,7 +1553,7 @@
             });
         }
 
-        // ================== SPIN WHEEL ==================
+        // ================== SPIN WHEEL (UPDATED) ==================
         const SPIN_COUNT_LIMIT = 20, SPIN_BUTTON_COOLDOWN_SECONDS = 15;
         let spinCount = SPIN_COUNT_LIMIT, spinBtnCooldownInterval = null, isSpinning = false, currentRotation = 0;
 
@@ -1574,6 +1574,8 @@
         function openSpinModal() { if (spinCount <= 0) { showToast('No spins!', 'error'); return; } document.getElementById('spinModal').classList.add('show'); updateSpinModalUI(); }
         function closeSpinModal() { document.getElementById('spinModal').classList.remove('show'); }
         function updateSpinModalUI() { document.getElementById('modalSpinCount').textContent = `Spins: ${spinCount}/${SPIN_COUNT_LIMIT}`; }
+        
+        // ================== UPDATED SPIN FUNCTION ==================
         function spinWheelFromModal() {
             if (!isOnline || isSpinning || spinCount <= 0) return;
             const btn = document.getElementById('modalSpinBtn'); btn.disabled = true; isSpinning = true;
@@ -1588,12 +1590,38 @@
             document.getElementById('wheelSegments').style.transform = `rotate(${currentRotation}deg)`;
             show_11197472().then(() => {
                 const p = getPrizeByAngle(currentRotation);
-                if (p.type === 'coins') app.balance += p.value; else app.usdBalance += p.value;
-                spinCount--; document.getElementById('spinBadge').textContent = spinCount; updateSpinModalUI();
-                document.getElementById('rewardText').textContent = `You won ${p.label}!`; document.getElementById('successModal').classList.add('active');
-                userRef.update({ balance: app.balance, usdBalance: app.usdBalance, spinCount }); updateUI(); isSpinning = false;
-            }).catch(() => { btn.disabled = false; isSpinning = false; showToast('Ad not watched!', 'error'); });
+                if (p.type === 'coins') {
+                    // Coins পেলে mining coins (progressCoins) এ যোগ হবে
+                    app.progressCoins += p.value;
+                    app.xpPoints += p.value * 2;
+                    // UI আপডেট
+                    updateProgressUI();
+                    updateLevelUI();
+                } else {
+                    // USD পেলে usdBalance এ যোগ হবে
+                    app.usdBalance += p.value;
+                }
+                spinCount--;
+                document.getElementById('spinBadge').textContent = spinCount;
+                updateSpinModalUI();
+                document.getElementById('rewardText').textContent = `You won ${p.label}!`;
+                document.getElementById('successModal').classList.add('active');
+                userRef.update({ 
+                    balance: app.balance, 
+                    usdBalance: app.usdBalance, 
+                    spinCount, 
+                    progressCoins: app.progressCoins,
+                    xpPoints: app.xpPoints 
+                });
+                updateUI();
+                isSpinning = false;
+            }).catch(() => {
+                btn.disabled = false;
+                isSpinning = false;
+                showToast('Ad not watched!', 'error');
+            });
         }
+
         function loadSpinData() {
             db.ref('users/' + userId + '/spinCount').on('value', s => {
                 spinCount = s.val() !== null ? s.val() : SPIN_COUNT_LIMIT; document.getElementById('spinBadge').textContent = spinCount; updateSpinModalUI();
