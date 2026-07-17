@@ -12,20 +12,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* ================== GLOBAL ================== */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', -apple-system, sans-serif; }
         body { background: #0f172a; color: #e2e8f0; padding-bottom: 80px; min-height: 100vh; background: radial-gradient(circle at 20% 30%, #1e293b, #0f172a); }
         .container { max-width: 500px; margin: 0 auto; padding: 12px; }
         
-        /* ================== MAINTENANCE OVERLAY ================== */
         #maintenanceOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; }
         #maintenanceOverlay.show { display: flex; }
         #maintenanceOverlay .icon { font-size: 80px; color: #fbbf24; margin-bottom: 20px; animation: pulse 1.5s infinite; }
         #maintenanceOverlay h1 { color: #fbbf24; font-size: 28px; margin-bottom: 10px; }
         #maintenanceOverlay p { color: #94a3b8; font-size: 16px; max-width: 400px; line-height: 1.6; }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-
-        /* ================== HEADER ================== */
         .header { background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); padding: 14px 18px; border-radius: 20px; margin-bottom: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
         .user-info { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
         .avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #3b82f6); display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; color: #fff; }
@@ -39,13 +35,9 @@
         .conversion-timer { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.15); border-radius: 12px; padding: 10px; margin-top: 10px; }
         .conversion-timer .label { font-size: 10px; color: #94a3b8; }
         .conversion-timer .time { font-size: 16px; font-weight: bold; color: #10b981; }
-
-        /* ================== DAILY BONUS ================== */
         .daily-bonus { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; padding: 14px 18px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(251,191,36,0.3); font-weight: 700; border: 2px solid rgba(251,191,36,0.5); }
         .daily-bonus .bonus-left { display: flex; align-items: center; gap: 8px; font-size: 16px; }
         .daily-bonus .bonus-status { background: rgba(15,23,42,0.2); padding: 4px 14px; border-radius: 20px; font-size: 14px; }
-
-        /* ================== MINING CIRCLE ================== */
         .mining-circle-wrapper { display: flex; justify-content: center; align-items: center; margin: 15px 0; position: relative; }
         .mining-circle { position: relative; width: 250px; height: 250px; border-radius: 50%; background: conic-gradient(#fbbf24 100%, #1e293b 100%); display: flex; justify-content: center; align-items: center; box-shadow: 0 0 50px rgba(251,191,36,0.2); transition: background 0.5s ease; cursor: pointer; }
         .mining-circle.mining-active { box-shadow: 0 0 60px rgba(251,191,36,0.4); animation: miningPulse 2s infinite; }
@@ -59,13 +51,9 @@
         .mining-circle .coin-icon { font-size: 32px; margin-bottom: 5px; animation: coinSpin 3s linear infinite; }
         @keyframes coinSpin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
         .mining-circle .coin-count { font-size: 30px; font-weight: 900; color: #fbbf24; }
-
-        /* ================== SPEED BOOST ================== */
         .speed-btn-container { margin-top: 12px; width: 100%; display: flex; justify-content: center; }
         .speed-boost-btn { color: #fff; padding: 10px 20px; border: none; border-radius: 25px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #f97316, #f59e0b); transition: all 0.3s ease; justify-content: center; }
         .speed-boost-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        /* ================== MYSTERY BOX ================== */
         .mystery-box-wrapper { position: relative; width: 100%; max-width: 280px; margin: 20px auto; cursor: pointer; text-align: center; }
         .mystery-box-container { position: relative; width: 100%; padding-bottom: 100%; transition: transform 0.3s ease; }
         .mystery-box-container:hover { transform: scale(1.02); }
@@ -80,14 +68,10 @@
         .mystery-box-wrapper .box-label { margin-top: 12px; font-size: 16px; font-weight: 700; color: #fbbf24; }
         .mystery-box-wrapper .box-timer { margin-top: 8px; font-size: 20px; font-weight: 900; color: #10b981; min-height: 30px; }
         .mystery-box-wrapper .box-timer.cooldown { color: #fbbf24; }
-
-        /* ================== NOTIFICATION BELL ================== */
         .notification-bell { position: relative; cursor: pointer; margin-left: auto; color: #94a3b8; transition: color 0.3s ease; }
         .notification-bell:hover { color: #fbbf24; }
         .notification-bell .bell-icon { font-size: 22px; }
         .notification-bell .badge { position: absolute; top: -5px; right: -5px; background: #ef4444; color: #fff; border-radius: 50%; padding: 2px 6px; font-size: 10px; font-weight: 700; display: none; }
-
-        /* ================== PAGES ================== */
         .page { display: none; min-height: 60vh; padding-top: 8px; }
         .page.active { display: block; }
         .page-header { font-size: 20px; font-weight: 800; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -109,8 +93,6 @@
         .withdraw-section .form-group input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #fff; font-size: 14px; outline: none; }
         .withdraw-section .withdraw-btn { margin-top: 8px; padding: 12px 20px; background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; width: 100%; font-size: 15px; transition: all 0.3s ease; }
         .withdraw-section .withdraw-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        /* ================== GAME SECTION ================== */
         .game-section { background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(59,130,246,0.15)); border: 2px solid rgba(139,92,246,0.3); border-radius: 16px; padding: 16px; margin: 16px 0; text-align: center; }
         .game-section .game-title { font-size: 16px; font-weight: 700; color: #8b5cf6; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .game-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
@@ -120,8 +102,6 @@
         .game-card .game-name { font-size: 14px; font-weight: 700; color: #fff; }
         .game-card .game-desc { font-size: 11px; color: #94a3b8; margin-top: 4px; }
         .game-card .game-bet { font-size: 10px; color: #fbbf24; margin-top: 4px; }
-
-        /* ================== GAME OVERLAY ================== */
         .game-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 20px; }
         .game-overlay.show { display: flex; }
         .game-container { background: rgba(30,41,59,0.98); padding: 20px; border-radius: 20px; width: 90%; max-width: 380px; text-align: center; border: 1px solid rgba(255,255,255,0.1); max-height: 90vh; overflow-y: auto; }
@@ -129,8 +109,6 @@
         .game-header .back-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; }
         .game-header .game-info { color: #94a3b8; font-size: 12px; }
         .game-content { padding: 10px 0; }
-        
-        /* ================== XO GAME ================== */
         .xo-game-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: none; align-items: center; justify-content: center; }
         .xo-game-overlay.show { display: flex; }
         .xo-game-container { background: rgba(30,41,59,0.98); padding: 20px; border-radius: 20px; width: 90%; max-width: 380px; text-align: center; border: 1px solid rgba(255,255,255,0.1); max-height: 90vh; overflow-y: auto; }
@@ -162,43 +140,29 @@
         .xo-status.win { color: #10b981; }
         .xo-status.lose { color: #ef4444; }
         .xo-status.draw { color: #fbbf24; }
-
-        /* ================== DICE GAME ================== */
         .game-dice-container { display: flex; justify-content: center; gap: 30px; margin: 20px 0; }
         .game-dice { width: 80px; height: 80px; background: rgba(255,255,255,0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 40px; border: 2px solid rgba(255,255,255,0.2); transition: all 0.3s ease; }
         .game-dice.rolling { animation: diceRoll 0.5s ease; }
         @keyframes diceRoll { 0% { transform: rotate(0deg); } 25% { transform: rotate(90deg); } 50% { transform: rotate(180deg); } 75% { transform: rotate(270deg); } 100% { transform: rotate(360deg); } }
         .game-dice.win { border-color: #10b981; box-shadow: 0 0 20px rgba(16,185,129,0.3); }
         .game-dice.lose { border-color: #ef4444; box-shadow: 0 0 20px rgba(239,68,68,0.3); }
-
-        /* ================== CARD GAME ================== */
         .game-cards { display: flex; justify-content: center; gap: 20px; margin: 20px 0; }
         .game-card-item { width: 70px; height: 100px; background: linear-gradient(135deg, #1e293b, #334155); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 28px; font-weight: 900; border: 2px solid rgba(255,255,255,0.2); transition: all 0.3s ease; position: relative; }
         .game-card-item.win { border-color: #10b981; box-shadow: 0 0 20px rgba(16,185,129,0.3); }
         .game-card-item.lose { border-color: #ef4444; box-shadow: 0 0 20px rgba(239,68,68,0.3); }
         .game-card-item .card-suit { font-size: 24px; }
         .game-card-item .card-value { font-size: 20px; font-weight: 900; }
-
-        /* ================== TARGET GAME ================== */
         .game-target { position: relative; width: 200px; height: 200px; margin: 20px auto; }
         .game-target-circle { position: absolute; border-radius: 50%; border: 3px solid rgba(255,255,255,0.3); }
         .game-target-circle.outer { width: 100%; height: 100%; top: 0; left: 0; background: rgba(239,68,68,0.1); }
         .game-target-circle.mid { width: 60%; height: 60%; top: 20%; left: 20%; background: rgba(251,191,36,0.1); }
         .game-target-circle.inner { width: 20%; height: 20%; top: 40%; left: 40%; background: rgba(16,185,129,0.2); border-color: #10b981; }
         .game-target-dot { position: absolute; width: 12px; height: 12px; background: #fbbf24; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 10px #fbbf24; }
-
-        /* ================== MEMORY GAME ================== */
         .memory-card { background: #1e293b; padding: 20px; border-radius: 10px; font-size: 24px; cursor: pointer; text-align: center; color: #fff; border: 2px solid #334155; transition: 0.3s; }
         .memory-card:hover { border-color: #fbbf24; }
-
-        /* ================== FLAPPY BIRD ================== */
         #flappyCanvas { background: #87CEEB; border-radius: 10px; width: 100%; max-width: 300px; height: auto; }
-
-        /* ================== PUZZLE GAME ================== */
         #puzzleGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; width: 200px; height: 200px; margin: 0 auto; }
         #puzzleGrid div { background: #fbbf24; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; border-radius: 8px; cursor: pointer; color: #0f172a; }
-
-        /* ================== BOWLING GAME ================== */
         .bowling-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: none; align-items: center; justify-content: center; }
         .bowling-overlay.show { display: flex; }
         .bowling-container { background: rgba(30,41,59,0.98); padding: 20px; border-radius: 20px; width: 90%; max-width: 380px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
@@ -206,8 +170,6 @@
         .bowling-pins { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 10px 0; }
         .bowling-pin { width: 30px; height: 50px; background: #fbbf24; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #0f172a; transition: 0.3s; }
         .bowling-pin.fallen { opacity: 0.3; transform: rotate(45deg); }
-
-        /* ================== COIN FLIP GAME ================== */
         .coinflip-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: none; align-items: center; justify-content: center; }
         .coinflip-overlay.show { display: flex; }
         .coinflip-container { background: rgba(30,41,59,0.98); padding: 20px; border-radius: 20px; width: 90%; max-width: 380px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
@@ -218,8 +180,6 @@
         .coinflip-options button { padding: 10px 24px; border-radius: 10px; border: 2px solid #334155; background: #1e293b; color: #fff; font-weight: 700; cursor: pointer; transition: 0.3s; }
         .coinflip-options button:hover { border-color: #fbbf24; }
         .coinflip-options button.selected { border-color: #10b981; background: rgba(16,185,129,0.15); color: #10b981; }
-
-        /* ================== RPS GAME ================== */
         .rps-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: none; align-items: center; justify-content: center; }
         .rps-overlay.show { display: flex; }
         .rps-container { background: rgba(30,41,59,0.98); padding: 20px; border-radius: 20px; width: 90%; max-width: 380px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
@@ -227,13 +187,9 @@
         .rps-options button { padding: 16px 24px; border-radius: 12px; border: 2px solid #334155; background: #1e293b; color: #fff; font-size: 40px; cursor: pointer; transition: 0.3s; }
         .rps-options button:hover { border-color: #fbbf24; transform: scale(1.05); }
         .rps-options button:disabled { opacity: 0.5; transform: none; }
-
-        /* ================== AVIATRIX GAME (COMPLETE FIX) ================== */
         .aviatrix-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 20px; }
         .aviatrix-overlay.show { display: flex; }
         .aviatrix-container { background: linear-gradient(145deg, #0a0a1a, #1a1a2e); padding: 16px; border-radius: 20px; width: 95%; max-width: 420px; text-align: center; border: 1px solid rgba(255,255,255,0.06); max-height: 95vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.9); }
-        
-        /* AVIATRIX HEADER */
         .aviatrix-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.05); flex-wrap: wrap; gap: 4px; }
         .aviatrix-header .back-btn { background: rgba(255,255,255,0.08); border: none; color: #fff; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; }
         .aviatrix-header .game-title { font-size: 18px; font-weight: 800; color: #fbbf24; }
@@ -241,8 +197,6 @@
         .aviatrix-header .round-id { font-size: 10px; color: #64748b; background: rgba(255,255,255,0.05); padding: 2px 10px; border-radius: 12px; }
         .aviatrix-header .players-online { font-size: 10px; color: #10b981; background: rgba(16,185,129,0.1); padding: 2px 10px; border-radius: 12px; }
         .aviatrix-header .players-online i { margin-right: 4px; }
-        
-        /* AVIATRIX STATS BAR */
         .aviatrix-stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; background: rgba(255,255,255,0.03); border-radius: 10px; padding: 6px 4px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.05); }
         .aviatrix-stats-bar .stat-item { text-align: center; }
         .aviatrix-stats-bar .stat-item .stat-label { font-size: 7px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -250,25 +204,17 @@
         .aviatrix-stats-bar .stat-item .stat-value.green { color: #10b981; }
         .aviatrix-stats-bar .stat-item .stat-value.red { color: #ef4444; }
         .aviatrix-stats-bar .stat-item .stat-value.blue { color: #3b82f6; }
-        
-        /* AVIATRIX PROGRESS BAR */
         .aviatrix-progress-container { margin: 6px 0; background: rgba(255,255,255,0.05); border-radius: 8px; height: 4px; overflow: hidden; }
         .aviatrix-progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #fbbf24, #f59e0b); border-radius: 8px; transition: width 0.1s linear; }
         .aviatrix-countdown-text { font-size: 11px; color: #94a3b8; text-align: center; margin-top: 2px; }
-        
-        /* AVIATRIX GRAPH */
         .aviatrix-graph { position: relative; background: rgba(0,0,0,0.6); border-radius: 14px; padding: 8px; margin: 6px 0; height: 280px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
         .aviatrix-graph canvas { width: 100%; height: 100%; border-radius: 8px; display: block; }
-        
-        /* AVIATRIX MULTIPLIER OVERLAY */
         .aviatrix-multiplier-display { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 5; pointer-events: none; }
         .aviatrix-multiplier-display .multiplier-value { font-size: 52px; font-weight: 900; color: #fff; text-shadow: 0 0 40px rgba(251,191,36,0.2); transition: all 0.2s ease; }
         .aviatrix-multiplier-display .multiplier-value.high { color: #10b981; text-shadow: 0 0 40px rgba(16,185,129,0.3); }
         .aviatrix-multiplier-display .multiplier-value.medium { color: #fbbf24; text-shadow: 0 0 40px rgba(251,191,36,0.3); }
         .aviatrix-multiplier-display .multiplier-value.low { color: #ef4444; text-shadow: 0 0 40px rgba(239,68,68,0.3); }
         .aviatrix-multiplier-display .multiplier-label { font-size: 10px; color: #94a3b8; letter-spacing: 2px; margin-top: -4px; }
-        
-        /* AVIATRIX STATUS */
         .aviatrix-status { font-size: 14px; font-weight: 600; margin: 6px 0; padding: 8px; border-radius: 8px; }
         .aviatrix-status.win { color: #10b981; background: rgba(16,185,129,0.08); }
         .aviatrix-status.lose { color: #ef4444; background: rgba(239,68,68,0.08); }
@@ -277,16 +223,12 @@
         .aviatrix-status.countdown { color: #8b5cf6; background: rgba(139,92,246,0.08); }
         .aviatrix-status.cashed { color: #10b981; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); }
         @keyframes pulseStatus { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-        
-        /* AVIATRIX BET SECTION */
         .aviatrix-bet-section { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 10px; margin: 4px 0; border: 1px solid rgba(255,255,255,0.05); }
         .aviatrix-bet-section .bet-row { display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; margin: 4px 0; }
         .aviatrix-bet-section .bet-row input { width: 70px; padding: 6px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #fff; text-align: center; font-size: 14px; }
         .aviatrix-bet-section .bet-row .bet-preset { background: rgba(255,255,255,0.06); padding: 4px 10px; border-radius: 6px; cursor: pointer; color: #94a3b8; font-weight: 600; font-size: 11px; transition: 0.3s; border: 1px solid transparent; }
         .aviatrix-bet-section .bet-row .bet-preset:hover { background: rgba(251,191,36,0.15); color: #fbbf24; border-color: rgba(251,191,36,0.2); }
         .aviatrix-bet-section .bet-row .bet-preset.selected { background: #fbbf24; color: #0f172a; border-color: #fbbf24; }
-        
-        /* AVIATRIX ACTIONS */
         .aviatrix-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 6px 0; }
         .aviatrix-actions .action-btn { padding: 10px; border: none; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.3s ease; }
         .aviatrix-actions .action-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
@@ -299,16 +241,12 @@
         .aviatrix-actions .action-btn.cashout:disabled { background: #334155; color: #64748b; }
         .aviatrix-actions .action-btn.restart { background: linear-gradient(135deg, #ec4899, #f472b6); color: #fff; grid-column: span 2; }
         .aviatrix-actions .action-btn.restart:hover:not(:disabled) { transform: scale(1.02); box-shadow: 0 4px 15px rgba(236,72,153,0.3); }
-        
-        /* AVIATRIX REALTIME STATS */
         .aviatrix-realtime { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 4px 0; }
         .aviatrix-realtime .rt-item { background: rgba(255,255,255,0.03); border-radius: 8px; padding: 4px; text-align: center; border: 1px solid rgba(255,255,255,0.03); }
         .aviatrix-realtime .rt-item .rt-label { font-size: 7px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
         .aviatrix-realtime .rt-item .rt-value { font-size: 13px; font-weight: 700; color: #fbbf24; }
         .aviatrix-realtime .rt-item .rt-value.green { color: #10b981; }
         .aviatrix-realtime .rt-item .rt-value.red { color: #ef4444; }
-        
-        /* AVIATRIX HISTORY */
         .aviatrix-history { margin-top: 6px; max-height: 120px; overflow-y: auto; }
         .aviatrix-history::-webkit-scrollbar { width: 3px; }
         .aviatrix-history::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
@@ -322,26 +260,18 @@
         .aviatrix-history .history-item .h-reward.win { color: #10b981; }
         .aviatrix-history .history-item .h-reward.lose { color: #ef4444; }
         .aviatrix-history .history-item .h-time { font-size: 8px; color: #64748b; }
-
-        /* ================== BOTTOM NAV ================== */
         .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; background: rgba(15,23,42,0.95); backdrop-filter: blur(24px); display: flex; justify-content: space-around; padding: 10px 4px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
         .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; color: #64748b; font-size: 10px; cursor: pointer; flex: 1; }
         .nav-item.active { color: #fbbf24; }
         .nav-item i { font-size: 20px; }
-
-        /* ================== MODALS ================== */
         .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 9999; align-items: center; justify-content: center; }
         .modal.active { display: flex; }
         .modal-content { background: rgba(30,41,59,0.95); padding: 25px; border-radius: 20px; width: 90%; max-width: 350px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
         .modal-content button { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; padding: 12px 30px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; margin-top: 15px; }
-
-        /* ================== TOAST ================== */
         .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #10b981; color: #fff; padding: 12px 24px; border-radius: 14px; font-weight: 700; z-index: 99999; display: none; font-size: 14px; }
         .toast.show { display: block; animation: slideDown 0.4s ease; }
         .toast.error { background: #ef4444; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-80px) translateX(-50%); } to { opacity: 1; transform: translateY(0) translateX(-50%); } }
-
-        /* ================== OVERLAYS ================== */
         .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9998; display: none; overflow-y: auto; padding-bottom: 70px; }
         .overlay.show { display: block; }
         .overlay-header { background: rgba(15,23,42,0.95); padding: 15px 20px; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 10px; }
@@ -402,8 +332,6 @@
         .loader-text { color: #fbbf24; font-size: 18px; font-weight: 700; letter-spacing: 2px; animation: pulseText 1.5s ease-in-out infinite; }
         @keyframes pulseText { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         .loader-sub { color: #94a3b8; font-size: 13px; margin-top: 8px; }
-
-        /* ================== FLOATING SPIN BUTTON ================== */
         #floatingSpinBtn { position: fixed; right: 20px; bottom: 120px; width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #f59e0b); color: #fff; border: none; box-shadow: 0 4px 20px rgba(249,115,22,0.4); cursor: grab; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.3s ease; touch-action: none; }
         #floatingSpinBtn:active { cursor: grabbing; }
         #floatingSpinBtn:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -411,8 +339,6 @@
         #floatingSpinBtn:disabled .spin-icon { animation: none; }
         @keyframes spinFloat { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         #floatingSpinBtn .spin-badge { position: absolute; top: -5px; right: -5px; background: #ef4444; color: #fff; border-radius: 50%; padding: 2px 8px; font-size: 12px; font-weight: 700; }
-
-        /* ================== SPIN WHEEL MODAL ================== */
         .spin-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 99999; display: none; align-items: center; justify-content: center; }
         .spin-modal-overlay.show { display: flex; }
         .spin-modal-content { background: rgba(30,41,59,0.95); padding: 25px; border-radius: 24px; width: 90%; max-width: 400px; text-align: center; border: 1px solid rgba(255,255,255,0.1); position: relative; }
@@ -436,8 +362,6 @@
         .spin-timer-box-new .timer-label { font-size: 12px; color: #94a3b8; }
         .spin-timer-box-new .timer-time { font-size: 24px; font-weight: 700; color: #fbbf24; }
         .spin-result-new { margin-top: 10px; font-size: 18px; font-weight: 700; color: #10b981; min-height: 30px; }
-
-        /* ================== NOTIFICATION OVERLAY ================== */
         .notification-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9998; display: none; overflow-y: auto; padding-bottom: 70px; }
         .notification-overlay.show { display: block; }
         .notification-overlay-header { background: rgba(15,23,42,0.95); padding: 15px 20px; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 10px; }
@@ -449,7 +373,7 @@
     </style>
 </head>
 <body>
-    <!-- ================== LOADING PAGE ================== -->
+    <!-- LOADING PAGE -->
     <div id="loadingPage">
         <div class="loader-container">
             <div class="loader-ring"></div>
@@ -458,19 +382,38 @@
         </div>
     </div>
 
-    <!-- ================== MAINTENANCE OVERLAY ================== -->
-    <div id="maintenanceOverlay"><div class="icon"><i class="fas fa-tools"></i></div><h1>🔧 Under Maintenance</h1><p id="maintenanceMessage">We are currently updating the app. Please come back later.</p></div>
+    <!-- MAINTENANCE OVERLAY -->
+    <div id="maintenanceOverlay">
+        <div class="icon"><i class="fas fa-tools"></i></div>
+        <h1>🔧 Under Maintenance</h1>
+        <p id="maintenanceMessage">We are currently updating the app. Please come back later.</p>
+    </div>
 
-    <!-- ================== SECURITY OVERLAY ================== -->
-    <div class="security-overlay" id="securityOverlay"><h1>🚫 Security Alert</h1><p>Unauthorized access detected! Please close Developer Tools to continue.</p><button onclick="location.reload()">🔄 Reload Page</button></div>
+    <!-- SECURITY OVERLAY -->
+    <div class="security-overlay" id="securityOverlay">
+        <h1>🚫 Security Alert</h1>
+        <p>Unauthorized access detected! Please close Developer Tools to continue.</p>
+        <button onclick="location.reload()">🔄 Reload Page</button>
+    </div>
 
-    <!-- ================== NETWORK OVERLAY ================== -->
-    <div class="network-overlay" id="networkOverlay"><div class="icon"><i class="fas fa-wifi"></i></div><h2>🔌 No Internet Connection</h2><p>Please check your network connection and try again.</p><button class="retry-btn" onclick="checkNetworkAndReload()"><i class="fas fa-sync"></i> Retry</button></div>
+    <!-- NETWORK OVERLAY -->
+    <div class="network-overlay" id="networkOverlay">
+        <div class="icon"><i class="fas fa-wifi"></i></div>
+        <h2>🔌 No Internet Connection</h2>
+        <p>Please check your network connection and try again.</p>
+        <button class="retry-btn" onclick="checkNetworkAndReload()"><i class="fas fa-sync"></i> Retry</button>
+    </div>
 
-    <!-- ================== BANNED OVERLAY ================== -->
-    <div class="banned-overlay" id="bannedOverlay"><h1>🚫 Account Banned</h1><p>Your account has been suspended.</p><div class="ban-reason" id="banReason"></div><button class="appeal-btn" id="appealBtn" onclick="submitBanAppeal()">📩 Submit Appeal</button><p id="appealStatus" style="display:none;"></p></div>
+    <!-- BANNED OVERLAY -->
+    <div class="banned-overlay" id="bannedOverlay">
+        <h1>🚫 Account Banned</h1>
+        <p>Your account has been suspended.</p>
+        <div class="ban-reason" id="banReason"></div>
+        <button class="appeal-btn" id="appealBtn" onclick="submitBanAppeal()">📩 Submit Appeal</button>
+        <p id="appealStatus" style="display:none;"></p>
+    </div>
 
-    <!-- ================== LEVEL OVERLAY ================== -->
+    <!-- LEVEL OVERLAY -->
     <div class="overlay" id="levelOverlay">
         <div class="overlay-header"><button class="back-btn" onclick="closeLevelPage()"><i class="fas fa-arrow-left"></i> Back</button><h2 style="color:#fff;">🏆 Level System</h2></div>
         <div class="level-overlay-content">
@@ -494,7 +437,7 @@
         </div>
     </div>
 
-    <!-- ================== AIRDROP OVERLAY ================== -->
+    <!-- AIRDROP OVERLAY -->
     <div class="overlay" id="airdropOverlay">
         <div class="overlay-header"><button class="back-btn" onclick="closeAirdropPage()"><i class="fas fa-arrow-left"></i> Back</button><h2 style="color:#fff;">📢 Live AirDrop</h2></div>
         <div style="padding:15px;">
@@ -507,14 +450,14 @@
         </div>
     </div>
 
-    <!-- ================== WEBVIEW OVERLAY ================== -->
+    <!-- WEBVIEW OVERLAY -->
     <div class="webview-overlay" id="webviewOverlay">
         <div class="webview-header"><button class="back-btn" onclick="closeWebView()"><i class="fas fa-arrow-left"></i> Back</button><span class="url-text" id="webviewUrlText">Loading...</span><span class="timer-badge" id="webviewTimer">⏱ 0s</span></div>
         <div class="webview-iframe" id="webviewIframeContainer"><iframe id="webviewIframe" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe></div>
         <div class="webview-footer"><button class="claim-btn" id="webviewClaimBtn" disabled onclick="claimWebViewTask()">⏳ Wait...</button></div>
     </div>
 
-    <!-- ================== XO GAME OVERLAY ================== -->
+    <!-- XO GAME OVERLAY -->
     <div class="xo-game-overlay" id="xoGameOverlay">
         <div class="xo-game-container">
             <div class="xo-game-header"><button class="back-btn" onclick="closeXOGame()"><i class="fas fa-arrow-left"></i> Back</button><span class="game-info" id="xoGameInfo">🎮 Tic-Tac-Toe</span></div>
@@ -551,7 +494,7 @@
         </div>
     </div>
 
-    <!-- ================== DICE GAME OVERLAY ================== -->
+    <!-- DICE GAME OVERLAY -->
     <div class="game-overlay" id="diceGameOverlay">
         <div class="game-container">
             <div class="game-header"><button class="back-btn" onclick="closeDiceGame()"><i class="fas fa-arrow-left"></i> Back</button><span class="game-info">🎲 Dice Roll</span></div>
@@ -577,7 +520,7 @@
         </div>
     </div>
 
-    <!-- ================== TARGET GAME OVERLAY ================== -->
+    <!-- TARGET GAME OVERLAY -->
     <div class="game-overlay" id="targetGameOverlay">
         <div class="game-container">
             <div class="game-header"><button class="back-btn" onclick="closeTargetGame()"><i class="fas fa-arrow-left"></i> Back</button><span class="game-info">🎯 Target Shoot</span></div>
@@ -605,7 +548,7 @@
         </div>
     </div>
 
-    <!-- ================== CARD GAME OVERLAY ================== -->
+    <!-- CARD GAME OVERLAY -->
     <div class="game-overlay" id="cardGameOverlay">
         <div class="game-container">
             <div class="game-header"><button class="back-btn" onclick="closeCardGame()"><i class="fas fa-arrow-left"></i> Back</button><span class="game-info">🃏 Card Draw</span></div>
@@ -631,7 +574,7 @@
         </div>
     </div>
 
-    <!-- ================== MEMORY GAME OVERLAY ================== -->
+    <!-- MEMORY GAME OVERLAY -->
     <div class="game-overlay" id="memoryGameOverlay">
         <div class="game-container">
             <div class="game-header"><button class="back-btn" onclick="closeMemoryGame()"><i class="fas fa-arrow-left"></i> Back</button><span class="game-info">🧠 Memory Game</span></div>
@@ -654,7 +597,7 @@
         </div>
     </div>
 
-    <!-- ================== FLAPPY BIRD GAME OVERLAY ================== -->
+    <!-- FLAPPY BIRD GAME OVERLAY -->
     <div class="game-overlay" id="flappyGameOverlay">
         <div class="game-container">
             <div class="game-header"><button class="back-btn" onclick="closeFlappyGame()"><i class="fas fa-arrow-left"></i> Back</button><span class="game-info">🦅 Flappy Bird</span></div>
@@ -677,7 +620,7 @@
         </div>
     </div>
 
-    <!-- ================== PUZZLE GAME OVERLAY ================== -->
+    <!-- PUZZLE GAME OVERLAY -->
     <div class="game-overlay" id="puzzleGameOverlay">
         <div class="game-container">
             <div class="game-header"><button class="back-btn" onclick="closePuzzleGame()"><i class="fas fa-arrow-left"></i> Back</button><span class="game-info">🧩 Puzzle Game</span></div>
@@ -700,7 +643,7 @@
         </div>
     </div>
 
-    <!-- ================== BOWLING GAME OVERLAY ================== -->
+    <!-- BOWLING GAME OVERLAY -->
     <div class="bowling-overlay" id="bowlingOverlay">
         <div class="bowling-container">
             <div class="game-header"><button class="back-btn" onclick="closeBowlingGame()"><i class="fas fa-arrow-left"></i> Back</button><span class="game-info">🎳 Bowling</span></div>
@@ -723,7 +666,7 @@
         </div>
     </div>
 
-    <!-- ================== COIN FLIP GAME OVERLAY ================== -->
+    <!-- COIN FLIP GAME OVERLAY -->
     <div class="coinflip-overlay" id="coinflipOverlay">
         <div class="coinflip-container">
             <div class="game-header"><button class="back-btn" onclick="closeCoinFlipGame()"><i class="fas fa-arrow-left"></i> Back</button><span class="game-info">🪙 Coin Flip</span></div>
@@ -749,7 +692,7 @@
         </div>
     </div>
 
-    <!-- ================== RPS GAME OVERLAY ================== -->
+    <!-- RPS GAME OVERLAY -->
     <div class="rps-overlay" id="rpsOverlay">
         <div class="rps-container">
             <div class="game-header"><button class="back-btn" onclick="closeRPSGame()"><i class="fas fa-arrow-left"></i> Back</button><span class="game-info">✊ Rock Paper Scissors</span></div>
@@ -776,44 +719,25 @@
         </div>
     </div>
 
-    <!-- ================== AVIATRIX GAME OVERLAY (COMPLETE FIX) ================== -->
+    <!-- AVIATRIX GAME OVERLAY -->
     <div class="aviatrix-overlay" id="aviatrixOverlay">
         <div class="aviatrix-container">
-            <!-- Header -->
             <div class="aviatrix-header">
                 <button class="back-btn" onclick="closeAviatrixGame()"><i class="fas fa-arrow-left"></i> Back</button>
                 <span class="game-title"><i class="fas fa-plane"></i> Aviatrix</span>
                 <span class="round-id" id="aviatrixRoundId">#RND-001</span>
                 <span class="players-online" id="aviatrixPlayersOnline"><i class="fas fa-users"></i> <span id="onlineCount">0</span></span>
             </div>
-
-            <!-- Stats Bar -->
             <div class="aviatrix-stats-bar">
-                <div class="stat-item">
-                    <span class="stat-label">🛫 Flights</span>
-                    <span class="stat-value" id="aviatrixTotalFlights">0</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">💥 Crashes</span>
-                    <span class="stat-value red" id="aviatrixTotalCrashes">0</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">📈 Avg</span>
-                    <span class="stat-value blue" id="aviatrixAvgMultiplier">0.00x</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">💰 Profit</span>
-                    <span class="stat-value green" id="aviatrixTotalProfit">+0</span>
-                </div>
+                <div class="stat-item"><span class="stat-label">🛫 Flights</span><span class="stat-value" id="aviatrixTotalFlights">0</span></div>
+                <div class="stat-item"><span class="stat-label">💥 Crashes</span><span class="stat-value red" id="aviatrixTotalCrashes">0</span></div>
+                <div class="stat-item"><span class="stat-label">📈 Avg</span><span class="stat-value blue" id="aviatrixAvgMultiplier">0.00x</span></div>
+                <div class="stat-item"><span class="stat-label">💰 Profit</span><span class="stat-value green" id="aviatrixTotalProfit">+0</span></div>
             </div>
-
-            <!-- Progress Bar - Countdown -->
             <div class="aviatrix-progress-container" id="aviatrixProgressContainer">
                 <div class="aviatrix-progress-bar" id="aviatrixProgressBar"></div>
             </div>
             <div class="aviatrix-countdown-text" id="aviatrixCountdownText">⏳ Next round in 5s...</div>
-
-            <!-- Graph -->
             <div class="aviatrix-graph" id="aviatrixGraph">
                 <canvas id="aviatrixCanvas"></canvas>
                 <div class="aviatrix-multiplier-display" id="multiplierDisplay">
@@ -821,18 +745,12 @@
                     <div class="multiplier-label">MULTIPLIER</div>
                 </div>
             </div>
-
-            <!-- Status -->
             <div class="aviatrix-status waiting" id="aviatrixStatus">🟢 Waiting for next round...</div>
-
-            <!-- Realtime Stats -->
             <div class="aviatrix-realtime" id="aviatrixRealtime">
                 <div class="rt-item"><span class="rt-label">🟢 Up</span><span class="rt-value green" id="rtTotalUp">0</span></div>
                 <div class="rt-item"><span class="rt-label">🔴 Down</span><span class="rt-value red" id="rtTotalDown">0</span></div>
                 <div class="rt-item"><span class="rt-label">📊 Win Rate</span><span class="rt-value" id="rtWinRate">0%</span></div>
             </div>
-
-            <!-- Bet Section -->
             <div class="aviatrix-bet-section" id="aviatrixBetSection">
                 <div class="bet-row">
                     <span class="bet-preset" onclick="setAviatrixBet(50)">50</span>
@@ -846,8 +764,6 @@
                     <button class="action-btn free" id="aviatrixFreeBtn" onclick="playAviatrixFree()">📺 Ad (20 🪙)</button>
                 </div>
             </div>
-
-            <!-- Game Board -->
             <div id="aviatrixGameBoard" style="display:none;">
                 <div class="aviatrix-actions">
                     <button class="action-btn cashout" id="aviatrixCashoutBtn" onclick="cashoutAviatrix()">💰 Cashout Now</button>
@@ -855,8 +771,6 @@
                 </div>
                 <div id="aviatrixRewardInfo" style="color:#10b981;font-size:14px;font-weight:700;margin:6px 0;text-align:center;"></div>
             </div>
-
-            <!-- History -->
             <div class="aviatrix-history" id="aviatrixHistory">
                 <div class="history-title">📜 Recent Flights</div>
                 <div id="aviatrixHistoryList"><span style="color:#64748b;font-size:12px;">Waiting for flights...</span></div>
@@ -864,9 +778,7 @@
         </div>
     </div>
 
-    <!-- ============================================================ -->
-    <!-- ================== MAIN CONTENT ============================= -->
-    <!-- ============================================================ -->
+    <!-- MAIN CONTENT -->
     <div class="container main-content" id="mainContent">
         <div class="header">
             <div class="user-info">
@@ -901,7 +813,7 @@
         <div class="page active" id="pageHome">
             <div class="mining-circle-wrapper">
                 <div class="mining-circle" id="miningCircle">
-                    <div class="circle-start-overlay" id="circleStartOverlay" onclick="startMining()"><div class="start-icon">⚡</div><div class="start-text">START<br>MINING</div><div class="start-subtext">Tap to earn coins</div></div>
+                    <div class="circle-start-overlay" id="circleStartOverlay" onclick="startMining()"><div class="start-icon">⚡</div><div class="start-text">START<br>MINING</div></div>
                     <div class="inner-circle"><span class="coin-icon">🪙</span><span class="coin-count" id="progressCoinCount">1000</span><div class="circle-status" id="progressStatus">Ready</div><div class="circle-progress-text" id="progressPercent">100%</div></div>
                 </div>
             </div>
@@ -1002,7 +914,6 @@
     </div>
 
     <script>
-        // ================== FIREBASE CONFIG ==================
         const firebaseConfig = { apiKey: "AIzaSyAqCNHhu9oaBDea85tAH-iHucHczZnR7nY", authDomain: "tolaka-exc-reverb-b1afd.firebaseapp.com", databaseURL: "https://tolaka-exc-reverb-b1afd-default-rtdb.firebaseio.com", projectId: "tolaka-exc-reverb-b1afd", storageBucket: "tolaka-exc-reverb-b1afd.appspot.com", messagingSenderId: "25114300036", appId: "1:25114300036:android:579e5c869a075113603cd1" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
@@ -1052,7 +963,20 @@
             });
         }
 
-        // ================== AVIATRIX GAME (COMPLETE FIX) ==================
+        // ================== MAINTENANCE SYSTEM (FIXED) ==================
+        function checkMaintenance() {
+            db.ref('maintenance').on('value', snap => {
+                const d = snap.val() || {};
+                if (d.active) {
+                    document.getElementById('maintenanceOverlay').classList.add('show');
+                    document.getElementById('maintenanceMessage').textContent = d.message || 'Under maintenance.';
+                } else {
+                    document.getElementById('maintenanceOverlay').classList.remove('show');
+                }
+            });
+        }
+
+        // ================== AVIATRIX GAME (LIVE SYSTEM WITH 5s COUNTDOWN) ==================
         let aviatrixData = {
             betAmount: 100,
             isFree: false,
@@ -3125,14 +3049,6 @@
             document.getElementById('appealStatus').textContent = '📩 Appeal submitted! We\'ll review it.';
             db.ref('banAppeals/' + userId).set({ userId, username: displayName, reason: document.getElementById('banReason').textContent || 'No reason', submittedAt: Date.now() });
             showToast('Appeal submitted!');
-        }
-
-        function checkMaintenance() {
-            db.ref('maintenance').on('value', snap => {
-                const d = snap.val() || {};
-                if (d.active) { document.getElementById('maintenanceOverlay').classList.add('show'); document.getElementById('maintenanceMessage').textContent = d.message || 'Under maintenance.'; }
-                else document.getElementById('maintenanceOverlay').classList.remove('show');
-            });
         }
 
         function loadRules() {
