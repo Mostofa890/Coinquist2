@@ -228,7 +228,7 @@
         .rps-options button:hover { border-color: #fbbf24; transform: scale(1.05); }
         .rps-options button:disabled { opacity: 0.5; transform: none; }
 
-        /* ================== AVIATRIX GAME (LIVE CASINO STYLE - FULLY FUNCTIONAL) ================== */
+        /* ================== AVIATRIX GAME (IMPROVED UI & GAMEPLAY) ================== */
         .aviatrix-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 20px; }
         .aviatrix-overlay.show { display: flex; }
         .aviatrix-container { background: linear-gradient(145deg, #0a0a1a, #1a1a2e); padding: 16px; border-radius: 20px; width: 95%; max-width: 420px; text-align: center; border: 1px solid rgba(255,255,255,0.06); max-height: 95vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.9); }
@@ -256,25 +256,26 @@
         .aviatrix-progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #fbbf24, #f59e0b); border-radius: 8px; transition: width 0.1s linear; }
         .aviatrix-countdown-text { font-size: 11px; color: #94a3b8; text-align: center; margin-top: 2px; }
         
-        /* AVIATRIX GRAPH */
-        .aviatrix-graph { position: relative; background: rgba(0,0,0,0.6); border-radius: 14px; padding: 8px; margin: 6px 0; height: 240px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
+        /* AVIATRIX GRAPH - IMPROVED */
+        .aviatrix-graph { position: relative; background: rgba(0,0,0,0.6); border-radius: 14px; padding: 8px; margin: 6px 0; height: 280px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
         .aviatrix-graph canvas { width: 100%; height: 100%; border-radius: 8px; display: block; }
         
         /* AVIATRIX MULTIPLIER OVERLAY */
         .aviatrix-multiplier-display { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 5; pointer-events: none; }
-        .aviatrix-multiplier-display .multiplier-value { font-size: 44px; font-weight: 900; color: #fff; text-shadow: 0 0 40px rgba(251,191,36,0.2); transition: all 0.2s ease; }
+        .aviatrix-multiplier-display .multiplier-value { font-size: 52px; font-weight: 900; color: #fff; text-shadow: 0 0 40px rgba(251,191,36,0.2); transition: all 0.2s ease; }
         .aviatrix-multiplier-display .multiplier-value.high { color: #10b981; text-shadow: 0 0 40px rgba(16,185,129,0.3); }
         .aviatrix-multiplier-display .multiplier-value.medium { color: #fbbf24; text-shadow: 0 0 40px rgba(251,191,36,0.3); }
         .aviatrix-multiplier-display .multiplier-value.low { color: #ef4444; text-shadow: 0 0 40px rgba(239,68,68,0.3); }
         .aviatrix-multiplier-display .multiplier-label { font-size: 10px; color: #94a3b8; letter-spacing: 2px; margin-top: -4px; }
         
         /* AVIATRIX STATUS */
-        .aviatrix-status { font-size: 13px; font-weight: 600; margin: 4px 0; padding: 6px; border-radius: 8px; }
+        .aviatrix-status { font-size: 14px; font-weight: 600; margin: 6px 0; padding: 8px; border-radius: 8px; }
         .aviatrix-status.win { color: #10b981; background: rgba(16,185,129,0.08); }
         .aviatrix-status.lose { color: #ef4444; background: rgba(239,68,68,0.08); }
         .aviatrix-status.waiting { color: #fbbf24; background: rgba(251,191,36,0.08); }
         .aviatrix-status.flying { color: #3b82f6; background: rgba(59,130,246,0.08); animation: pulseStatus 1s infinite; }
         .aviatrix-status.countdown { color: #8b5cf6; background: rgba(139,92,246,0.08); }
+        .aviatrix-status.cashed { color: #10b981; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); }
         @keyframes pulseStatus { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
         
         /* AVIATRIX BET SECTION */
@@ -308,7 +309,7 @@
         .aviatrix-realtime .rt-item .rt-value.red { color: #ef4444; }
         
         /* AVIATRIX HISTORY */
-        .aviatrix-history { margin-top: 6px; max-height: 110px; overflow-y: auto; }
+        .aviatrix-history { margin-top: 6px; max-height: 120px; overflow-y: auto; }
         .aviatrix-history::-webkit-scrollbar { width: 3px; }
         .aviatrix-history::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
         .aviatrix-history .history-title { font-size: 10px; color: #64748b; margin-bottom: 4px; text-align: left; text-transform: uppercase; letter-spacing: 1px; }
@@ -775,7 +776,7 @@
         </div>
     </div>
 
-    <!-- ================== AVIATRIX GAME OVERLAY (LIVE CASINO STYLE) ================== -->
+    <!-- ================== AVIATRIX GAME OVERLAY (IMPROVED) ================== -->
     <div class="aviatrix-overlay" id="aviatrixOverlay">
         <div class="aviatrix-container">
             <!-- Header -->
@@ -786,7 +787,7 @@
                 <span class="players-online" id="aviatrixPlayersOnline"><i class="fas fa-users"></i> <span id="onlineCount">0</span></span>
             </div>
 
-            <!-- Stats Bar - Live Casino Style -->
+            <!-- Stats Bar -->
             <div class="aviatrix-stats-bar">
                 <div class="stat-item">
                     <span class="stat-label">🛫 Flights</span>
@@ -812,33 +813,23 @@
             </div>
             <div class="aviatrix-countdown-text" id="aviatrixCountdownText">⏳ Next round in 5s...</div>
 
-            <!-- Graph - Live Chart -->
+            <!-- Graph -->
             <div class="aviatrix-graph" id="aviatrixGraph">
                 <canvas id="aviatrixCanvas"></canvas>
-                <!-- Multiplier Overlay -->
                 <div class="aviatrix-multiplier-display" id="multiplierDisplay">
                     <div class="multiplier-value" id="aviatrixMultiplier">1.00x</div>
                     <div class="multiplier-label">MULTIPLIER</div>
                 </div>
             </div>
 
-            <!-- Status - Live -->
+            <!-- Status -->
             <div class="aviatrix-status waiting" id="aviatrixStatus">🟢 Waiting for next round...</div>
 
-            <!-- Realtime Stats - Live Ticker -->
+            <!-- Realtime Stats -->
             <div class="aviatrix-realtime" id="aviatrixRealtime">
-                <div class="rt-item">
-                    <span class="rt-label">🟢 Up</span>
-                    <span class="rt-value green" id="rtTotalUp">0</span>
-                </div>
-                <div class="rt-item">
-                    <span class="rt-label">🔴 Down</span>
-                    <span class="rt-value red" id="rtTotalDown">0</span>
-                </div>
-                <div class="rt-item">
-                    <span class="rt-label">📊 Win Rate</span>
-                    <span class="rt-value" id="rtWinRate">0%</span>
-                </div>
+                <div class="rt-item"><span class="rt-label">🟢 Up</span><span class="rt-value green" id="rtTotalUp">0</span></div>
+                <div class="rt-item"><span class="rt-label">🔴 Down</span><span class="rt-value red" id="rtTotalDown">0</span></div>
+                <div class="rt-item"><span class="rt-label">📊 Win Rate</span><span class="rt-value" id="rtWinRate">0%</span></div>
             </div>
 
             <!-- Bet Section -->
@@ -856,7 +847,7 @@
                 </div>
             </div>
 
-            <!-- Game Board (shows during flight) -->
+            <!-- Game Board -->
             <div id="aviatrixGameBoard" style="display:none;">
                 <div class="aviatrix-actions">
                     <button class="action-btn cashout" id="aviatrixCashoutBtn" onclick="cashoutAviatrix()">💰 Cashout Now</button>
@@ -865,7 +856,7 @@
                 <div id="aviatrixRewardInfo" style="color:#10b981;font-size:14px;font-weight:700;margin:6px 0;text-align:center;"></div>
             </div>
 
-            <!-- History - Live Feed -->
+            <!-- History -->
             <div class="aviatrix-history" id="aviatrixHistory">
                 <div class="history-title">📜 Recent Flights</div>
                 <div id="aviatrixHistoryList"><span style="color:#64748b;font-size:12px;">Waiting for flights...</span></div>
@@ -1061,7 +1052,7 @@
             });
         }
 
-        // ================== AVIATRIX GAME (LIVE CASINO STYLE - FULLY FUNCTIONAL) ==================
+        // ================== AVIATRIX GAME (IMPROVED - SLOWER SPEED, BETTER UI) ==================
         let aviatrixData = {
             betAmount: 100,
             isFree: false,
@@ -1086,7 +1077,8 @@
             playersOnline: 0,
             isWaitingForNextRound: false,
             countdownInterval: null,
-            betLocked: false
+            betLocked: false,
+            flightSpeed: 0.02 // Slower speed for better visual
         };
 
         // Predefined crash points loaded from admin config
@@ -1098,6 +1090,7 @@
                 if (config.crashPoints && config.crashPoints.length) {
                     crashPoints = config.crashPoints;
                 }
+                if (config.flightSpeed) aviatrixData.flightSpeed = config.flightSpeed;
                 if (config.minBet) document.getElementById('aviatrixBetAmount').min = config.minBet;
                 if (config.maxBet) document.getElementById('aviatrixBetAmount').max = config.maxBet;
             });
@@ -1134,7 +1127,7 @@
             // Initialize canvas
             const canvas = document.getElementById('aviatrixCanvas');
             canvas.width = canvas.parentElement.clientWidth - 16 || 350;
-            canvas.height = 220;
+            canvas.height = 250;
             aviatrixData.canvas = canvas;
             aviatrixData.ctx = canvas.getContext('2d');
             aviatrixData.points = [];
@@ -1172,7 +1165,6 @@
             aviatrixData.betAmount = Math.min(Math.max(a, min), max);
             document.getElementById('aviatrixBetAmount').value = aviatrixData.betAmount;
             
-            // Highlight selected preset
             document.querySelectorAll('#aviatrixBetSection .bet-preset').forEach(el => {
                 el.classList.toggle('selected', parseInt(el.textContent) === aviatrixData.betAmount);
             });
@@ -1249,7 +1241,7 @@
             aviatrixData.crashed = false;
             aviatrixData.gameActive = true;
             aviatrixData.status = 'flying';
-            aviatrixData.points = [{x: 0, y: 220}];
+            aviatrixData.points = [{x: 0, y: 250}];
             aviatrixData.flightStartTime = Date.now();
             document.getElementById('aviatrixProgressContainer').style.display = 'none';
             
@@ -1262,8 +1254,8 @@
             
             updateAviatrixUI();
             
-            // Random speed and crash point from config
-            const speed = 0.035 + Math.random() * 0.065;
+            // Slower speed for better visual
+            const speed = aviatrixData.flightSpeed || 0.02;
             const crashPoint = crashPoints[Math.floor(Math.random() * crashPoints.length)] + (Math.random() * 0.3 - 0.15);
             
             aviatrixData.currentFlight = setInterval(() => {
@@ -1274,8 +1266,8 @@
                 
                 // Update graph
                 const elapsed = (Date.now() - aviatrixData.flightStartTime) / 1000;
-                const x = elapsed * 65;
-                const y = 220 - (aviatrixData.multiplier - 1) * 30;
+                const x = elapsed * 55;
+                const y = 250 - (aviatrixData.multiplier - 1) * 28;
                 aviatrixData.points.push({x: Math.min(x, 350), y: Math.max(y, 10)});
                 
                 // Update multiplier display
@@ -1298,7 +1290,7 @@
                 }
                 
                 updateAviatrixUI();
-            }, 80);
+            }, 120); // Slower interval for smoother animation
         }
 
         function drawAviatrixGraph() {
@@ -1338,7 +1330,7 @@
                     gradient.addColorStop(1, '#ef4444');
                 }
                 ctx.strokeStyle = gradient;
-                ctx.lineWidth = 2.5;
+                ctx.lineWidth = 3;
                 ctx.shadowColor = aviatrixData.crashed ? 'rgba(239,68,68,0.2)' : 'rgba(16,185,129,0.2)';
                 ctx.shadowBlur = 10;
                 ctx.stroke();
@@ -1347,19 +1339,19 @@
                 // Current position glow dot
                 if (!aviatrixData.crashed && aviatrixData.points.length > 0) {
                     const last = aviatrixData.points[aviatrixData.points.length - 1];
-                    const glow = ctx.createRadialGradient(last.x, last.y, 2, last.x, last.y, 20);
+                    const glow = ctx.createRadialGradient(last.x, last.y, 2, last.x, last.y, 25);
                     glow.addColorStop(0, 'rgba(251,191,36,0.6)');
                     glow.addColorStop(1, 'rgba(251,191,36,0)');
                     ctx.fillStyle = glow;
                     ctx.beginPath();
-                    ctx.arc(last.x, last.y, 20, 0, Math.PI * 2);
+                    ctx.arc(last.x, last.y, 25, 0, Math.PI * 2);
                     ctx.fill();
                     
                     ctx.beginPath();
-                    ctx.arc(last.x, last.y, 4, 0, Math.PI * 2);
+                    ctx.arc(last.x, last.y, 5, 0, Math.PI * 2);
                     ctx.fillStyle = '#fbbf24';
                     ctx.shadowColor = 'rgba(251,191,36,0.5)';
-                    ctx.shadowBlur = 15;
+                    ctx.shadowBlur = 20;
                     ctx.fill();
                     ctx.shadowBlur = 0;
                 }
@@ -1370,13 +1362,13 @@
                 ctx.fillStyle = 'rgba(239,68,68,0.08)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.fillStyle = '#ef4444';
-                ctx.font = 'bold 20px sans-serif';
+                ctx.font = 'bold 24px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.shadowColor = 'rgba(239,68,68,0.3)';
-                ctx.shadowBlur = 20;
+                ctx.shadowBlur = 30;
                 ctx.fillText('💥 CRASHED', canvas.width/2, canvas.height/2 - 10);
-                ctx.font = '12px sans-serif';
-                ctx.fillText('@ ' + aviatrixData.multiplier.toFixed(2) + 'x', canvas.width/2, canvas.height/2 + 25);
+                ctx.font = '14px sans-serif';
+                ctx.fillText('@ ' + aviatrixData.multiplier.toFixed(2) + 'x', canvas.width/2, canvas.height/2 + 30);
                 ctx.shadowBlur = 0;
             }
             
@@ -1385,7 +1377,7 @@
                 ctx.fillStyle = 'rgba(251,191,36,0.03)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.fillStyle = '#fbbf24';
-                ctx.font = '16px sans-serif';
+                ctx.font = '18px sans-serif';
                 ctx.textAlign = 'center';
                 if (aviatrixData.status === 'countdown') {
                     ctx.fillText('⏳ ' + aviatrixData.countdown + 's', canvas.width/2, canvas.height/2);
@@ -1430,7 +1422,7 @@
                 time: new Date().toISOString()
             });
             
-            document.getElementById('aviatrixStatus').className = 'aviatrix-status win';
+            document.getElementById('aviatrixStatus').className = 'aviatrix-status cashed';
             document.getElementById('aviatrixStatus').textContent = `🎉 Cashed out at ${multiplier.toFixed(2)}x!`;
             document.getElementById('aviatrixRewardInfo').textContent = `+${reward} Coins`;
             document.getElementById('aviatrixCashoutBtn').style.display = 'none';
@@ -1548,13 +1540,11 @@
         }
 
         function startAviatrixLoop() {
-            // Clear any existing countdown
             if (aviatrixData.countdownInterval) {
                 clearInterval(aviatrixData.countdownInterval);
                 aviatrixData.countdownInterval = null;
             }
             
-            // Auto-start rounds - Live casino style with 5 second countdown
             if (aviatrixData.status === 'waiting' && !aviatrixData.isWaitingForNextRound) {
                 aviatrixData.status = 'countdown';
                 aviatrixData.countdown = 5;
@@ -1565,7 +1555,6 @@
                 document.getElementById('aviatrixCountdownText').textContent = `⏳ Next round in ${aviatrixData.countdown}s...`;
                 document.getElementById('aviatrixProgressContainer').style.display = 'block';
                 
-                // Show bet section if not shown
                 if (document.getElementById('aviatrixBetSection').style.display === 'none') {
                     document.getElementById('aviatrixBetSection').style.display = 'block';
                     document.getElementById('aviatrixGameBoard').style.display = 'none';
@@ -1582,19 +1571,14 @@
                     } else {
                         clearInterval(aviatrixData.countdownInterval);
                         aviatrixData.countdownInterval = null;
-                        
-                        // Lock betting for this round
                         aviatrixData.betLocked = true;
                         
-                        // Start flight if user has bet placed
                         if (aviatrixData.hasBet) {
-                            // Enable cashout button for the flight
                             document.getElementById('aviatrixCashoutBtn').disabled = false;
                             document.getElementById('aviatrixBetSection').style.display = 'none';
                             document.getElementById('aviatrixGameBoard').style.display = 'block';
                             startAviatrixFlight();
                         } else {
-                            // No bet placed, wait for next round
                             aviatrixData.status = 'waiting';
                             aviatrixData.isWaitingForNextRound = false;
                             document.getElementById('aviatrixStatus').className = 'aviatrix-status waiting';
@@ -1602,7 +1586,6 @@
                             document.getElementById('aviatrixCountdownText').textContent = '🟢 Place your bet!';
                             document.getElementById('aviatrixProgressBar').style.width = '100%';
                             
-                            // Reset after a moment to start next countdown
                             setTimeout(() => {
                                 if (document.getElementById('aviatrixOverlay').classList.contains('show')) {
                                     aviatrixData.isWaitingForNextRound = false;
@@ -1611,7 +1594,6 @@
                             }, 1000);
                         }
                     }
-                    
                     drawAviatrixGraph();
                 }, 1000);
             }
@@ -1654,7 +1636,6 @@
             drawAviatrixGraph();
             updateAviatrixUI();
             
-            // Start the loop with a slight delay
             setTimeout(() => {
                 if (document.getElementById('aviatrixOverlay').classList.contains('show')) {
                     startAviatrixLoop();
