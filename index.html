@@ -149,6 +149,26 @@
         .balance-card h3 { margin: 0 0 8px 0; font-size: 16px; font-weight: 500; opacity: 0.9; z-index: 1; position: relative; }
         .balance-card .amount { font-size: 48px; font-weight: 800; line-height: 1.2; z-index: 1; position: relative; }
         
+        /* Mining Circle */
+        .mining-section { background: var(--card-background); padding: 20px; border-radius: 18px; margin-bottom: 20px; border: 1px solid var(--border-color); text-align: center; }
+        .mining-circle { width: 200px; height: 200px; border-radius: 50%; margin: 15px auto; background: conic-gradient(var(--primary-color) 0%, var(--border-color) 0%); display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; transition: all 0.3s ease; }
+        .mining-circle .inner { width: 160px; height: 160px; border-radius: 50%; background: var(--background-color); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2; }
+        .mining-circle .inner .coin-icon { font-size: 40px; }
+        .mining-circle .inner .coin-count { font-size: 28px; font-weight: 900; color: var(--primary-color); }
+        .mining-circle .inner .status { font-size: 12px; color: var(--text-light); }
+        .mining-circle .start-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background: rgba(0,0,0,0.6); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 3; cursor: pointer; transition: all 0.4s ease; }
+        .mining-circle .start-overlay.hidden { opacity: 0; pointer-events: none; }
+        .mining-circle .start-overlay .start-icon { font-size: 40px; animation: bounce 1.5s infinite; }
+        .mining-circle .start-overlay .start-text { color: #fff; font-weight: 700; font-size: 18px; margin-top: 5px; }
+        .mining-circle .progress-text { position: absolute; bottom: -30px; font-size: 14px; font-weight: 700; color: var(--text-light); }
+        
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes spinCoin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
+        
+        .speed-boost-btn { background: linear-gradient(135deg, #f97316, #f59e0b); color: #fff; padding: 12px 24px; border: none; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.3s ease; margin-top: 10px; }
+        .speed-boost-btn:active { transform: scale(0.95); }
+        .speed-boost-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
         .stat-item { position: relative; overflow: hidden; background-color: var(--card-background); padding: 20px; border-radius: 18px; text-align: center; border: 1px solid var(--border-color); animation: fadeIn 0.7s ease-out; transition: background-color 0.3s, border-color 0.3s; }
         .stat-item .bg-icon { position: absolute; right: 5px; bottom: 5px; font-size: 50px; opacity: 0.08; color: var(--text-color); pointer-events: none; }
@@ -213,43 +233,17 @@
         
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; font-size: 14px; font-weight: 600; color: var(--text-color); margin-bottom: 4px; }
-
-        /* ===== MINING STYLES (from CoinQuest) ===== */
-        .mining-circle-wrapper { display: flex; justify-content: center; align-items: center; margin: 15px 0; position: relative; }
-        .mining-circle { position: relative; width: 200px; height: 200px; border-radius: 50%; background: conic-gradient(#fbbf24 100%, #1e293b 100%); display: flex; justify-content: center; align-items: center; box-shadow: 0 0 50px rgba(251,191,36,0.2); transition: background 0.5s ease; cursor: pointer; }
-        .mining-circle.mining-active { box-shadow: 0 0 60px rgba(251,191,36,0.4), 0 0 100px rgba(251,191,36,0.1); animation: miningPulse 2s infinite; }
-        @keyframes miningPulse { 0%, 100% { box-shadow: 0 0 40px rgba(251,191,36,0.2); } 50% { box-shadow: 0 0 70px rgba(251,191,36,0.5), 0 0 120px rgba(251,191,36,0.15); } }
-        .circle-start-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; cursor: pointer; transition: all 0.4s ease; border: 3px solid rgba(251,191,36,0.4); }
-        .circle-start-overlay.hidden { opacity: 0; pointer-events: none; transform: scale(0.95); }
-        .circle-start-overlay .start-icon { font-size: 36px; margin-bottom: 5px; animation: bounceIcon 1.5s infinite; }
-        @keyframes bounceIcon { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        .circle-start-overlay .start-text { font-size: 16px; font-weight: 900; color: #fbbf24; text-shadow: 0 0 20px rgba(251,191,36,0.5); letter-spacing: 2px; text-align: center; line-height: 1.3; }
-        .mining-circle .inner-circle { width: 140px; height: 140px; border-radius: 50%; background: #0f172a; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 5; border: 2px solid rgba(255,255,255,0.08); backdrop-filter: blur(4px); box-shadow: inset 0 0 30px rgba(0,0,0,0.5); }
-        .mining-circle .coin-icon { font-size: 28px; margin-bottom: 5px; animation: coinSpin 3s linear infinite; }
-        @keyframes coinSpin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
-        .mining-circle .coin-count { font-size: 26px; font-weight: 900; color: #fbbf24; text-shadow: 0 0 20px rgba(251,191,36,0.3); }
-        .circle-status { font-size: 11px; color: #94a3b8; margin-top: 2px; }
-        .circle-progress-text { font-size: 10px; color: #fbbf24; }
-        .speed-btn-container { margin-top: 12px; width: 100%; display: flex; justify-content: center; }
-        .speed-boost-btn { color: #fff; padding: 10px 20px; border: none; border-radius: 25px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #f97316, #f59e0b); transition: all 0.3s ease; justify-content: center; box-shadow: 0 4px 15px rgba(249,115,22,0.3); }
-        .speed-boost-btn:active { transform: scale(0.92); box-shadow: 0 2px 8px rgba(249,115,22,0.2); }
-        .speed-boost-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        .mystery-box-wrapper { position: relative; width: 100%; max-width: 280px; margin: 20px auto; cursor: pointer; text-align: center; }
-        .mystery-box-container { position: relative; width: 100%; padding-bottom: 100%; transition: transform 0.3s ease; perspective: 800px; }
-        .mystery-box-container:hover { transform: scale(1.02); }
-        .mystery-box-container .box-lid { position: absolute; top: 0; left: 0; width: 100%; height: 50%; background: linear-gradient(135deg, #f472b6, #ec4899); border-radius: 20px 20px 0 0; border: 3px solid rgba(244,114,182,0.4); transform-origin: bottom center; transition: transform 0.6s ease; z-index: 2; display: flex; align-items: center; justify-content: center; font-size: 40px; box-shadow: 0 -4px 15px rgba(236,72,153,0.3); }
-        .mystery-box-container .box-lid.open { transform: rotateX(-120deg); }
-        .mystery-box-container .box-body { position: absolute; bottom: 0; left: 0; width: 100%; height: 60%; background: linear-gradient(135deg, #f472b6, #ec4899); border-radius: 0 0 20px 20px; border: 3px solid rgba(244,114,182,0.4); border-top: none; z-index: 1; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(236,72,153,0.3); }
-        .mystery-box-container .box-body .gift-icon { font-size: 60px; animation: pulseBox 1.5s infinite; }
-        @keyframes pulseBox { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-        .mystery-box-container .box-body .gift-icon.opened { animation: none; font-size: 40px; }
-        .mystery-box-container .box-shine { position: absolute; top: -10%; left: -10%; width: 120%; height: 120%; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%); pointer-events: none; z-index: 3; animation: shine 3s infinite; }
-        @keyframes shine { 0% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.3; transform: scale(0.8); } }
-        .mystery-box-wrapper .box-label { margin-top: 12px; font-size: 16px; font-weight: 700; color: #fbbf24; }
-        .mystery-box-wrapper .box-timer { margin-top: 8px; font-size: 20px; font-weight: 900; color: #10b981; min-height: 30px; }
-        .mystery-box-wrapper .box-timer.cooldown { color: #fbbf24; }
-        .floating-coin { position: fixed; font-size: 30px; pointer-events: none; z-index: 1000; animation: floatUp 1s ease-out forwards; }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-150px) scale(0.5); } }
+        
+        .convert-section { background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 12px; padding: 16px; margin-top: 12px; }
+        .convert-section .convert-info { display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: var(--text-color); }
+        .convert-section .convert-info .label { color: var(--text-light); }
+        .convert-section .convert-info .value { font-weight: 700; color: #10b981; }
+        .convert-btn { background: linear-gradient(135deg, #10b981, #059669); color: #fff; padding: 10px 20px; border: none; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; width: 100%; transition: all 0.3s ease; margin-top: 8px; }
+        .convert-btn:active { transform: scale(0.96); }
+        .convert-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .floating-coin { position: fixed; font-size: 24px; pointer-events: none; z-index: 999; animation: floatUp 1s ease-out forwards; }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-100px) scale(0.5); } }
     </style>
 </head>
 <body>
@@ -274,44 +268,61 @@
     
     <div class="container">
         <div class="profile-header"><div id="profile-pic"><i class="fa-solid fa-user"></i></div><h1 id="greeting">Welcome!</h1></div>
+        
+        <!-- ===== MAIN BALANCE CARD ===== -->
         <div class="balance-card">
-            <h3>Your Balance</h3>
+            <h3>Main Balance</h3>
             <div class="amount" id="total-earning">$0.000</div>
+            <div style="font-size:14px; opacity:0.8; margin-top:4px;">🪙 <span id="coin-display">0</span> Coins</div>
         </div>
+        
+        <!-- ===== MINING SECTION ===== -->
+        <div class="mining-section">
+            <h3 class="card-title">⛏️ Mining</h3>
+            <div class="mining-circle" id="miningCircle">
+                <div class="start-overlay" id="startOverlay" onclick="startMining()">
+                    <div class="start-icon">⚡</div>
+                    <div class="start-text">START MINING</div>
+                </div>
+                <div class="inner">
+                    <div class="coin-icon">🪙</div>
+                    <div class="coin-count" id="miningCoinCount">1000</div>
+                    <div class="status" id="miningStatus">Ready</div>
+                </div>
+                <div class="progress-text" id="miningProgress">100%</div>
+            </div>
+            <button class="speed-boost-btn" id="speedBoostBtn" onclick="activateSpeedBoost()"><i class="fas fa-rocket"></i> Speed Boost</button>
+        </div>
+        
         <div class="stats-grid">
             <div class="stat-item"><i class="fa-solid fa-rectangle-ad bg-icon"></i><div class="icon"><i class="fa-solid fa-rectangle-ad"></i></div><div class="value" id="ad-count">0</div><div class="label">Ads Watched</div></div>
             <div class="stat-item"><i class="fa-solid fa-calendar-day bg-icon"></i><div class="icon"><i class="fa-solid fa-calendar-day"></i></div><div class="value" id="ads-today-count">0 / 15</div><div class="label">Today's Ads</div></div>
             <div class="stat-item"><i class="fa-solid fa-users bg-icon"></i><div class="icon"><i class="fa-solid fa-users"></i></div><div class="value" id="referral-count">0</div><div class="label">Referrals</div></div>
         </div>
+        
+        <!-- ===== CONVERT SECTION ===== -->
         <div class="card">
-            <h3 class="card-title">⛏️ Mining</h3>
-            <div class="mining-circle-wrapper">
-                <div class="mining-circle" id="miningCircle">
-                    <div class="circle-start-overlay" id="circleStartOverlay" onclick="startMining()">
-                        <div class="start-icon">⚡</div>
-                        <div class="start-text">START<br>MINING</div>
-                    </div>
-                    <div class="inner-circle">
-                        <span class="coin-icon">🪙</span>
-                        <span class="coin-count" id="progressCoinCount">1000</span>
-                        <div class="circle-status" id="progressStatus">Ready</div>
-                        <div class="circle-progress-text" id="progressPercent">100%</div>
-                    </div>
+            <h3 class="card-title">💰 Convert Coins</h3>
+            <div class="convert-section">
+                <div class="convert-info">
+                    <span class="label">🪙 Coins to Convert</span>
+                    <span class="value" id="convert-coins">0</span>
                 </div>
-            </div>
-            <div class="speed-btn-container">
-                <button class="speed-boost-btn" id="speedBoostBtn" onclick="activateSpeedBoost()"><i class="fas fa-rocket"></i> Speed Boost</button>
-            </div>
-            <div class="mystery-box-wrapper" id="mysteryBoxWrapper">
-                <div class="mystery-box-container" id="mysteryBoxContainer" onclick="openMysteryBox()">
-                    <div class="box-shine"></div>
-                    <div class="box-lid" id="boxLid">🎁</div>
-                    <div class="box-body"><span class="gift-icon" id="giftIcon">🎁</span></div>
+                <div class="convert-info">
+                    <span class="label">💵 Will Get</span>
+                    <span class="value" id="convert-usd">$0.0000</span>
                 </div>
-                <div class="box-label">🎁 Mystery Box</div>
-                <div class="box-timer" id="mysteryBoxTimer">Tap to open</div>
+                <div class="convert-info" style="font-size:12px; color:var(--text-light);">
+                    <span>Rate: 1 USD = <span id="rate-info">1000</span> Coins</span>
+                    <span id="convert-timer">⏳ Ready</span>
+                </div>
+                <button class="convert-btn" id="convertBtn" onclick="performConversion()">🔄 Convert Now</button>
+                <div style="font-size:11px; color:var(--text-light); margin-top:6px; text-align:center;">
+                    ⏰ Next conversion available after 24 hours
+                </div>
             </div>
         </div>
+        
         <div class="card"><h3 class="card-title">Today's Task</h3><button class="action-button" id="watch-ad-button"><i class="fa-solid fa-play"></i><span>Watch Ad</span></button><button class="action-button secondary-button" id="join-channel-button"><i class="fa-brands fa-telegram"></i><span>Join Channel</span></button></div>
         <div class="card"><h3 class="card-title">Weekly Activity</h3><div class="chart-container"><canvas id="activityChart"></canvas></div></div>
     </div>
@@ -339,15 +350,11 @@
                         <option value="" disabled selected>Select Payment Method</option>
                     </select>
                 </div>
-                
-                <!-- Dynamic method fields will be shown here -->
                 <div id="method-fields-container"></div>
-                
                 <div class="form-group">
                     <label>Amount (USD)</label>
                     <input type="number" step="0.001" id="withdraw-amount" placeholder="Amount in USD" required>
                 </div>
-                
                 <button type="submit" class="action-button" id="withdraw-submit-button">
                     <span class="button-text">Submit Request</span>
                     <div class="spinner" style="display: none;"></div>
@@ -399,6 +406,9 @@
         let firebaseDb;
         const tg = window.Telegram ? window.Telegram.WebApp : null;
         
+        // ============================================================
+        // STATE - WITH MINING & CONVERT
+        // ============================================================
         let state = { 
             totalEarning: 0.0, 
             adCount: 0, 
@@ -410,21 +420,20 @@
             lastUsedIp: null, 
             completedBonusTasks: [], 
             rewardedReferrals: 0, 
-            originalUserId: null 
-        };
-        
-        // ===== MINING STATE =====
-        let miningState = {
-            progressCoins: 1000,
+            originalUserId: null,
+            
+            // ===== MINING & CONVERT =====
+            miningCoins: 1000,        // Coins to convert
+            convertCooldown: null,    // 24 hours cooldown
+            speedBoostActive: false,
+            speedBoostCooldown: null,
             isMining: false,
-            miningInterval: null,
-            speedBoostCooldown: 0,
-            mysteryBoxCooldown: 0,
-            balance: 0
+            miningMultiplier: 1       // Speed boost multiplier
         };
         
         let currentUserId = null;
         let currentIpAddress = null;
+        let miningInterval = null;
 
         const allDOMElements = { 
             preloader: document.getElementById('preloader'), 
@@ -450,16 +459,20 @@
             minWithdrawText: document.getElementById('min-withdraw-text'),
             welcomeTitle: document.getElementById('welcome-title'), 
             welcomeMessage: document.getElementById('welcome-message'),
+            
             // Mining elements
             miningCircle: document.getElementById('miningCircle'),
-            circleStartOverlay: document.getElementById('circleStartOverlay'),
-            progressCoinCount: document.getElementById('progressCoinCount'),
-            progressStatus: document.getElementById('progressStatus'),
-            progressPercent: document.getElementById('progressPercent'),
+            startOverlay: document.getElementById('startOverlay'),
+            miningCoinCount: document.getElementById('miningCoinCount'),
+            miningStatus: document.getElementById('miningStatus'),
+            miningProgress: document.getElementById('miningProgress'),
             speedBoostBtn: document.getElementById('speedBoostBtn'),
-            mysteryBoxTimer: document.getElementById('mysteryBoxTimer'),
-            boxLid: document.getElementById('boxLid'),
-            giftIcon: document.getElementById('giftIcon')
+            coinDisplay: document.getElementById('coin-display'),
+            convertCoins: document.getElementById('convert-coins'),
+            convertUsd: document.getElementById('convert-usd'),
+            convertBtn: document.getElementById('convertBtn'),
+            convertTimer: document.getElementById('convert-timer'),
+            rateInfo: document.getElementById('rate-info')
         };
 
         // ============================================================
@@ -536,11 +549,14 @@
                 lastUsedIp: state.lastUsedIp,
                 name: tg ? tg.initDataUnsafe?.user?.first_name : 'User',
                 username: tg ? tg.initDataUnsafe?.user?.username : null,
-                // Mining data
-                progressCoins: miningState.progressCoins,
-                speedBoostCooldown: miningState.speedBoostCooldown,
-                mysteryBoxCooldown: miningState.mysteryBoxCooldown,
-                balance: miningState.balance
+                
+                // Mining & Convert
+                miningCoins: state.miningCoins,
+                convertCooldown: state.convertCooldown,
+                speedBoostActive: state.speedBoostActive,
+                speedBoostCooldown: state.speedBoostCooldown,
+                isMining: state.isMining,
+                miningMultiplier: state.miningMultiplier
             };
             
             firebaseDb.ref(`users/${currentUserId}`).update(userData).catch(err => {
@@ -566,11 +582,13 @@
                         state.rewardedReferrals = data.rewardedReferrals || 0;
                         state.lastUsedIp = data.lastUsedIp || null;
                         
-                        // Mining data
-                        miningState.progressCoins = data.progressCoins !== undefined ? data.progressCoins : 1000;
-                        miningState.speedBoostCooldown = data.speedBoostCooldown || 0;
-                        miningState.mysteryBoxCooldown = data.mysteryBoxCooldown || 0;
-                        miningState.balance = data.balance || 0;
+                        // Mining & Convert
+                        state.miningCoins = data.miningCoins !== undefined ? data.miningCoins : 1000;
+                        state.convertCooldown = data.convertCooldown || null;
+                        state.speedBoostActive = data.speedBoostActive || false;
+                        state.speedBoostCooldown = data.speedBoostCooldown || null;
+                        state.isMining = data.isMining || false;
+                        state.miningMultiplier = data.miningMultiplier || 1;
                         
                         const today = new Date().toLocaleDateString();
                         if (state.lastAdWatchedDate !== today) {
@@ -658,9 +676,6 @@
             return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); 
         }
 
-        // ============================================================
-        // POPULATE WITHDRAWAL METHODS (DYNAMIC)
-        // ============================================================
         function populateWithdrawalMethods() {
             const methodSelect = document.getElementById('method');
             const container = document.getElementById('method-fields-container');
@@ -698,6 +713,182 @@
         }
 
         // ============================================================
+        // ===== MINING SYSTEM (from CoinQuest) =====
+        // ============================================================
+        function startMining() {
+            if (state.isMining || state.miningCoins <= 0) return;
+            
+            allDOMElements.startOverlay.classList.add('hidden');
+            state.isMining = true;
+            saveUserDataToFirebase();
+            
+            function mine() {
+                if (!state.isMining || state.miningCoins <= 0) {
+                    stopMining();
+                    return;
+                }
+                
+                // Calculate speed (1 coin per click, speed boost multiplies)
+                let speed = 1;
+                if (state.speedBoostActive) {
+                    speed = state.miningMultiplier || 2;
+                }
+                
+                state.miningCoins -= 1;
+                
+                // Show floating coin animation
+                showFloatingCoin(`+${speed} 🪙`);
+                
+                // Update UI
+                updateMiningUI();
+                saveUserDataToFirebase();
+                
+                // Continue mining
+                const delay = state.speedBoostActive ? 3000 / speed : 3000;
+                miningInterval = setTimeout(mine, delay);
+            }
+            
+            mine();
+            showToast('⛏️ Mining started!');
+        }
+        
+        function stopMining() {
+            state.isMining = false;
+            if (miningInterval) {
+                clearTimeout(miningInterval);
+                miningInterval = null;
+            }
+            allDOMElements.startOverlay.classList.remove('hidden');
+            updateMiningUI();
+            saveUserDataToFirebase();
+        }
+        
+        function showFloatingCoin(text) {
+            const coin = document.createElement('div');
+            coin.className = 'floating-coin';
+            coin.textContent = text;
+            coin.style.left = (Math.random() * 80 + 10) + '%';
+            coin.style.top = '35%';
+            document.body.appendChild(coin);
+            setTimeout(() => coin.remove(), 1000);
+        }
+        
+        function updateMiningUI() {
+            const total = 1000;
+            const progress = ((total - state.miningCoins) / total) * 100;
+            
+            allDOMElements.miningCoinCount.textContent = state.miningCoins;
+            allDOMElements.miningStatus.textContent = state.isMining ? '⛏️ Mining...' : 'Ready';
+            allDOMElements.miningProgress.textContent = Math.round(progress) + '%';
+            
+            // Update circle progress
+            const circle = allDOMElements.miningCircle;
+            circle.style.background = `conic-gradient(var(--primary-color) ${progress}%, var(--border-color) ${progress}%)`;
+            
+            // Update coin display
+            allDOMElements.coinDisplay.textContent = state.miningCoins;
+            
+            // Update convert info
+            updateConvertUI();
+        }
+        
+        function updateSpeedBoostUI() {
+            const btn = allDOMElements.speedBoostBtn;
+            if (state.speedBoostCooldown && new Date() < new Date(state.speedBoostCooldown)) {
+                const remaining = Math.ceil((new Date(state.speedBoostCooldown) - new Date()) / 60000);
+                btn.disabled = true;
+                btn.innerHTML = `<i class="fas fa-clock"></i> ${remaining}m cooldown`;
+            } else if (state.speedBoostActive) {
+                btn.disabled = true;
+                btn.innerHTML = `<i class="fas fa-rocket"></i> Active (${state.miningMultiplier}x)`;
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fas fa-rocket"></i> Speed Boost (2x)`;
+            }
+        }
+        
+        function activateSpeedBoost() {
+            if (state.speedBoostActive) {
+                showToast('⚡ Speed boost already active!');
+                return;
+            }
+            if (state.speedBoostCooldown && new Date() < new Date(state.speedBoostCooldown)) {
+                showToast('⏳ Please wait for cooldown!');
+                return;
+            }
+            
+            state.speedBoostActive = true;
+            state.miningMultiplier = 2;
+            state.speedBoostCooldown = new Date(Date.now() + 5 * 60000).toISOString(); // 5 min cooldown
+            
+            // Auto disable after 30 seconds
+            setTimeout(() => {
+                state.speedBoostActive = false;
+                state.miningMultiplier = 1;
+                saveUserDataToFirebase();
+                updateSpeedBoostUI();
+                showToast('⚡ Speed boost ended!');
+            }, 30000);
+            
+            saveUserDataToFirebase();
+            updateSpeedBoostUI();
+            showToast('⚡ Speed boost activated! (2x speed for 30s)');
+        }
+
+        // ============================================================
+        // ===== CONVERT SYSTEM (24 hours cooldown) =====
+        // ============================================================
+        function updateConvertUI() {
+            const rate = config.conversionRate || 1000;
+            const coins = state.miningCoins;
+            const usd = coins / rate;
+            
+            allDOMElements.convertCoins.textContent = coins;
+            allDOMElements.convertUsd.textContent = '$' + usd.toFixed(4);
+            allDOMElements.rateInfo.textContent = rate;
+            
+            // Check cooldown
+            if (state.convertCooldown && new Date() < new Date(state.convertCooldown)) {
+                const remaining = Math.ceil((new Date(state.convertCooldown) - new Date()) / 3600000);
+                allDOMElements.convertTimer.textContent = `⏳ ${remaining}h remaining`;
+                allDOMElements.convertBtn.disabled = true;
+                allDOMElements.convertBtn.textContent = '⏳ Wait...';
+            } else {
+                allDOMElements.convertTimer.textContent = '✅ Ready';
+                allDOMElements.convertBtn.disabled = coins <= 0;
+                allDOMElements.convertBtn.textContent = '🔄 Convert Now';
+            }
+        }
+        
+        function performConversion() {
+            const rate = config.conversionRate || 1000;
+            const coins = state.miningCoins;
+            
+            if (coins <= 0) {
+                showToast('❌ No coins to convert!');
+                return;
+            }
+            
+            if (state.convertCooldown && new Date() < new Date(state.convertCooldown)) {
+                showToast('⏳ Please wait 24 hours between conversions!');
+                return;
+            }
+            
+            const usd = coins / rate;
+            state.totalEarning += usd;
+            state.miningCoins = 0;
+            state.convertCooldown = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+            
+            saveUserDataToFirebase();
+            updateMiningUI();
+            updateConvertUI();
+            updateUI();
+            
+            showToast(`✅ Converted ${coins} coins → $${usd.toFixed(4)} USD!`);
+            safeTgAction(tg => tg.HapticFeedback.notificationOccurred('success'));
+        }
+
+        // ============================================================
         // MONETAG IN-APP INTERSTITIAL
         // ============================================================
         let interstitialInitialized = false;
@@ -709,6 +900,7 @@
                     setTimeout(initInAppInterstitial, 2000);
                     return;
                 }
+
                 if (interstitialInitialized) return;
                 
                 show_11573980({
@@ -730,225 +922,6 @@
             }
         }
 
-        function showInAppAd() {
-            try {
-                if (typeof show_11573980 === 'function') {
-                    show_11573980({
-                        type: 'inApp',
-                        inAppSettings: {
-                            frequency: 1,
-                            capping: 0.05,
-                            interval: 30,
-                            timeout: 3,
-                            everyPage: false
-                        }
-                    });
-                }
-            } catch (e) {
-                console.error("Error showing in-app ad:", e);
-            }
-        }
-
-        // ============================================================
-        // MINING FUNCTIONS (from CoinQuest)
-        // ============================================================
-        function startMining() {
-            if (miningState.isMining || miningState.progressCoins <= 0) return;
-            
-            allDOMElements.circleStartOverlay.classList.add('hidden');
-            miningState.isMining = true;
-            allDOMElements.miningCircle.classList.add('mining-active');
-            allDOMElements.progressStatus.textContent = '⛏️ Mining...';
-            
-            // Update Firebase
-            firebaseDb.ref(`users/${currentUserId}/isCurrentlyMining`).set(true);
-            firebaseDb.ref(`users/${currentUserId}/lastMiningActivity`).set(Date.now());
-            
-            function mine() {
-                if (!miningState.isMining || miningState.progressCoins <= 0) {
-                    stopMining();
-                    return;
-                }
-                
-                // Each mine gives 1 coin
-                miningState.progressCoins -= 1;
-                miningState.balance += 1;
-                state.totalEarning += 0.001; // $0.001 per coin
-                
-                // Update UI
-                updateMiningUI();
-                updateUI();
-                
-                // Floating coin animation
-                const coin = document.createElement('div');
-                coin.className = 'floating-coin';
-                coin.textContent = '+1 🪙';
-                coin.style.left = (Math.random() * 80 + 10) + '%';
-                coin.style.top = '35%';
-                document.body.appendChild(coin);
-                setTimeout(() => coin.remove(), 1000);
-                
-                // Save to Firebase
-                saveUserDataToFirebase();
-                
-                // Schedule next mine (every 5 seconds)
-                miningState.miningInterval = setTimeout(mine, 5000);
-            }
-            
-            mine();
-            showToast('⛏️ Mining started!');
-        }
-
-        function stopMining() {
-            miningState.isMining = false;
-            if (miningState.miningInterval) {
-                clearTimeout(miningState.miningInterval);
-                miningState.miningInterval = null;
-            }
-            allDOMElements.miningCircle.classList.remove('mining-active');
-            allDOMElements.progressStatus.textContent = 'Stopped';
-            allDOMElements.circleStartOverlay.classList.remove('hidden');
-            
-            firebaseDb.ref(`users/${currentUserId}/isCurrentlyMining`).set(false);
-        }
-
-        function updateMiningUI() {
-            const progress = (miningState.progressCoins / 1000) * 100;
-            allDOMElements.progressCoinCount.textContent = Math.round(miningState.progressCoins);
-            allDOMElements.progressPercent.textContent = Math.round(progress) + '%';
-            
-            // Update circle progress
-            const circle = allDOMElements.miningCircle;
-            circle.style.background = `conic-gradient(#fbbf24 ${progress}%, #1e293b ${progress}%)`;
-            
-            if (miningState.progressCoins <= 0) {
-                allDOMElements.progressStatus.textContent = '⛔ Depleted';
-                stopMining();
-            }
-        }
-
-        function activateSpeedBoost() {
-            if (miningState.speedBoostCooldown > Date.now()) {
-                const remaining = Math.ceil((miningState.speedBoostCooldown - Date.now()) / 1000);
-                safeTgAlert(`⏳ Speed Boost on cooldown! ${remaining}s left`);
-                return;
-            }
-            
-            if (!miningState.isMining) {
-                safeTgAlert('⚠️ Start mining first!');
-                return;
-            }
-            
-            // Speed boost: mine faster for 30 seconds
-            miningState.speedBoostCooldown = Date.now() + 120000; // 2 min cooldown
-            
-            safeTgAlert('🚀 Speed Boost activated! Mining faster for 30 seconds!');
-            updateSpeedBoostUI();
-            
-            // Temporarily increase mining speed
-            let boostTimer = 30;
-            const boostInterval = setInterval(() => {
-                boostTimer--;
-                if (boostTimer <= 0) {
-                    clearInterval(boostInterval);
-                    showToast('⏱️ Speed Boost ended');
-                    if (miningState.isMining) {
-                        // Restart normal mining
-                        stopMining();
-                        setTimeout(startMining, 500);
-                    }
-                }
-            }, 1000);
-            
-            // Mine extra coins during boost
-            let extraMines = 0;
-            const extraInterval = setInterval(() => {
-                if (!miningState.isMining || boostTimer <= 0) {
-                    clearInterval(extraInterval);
-                    return;
-                }
-                if (miningState.progressCoins > 0) {
-                    miningState.progressCoins -= 1;
-                    miningState.balance += 1;
-                    state.totalEarning += 0.001;
-                    updateMiningUI();
-                    updateUI();
-                    saveUserDataToFirebase();
-                    extraMines++;
-                }
-            }, 1500);
-            
-            saveUserDataToFirebase();
-        }
-
-        function updateSpeedBoostUI() {
-            const btn = allDOMElements.speedBoostBtn;
-            if (miningState.speedBoostCooldown > Date.now()) {
-                btn.disabled = true;
-                const remaining = Math.ceil((miningState.speedBoostCooldown - Date.now()) / 1000);
-                btn.innerHTML = `<i class="fas fa-clock"></i> ${remaining}s`;
-                setTimeout(updateSpeedBoostUI, 1000);
-            } else {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-rocket"></i> Speed Boost';
-            }
-        }
-
-        // ============================================================
-        // MYSTERY BOX FUNCTIONS (from CoinQuest)
-        // ============================================================
-        function openMysteryBox() {
-            if (miningState.mysteryBoxCooldown > Date.now()) {
-                const remaining = Math.ceil((miningState.mysteryBoxCooldown - Date.now()) / 1000);
-                const mins = Math.floor(remaining / 60);
-                const secs = remaining % 60;
-                safeTgAlert(`⏳ Box on cooldown! ${mins}m ${secs}s left`);
-                return;
-            }
-            
-            // Open animation
-            allDOMElements.boxLid.classList.add('open');
-            allDOMElements.giftIcon.classList.add('opened');
-            allDOMElements.giftIcon.textContent = '✨';
-            
-            // Random reward: 20-100 coins
-            const reward = Math.floor(Math.random() * 80) + 20;
-            miningState.balance += reward;
-            state.totalEarning += reward * 0.001;
-            
-            // Set cooldown (30 minutes)
-            miningState.mysteryBoxCooldown = Date.now() + 1800000;
-            
-            // Update UI
-            updateMysteryBoxUI();
-            updateUI();
-            saveUserDataToFirebase();
-            
-            safeTgAlert(`🎁 You got ${reward} coins from the Mystery Box!`);
-            
-            // Reset after 3 seconds
-            setTimeout(() => {
-                allDOMElements.boxLid.classList.remove('open');
-                allDOMElements.giftIcon.classList.remove('opened');
-                allDOMElements.giftIcon.textContent = '🎁';
-            }, 3000);
-        }
-
-        function updateMysteryBoxUI() {
-            const timer = allDOMElements.mysteryBoxTimer;
-            if (miningState.mysteryBoxCooldown > Date.now()) {
-                const remaining = Math.ceil((miningState.mysteryBoxCooldown - Date.now()) / 1000);
-                const mins = Math.floor(remaining / 60);
-                const secs = remaining % 60;
-                timer.textContent = `⏳ ${mins}m ${secs}s`;
-                timer.className = 'box-timer cooldown';
-                setTimeout(updateMysteryBoxUI, 1000);
-            } else {
-                timer.textContent = '🎁 Tap to open';
-                timer.className = 'box-timer';
-            }
-        }
-
         // ============================================================
         // UI FUNCTIONS
         // ============================================================
@@ -961,19 +934,10 @@
                 saveUserDataToFirebase();
             }
             
-            // Total earning includes mining balance converted to USD
-            const miningUSD = miningState.balance * 0.001;
-            const totalUSD = state.totalEarning + miningUSD;
-            
-            allDOMElements.totalEarningEl.textContent = `$${totalUSD.toFixed(3)}`;
+            allDOMElements.totalEarningEl.textContent = `$${state.totalEarning.toFixed(3)}`;
             allDOMElements.adCountEl.textContent = state.adCount;
             allDOMElements.adsTodayCountEl.textContent = `${state.adsWatchedToday} / ${config.DAILY_AD_LIMIT}`;
             allDOMElements.minWithdrawText.textContent = `Minimum withdrawal is $${config.MINIMUM_WITHDRAWAL.toFixed(2)}.`;
-            
-            // Update mining UI
-            updateMiningUI();
-            updateSpeedBoostUI();
-            updateMysteryBoxUI();
             
             clearInterval(cooldownInterval);
             const watchAdButton = allDOMElements.watchAdButton;
@@ -1003,10 +967,13 @@
             }
             watchAdButton.classList.toggle('pulsing', !watchAdButton.disabled);
             updateChart();
+            updateMiningUI();
+            updateConvertUI();
+            updateSpeedBoostUI();
         }
 
         // ============================================================
-        // WATCH AD FUNCTION
+        // WATCH AD FUNCTION - UPDATED WITH MONETAG
         // ============================================================
         async function watchAd() {
             if (state.lastUsedIp && !state.cooldownUntil) {
@@ -1026,12 +993,16 @@
             try {
                 await show_11573980();
                 
-                state.totalEarning += config.AD_REWARD; 
+                // ===== AD REWARD GOES TO MINING COINS (not main balance) =====
+                const rewardCoins = 1; // 1 coin per ad
+                state.miningCoins += rewardCoins;
+                
+                // Also track ad count
                 state.adCount++; 
                 state.adsWatchedToday++; 
                 state.weeklyActivity[new Date().getDay()]++;
                 
-                let alertMessage = `Ad watched! You have ${config.DAILY_AD_LIMIT - state.adsWatchedToday} ads left.`;
+                let alertMessage = `Ad watched! +${rewardCoins} coin! You have ${config.DAILY_AD_LIMIT - state.adsWatchedToday} ads left.`;
                 if (state.adsWatchedToday >= config.DAILY_AD_LIMIT) {
                     const cdDate = new Date(); 
                     cdDate.setMinutes(cdDate.getMinutes() + config.COOLDOWN_MINUTES);
@@ -1076,12 +1047,9 @@
             
             const amount = parseFloat(document.getElementById('withdraw-amount').value);
             
-            // Calculate total balance (including mining)
-            const totalUSD = state.totalEarning + (miningState.balance * 0.001);
-            
             if (!method) return safeTgAlert('Please select a payment method.');
             if (!accountNumber) return safeTgAlert(`Please enter your ${method} account number.`);
-            if (amount > totalUSD) return safeTgAlert('You do not have enough balance.');
+            if (amount > state.totalEarning) return safeTgAlert('You do not have enough balance.');
             if (isNaN(amount) || amount < config.MINIMUM_WITHDRAWAL) return safeTgAlert(`Minimum withdrawal amount is $${config.MINIMUM_WITHDRAWAL}.`);
 
             buttonText.style.display = 'none'; 
@@ -1106,15 +1074,7 @@
             try {
                 await firebaseDb.ref(`withdrawals/${withdrawalId}`).set(withdrawalData);
                 
-                // Deduct from total earning first, then from mining balance if needed
-                if (state.totalEarning >= amount) {
-                    state.totalEarning -= amount;
-                } else {
-                    const remaining = amount - state.totalEarning;
-                    state.totalEarning = 0;
-                    miningState.balance -= Math.ceil(remaining / 0.001);
-                }
-                
+                state.totalEarning -= amount;
                 state.withdrawalHistory.unshift({ 
                     method, 
                     number: accountNumber, 
@@ -1372,11 +1332,6 @@
                 
                 currentIpAddress = await getIpAddress();
                 
-                // Initialize mining UI
-                updateMiningUI();
-                updateSpeedBoostUI();
-                updateMysteryBoxUI();
-                
                 allDOMElements.watchAdButton.addEventListener('click', watchAd);
                 allDOMElements.withdrawForm.addEventListener('submit', handleWithdrawal);
                 allDOMElements.joinChannelButton.addEventListener('click', () => safeTgAction(tg => tg.openTelegramLink(config.TELEGRAM_CHANNEL_LINK)));
@@ -1396,9 +1351,15 @@
                     });
                 });
                 
+                // Load conversion rate
+                firebaseDb.ref('conversionRate').on('value', snap => {
+                    config.conversionRate = snap.val() || 1000;
+                    updateConvertUI();
+                });
+                
                 updateUI();
                 
-                // Initialize In-App Interstitial
+                // ===== INITIALIZE IN-APP INTERSTITIAL =====
                 setTimeout(initInAppInterstitial, 3000);
                 
                 if (!sessionStorage.getItem('alreadyVisited')) { 
