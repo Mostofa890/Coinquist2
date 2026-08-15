@@ -11,6 +11,7 @@
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 
     <!-- Monetag SDK -->
     <script src='//libtl.com/sdk.js' data-zone='11573980' data-sdk='show_11573980'></script>
@@ -73,7 +74,6 @@
         #profile-pic img { width: 100%; height: 100%; object-fit: cover; }
         #greeting { font-size: 22px; font-weight: 800; }
         
-        /* Role Selector */
         .role-selector { display: flex; gap: 10px; margin-bottom: 16px; }
         .role-btn { flex: 1; padding: 12px; border-radius: 12px; border: 2px solid var(--border-color); background: var(--card-background); color: var(--text-light); font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-align: center; }
         .role-btn.active { border-color: var(--primary-color); background: rgba(var(--primary-color-rgb), 0.1); color: var(--primary-color); }
@@ -87,7 +87,10 @@
         .balance-card h3 { margin: 0 0 4px 0; font-size: 14px; font-weight: 500; opacity: 0.9; z-index: 1; position: relative; }
         .balance-card .amount { font-size: 40px; font-weight: 800; line-height: 1.2; z-index: 1; position: relative; }
         
-        /* Convert Timer */
+        .wallet-card { background: var(--card-background); padding: 16px 18px; border-radius: 14px; margin-bottom: 12px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .wallet-card .label { font-size: 13px; color: var(--text-light); font-weight: 500; }
+        .wallet-card .value { font-size: 20px; font-weight: 800; color: var(--primary-color); }
+        
         .convert-timer { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); border-radius: 12px; padding: 12px; margin-top: 8px; text-align: center; }
         .convert-timer .timer-label { font-size: 12px; color: var(--text-light); }
         .convert-timer .timer-time { font-size: 24px; font-weight: 900; color: #10b981; }
@@ -124,6 +127,8 @@
         .modal-content input:focus, .modal-content select:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.2); }
         .modal-content textarea { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid var(--border-color); border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 14px; background-color: var(--background-color); color: var(--text-color); min-height: 80px; resize: vertical; transition: border-color 0.2s, box-shadow 0.2s; }
         .modal-content textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.2); }
+        .modal-content input[type="file"] { width: 100%; padding: 10px; border: 1px dashed var(--border-color); border-radius: 10px; background: var(--background-color); color: var(--text-color); cursor: pointer; }
+        .modal-content input[type="file"]:hover { border-color: var(--primary-color); }
         
         #bonus-tasks-list .bonus-item { display: flex; align-items: center; justify-content: space-between; padding: 15px; background-color: var(--background-color); border-radius: 12px; margin-bottom: 12px; border: 1px solid var(--border-color); }
         .bonus-item .details { display: flex; flex-direction: column; gap: 4px; }
@@ -159,7 +164,6 @@
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; font-size: 14px; font-weight: 600; color: var(--text-color); margin-bottom: 4px; }
         
-        /* Ad Cards */
         .ad-card { background: var(--card-background); border-radius: 14px; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border-color); transition: all 0.3s ease; }
         .ad-card:hover { border-color: var(--primary-color); }
         .ad-card .ad-header { display: flex; justify-content: space-between; align-items: center; }
@@ -177,6 +181,7 @@
         .ad-card .ad-status.active { background: rgba(16,185,129,0.1); color: #10b981; }
         .ad-card .ad-status.pending { background: rgba(245,158,11,0.1); color: #f59e0b; }
         .ad-card .ad-status.completed { background: rgba(59,130,246,0.1); color: #3b82f6; }
+        .ad-card .ad-image { width: 100%; max-height: 150px; object-fit: cover; border-radius: 8px; margin-top: 8px; }
         
         .ad-filters { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; }
         .ad-filters .filter-btn { padding: 5px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #94a3b8; cursor: pointer; font-size: 11px; white-space: nowrap; transition: all 0.3s; }
@@ -188,6 +193,13 @@
         
         .floating-coin { position: fixed; font-size: 24px; pointer-events: none; z-index: 999; animation: floatUp 1s ease-out forwards; }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-100px) scale(0.5); } }
+        
+        .deposit-method { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: rgba(255,255,255,0.03); border-radius: 10px; margin-bottom: 8px; border: 1px solid var(--border-color); cursor: pointer; transition: all 0.3s ease; }
+        .deposit-method:hover { border-color: var(--primary-color); background: rgba(var(--primary-color-rgb), 0.05); }
+        .deposit-method .method-icon { font-size: 24px; width: 40px; text-align: center; }
+        .deposit-method .method-name { font-weight: 600; font-size: 14px; }
+        .deposit-method .method-desc { font-size: 12px; color: var(--text-light); }
+        .deposit-method .method-number { font-size: 13px; font-weight: 700; color: var(--primary-color); }
     </style>
 </head>
 <body>
@@ -242,6 +254,15 @@
             <div class="amount" id="total-earning">$0.000</div>
         </div>
         
+        <!-- ===== WALLET BALANCE ===== -->
+        <div class="wallet-card">
+            <div>
+                <div class="label">💳 Wallet Balance</div>
+                <div class="value" id="wallet-balance">$0.000</div>
+            </div>
+            <button onclick="showModal('depositModal')" style="background:linear-gradient(135deg,#10b981,#059669); color:#fff; border:none; padding:8px 16px; border-radius:10px; font-weight:600; font-size:12px; cursor:pointer;">+ Deposit</button>
+        </div>
+        
         <!-- ===== AUTO CONVERT TIMER ===== -->
         <div class="convert-timer" id="convertTimer">
             <div class="timer-label">🔄 Auto Convert in</div>
@@ -262,6 +283,7 @@
                     <button class="filter-btn active" onclick="filterAds('all',this)">All</button>
                     <button class="filter-btn" onclick="filterAds('viewed',this)">👁 Viewed</button>
                     <button class="filter-btn" onclick="filterAds('pending',this)">⏳ Pending</button>
+                    <button class="filter-btn" onclick="filterAds('verified',this)">✅ Verified</button>
                 </div>
                 <div id="ad-list-container"></div>
             </div>
@@ -287,12 +309,20 @@
                         <input type="url" id="ad-link" placeholder="https://example.com" required>
                     </div>
                     <div class="form-group">
+                        <label>Ad Image (Optional)</label>
+                        <input type="file" id="ad-image" accept="image/*">
+                        <div style="font-size:11px; color:var(--text-light); margin-top:4px;">Upload PNG, JPG or GIF (Max 2MB)</div>
+                    </div>
+                    <div class="form-group">
                         <label>Reward per View ($)</label>
                         <input type="number" id="ad-reward" step="0.001" value="0.001" required>
                     </div>
                     <div class="form-group">
                         <label>Total Budget ($)</label>
                         <input type="number" id="ad-budget" step="0.01" value="1.00" required>
+                    </div>
+                    <div id="ad-budget-info" style="font-size:12px; color:var(--text-light); margin-bottom:12px;">
+                        Total Views: <span id="ad-total-views">1000</span> | Cost per view: $<span id="ad-cost-per-view">0.001</span>
                     </div>
                     <button type="submit" class="action-button" id="create-ad-btn">
                         <i class="fa-solid fa-plus"></i> <span>Create Ad</span>
@@ -303,6 +333,11 @@
             <div class="card">
                 <h3 class="card-title">📊 My Ads</h3>
                 <div id="my-ads-container"></div>
+            </div>
+            
+            <div class="card">
+                <h3 class="card-title">📋 Ad Verification Requests</h3>
+                <div id="verification-requests"></div>
             </div>
         </div>
         
@@ -346,6 +381,43 @@
         </div>
     </div>
     
+    <!-- Deposit Modal -->
+    <div id="depositModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal('depositModal')">&times;</span>
+            <h3 class="card-title">💳 Deposit Funds</h3>
+            <p style="font-size:13px; color:var(--text-light); margin-bottom:12px;">Select a payment method to deposit</p>
+            <div id="deposit-methods-list"></div>
+            <div style="margin-top:12px;">
+                <div class="form-group">
+                    <label>Amount (BDT)</label>
+                    <input type="number" id="deposit-amount" step="1" placeholder="Enter amount in BDT" min="10">
+                </div>
+                <button class="action-button" onclick="submitDeposit()" style="margin-top:8px;">
+                    <i class="fa-solid fa-check"></i> <span>Confirm Deposit</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Verify Ad Modal -->
+    <div id="verifyAdModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal('verifyAdModal')">&times;</span>
+            <h3 class="card-title">📸 Submit Proof</h3>
+            <p style="font-size:13px; color:var(--text-light); margin-bottom:12px;">Take a screenshot of the ad and upload it here</p>
+            <div id="verify-ad-info"></div>
+            <div class="form-group">
+                <label>Upload Screenshot</label>
+                <input type="file" id="verify-screenshot" accept="image/*" required>
+                <div style="font-size:11px; color:var(--text-light); margin-top:4px;">Upload PNG, JPG or GIF (Max 2MB)</div>
+            </div>
+            <button class="action-button" onclick="submitVerification()">
+                <i class="fa-solid fa-upload"></i> <span>Submit for Verification</span>
+            </button>
+        </div>
+    </div>
+    
     <div id="supportModal" class="modal"><div class="modal-content"><span class="close-button" onclick="closeModal('supportModal')">&times;</span><h3 class="card-title">Support</h3><p>For any help or questions, please contact the admin directly. We are here to assist you!</p><button class="action-button" id="admin-contact-button"><i class="fa-brands fa-telegram"></i><span>Contact Admin</span></button></div></div>
     <div id="historyModal" class="modal"><div class="modal-content"><span class="close-button" onclick="closeModal('historyModal')">&times;</span><h3 class="card-title">Withdrawal History</h3><div id="history-list"></div></div></div>
     <div id="inviteModal" class="modal"><div class="modal-content"><span class="close-button" onclick="closeModal('inviteModal')">&times;</span><h3 class="card-title">Invite Friends</h3><p>Share your referral link with your friends and earn together. You will get a reward for each successful referral.</p><button class="action-button" id="copy-link-button"><i class="fa-solid fa-copy"></i><span>Copy Link</span></button><button class="action-button secondary-button" id="share-link-button"><i class="fa-solid fa-share-nodes"></i><span>Share Link</span></button></div></div>
@@ -354,7 +426,7 @@
 
     <script>
         // ============================================================
-        // FIREBASE CONFIG
+        // FIREBASE CONFIG WITH STORAGE
         // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyC_WvNxSQQ58TcJhDcBw5NUrAZjOQe1T2g",
@@ -384,10 +456,11 @@
                 title: "Welcome to NexEarn!",
                 message: "Please follow the rules to ensure you receive your payment.\n\n💰 Reward per Ad: $0.001\n✅ 100% Payment Guarantee\n💸 Withdraw via Binance UID or Email\n🔥 Minimum withdrawal is only $0.10"
             },
-            conversionRate: 1000
+            conversionRate: 1000,
+            depositMethods: []
         };
 
-        let firebaseDb;
+        let firebaseDb, firebaseStorage;
         const tg = window.Telegram ? window.Telegram.WebApp : null;
         
         // ============================================================
@@ -406,14 +479,17 @@
             rewardedReferrals: 0, 
             originalUserId: null,
             convertCooldown: null,
-            userRole: 'publisher', // publisher or advertiser
+            userRole: 'publisher',
             viewedAds: [],
-            myAds: []
+            walletBalance: 0,
+            myAds: [],
+            pendingVerifications: []
         };
         
         let currentUserId = null;
         let currentIpAddress = null;
         let currentFilter = 'all';
+        let currentVerifyAdId = null;
 
         const allDOMElements = { 
             preloader: document.getElementById('preloader'), 
@@ -422,6 +498,7 @@
             preloaderFooter: document.getElementById('preloader-footer'),
             container: document.querySelector('.container'), 
             totalEarningEl: document.getElementById('total-earning'), 
+            walletBalanceEl: document.getElementById('wallet-balance'),
             adCountEl: document.getElementById('ad-count'), 
             adsTodayCountEl: document.getElementById('ads-today-count'), 
             referralCountEl: document.getElementById('referral-count'), 
@@ -443,10 +520,12 @@
             convertTimeDisplay: document.getElementById('convertTimeDisplay'),
             adListContainer: document.getElementById('ad-list-container'),
             myAdsContainer: document.getElementById('my-ads-container'),
+            verificationContainer: document.getElementById('verification-requests'),
             userRoleBadge: document.getElementById('userRoleBadge'),
             publisherView: document.getElementById('publisherView'),
             advertiserView: document.getElementById('advertiserView'),
-            createAdForm: document.getElementById('create-ad-form')
+            createAdForm: document.getElementById('create-ad-form'),
+            depositMethodsList: document.getElementById('deposit-methods-list')
         };
 
         // ============================================================
@@ -456,6 +535,7 @@
             try {
                 firebase.initializeApp(firebaseConfig);
                 firebaseDb = firebase.database();
+                firebaseStorage = firebase.storage();
                 console.log("✅ Firebase Connected");
                 return true;
             } catch (e) {
@@ -467,7 +547,7 @@
         function loadConfigFromFirebase() {
             return new Promise((resolve) => {
                 if (!firebaseDb) { resolve(); return; }
-                firebaseDb.ref('adminConfig').once('value').then(snapshot => {
+                firebaseDb.ref('adminConfig').on('value', (snapshot) => {
                     const data = snapshot.val();
                     if (data) {
                         config.BOT_TOKEN = data.botToken || config.BOT_TOKEN;
@@ -484,10 +564,12 @@
                         if (data.withdrawMethods) config.withdrawalMethods = data.withdrawMethods;
                         if (data.welcomeMessage) config.welcomeNotice.message = data.welcomeMessage;
                         if (data.conversionRate) config.conversionRate = data.conversionRate;
+                        if (data.depositMethods) config.depositMethods = data.depositMethods;
                         console.log("✅ Config loaded from Firebase");
+                        renderDepositMethods();
                     }
                     resolve();
-                }).catch(() => resolve());
+                });
             });
         }
 
@@ -527,6 +609,7 @@
                 convertCooldown: state.convertCooldown,
                 userRole: state.userRole,
                 viewedAds: state.viewedAds,
+                walletBalance: state.walletBalance,
                 myAds: state.myAds
             };
             
@@ -555,6 +638,7 @@
                         state.convertCooldown = data.convertCooldown || null;
                         state.userRole = data.userRole || 'publisher';
                         state.viewedAds = data.viewedAds || [];
+                        state.walletBalance = data.walletBalance || 0;
                         state.myAds = data.myAds || [];
                         
                         const today = new Date().toLocaleDateString();
@@ -570,10 +654,109 @@
         }
 
         // ============================================================
-        // AD SYSTEM - PUBLISHER & ADVERTISER
+        // DEPOSIT SYSTEM
         // ============================================================
-        
-        // Load all ads from Firebase
+        function renderDepositMethods() {
+            const container = allDOMElements.depositMethodsList;
+            if (!container) return;
+            
+            if (!config.depositMethods || config.depositMethods.length === 0) {
+                container.innerHTML = '<p style="color:var(--text-light); font-size:13px;">No deposit methods available. Contact admin.</p>';
+                return;
+            }
+            
+            container.innerHTML = config.depositMethods.map(method => `
+                <div class="deposit-method" onclick="selectDepositMethod('${method.name}', '${method.number}')">
+                    <div class="method-icon">${method.icon || '💰'}</div>
+                    <div>
+                        <div class="method-name">${method.name}</div>
+                        <div class="method-desc">Send money to this number</div>
+                    </div>
+                    <div class="method-number">${method.number}</div>
+                </div>
+            `).join('');
+        }
+
+        let selectedDepositMethod = null;
+        let selectedDepositNumber = null;
+
+        function selectDepositMethod(name, number) {
+            selectedDepositMethod = name;
+            selectedDepositNumber = number;
+            document.querySelectorAll('.deposit-method').forEach(el => {
+                el.style.borderColor = 'var(--border-color)';
+                el.style.background = 'rgba(255,255,255,0.03)';
+            });
+            event.target.closest('.deposit-method').style.borderColor = '#10b981';
+            event.target.closest('.deposit-method').style.background = 'rgba(16,185,129,0.08)';
+            showToast(`✅ Selected: ${name} - ${number}`);
+        }
+
+        async function submitDeposit() {
+            const amount = parseInt(document.getElementById('deposit-amount').value);
+            if (!amount || amount < 10) {
+                safeTgAlert('❌ Please enter a valid amount (min 10 BDT)');
+                return;
+            }
+            if (!selectedDepositMethod || !selectedDepositNumber) {
+                safeTgAlert('❌ Please select a payment method first');
+                return;
+            }
+            
+            const user = tg ? tg.initDataUnsafe?.user : { first_name: 'User', id: 'testuser' };
+            
+            const depositData = {
+                userId: currentUserId,
+                userName: user.first_name || 'User',
+                method: selectedDepositMethod,
+                number: selectedDepositNumber,
+                amount: amount,
+                status: 'pending',
+                createdAt: Date.now()
+            };
+            
+            try {
+                await firebaseDb.ref('deposits').push(depositData);
+                
+                // Notify admin
+                const message = `<b>💳 New Deposit Request</b>\n\n👤 <b>User:</b> ${user.first_name}\n🆔 <b>User ID:</b> <code>${currentUserId}</code>\n---------------------------------------\n💳 <b>Method:</b> ${selectedDepositMethod}\n🔢 <b>Number:</b> <code>${selectedDepositNumber}</code>\n💵 <b>Amount:</b> ${amount} BDT`;
+                
+                const url = `https://api.telegram.org/bot${config.BOT_TOKEN}/sendMessage`;
+                config.ADMIN_IDS.forEach(chat_id => {
+                    fetch(url, { 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify({ chat_id, text: message, parse_mode: 'HTML' }) 
+                    }).catch(err => console.error("Admin notification error:", err));
+                });
+                
+                closeModal('depositModal');
+                safeTgAlert(`✅ Deposit request sent! Please send ${amount} BDT to ${selectedDepositMethod} (${selectedDepositNumber})`);
+                document.getElementById('deposit-amount').value = '';
+                
+            } catch(e) {
+                console.error("Deposit error:", e);
+                safeTgAlert('❌ Failed to submit deposit. Please try again.');
+            }
+        }
+
+        // Listen for deposit approvals
+        function listenForDepositApprovals() {
+            if (!firebaseDb) return;
+            firebaseDb.ref('deposits').orderByChild('userId').equalTo(currentUserId).on('child_changed', (snapshot) => {
+                const data = snapshot.val();
+                if (data.status === 'approved') {
+                    state.walletBalance += data.amount / 100; // Convert BDT to USD (approx)
+                    saveUserDataToFirebase();
+                    updateUI();
+                    safeTgAlert(`✅ Deposit of ${data.amount} BDT approved! Wallet balance updated.`);
+                }
+            });
+        }
+
+        // ============================================================
+        // AD SYSTEM WITH VERIFICATION
+        // ============================================================
         function loadAdsFromFirebase() {
             if (!firebaseDb) return;
             firebaseDb.ref('ads').on('value', (snapshot) => {
@@ -581,23 +764,24 @@
                 const adList = Object.entries(ads).map(([id, data]) => ({ id, ...data }));
                 renderAdList(adList);
                 renderMyAds(adList);
+                renderVerificationRequests(adList);
             });
         }
 
-        // Render ads for publisher
         function renderAdList(ads) {
             const container = allDOMElements.adListContainer;
             if (!container) return;
             
-            // Filter based on viewed status
-            let filteredAds = ads;
+            let filteredAds = ads.filter(ad => ad.status === 'active' || ad.status === 'paused');
+            
             if (currentFilter === 'viewed') {
-                filteredAds = ads.filter(ad => state.viewedAds.includes(ad.id));
+                filteredAds = filteredAds.filter(ad => state.viewedAds.includes(ad.id));
             } else if (currentFilter === 'pending') {
-                filteredAds = ads.filter(ad => !state.viewedAds.includes(ad.id) && ad.status === 'active');
+                filteredAds = filteredAds.filter(ad => !state.viewedAds.includes(ad.id) && ad.status === 'active');
+            } else if (currentFilter === 'verified') {
+                filteredAds = filteredAds.filter(ad => state.viewedAds.includes(ad.id) && ad.verified);
             }
             
-            // Sort by newest first
             filteredAds.sort((a, b) => b.createdAt - a.createdAt);
             
             if (filteredAds.length === 0) {
@@ -610,6 +794,8 @@
                 const isActive = ad.status === 'active';
                 const views = ad.views || 0;
                 const totalViews = ad.totalViews || 0;
+                const isVerified = ad.verified || false;
+                const imageUrl = ad.imageUrl || '';
                 
                 return `
                     <div class="ad-card" data-id="${ad.id}">
@@ -617,16 +803,17 @@
                             <span class="ad-title">${escapeHTML(ad.title || 'Untitled')}</span>
                             <span class="ad-reward">+$${ad.reward?.toFixed(3) || '0.001'}</span>
                         </div>
+                        ${imageUrl ? `<img src="${imageUrl}" class="ad-image" alt="Ad image">` : ''}
                         <div class="ad-desc">${escapeHTML(ad.desc || 'No description')}</div>
                         <div class="ad-footer">
                             <span class="ad-views"><i class="fa-solid fa-eye"></i> ${views}/${totalViews || 100}</span>
-                            <span class="ad-status ${isViewed ? 'completed' : (isActive ? 'active' : 'pending')}">
-                                ${isViewed ? '✅ Viewed' : (isActive ? '🟢 Active' : '⏳ Pending')}
+                            <span class="ad-status ${isVerified ? 'completed' : (isViewed ? 'pending' : (isActive ? 'active' : 'pending'))}">
+                                ${isVerified ? '✅ Verified' : (isViewed ? '⏳ Pending' : (isActive ? '🟢 Active' : '⏳ Pending'))}
                             </span>
                             <button class="ad-btn view ${isViewed ? 'completed' : ''}" 
-                                    onclick="viewAd('${ad.id}')" 
-                                    ${isViewed || !isActive ? 'disabled' : ''}>
-                                ${isViewed ? '✓ Viewed' : '👁 View'}
+                                    onclick="${isViewed ? `openVerifyModal('${ad.id}')` : `viewAd('${ad.id}')`}" 
+                                    ${!isActive ? 'disabled' : ''}>
+                                ${isVerified ? '✓ Verified' : (isViewed ? '📸 Verify' : '👁 View')}
                             </button>
                         </div>
                     </div>
@@ -634,67 +821,234 @@
             }).join('');
         }
 
-        // View an ad (publisher)
         async function viewAd(adId) {
             if (state.viewedAds.includes(adId)) {
-                safeTgAlert('✅ You already viewed this ad!');
+                openVerifyModal(adId);
                 return;
             }
             
-            // Check daily limit
             if (state.adsWatchedToday >= config.DAILY_AD_LIMIT) {
                 safeTgAlert(`📊 Daily limit reached! (${config.DAILY_AD_LIMIT})`);
                 return;
             }
             
-            // Get ad data
             const snapshot = await firebaseDb.ref(`ads/${adId}`).once('value');
             const ad = snapshot.val();
-            if (!ad) {
-                safeTgAlert('❌ Ad not found!');
+            if (!ad || ad.status !== 'active') {
+                safeTgAlert('❌ Ad not available!');
                 return;
             }
             
-            if (ad.status !== 'active') {
-                safeTgAlert('⏳ This ad is not active!');
+            // Check if advertiser has enough budget
+            if (ad.views >= ad.totalViews) {
+                safeTgAlert('❌ This ad has reached its view limit!');
                 return;
             }
             
             // Open link
             safeTgAction(tg => tg.openLink(ad.link));
             
-            // Show loader
-            allDOMElements.adLoaderOverlay.style.display = 'flex';
+            // Store ad ID for verification
+            currentVerifyAdId = adId;
+            
+            // Show verification modal
+            openVerifyModal(adId);
+        }
+
+        function openVerifyModal(adId) {
+            currentVerifyAdId = adId;
+            const modal = document.getElementById('verifyAdModal');
+            const info = document.getElementById('verify-ad-info');
+            
+            firebaseDb.ref(`ads/${adId}`).once('value').then(snapshot => {
+                const ad = snapshot.val();
+                if (ad) {
+                    info.innerHTML = `
+                        <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:10px; margin-bottom:12px;">
+                            <strong>${escapeHTML(ad.title)}</strong>
+                            <div style="font-size:12px; color:var(--text-light);">Reward: $${ad.reward?.toFixed(3) || '0.001'}</div>
+                            ${ad.imageUrl ? `<img src="${ad.imageUrl}" style="width:100%; max-height:100px; object-fit:cover; border-radius:6px; margin-top:6px;">` : ''}
+                        </div>
+                    `;
+                }
+            });
+            
+            document.getElementById('verify-screenshot').value = '';
+            modal.style.display = 'flex';
+        }
+
+        async function submitVerification() {
+            const fileInput = document.getElementById('verify-screenshot');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                safeTgAlert('❌ Please upload a screenshot!');
+                return;
+            }
+            
+            if (!currentVerifyAdId) {
+                safeTgAlert('❌ No ad selected!');
+                return;
+            }
+            
+            // Check file size (max 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                safeTgAlert('❌ File too large! Max 2MB');
+                return;
+            }
             
             try {
-                // Show Monetag ad
-                await show_11573980();
+                // Upload to Firebase Storage
+                const storageRef = firebaseStorage.ref(`verifications/${currentUserId}/${currentVerifyAdId}_${Date.now()}.jpg`);
+                const uploadTask = storageRef.put(file);
                 
-                // Update counts
-                state.totalEarning += ad.reward || 0.001;
-                state.adCount++;
-                state.adsWatchedToday++;
-                state.weeklyActivity[new Date().getDay()]++;
-                state.viewedAds.push(adId);
+                showToast('📤 Uploading screenshot...');
+                
+                const snapshot = await uploadTask;
+                const downloadUrl = await snapshot.ref.getDownloadURL();
+                
+                // Save verification request
+                const verificationData = {
+                    adId: currentVerifyAdId,
+                    userId: currentUserId,
+                    userName: tg ? tg.initDataUnsafe?.user?.first_name : 'User',
+                    screenshot: downloadUrl,
+                    status: 'pending',
+                    createdAt: Date.now()
+                };
+                
+                await firebaseDb.ref('verifications').push(verificationData);
+                
+                // Add to viewed ads
+                if (!state.viewedAds.includes(currentVerifyAdId)) {
+                    state.viewedAds.push(currentVerifyAdId);
+                }
                 
                 // Update ad views
-                await firebaseDb.ref(`ads/${adId}/views`).transaction((current) => (current || 0) + 1);
+                await firebaseDb.ref(`ads/${currentVerifyAdId}/views`).transaction((current) => (current || 0) + 1);
                 
                 saveUserDataToFirebase();
                 updateUI();
                 
-                safeTgAlert(`🎉 You earned $${(ad.reward || 0.001).toFixed(3)}!`);
-                safeTgAction(tg => tg.HapticFeedback.notificationOccurred('success'));
+                closeModal('verifyAdModal');
+                safeTgAlert('✅ Screenshot submitted! Waiting for admin verification.');
                 
             } catch(e) {
-                console.error("Ad Error:", e);
-                safeTgAlert('Ad could not be completed. Please try again.');
-            } finally {
-                allDOMElements.adLoaderOverlay.style.display = 'none';
+                console.error("Verification error:", e);
+                safeTgAlert('❌ Failed to upload screenshot. Please try again.');
             }
         }
 
-        // Render my ads (advertiser)
+        // ============================================================
+        // ADVERTISER - CREATE AD (WITH BALANCE CHECK)
+        // ============================================================
+        function setupCreateAdForm() {
+            const form = allDOMElements.createAdForm;
+            if (!form) return;
+            
+            // Update total views on budget/reward change
+            document.getElementById('ad-budget').addEventListener('input', updateAdCostInfo);
+            document.getElementById('ad-reward').addEventListener('input', updateAdCostInfo);
+            
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const title = document.getElementById('ad-title').value.trim();
+                const desc = document.getElementById('ad-desc').value.trim();
+                const link = document.getElementById('ad-link').value.trim();
+                const reward = parseFloat(document.getElementById('ad-reward').value) || 0.001;
+                const budget = parseFloat(document.getElementById('ad-budget').value) || 1.00;
+                const fileInput = document.getElementById('ad-image');
+                
+                if (!title || !link) {
+                    safeTgAlert('❌ Please fill all required fields!');
+                    return;
+                }
+                
+                // Check wallet balance
+                if (state.walletBalance < budget) {
+                    safeTgAlert(`❌ Insufficient balance! You need $${budget.toFixed(2)}. Please deposit first.`);
+                    return;
+                }
+                
+                const totalViews = Math.floor(budget / reward);
+                if (totalViews < 1) {
+                    safeTgAlert('❌ Budget too low for the reward amount!');
+                    return;
+                }
+                
+                let imageUrl = '';
+                
+                // Upload image if provided
+                if (fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    if (file.size > 2 * 1024 * 1024) {
+                        safeTgAlert('❌ Image too large! Max 2MB');
+                        return;
+                    }
+                    
+                    try {
+                        const storageRef = firebaseStorage.ref(`ads/${currentUserId}/${Date.now()}_${file.name}`);
+                        const uploadTask = await storageRef.put(file);
+                        imageUrl = await uploadTask.ref.getDownloadURL();
+                    } catch(e) {
+                        console.error("Image upload error:", e);
+                        safeTgAlert('❌ Failed to upload image. Please try again.');
+                        return;
+                    }
+                }
+                
+                // Deduct from wallet
+                state.walletBalance -= budget;
+                
+                const adData = {
+                    title: title,
+                    desc: desc || 'No description',
+                    link: link,
+                    reward: reward,
+                    totalViews: totalViews,
+                    views: 0,
+                    status: 'active',
+                    createdBy: currentUserId,
+                    createdAt: Date.now(),
+                    budget: budget,
+                    imageUrl: imageUrl,
+                    verified: false
+                };
+                
+                try {
+                    const newRef = firebaseDb.ref('ads').push();
+                    await newRef.set(adData);
+                    
+                    saveUserDataToFirebase();
+                    updateUI();
+                    
+                    safeTgAlert('✅ Ad created successfully!');
+                    form.reset();
+                    document.getElementById('ad-image').value = '';
+                    loadAdsFromFirebase();
+                } catch(e) {
+                    console.error("Error creating ad:", e);
+                    // Refund if failed
+                    state.walletBalance += budget;
+                    saveUserDataToFirebase();
+                    safeTgAlert('❌ Failed to create ad. Please try again.');
+                }
+            });
+        }
+
+        function updateAdCostInfo() {
+            const reward = parseFloat(document.getElementById('ad-reward').value) || 0.001;
+            const budget = parseFloat(document.getElementById('ad-budget').value) || 1.00;
+            const totalViews = Math.floor(budget / reward);
+            
+            document.getElementById('ad-total-views').textContent = totalViews || 0;
+            document.getElementById('ad-cost-per-view').textContent = reward.toFixed(4);
+        }
+
+        // ============================================================
+        // RENDER MY ADS & VERIFICATION REQUESTS
+        // ============================================================
         function renderMyAds(ads) {
             const container = allDOMElements.myAdsContainer;
             if (!container) return;
@@ -710,15 +1064,17 @@
                 const views = ad.views || 0;
                 const totalViews = ad.totalViews || 100;
                 const progress = Math.min((views / totalViews) * 100, 100);
+                const imageUrl = ad.imageUrl || '';
                 
                 return `
                     <div class="ad-card" data-id="${ad.id}">
                         <div class="ad-header">
                             <span class="ad-title">${escapeHTML(ad.title || 'Untitled')}</span>
                             <span class="ad-status ${ad.status === 'active' ? 'active' : 'pending'}">
-                                ${ad.status === 'active' ? '🟢 Active' : '⏳ Pending'}
+                                ${ad.status === 'active' ? '🟢 Active' : '⏳ Paused'}
                             </span>
                         </div>
+                        ${imageUrl ? `<img src="${imageUrl}" class="ad-image" alt="Ad image">` : ''}
                         <div class="ad-desc">${escapeHTML(ad.desc || 'No description')}</div>
                         <div style="margin-top:8px;">
                             <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-light);">
@@ -742,59 +1098,87 @@
             }).join('');
         }
 
-        // Create new ad (advertiser)
-        function setupCreateAdForm() {
-            const form = allDOMElements.createAdForm;
-            if (!form) return;
+        function renderVerificationRequests(ads) {
+            const container = allDOMElements.verificationContainer;
+            if (!container || state.userRole !== 'advertiser') return;
             
-            form.addEventListener('submit', async function(e) {
-                e.preventDefault();
+            firebaseDb.ref('verifications').orderByChild('status').equalTo('pending').on('value', (snapshot) => {
+                const verifications = snapshot.val() || {};
+                const items = Object.entries(verifications).map(([id, data]) => ({ id, ...data }));
                 
-                const title = document.getElementById('ad-title').value.trim();
-                const desc = document.getElementById('ad-desc').value.trim();
-                const link = document.getElementById('ad-link').value.trim();
-                const reward = parseFloat(document.getElementById('ad-reward').value) || 0.001;
-                const budget = parseFloat(document.getElementById('ad-budget').value) || 1.00;
+                // Only show verifications for user's ads
+                const myAdIds = ads.filter(ad => ad.createdBy === currentUserId).map(ad => ad.id);
+                const filtered = items.filter(v => myAdIds.includes(v.adId));
                 
-                if (!title || !link) {
-                    safeTgAlert('❌ Please fill all required fields!');
+                if (filtered.length === 0) {
+                    container.innerHTML = `<p style="text-align:center; color:var(--text-light); padding:20px;">No pending verification requests</p>`;
                     return;
                 }
                 
-                const totalViews = Math.floor(budget / reward);
-                if (totalViews < 1) {
-                    safeTgAlert('❌ Budget too low for the reward amount!');
-                    return;
-                }
-                
-                const adData = {
-                    title: title,
-                    desc: desc || 'No description',
-                    link: link,
-                    reward: reward,
-                    totalViews: totalViews,
-                    views: 0,
-                    status: 'active',
-                    createdBy: currentUserId,
-                    createdAt: Date.now(),
-                    budget: budget
-                };
-                
-                try {
-                    const newRef = firebaseDb.ref('ads').push();
-                    await newRef.set(adData);
-                    
-                    safeTgAlert('✅ Ad created successfully!');
-                    form.reset();
-                    loadAdsFromFirebase();
-                } catch(e) {
-                    console.error("Error creating ad:", e);
-                    safeTgAlert('❌ Failed to create ad. Please try again.');
-                }
+                container.innerHTML = filtered.map(v => `
+                    <div class="ad-card">
+                        <div class="ad-header">
+                            <span class="ad-title">Verification from ${escapeHTML(v.userName || 'User')}</span>
+                            <span class="ad-status pending">⏳ Pending</span>
+                        </div>
+                        ${v.screenshot ? `<img src="${v.screenshot}" class="ad-image" alt="Screenshot" style="cursor:pointer;" onclick="window.open('${v.screenshot}','_blank')">` : ''}
+                        <div class="ad-footer" style="margin-top:8px;">
+                            <button class="ad-btn" style="background:#10b981; color:#fff; padding:4px 12px; border:none; border-radius:6px; font-size:11px; cursor:pointer;" onclick="verifyAdRequest('${v.id}')">
+                                ✅ Approve
+                            </button>
+                            <button class="ad-btn" style="background:#ef4444; color:#fff; padding:4px 12px; border:none; border-radius:6px; font-size:11px; cursor:pointer;" onclick="rejectAdRequest('${v.id}')">
+                                ❌ Reject
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
             });
         }
 
-        // Delete ad
+        async function verifyAdRequest(verificationId) {
+            try {
+                const snapshot = await firebaseDb.ref(`verifications/${verificationId}`).once('value');
+                const data = snapshot.val();
+                if (!data) return;
+                
+                // Update verification status
+                await firebaseDb.ref(`verifications/${verificationId}/status`).set('approved');
+                
+                // Add reward to user
+                const adSnapshot = await firebaseDb.ref(`ads/${data.adId}`).once('value');
+                const ad = adSnapshot.val();
+                
+                if (ad) {
+                    // Add reward to user's earning
+                    await firebaseDb.ref(`users/${data.userId}/totalEarning`).transaction((current) => (current || 0) + ad.reward);
+                }
+                
+                // Mark ad as verified
+                await firebaseDb.ref(`ads/${data.adId}/verified`).set(true);
+                
+                safeTgAlert('✅ Verification approved! User got reward.');
+                loadAdsFromFirebase();
+                
+            } catch(e) {
+                console.error("Verification error:", e);
+                safeTgAlert('❌ Failed to approve verification.');
+            }
+        }
+
+        async function rejectAdRequest(verificationId) {
+            try {
+                await firebaseDb.ref(`verifications/${verificationId}/status`).set('rejected');
+                safeTgAlert('❌ Verification rejected.');
+                loadAdsFromFirebase();
+            } catch(e) {
+                console.error("Rejection error:", e);
+                safeTgAlert('❌ Failed to reject verification.');
+            }
+        }
+
+        // ============================================================
+        // DELETE & TOGGLE AD
+        // ============================================================
         async function deleteAd(adId) {
             if (!confirm('Delete this ad?')) return;
             try {
@@ -807,7 +1191,6 @@
             }
         }
 
-        // Toggle ad status
         async function toggleAdStatus(adId) {
             try {
                 const snapshot = await firebaseDb.ref(`ads/${adId}`).once('value');
@@ -1051,6 +1434,7 @@
             }
             
             allDOMElements.totalEarningEl.textContent = `$${state.totalEarning.toFixed(3)}`;
+            allDOMElements.walletBalanceEl.textContent = `$${state.walletBalance.toFixed(3)}`;
             allDOMElements.adCountEl.textContent = state.adCount;
             allDOMElements.adsTodayCountEl.textContent = `${state.adsWatchedToday} / ${config.DAILY_AD_LIMIT}`;
             allDOMElements.minWithdrawText.textContent = `Minimum withdrawal is $${config.MINIMUM_WITHDRAWAL.toFixed(2)}.`;
@@ -1466,6 +1850,7 @@
                 await handleReferral();
                 await processReferralRewards();
                 listenForReferralCount();
+                listenForDepositApprovals();
                 
                 if (user?.first_name) {
                     allDOMElements.greetingEl.textContent = `Welcome, ${escapeHTML(user.first_name)}!`;
