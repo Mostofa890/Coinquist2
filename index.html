@@ -156,6 +156,7 @@
         .mining-balance-card .value { font-size: 20px; font-weight: 800; color: var(--primary-color); }
         .mining-balance-card .countdown { font-size: 12px; color: #10b981; font-weight: 600; }
         .mining-balance-card .countdown.waiting { color: #f59e0b; }
+        .mining-balance-card .ad-reward-badge { background: rgba(251,191,36,0.15); color: #fbbf24; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
         
         /* Mining Circle */
         .mining-section { background: var(--card-background); padding: 20px; border-radius: 18px; margin-bottom: 20px; border: 1px solid var(--border-color); text-align: center; }
@@ -194,6 +195,12 @@
         .action-button:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 4px 10px rgba(var(--primary-color-rgb), 0.2); }
         .action-button:disabled { background-color: #8E8E93; cursor: not-allowed; }
         .secondary-button { background-color: transparent; color: var(--primary-color); border: 2px solid var(--primary-color); margin-top: 15px; }
+        
+        /* Ad Watch Modal */
+        .ad-watch-modal .modal-content { text-align: center; }
+        .ad-watch-modal .ad-counter { font-size: 48px; font-weight: 900; color: var(--primary-color); }
+        .ad-watch-modal .ad-progress { width: 100%; height: 6px; background: var(--border-color); border-radius: 4px; overflow: hidden; margin: 15px 0; }
+        .ad-watch-modal .ad-progress .fill { height: 100%; background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); border-radius: 4px; transition: width 0.5s ease; }
         
         .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; max-width: 500px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); padding: 10px 15px; background: var(--glass-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid var(--border-color); transition: background-color 0.3s, border-color 0.3s; z-index: 100; }
         .nav-button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 8px; border-radius: 12px; color: var(--text-light); text-decoration: none; font-size: 12px; font-weight: 500; border: none; background: transparent; cursor: pointer; transition: all 0.2s ease; }
@@ -287,6 +294,7 @@
                 <div class="value" id="mining-balance-display">0 🪙</div>
             </div>
             <div>
+                <span class="ad-reward-badge" id="adRewardBadge" style="display:none;">📺 Watch Ads</span>
                 <div class="countdown" id="auto-convert-timer">⏳ 24h:00m</div>
             </div>
         </div>
@@ -324,6 +332,29 @@
         <div class="card"><h3 class="card-title">Today's Task</h3><button class="action-button" id="watch-ad-button"><i class="fa-solid fa-play"></i><span>Watch Ad</span></button><button class="action-button secondary-button" id="join-channel-button"><i class="fa-brands fa-telegram"></i><span>Join Channel</span></button></div>
         <div class="card"><h3 class="card-title">Weekly Activity</h3><div class="chart-container"><canvas id="activityChart"></canvas></div></div>
     </div>
+    
+    <!-- ===== AD WATCH MODAL (for mining balance) ===== -->
+    <div id="adWatchModal" class="modal ad-watch-modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeAdWatchModal()">&times;</span>
+            <h3 class="card-title">📺 Watch Ads to Earn Coins</h3>
+            <p style="color:var(--text-light); font-size:14px;">Your mining balance is 0. Watch ads to earn coins!</p>
+            <div style="margin: 15px 0;">
+                <div class="ad-counter" id="adWatchCounter">0 / <span id="adWatchTotal">10</span></div>
+                <div class="ad-progress"><div class="fill" id="adWatchProgress" style="width:0%;"></div></div>
+            </div>
+            <button class="action-button" id="adWatchBtn" onclick="watchAdForMining()">
+                <i class="fa-solid fa-play"></i> <span>Watch Ad</span>
+            </button>
+            <button class="action-button secondary-button" onclick="closeAdWatchModal()" style="margin-top:10px;">
+                <i class="fa-solid fa-times"></i> <span>Close</span>
+            </button>
+            <div style="margin-top:10px; font-size:12px; color:var(--text-light);">
+                💰 +1 coin per ad | <span id="adWatchRemaining">10</span> ads remaining
+            </div>
+        </div>
+    </div>
+    
     <div class="nav-bar">
         <button class="nav-button" onclick="showModal('withdrawModal', this)"><i class="fa-solid fa-money-bill-transfer"></i><span>Withdraw</span></button>
         <button class="nav-button" onclick="showModal('historyModal', this)"><i class="fa-solid fa-clock-rotate-left"></i><span>History</span></button>
@@ -421,14 +452,19 @@
             originalUserId: null,
             
             // ===== MINING & CONVERT =====
-            miningCoins: 1000,        // Remaining coins in mining pool
-            miningBalance: 0,         // Total coins mined (will auto convert)
-            convertCooldown: null,    // 24 hours cooldown
+            miningCoins: 1000,
+            miningBalance: 0,
+            convertCooldown: null,
             speedBoostActive: false,
             speedBoostCooldown: null,
             isMining: false,
             miningMultiplier: 1,
-            lastConvertTime: null
+            lastConvertTime: null,
+            
+            // ===== AD WATCH FOR MINING =====
+            adWatchCount: 0,
+            adWatchTotal: 0,
+            adWatchActive: false
         };
         
         let currentUserId = null;
@@ -470,7 +506,16 @@
             speedBoostBtn: document.getElementById('speedBoostBtn'),
             miningBalanceDisplay: document.getElementById('mining-balance-display'),
             autoConvertTimer: document.getElementById('auto-convert-timer'),
-            autoConvertStatus: document.getElementById('auto-convert-status')
+            autoConvertStatus: document.getElementById('auto-convert-status'),
+            adRewardBadge: document.getElementById('adRewardBadge'),
+            
+            // Ad Watch Modal
+            adWatchModal: document.getElementById('adWatchModal'),
+            adWatchCounter: document.getElementById('adWatchCounter'),
+            adWatchTotal: document.getElementById('adWatchTotal'),
+            adWatchProgress: document.getElementById('adWatchProgress'),
+            adWatchBtn: document.getElementById('adWatchBtn'),
+            adWatchRemaining: document.getElementById('adWatchRemaining')
         };
 
         // ============================================================
@@ -548,7 +593,6 @@
                 name: tg ? tg.initDataUnsafe?.user?.first_name : 'User',
                 username: tg ? tg.initDataUnsafe?.user?.username : null,
                 
-                // Mining & Convert
                 miningCoins: state.miningCoins,
                 miningBalance: state.miningBalance,
                 convertCooldown: state.convertCooldown,
@@ -556,7 +600,11 @@
                 speedBoostCooldown: state.speedBoostCooldown,
                 isMining: state.isMining,
                 miningMultiplier: state.miningMultiplier,
-                lastConvertTime: state.lastConvertTime
+                lastConvertTime: state.lastConvertTime,
+                
+                adWatchCount: state.adWatchCount,
+                adWatchTotal: state.adWatchTotal,
+                adWatchActive: state.adWatchActive
             };
             
             firebaseDb.ref(`users/${currentUserId}`).update(userData).catch(err => {
@@ -582,7 +630,6 @@
                         state.rewardedReferrals = data.rewardedReferrals || 0;
                         state.lastUsedIp = data.lastUsedIp || null;
                         
-                        // Mining & Convert
                         state.miningCoins = data.miningCoins !== undefined ? data.miningCoins : 1000;
                         state.miningBalance = data.miningBalance !== undefined ? data.miningBalance : 0;
                         state.convertCooldown = data.convertCooldown || null;
@@ -591,6 +638,10 @@
                         state.isMining = data.isMining || false;
                         state.miningMultiplier = data.miningMultiplier || 1;
                         state.lastConvertTime = data.lastConvertTime || null;
+                        
+                        state.adWatchCount = data.adWatchCount || 0;
+                        state.adWatchTotal = data.adWatchTotal || 0;
+                        state.adWatchActive = data.adWatchActive || false;
                         
                         const today = new Date().toLocaleDateString();
                         if (state.lastAdWatchedDate !== today) {
@@ -718,7 +769,18 @@
         // ===== MINING SYSTEM =====
         // ============================================================
         function startMining() {
-            if (state.isMining || state.miningCoins <= 0) return;
+            // Check if mining balance is 0 - show ad watch modal
+            if (state.miningBalance === 0 && state.miningCoins === 0) {
+                openAdWatchModal();
+                return;
+            }
+            
+            if (state.isMining || state.miningCoins <= 0) {
+                if (state.miningCoins <= 0 && state.miningBalance === 0) {
+                    openAdWatchModal();
+                }
+                return;
+            }
             
             allDOMElements.startOverlay.classList.add('hidden');
             state.isMining = true;
@@ -735,7 +797,6 @@
                     speed = state.miningMultiplier || 2;
                 }
                 
-                // Remove 1 from mining pool, add to mining balance
                 state.miningCoins -= 1;
                 state.miningBalance += speed;
                 
@@ -784,10 +845,18 @@
             const circle = allDOMElements.miningCircle;
             circle.style.background = `conic-gradient(var(--primary-color) ${progress}%, var(--border-color) ${progress}%)`;
             
-            // Update mining balance display
             allDOMElements.miningBalanceDisplay.textContent = `${state.miningBalance} 🪙`;
             
-            // Update auto convert timer
+            // Show ad watch badge if mining balance is 0
+            if (state.miningBalance === 0 && state.miningCoins === 0) {
+                allDOMElements.adRewardBadge.style.display = 'inline-block';
+                allDOMElements.adRewardBadge.textContent = '📺 Watch Ads';
+                allDOMElements.adRewardBadge.style.cursor = 'pointer';
+                allDOMElements.adRewardBadge.onclick = openAdWatchModal;
+            } else {
+                allDOMElements.adRewardBadge.style.display = 'none';
+            }
+            
             updateAutoConvertTimer();
         }
         
@@ -834,6 +903,84 @@
         }
 
         // ============================================================
+        // ===== AD WATCH FOR MINING (when balance is 0) =====
+        // ============================================================
+        function openAdWatchModal() {
+            // Generate random number between 10-12
+            const total = Math.floor(Math.random() * 3) + 10; // 10, 11, or 12
+            state.adWatchTotal = total;
+            state.adWatchCount = 0;
+            state.adWatchActive = true;
+            
+            allDOMElements.adWatchTotal.textContent = total;
+            allDOMElements.adWatchCounter.textContent = `0 / ${total}`;
+            allDOMElements.adWatchProgress.style.width = '0%';
+            allDOMElements.adWatchRemaining.textContent = total;
+            allDOMElements.adWatchBtn.disabled = false;
+            allDOMElements.adWatchBtn.querySelector('span').textContent = 'Watch Ad';
+            
+            allDOMElements.adWatchModal.style.display = 'flex';
+            saveUserDataToFirebase();
+        }
+        
+        function closeAdWatchModal() {
+            allDOMElements.adWatchModal.style.display = 'none';
+            state.adWatchActive = false;
+            saveUserDataToFirebase();
+        }
+        
+        async function watchAdForMining() {
+            if (state.adWatchCount >= state.adWatchTotal) {
+                safeTgAlert('🎉 You have completed all ads! Start mining again!');
+                closeAdWatchModal();
+                return;
+            }
+            
+            allDOMElements.adWatchBtn.disabled = true;
+            allDOMElements.adWatchBtn.querySelector('span').textContent = 'Loading...';
+            
+            try {
+                await show_11573980();
+                
+                // Add 1 coin to mining balance
+                state.miningBalance += 1;
+                state.adWatchCount++;
+                
+                // Update UI
+                const total = state.adWatchTotal;
+                allDOMElements.adWatchCounter.textContent = `${state.adWatchCount} / ${total}`;
+                allDOMElements.adWatchProgress.style.width = `${(state.adWatchCount / total) * 100}%`;
+                allDOMElements.adWatchRemaining.textContent = total - state.adWatchCount;
+                
+                saveUserDataToFirebase();
+                updateMiningUI();
+                updateUI();
+                
+                safeTgAction(tg => tg.HapticFeedback.notificationOccurred('success'));
+                
+                if (state.adWatchCount >= total) {
+                    allDOMElements.adWatchBtn.querySelector('span').textContent = '✅ Completed!';
+                    allDOMElements.adWatchBtn.disabled = true;
+                    safeTgAlert('🎉 All ads completed! You earned ' + total + ' coins! Start mining now!');
+                    setTimeout(() => {
+                        closeAdWatchModal();
+                        allDOMElements.startOverlay.classList.remove('hidden');
+                        startMining();
+                    }, 1500);
+                } else {
+                    allDOMElements.adWatchBtn.querySelector('span').textContent = 'Watch Ad';
+                    allDOMElements.adWatchBtn.disabled = false;
+                }
+                
+            } catch(e) {
+                console.error("Ad Error:", e);
+                safeTgAlert('Ad could not be completed. Please try again.');
+                allDOMElements.adWatchBtn.querySelector('span').textContent = 'Watch Ad';
+                allDOMElements.adWatchBtn.disabled = false;
+            }
+        }
+
+        // ============================================================
         // ===== AUTO CONVERT SYSTEM (24 hours) =====
         // ============================================================
         function updateAutoConvertTimer() {
@@ -856,7 +1003,6 @@
                 statusEl.textContent = '✅ Ready to Convert';
                 statusEl.className = 'value';
                 
-                // If there are coins to convert and no cooldown, auto convert
                 if (state.miningBalance > 0 && !state.convertCooldown) {
                     performAutoConvert();
                 }
@@ -967,7 +1113,7 @@
         }
 
         // ============================================================
-        // WATCH AD FUNCTION
+        // WATCH AD FUNCTION (Regular)
         // ============================================================
         async function watchAd() {
             if (state.lastUsedIp && !state.cooldownUntil) {
@@ -987,7 +1133,6 @@
             try {
                 await show_11573980();
                 
-                // ===== AD REWARD GOES TO MINING BALANCE =====
                 const rewardCoins = 1;
                 state.miningBalance += rewardCoins;
                 
@@ -1346,10 +1491,8 @@
                 
                 updateUI();
                 
-                // ===== INITIALIZE IN-APP INTERSTITIAL =====
                 setTimeout(initInAppInterstitial, 3000);
                 
-                // ===== AUTO CONVERT COUNTDOWN =====
                 setInterval(() => {
                     updateAutoConvertTimer();
                 }, 1000);
