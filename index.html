@@ -37,7 +37,6 @@
         html, body { overscroll-behavior-y: contain; }
         body { font-family: 'Inter', sans-serif; margin: 0; padding: 20px 15px 100px 15px; background-color: var(--background-color); color: var(--text-color); -webkit-font-smoothing: antialiased; transition: background-color 0.3s, color 0.3s; }
         
-        /* ===== PRELOADER ===== */
         #preloader {
             position: fixed;
             top: 0;
@@ -67,7 +66,6 @@
         #preloader-footer { position: fixed; bottom: 30px; left: 0; width: 100%; text-align: center; padding: 15px; z-index: 10000; transition: opacity 0.5s ease; }
         #preloader-footer a { font-size: 13px; font-weight: 500; color: var(--text-light); text-decoration: none; opacity: 0.5; }
         
-        /* ===== MAIN APP ===== */
         .container { max-width: 500px; margin: 0 auto; display: none; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .profile-header { display: flex; align-items: center; gap: 15px; margin-bottom: 24px; animation: fadeIn 0.5s ease-out; }
@@ -80,19 +78,16 @@
         .balance-card h3 { margin: 0 0 4px 0; font-size: 14px; font-weight: 500; opacity: 0.9; z-index: 1; position: relative; }
         .balance-card .amount { font-size: 40px; font-weight: 800; line-height: 1.2; z-index: 1; position: relative; }
         
-        /* Mining Balance - Small Card Below Main */
         .mining-balance-card { background: var(--card-background); padding: 12px 18px; border-radius: 14px; margin-bottom: 12px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
         .mining-balance-card .label { font-size: 13px; color: var(--text-light); font-weight: 500; }
         .mining-balance-card .label i { margin-right: 6px; }
         .mining-balance-card .value { font-size: 20px; font-weight: 800; color: var(--primary-color); }
         
-        /* Convert Timer */
         .convert-timer { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); border-radius: 12px; padding: 12px; margin-top: 8px; text-align: center; }
         .convert-timer .timer-label { font-size: 12px; color: var(--text-light); }
         .convert-timer .timer-time { font-size: 24px; font-weight: 900; color: #10b981; }
         .convert-timer .timer-time.waiting { color: #f59e0b; }
         
-        /* Mining Circle */
         .mining-section { background: var(--card-background); padding: 20px; border-radius: 18px; margin-bottom: 20px; border: 1px solid var(--border-color); text-align: center; }
         .mining-circle { width: 200px; height: 200px; border-radius: 50%; margin: 15px auto; background: conic-gradient(var(--primary-color) 0%, var(--border-color) 0%); display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; transition: all 0.3s ease; }
         .mining-circle .inner { width: 160px; height: 160px; border-radius: 50%; background: var(--background-color); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2; }
@@ -105,7 +100,6 @@
         .mining-circle .start-overlay .start-text { color: #fff; font-weight: 700; font-size: 18px; margin-top: 5px; }
         .mining-circle .progress-text { position: absolute; bottom: -30px; font-size: 14px; font-weight: 700; color: var(--text-light); }
         
-        /* Auto Recharge Timer */
         .recharge-timer { background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.2); border-radius: 12px; padding: 12px; margin-top: 10px; text-align: center; }
         .recharge-timer .timer-label { font-size: 12px; color: var(--text-light); }
         .recharge-timer .timer-time { font-size: 28px; font-weight: 900; color: #fbbf24; }
@@ -168,7 +162,6 @@
         #multiAccountModal .modal-content { text-align: center; border-radius: 20px; max-height: initial;}
         #multiAccountModal { align-items: center; justify-content: center; }
 
-        /* Withdraw method specific styles */
         .method-field { display: none; margin-top: 10px; }
         .method-field.active { display: block; }
         .method-field label { font-size: 14px; font-weight: 600; color: var(--text-color); display: block; margin-bottom: 4px; }
@@ -179,6 +172,11 @@
         
         .floating-coin { position: fixed; font-size: 24px; pointer-events: none; z-index: 999; animation: floatUp 1s ease-out forwards; }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-100px) scale(0.5); } }
+        
+        /* Mining status indicator */
+        .mining-status-indicator { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+        .mining-status-indicator.active { background: #4ade80; animation: pulse 1.5s infinite; }
+        .mining-status-indicator.inactive { background: #ef4444; }
     </style>
 </head>
 <body>
@@ -202,7 +200,14 @@
     <div id="ad-loader-overlay"><div class="loader"></div><span>Loading Ad...</span></div>
     
     <div class="container">
-        <div class="profile-header"><div id="profile-pic"><i class="fa-solid fa-user"></i></div><h1 id="greeting">Welcome!</h1></div>
+        <div class="profile-header">
+            <div id="profile-pic"><i class="fa-solid fa-user"></i></div>
+            <h1 id="greeting">Welcome!</h1>
+            <div style="margin-left:auto; display:flex; align-items:center; font-size:12px; color:var(--text-light);">
+                <span class="mining-status-indicator inactive" id="miningStatusDot"></span>
+                <span id="miningStatusText">Idle</span>
+            </div>
+        </div>
         
         <!-- ===== MAIN BALANCE CARD ===== -->
         <div class="balance-card">
@@ -270,7 +275,6 @@
     <!-- All Modals -->
     <div id="welcomeModal" class="modal"><div class="modal-content"><span class="close-button" onclick="closeModal('welcomeModal')">&times;</span><h3 id="welcome-title" class="card-title" style="text-align:center;"></h3><p id="welcome-message" style="line-height: 1.6; font-size: 15px; text-align: center; white-space: pre-wrap; margin: 15px 0;"></p><button class="action-button" onclick="closeModal('welcomeModal')">I Understand</button></div></div>
     
-    <!-- Withdraw Modal -->
     <div id="withdrawModal" class="modal">
         <div class="modal-content">
             <span class="close-button" onclick="closeModal('withdrawModal')">&times;</span>
@@ -406,7 +410,10 @@
             rechargeStatus: document.getElementById('rechargeStatus'),
             
             convertTimer: document.getElementById('convertTimer'),
-            convertTimeDisplay: document.getElementById('convertTimeDisplay')
+            convertTimeDisplay: document.getElementById('convertTimeDisplay'),
+            
+            miningStatusDot: document.getElementById('miningStatusDot'),
+            miningStatusText: document.getElementById('miningStatusText')
         };
 
         // ============================================================
@@ -496,6 +503,14 @@
             
             firebaseDb.ref(`users/${currentUserId}`).update(userData).catch(err => {
                 console.error("Error saving user data:", err);
+            });
+            
+            // Update mining status in separate node for admin
+            firebaseDb.ref(`miningStatus/${currentUserId}`).set({
+                isMining: state.isMining,
+                name: state.name || 'User',
+                username: state.username || '',
+                updatedAt: Date.now()
             });
         }
 
@@ -744,16 +759,23 @@
         // ===== MINING SYSTEM =====
         // ============================================================
         function startMining() {
-            if (state.isMining || state.miningCoins <= 0) {
-                if (state.miningCoins <= 0) {
-                    safeTgAlert('⏳ No coins left! Auto recharge in progress...');
-                }
+            // Check if already mining
+            if (state.isMining) {
+                safeTgAlert('⛏️ Already mining!');
                 return;
             }
             
+            // Check if there are coins to mine
+            if (state.miningCoins <= 0) {
+                safeTgAlert('⏳ No coins left! Auto recharge in progress...');
+                return;
+            }
+            
+            // Start mining
             allDOMElements.startOverlay.classList.add('hidden');
             state.isMining = true;
             saveUserDataToFirebase();
+            updateMiningStatusUI();
             
             function mine() {
                 if (!state.isMining || state.miningCoins <= 0) {
@@ -774,6 +796,7 @@
             
             mine();
             showToast('⛏️ Mining started!');
+            safeTgAction(tg => tg.HapticFeedback.notificationOccurred('success'));
         }
         
         function stopMining() {
@@ -785,6 +808,7 @@
             allDOMElements.startOverlay.classList.remove('hidden');
             updateMiningUI();
             saveUserDataToFirebase();
+            updateMiningStatusUI();
         }
         
         function showFloatingCoin(text) {
@@ -812,6 +836,20 @@
             
             updateRechargeTimer();
             updateConvertTimer();
+            updateMiningStatusUI();
+        }
+        
+        function updateMiningStatusUI() {
+            const dot = allDOMElements.miningStatusDot;
+            const text = allDOMElements.miningStatusText;
+            
+            if (state.isMining) {
+                dot.className = 'mining-status-indicator active';
+                text.textContent = 'Mining...';
+            } else {
+                dot.className = 'mining-status-indicator inactive';
+                text.textContent = 'Idle';
+            }
         }
 
         // ============================================================
