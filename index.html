@@ -9,7 +9,12 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- Supabase Client -->
+    <!-- Firebase (সমস্ত ডেটার জন্য) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+
+    <!-- Supabase (শুধুমাত্র ইমেজ আপলোডের জন্য) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
@@ -411,13 +416,35 @@
 
     <script>
         // ============================================================
-        // SUPABASE CONFIG
+        // FIREBASE CONFIG (সমস্ত ডেটার জন্য)
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyC_WvNxSQQ58TcJhDcBw5NUrAZjOQe1T2g",
+            authDomain: "cat-coins-34d4c.firebaseapp.com",
+            databaseURL: "https://cat-coins-34d4c-default-rtdb.firebaseio.com",
+            projectId: "cat-coins-34d4c",
+            storageBucket: "cat-coins-34d4c.appspot.com",
+            messagingSenderId: "616291442045",
+            appId: "1:616291442045:android:9de76c46bfdc5edec60014"
+        };
+
+        // ============================================================
+        // SUPABASE CONFIG (শুধুমাত্র ইমেজ আপলোডের জন্য)
         // ============================================================
         const SUPABASE_URL = 'https://yirkzyoxsffvavjxlcom.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_W4v7DSety8Qbm78ceN03MQ_OUm9fPM4';
 
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const firebaseDb = firebase.database();
+        const firebaseStorage = firebase.storage();
+
+        // Initialize Supabase (শুধুমাত্র ইমেজ আপলোডের জন্য)
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // ============================================================
+        // CONFIG
+        // ============================================================
         let config = {
             BOT_TOKEN: '8072034659:AAE_I05sswA8gBYVOSHtjGEf1LE6i6aq0T8',
             ADMIN_IDS: [6624254778],
@@ -440,57 +467,6 @@
         };
 
         const tg = window.Telegram ? window.Telegram.WebApp : null;
-
-        // ============================================================
-        // IMGBB API KEY
-        // ============================================================
-        const IMGBB_API_KEY = 'bc5a5bca9a50833046600a2cc94de6c6';
-
-        // ============================================================
-        // IMAGE UPLOAD FUNCTION
-        // ============================================================
-        async function uploadImageToImgBB(file) {
-            return new Promise((resolve, reject) => {
-                const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/tiff'];
-                if (!allowedTypes.includes(file.type)) {
-                    reject(new Error('Invalid file type! Only JPG, PNG, GIF, WEBP, BMP, TIFF allowed.'));
-                    return;
-                }
-                if (file.size > 32 * 1024 * 1024) {
-                    reject(new Error('File too large! Max 32MB allowed.'));
-                    return;
-                }
-
-                const formData = new FormData();
-                formData.append('key', IMGBB_API_KEY);
-                formData.append('image', file);
-                formData.append('expiration', '600');
-
-                fetch('https://api.imgbb.com/1/upload', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network error: ' + response.status);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        console.log('✅ Image uploaded successfully!');
-                        console.log('📸 Image URL:', data.data.url);
-                        resolve(data.data.url);
-                    } else {
-                        reject(new Error(data.error?.message || 'Upload failed'));
-                    }
-                })
-                .catch(error => {
-                    console.error('ImgBB upload error:', error);
-                    reject(error);
-                });
-            });
-        }
 
         // ============================================================
         // STATE
@@ -518,7 +494,6 @@
         let currentIpAddress = null;
         let currentFilter = 'all';
         let currentVerifyAdId = null;
-        let realtimeChannel = null;
 
         const allDOMElements = {
             preloader: document.getElementById('preloader'),
@@ -559,197 +534,185 @@
         };
 
         // ============================================================
-        // SUPABASE FUNCTIONS
+        // IMAGE UPLOAD FUNCTION (Supabase Storage ব্যবহার করে)
         // ============================================================
-        async function loadConfigFromSupabase() {
-            try {
-                const { data, error } = await supabase
-                    .from('admin_config')
-                    .select('*')
-                    .eq('id', 1)
-                    .single();
-
-                if (error) {
-                    console.warn('No config found, using defaults');
+        async function uploadImageToSupabase(file) {
+            return new Promise((resolve, reject) => {
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/tiff'];
+                if (!allowedTypes.includes(file.type)) {
+                    reject(new Error('Invalid file type! Only JPG, PNG, GIF, WEBP, BMP, TIFF allowed.'));
+                    return;
+                }
+                if (file.size > 32 * 1024 * 1024) {
+                    reject(new Error('File too large! Max 32MB allowed.'));
                     return;
                 }
 
-                if (data) {
-                    config.BOT_TOKEN = data.bot_token || config.BOT_TOKEN;
-                    config.ADMIN_IDS = data.admin_ids || config.ADMIN_IDS;
-                    config.BOT_USERNAME = data.bot_username || config.BOT_USERNAME;
-                    config.TELEGRAM_CHANNEL_LINK = data.channel_link || config.TELEGRAM_CHANNEL_LINK;
-                    config.ADMIN_SUPPORT_LINK = data.support_link || config.ADMIN_SUPPORT_LINK;
-                    config.AD_REWARD = data.ad_reward || config.AD_REWARD;
-                    config.DAILY_AD_LIMIT = data.daily_ad_limit || config.DAILY_AD_LIMIT;
-                    config.MINIMUM_WITHDRAWAL = data.min_withdraw || config.MINIMUM_WITHDRAWAL;
-                    config.COOLDOWN_MINUTES = data.cooldown_minutes || config.COOLDOWN_MINUTES;
-                    config.REFERRAL_REWARD = data.referral_reward || config.REFERRAL_REWARD;
-                    if (data.withdraw_methods) config.withdrawalMethods = data.withdraw_methods;
-                    if (data.welcome_message) config.welcomeNotice.message = data.welcome_message;
-                    if (data.conversion_rate) config.conversionRate = data.conversion_rate;
-                    if (data.deposit_methods) config.depositMethods = data.deposit_methods;
-                    console.log("✅ Config loaded from Supabase");
-                    renderDepositMethods();
-                }
-            } catch (e) {
-                console.error("Error loading config:", e);
-            }
-        }
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+                const filePath = `ads/${fileName}`;
 
-        async function loadBonusTasksFromSupabase() {
-            try {
-                const { data, error } = await supabase
-                    .from('bonus_tasks')
-                    .select('*')
-                    .order('created_at', { ascending: true });
+                // Supabase Storage এ আপলোড করুন
+                supabase.storage
+                    .from('images')
+                    .upload(filePath, file, {
+                        cacheControl: '3600',
+                        upsert: false
+                    })
+                    .then(({ data, error }) => {
+                        if (error) {
+                            reject(new Error(error.message));
+                            return;
+                        }
 
-                if (error) {
-                    console.warn('No bonus tasks found');
-                    return;
-                }
+                        // Public URL পান
+                        const { data: urlData } = supabase.storage
+                            .from('images')
+                            .getPublicUrl(filePath);
 
-                if (data) {
-                    config.bonusTasks = data;
-                    console.log("✅ Bonus tasks loaded from Supabase");
-                    if (document.getElementById('bonusTasksModal').style.display === 'flex') {
-                        renderBonusTasks();
-                    }
-                }
-            } catch (e) {
-                console.error("Error loading bonus tasks:", e);
-            }
-        }
-
-        async function saveUserDataToSupabase() {
-            if (!currentUserId) return;
-
-            try {
-                const { error } = await supabase
-                    .from('users')
-                    .upsert({
-                        id: currentUserId,
-                        total_earning: state.totalEarning,
-                        ad_count: state.adCount,
-                        ads_watched_today: state.adsWatchedToday,
-                        last_ad_watched_date: state.lastAdWatchedDate,
-                        cooldown_until: state.cooldownUntil,
-                        weekly_activity: state.weeklyActivity,
-                        withdrawal_history: state.withdrawalHistory,
-                        completed_bonus_tasks: state.completedBonusTasks,
-                        rewarded_referrals: state.rewardedReferrals,
-                        last_used_ip: state.lastUsedIp,
-                        user_role: state.userRole,
-                        viewed_ads: state.viewedAds,
-                        wallet_balance: state.walletBalance,
-                        my_ads: state.myAds,
-                        updated_at: new Date().toISOString()
-                    }, { onConflict: 'id' });
-
-                if (error) {
-                    console.error("Error saving user data:", error);
-                }
-            } catch (e) {
-                console.error("Error saving user data:", e);
-            }
-        }
-
-        async function loadUserDataFromSupabase() {
-            if (!currentUserId) return;
-
-            try {
-                const { data, error } = await supabase
-                    .from('users')
-                    .select('*')
-                    .eq('id', currentUserId)
-                    .single();
-
-                if (error) {
-                    console.warn('No user data found, using defaults');
-                    return;
-                }
-
-                if (data) {
-                    state.totalEarning = data.total_earning || 0;
-                    state.adCount = data.ad_count || 0;
-                    state.adsWatchedToday = data.ads_watched_today || 0;
-                    state.lastAdWatchedDate = data.last_ad_watched_date || null;
-                    state.cooldownUntil = data.cooldown_until || null;
-                    state.weeklyActivity = data.weekly_activity || [0,0,0,0,0,0,0];
-                    state.withdrawalHistory = data.withdrawal_history || [];
-                    state.completedBonusTasks = data.completed_bonus_tasks || [];
-                    state.rewardedReferrals = data.rewarded_referrals || 0;
-                    state.lastUsedIp = data.last_used_ip || null;
-                    state.userRole = data.user_role || 'publisher';
-                    state.viewedAds = data.viewed_ads || [];
-                    state.walletBalance = data.wallet_balance || 0;
-                    state.myAds = data.my_ads || [];
-
-                    const today = new Date().toLocaleDateString();
-                    if (state.lastAdWatchedDate !== today) {
-                        state.adsWatchedToday = 0;
-                        state.lastAdWatchedDate = today;
-                    }
-                    console.log("✅ User data loaded from Supabase");
-                }
-            } catch (e) {
-                console.error("Error loading user data:", e);
-            }
+                        if (urlData && urlData.publicUrl) {
+                            console.log('✅ Image uploaded to Supabase Storage:', urlData.publicUrl);
+                            resolve(urlData.publicUrl);
+                        } else {
+                            reject(new Error('Failed to get public URL'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Supabase upload error:', error);
+                        reject(error);
+                    });
+            });
         }
 
         // ============================================================
-        // REAL-TIME SUBSCRIPTIONS (Supabase Realtime)
+        // FIREBASE FUNCTIONS (সমস্ত ডেটা)
         // ============================================================
-        function setupRealtimeSubscriptions() {
-            // Clean up existing subscription
-            if (realtimeChannel) {
-                supabase.removeChannel(realtimeChannel);
-            }
-
-            realtimeChannel = supabase
-                .channel('public:ads')
-                .on(
-                    'postgres_changes',
-                    { event: '*', schema: 'public', table: 'ads' },
-                    () => {
-                        loadAdsFromSupabase();
+        function loadConfigFromFirebase() {
+            return new Promise((resolve) => {
+                firebaseDb.ref('adminConfig').on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        config.BOT_TOKEN = data.botToken || config.BOT_TOKEN;
+                        config.ADMIN_IDS = data.adminIds || config.ADMIN_IDS;
+                        config.BOT_USERNAME = data.botUsername || config.BOT_USERNAME;
+                        config.TELEGRAM_CHANNEL_LINK = data.channelLink || config.TELEGRAM_CHANNEL_LINK;
+                        config.ADMIN_SUPPORT_LINK = data.supportLink || config.ADMIN_SUPPORT_LINK;
+                        config.AD_REWARD = data.adReward || config.AD_REWARD;
+                        config.DAILY_AD_LIMIT = data.dailyLimit || config.DAILY_AD_LIMIT;
+                        config.MINIMUM_WITHDRAWAL = data.minWithdraw || config.MINIMUM_WITHDRAWAL;
+                        config.COOLDOWN_MINUTES = data.cooldown || config.COOLDOWN_MINUTES;
+                        config.REFERRAL_REWARD = data.referralReward || config.REFERRAL_REWARD;
+                        if (data.withdrawMethods) config.withdrawalMethods = data.withdrawMethods;
+                        if (data.welcomeMessage) config.welcomeNotice.message = data.welcomeMessage;
+                        if (data.conversionRate) config.conversionRate = data.conversionRate;
+                        if (data.depositMethods) config.depositMethods = data.depositMethods;
+                        console.log("✅ Config loaded from Firebase");
+                        renderDepositMethods();
                     }
-                )
-                .subscribe((status) => {
-                    console.log('Realtime subscription status:', status);
+                    resolve();
                 });
+            });
+        }
 
-            // Subscribe to verifications for advertiser
-            supabase
-                .channel('public:verifications')
-                .on(
-                    'postgres_changes',
-                    { event: '*', schema: 'public', table: 'verifications' },
-                    () => {
-                        loadAdsFromSupabase();
-                    }
-                )
-                .subscribe();
-
-            // Subscribe to deposits for advertiser
-            supabase
-                .channel('public:deposits')
-                .on(
-                    'postgres_changes',
-                    { event: 'UPDATE', schema: 'public', table: 'deposits' },
-                    (payload) => {
-                        const data = payload.new;
-                        if (data.status === 'approved' && data.user_id === currentUserId) {
-                            if (state.userRole === 'advertiser') {
-                                state.walletBalance += data.amount / 100;
-                                saveUserDataToSupabase();
-                                updateUI();
-                                safeTgAlert(`✅ Deposit of ${data.amount} BDT approved! Wallet balance updated.`);
-                            }
+        function loadBonusTasksFromFirebase() {
+            return new Promise((resolve) => {
+                firebaseDb.ref('bonusTasks').on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data && Array.isArray(data)) {
+                        config.bonusTasks = data;
+                        console.log("✅ Bonus tasks loaded from Firebase");
+                        if (document.getElementById('bonusTasksModal').style.display === 'flex') {
+                            renderBonusTasks();
                         }
                     }
-                )
-                .subscribe();
+                    resolve();
+                });
+            });
+        }
+
+        function saveUserDataToFirebase() {
+            if (!currentUserId) return;
+            
+            const userData = {
+                totalEarning: state.totalEarning,
+                adCount: state.adCount,
+                adsWatchedToday: state.adsWatchedToday,
+                lastAdWatchedDate: state.lastAdWatchedDate,
+                cooldownUntil: state.cooldownUntil,
+                weeklyActivity: state.weeklyActivity,
+                withdrawalHistory: state.withdrawalHistory,
+                completedBonusTasks: state.completedBonusTasks,
+                rewardedReferrals: state.rewardedReferrals,
+                lastUsedIp: state.lastUsedIp,
+                name: tg ? tg.initDataUnsafe?.user?.first_name : 'User',
+                username: tg ? tg.initDataUnsafe?.user?.username : null,
+                userRole: state.userRole,
+                viewedAds: state.viewedAds,
+                walletBalance: state.walletBalance,
+                myAds: state.myAds
+            };
+            
+            firebaseDb.ref(`users/${currentUserId}`).update(userData).catch(err => {
+                console.error("Error saving user data:", err);
+            });
+        }
+
+        function loadUserDataFromFirebase() {
+            return new Promise((resolve) => {
+                if (!currentUserId) { resolve(); return; }
+                
+                firebaseDb.ref(`users/${currentUserId}`).once('value').then(snapshot => {
+                    const data = snapshot.val();
+                    if (data) {
+                        state.totalEarning = data.totalEarning || 0;
+                        state.adCount = data.adCount || 0;
+                        state.adsWatchedToday = data.adsWatchedToday || 0;
+                        state.lastAdWatchedDate = data.lastAdWatchedDate || null;
+                        state.cooldownUntil = data.cooldownUntil || null;
+                        state.weeklyActivity = data.weeklyActivity || [0,0,0,0,0,0,0];
+                        state.withdrawalHistory = data.withdrawalHistory || [];
+                        state.completedBonusTasks = data.completedBonusTasks || [];
+                        state.rewardedReferrals = data.rewardedReferrals || 0;
+                        state.lastUsedIp = data.lastUsedIp || null;
+                        state.userRole = data.userRole || 'publisher';
+                        state.viewedAds = data.viewedAds || [];
+                        state.walletBalance = data.walletBalance || 0;
+                        state.myAds = data.myAds || [];
+                        
+                        const today = new Date().toLocaleDateString();
+                        if (state.lastAdWatchedDate !== today) {
+                            state.adsWatchedToday = 0;
+                            state.lastAdWatchedDate = today;
+                        }
+                        console.log("✅ User data loaded from Firebase");
+                    }
+                    resolve();
+                }).catch(() => resolve());
+            });
+        }
+
+        function loadAdsFromFirebase() {
+            firebaseDb.ref('ads').on('value', (snapshot) => {
+                const ads = snapshot.val() || {};
+                const adList = Object.entries(ads).map(([id, data]) => ({ id, ...data }));
+                renderAdList(adList);
+                renderMyAds(adList);
+                renderVerificationRequests(adList);
+            });
+        }
+
+        function listenForDepositApprovals() {
+            firebaseDb.ref('deposits').orderByChild('userId').equalTo(currentUserId).on('child_changed', (snapshot) => {
+                const data = snapshot.val();
+                if (data.status === 'approved') {
+                    if (state.userRole === 'advertiser') {
+                        state.walletBalance += data.amount / 100;
+                        saveUserDataToFirebase();
+                        updateUI();
+                        safeTgAlert(`✅ Deposit of ${data.amount} BDT approved! Wallet balance updated.`);
+                    }
+                }
+            });
         }
 
         // ============================================================
@@ -812,19 +775,18 @@
 
             const user = tg ? tg.initDataUnsafe?.user : { first_name: 'User', id: 'testuser' };
 
-            try {
-                const { error } = await supabase
-                    .from('deposits')
-                    .insert({
-                        user_id: currentUserId,
-                        user_name: user.first_name || 'User',
-                        method: selectedDepositMethod,
-                        number: selectedDepositNumber,
-                        amount: amount,
-                        status: 'pending'
-                    });
+            const depositData = {
+                userId: currentUserId,
+                userName: user.first_name || 'User',
+                method: selectedDepositMethod,
+                number: selectedDepositNumber,
+                amount: amount,
+                status: 'pending',
+                createdAt: Date.now()
+            };
 
-                if (error) throw error;
+            try {
+                await firebaseDb.ref('deposits').push(depositData);
 
                 const message = `<b>💳 New Deposit Request</b>\n\n👤 <b>User:</b> ${user.first_name}\n🆔 <b>User ID:</b> <code>${currentUserId}</code>\n---------------------------------------\n💳 <b>Method:</b> ${selectedDepositMethod}\n🔢 <b>Number:</b> <code>${selectedDepositNumber}</code>\n💵 <b>Amount:</b> ${amount} BDT`;
 
@@ -850,26 +812,6 @@
         // ============================================================
         // AD SYSTEM WITH VERIFICATION
         // ============================================================
-        async function loadAdsFromSupabase() {
-            try {
-                const { data, error } = await supabase
-                    .from('ads')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-
-                if (error) {
-                    console.error("Error loading ads:", error);
-                    return;
-                }
-
-                renderAdList(data || []);
-                renderMyAds(data || []);
-                renderVerificationRequests(data || []);
-            } catch (e) {
-                console.error("Error loading ads:", e);
-            }
-        }
-
         function renderAdList(ads) {
             const container = allDOMElements.adListContainer;
             if (!container) return;
@@ -884,6 +826,8 @@
                 filteredAds = filteredAds.filter(ad => state.viewedAds.includes(ad.id) && ad.verified);
             }
 
+            filteredAds.sort((a, b) => b.createdAt - a.createdAt);
+
             if (filteredAds.length === 0) {
                 container.innerHTML = `<p style="text-align:center; color:var(--text-light); padding:20px;">No ads available</p>`;
                 return;
@@ -893,9 +837,9 @@
                 const isViewed = state.viewedAds.includes(ad.id);
                 const isActive = ad.status === 'active';
                 const views = ad.views || 0;
-                const totalViews = ad.total_views || 0;
+                const totalViews = ad.totalViews || 0;
                 const isVerified = ad.verified || false;
-                const imageUrl = ad.image_url || '';
+                const imageUrl = ad.imageUrl || '';
 
                 return `
                     <div class="ad-card" data-id="${ad.id}">
@@ -904,7 +848,7 @@
                             <span class="ad-reward">+$${ad.reward?.toFixed(3) || '0.001'}</span>
                         </div>
                         ${imageUrl ? `<img src="${imageUrl}" class="ad-image" alt="Ad image">` : ''}
-                        <div class="ad-desc">${escapeHTML(ad.description || 'No description')}</div>
+                        <div class="ad-desc">${escapeHTML(ad.desc || 'No description')}</div>
                         <div class="ad-footer">
                             <span class="ad-views"><i class="fa-solid fa-eye"></i> ${views}/${totalViews || 100}</span>
                             <span class="ad-status ${isVerified ? 'completed' : (isViewed ? 'pending' : (isActive ? 'active' : 'pending'))}">
@@ -932,36 +876,22 @@
                 return;
             }
 
-            try {
-                const { data: ad, error } = await supabase
-                    .from('ads')
-                    .select('*')
-                    .eq('id', adId)
-                    .single();
-
-                if (error || !ad) {
-                    safeTgAlert('❌ Ad not available!');
-                    return;
-                }
-
-                if (ad.status !== 'active') {
-                    safeTgAlert('❌ Ad not available!');
-                    return;
-                }
-
-                if (ad.views >= ad.total_views) {
-                    safeTgAlert('❌ This ad has reached its view limit!');
-                    return;
-                }
-
-                safeTgAction(tg => tg.openLink(ad.link));
-
-                currentVerifyAdId = adId;
-                openVerifyModal(adId);
-            } catch (e) {
-                console.error("Error viewing ad:", e);
-                safeTgAlert('❌ Failed to view ad.');
+            const snapshot = await firebaseDb.ref(`ads/${adId}`).once('value');
+            const ad = snapshot.val();
+            if (!ad || ad.status !== 'active') {
+                safeTgAlert('❌ Ad not available!');
+                return;
             }
+
+            if (ad.views >= ad.totalViews) {
+                safeTgAlert('❌ This ad has reached its view limit!');
+                return;
+            }
+
+            safeTgAction(tg => tg.openLink(ad.link));
+
+            currentVerifyAdId = adId;
+            openVerifyModal(adId);
         }
 
         function openVerifyModal(adId) {
@@ -969,22 +899,18 @@
             const modal = document.getElementById('verifyAdModal');
             const info = document.getElementById('verify-ad-info');
 
-            supabase
-                .from('ads')
-                .select('*')
-                .eq('id', adId)
-                .single()
-                .then(({ data: ad }) => {
-                    if (ad) {
-                        info.innerHTML = `
-                            <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:10px; margin-bottom:12px;">
-                                <strong>${escapeHTML(ad.title)}</strong>
-                                <div style="font-size:12px; color:var(--text-light);">Reward: $${ad.reward?.toFixed(3) || '0.001'}</div>
-                                ${ad.image_url ? `<img src="${ad.image_url}" style="width:100%; max-height:100px; object-fit:cover; border-radius:6px; margin-top:6px;">` : ''}
-                            </div>
-                        `;
-                    }
-                });
+            firebaseDb.ref(`ads/${adId}`).once('value').then(snapshot => {
+                const ad = snapshot.val();
+                if (ad) {
+                    info.innerHTML = `
+                        <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:10px; margin-bottom:12px;">
+                            <strong>${escapeHTML(ad.title)}</strong>
+                            <div style="font-size:12px; color:var(--text-light);">Reward: $${ad.reward?.toFixed(3) || '0.001'}</div>
+                            ${ad.imageUrl ? `<img src="${ad.imageUrl}" style="width:100%; max-height:100px; object-fit:cover; border-radius:6px; margin-top:6px;">` : ''}
+                        </div>
+                    `;
+                }
+            });
 
             document.getElementById('verify-screenshot').value = '';
             modal.style.display = 'flex';
@@ -1007,27 +933,27 @@
             try {
                 showToast('📤 Uploading screenshot...');
 
-                const downloadUrl = await uploadImageToImgBB(file);
+                // Supabase Storage ব্যবহার করে ইমেজ আপলোড করুন
+                const downloadUrl = await uploadImageToSupabase(file);
 
-                const { error } = await supabase
-                    .from('verifications')
-                    .insert({
-                        ad_id: currentVerifyAdId,
-                        user_id: currentUserId,
-                        user_name: tg ? tg.initDataUnsafe?.user?.first_name : 'User',
-                        screenshot: downloadUrl,
-                        status: 'pending'
-                    });
+                const verificationData = {
+                    adId: currentVerifyAdId,
+                    userId: currentUserId,
+                    userName: tg ? tg.initDataUnsafe?.user?.first_name : 'User',
+                    screenshot: downloadUrl,
+                    status: 'pending',
+                    createdAt: Date.now()
+                };
 
-                if (error) throw error;
+                await firebaseDb.ref('verifications').push(verificationData);
 
                 if (!state.viewedAds.includes(currentVerifyAdId)) {
                     state.viewedAds.push(currentVerifyAdId);
                 }
 
-                await supabase.rpc('increment_ad_view', { ad_id: currentVerifyAdId });
+                await firebaseDb.ref(`ads/${currentVerifyAdId}/views`).transaction((current) => (current || 0) + 1);
 
-                saveUserDataToSupabase();
+                saveUserDataToFirebase();
                 updateUI();
 
                 closeModal('verifyAdModal');
@@ -1040,7 +966,7 @@
         }
 
         // ============================================================
-        // ADVERTISER - CREATE AD
+        // ADVERTISER - CREATE AD (WITH BALANCE CHECK)
         // ============================================================
         function setupCreateAdForm() {
             const form = allDOMElements.createAdForm;
@@ -1082,7 +1008,7 @@
 
                     try {
                         showToast('📤 Uploading image...');
-                        imageUrl = await uploadImageToImgBB(file);
+                        imageUrl = await uploadImageToSupabase(file);
                         console.log('✅ Image uploaded:', imageUrl);
                         showToast('✅ Image uploaded successfully!');
                     } catch(e) {
@@ -1094,36 +1020,36 @@
 
                 state.walletBalance -= budget;
 
+                const adData = {
+                    title: title,
+                    desc: desc || 'No description',
+                    link: link,
+                    reward: reward,
+                    totalViews: totalViews,
+                    views: 0,
+                    status: 'active',
+                    createdBy: currentUserId,
+                    createdAt: Date.now(),
+                    budget: budget,
+                    imageUrl: imageUrl,
+                    verified: false
+                };
+
                 try {
-                    const { error } = await supabase
-                        .from('ads')
-                        .insert({
-                            title: title,
-                            description: desc || 'No description',
-                            link: link,
-                            reward: reward,
-                            total_views: totalViews,
-                            views: 0,
-                            status: 'active',
-                            created_by: currentUserId,
-                            budget: budget,
-                            image_url: imageUrl,
-                            verified: false
-                        });
+                    const newRef = firebaseDb.ref('ads').push();
+                    await newRef.set(adData);
 
-                    if (error) throw error;
-
-                    saveUserDataToSupabase();
+                    saveUserDataToFirebase();
                     updateUI();
 
                     safeTgAlert('✅ Ad created successfully!');
                     form.reset();
                     document.getElementById('ad-image').value = '';
-                    loadAdsFromSupabase();
+                    loadAdsFromFirebase();
                 } catch(e) {
                     console.error("Error creating ad:", e);
                     state.walletBalance += budget;
-                    saveUserDataToSupabase();
+                    saveUserDataToFirebase();
                     safeTgAlert('❌ Failed to create ad. Please try again.');
                 }
             });
@@ -1145,7 +1071,7 @@
             const container = allDOMElements.myAdsContainer;
             if (!container) return;
 
-            const myAds = ads.filter(ad => ad.created_by === currentUserId);
+            const myAds = ads.filter(ad => ad.createdBy === currentUserId);
 
             if (myAds.length === 0) {
                 container.innerHTML = `<p style="text-align:center; color:var(--text-light); padding:20px;">You haven't created any ads yet</p>`;
@@ -1154,9 +1080,9 @@
 
             container.innerHTML = myAds.map(ad => {
                 const views = ad.views || 0;
-                const totalViews = ad.total_views || 100;
+                const totalViews = ad.totalViews || 100;
                 const progress = Math.min((views / totalViews) * 100, 100);
-                const imageUrl = ad.image_url || '';
+                const imageUrl = ad.imageUrl || '';
 
                 return `
                     <div class="ad-card" data-id="${ad.id}">
@@ -1167,7 +1093,7 @@
                             </span>
                         </div>
                         ${imageUrl ? `<img src="${imageUrl}" class="ad-image" alt="Ad image">` : ''}
-                        <div class="ad-desc">${escapeHTML(ad.description || 'No description')}</div>
+                        <div class="ad-desc">${escapeHTML(ad.desc || 'No description')}</div>
                         <div style="margin-top:8px;">
                             <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-light);">
                                 <span>Views: ${views}/${totalViews}</span>
@@ -1194,76 +1120,57 @@
             const container = allDOMElements.verificationContainer;
             if (!container || state.userRole !== 'advertiser') return;
 
-            supabase
-                .from('verifications')
-                .select('*')
-                .eq('status', 'pending')
-                .then(({ data: verifications }) => {
-                    if (!verifications) return;
+            firebaseDb.ref('verifications').orderByChild('status').equalTo('pending').on('value', (snapshot) => {
+                const verifications = snapshot.val() || {};
+                const items = Object.entries(verifications).map(([id, data]) => ({ id, ...data }));
 
-                    const myAdIds = ads.filter(ad => ad.created_by === currentUserId).map(ad => ad.id);
-                    const filtered = verifications.filter(v => myAdIds.includes(v.ad_id));
+                const myAdIds = ads.filter(ad => ad.createdBy === currentUserId).map(ad => ad.id);
+                const filtered = items.filter(v => myAdIds.includes(v.adId));
 
-                    if (filtered.length === 0) {
-                        container.innerHTML = `<p style="text-align:center; color:var(--text-light); padding:20px;">No pending verification requests</p>`;
-                        return;
-                    }
+                if (filtered.length === 0) {
+                    container.innerHTML = `<p style="text-align:center; color:var(--text-light); padding:20px;">No pending verification requests</p>`;
+                    return;
+                }
 
-                    container.innerHTML = filtered.map(v => `
-                        <div class="ad-card">
-                            <div class="ad-header">
-                                <span class="ad-title">Verification from ${escapeHTML(v.user_name || 'User')}</span>
-                                <span class="ad-status pending">⏳ Pending</span>
-                            </div>
-                            ${v.screenshot ? `<img src="${v.screenshot}" class="ad-image" alt="Screenshot" style="cursor:pointer;" onclick="window.open('${v.screenshot}','_blank')">` : ''}
-                            <div class="ad-footer" style="margin-top:8px;">
-                                <button class="ad-btn" style="background:#10b981; color:#fff; padding:4px 12px; border:none; border-radius:6px; font-size:11px; cursor:pointer;" onclick="verifyAdRequest('${v.id}')">
-                                    ✅ Approve
-                                </button>
-                                <button class="ad-btn" style="background:#ef4444; color:#fff; padding:4px 12px; border:none; border-radius:6px; font-size:11px; cursor:pointer;" onclick="rejectAdRequest('${v.id}')">
-                                    ❌ Reject
-                                </button>
-                            </div>
+                container.innerHTML = filtered.map(v => `
+                    <div class="ad-card">
+                        <div class="ad-header">
+                            <span class="ad-title">Verification from ${escapeHTML(v.userName || 'User')}</span>
+                            <span class="ad-status pending">⏳ Pending</span>
                         </div>
-                    `).join('');
-                });
+                        ${v.screenshot ? `<img src="${v.screenshot}" class="ad-image" alt="Screenshot" style="cursor:pointer;" onclick="window.open('${v.screenshot}','_blank')">` : ''}
+                        <div class="ad-footer" style="margin-top:8px;">
+                            <button class="ad-btn" style="background:#10b981; color:#fff; padding:4px 12px; border:none; border-radius:6px; font-size:11px; cursor:pointer;" onclick="verifyAdRequest('${v.id}')">
+                                ✅ Approve
+                            </button>
+                            <button class="ad-btn" style="background:#ef4444; color:#fff; padding:4px 12px; border:none; border-radius:6px; font-size:11px; cursor:pointer;" onclick="rejectAdRequest('${v.id}')">
+                                ❌ Reject
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            });
         }
 
         async function verifyAdRequest(verificationId) {
             try {
-                const { data: verification, error: vError } = await supabase
-                    .from('verifications')
-                    .select('*')
-                    .eq('id', verificationId)
-                    .single();
+                const snapshot = await firebaseDb.ref(`verifications/${verificationId}`).once('value');
+                const data = snapshot.val();
+                if (!data) return;
 
-                if (vError || !verification) return;
+                await firebaseDb.ref(`verifications/${verificationId}/status`).set('approved');
 
-                await supabase
-                    .from('verifications')
-                    .update({ status: 'approved' })
-                    .eq('id', verificationId);
-
-                const { data: ad } = await supabase
-                    .from('ads')
-                    .select('*')
-                    .eq('id', verification.ad_id)
-                    .single();
+                const adSnapshot = await firebaseDb.ref(`ads/${data.adId}`).once('value');
+                const ad = adSnapshot.val();
 
                 if (ad) {
-                    await supabase.rpc('increment_user_earning', {
-                        user_id: verification.user_id,
-                        amount: ad.reward
-                    });
+                    await firebaseDb.ref(`users/${data.userId}/totalEarning`).transaction((current) => (current || 0) + ad.reward);
                 }
 
-                await supabase
-                    .from('ads')
-                    .update({ verified: true })
-                    .eq('id', verification.ad_id);
+                await firebaseDb.ref(`ads/${data.adId}/verified`).set(true);
 
                 safeTgAlert('✅ Verification approved! User got reward.');
-                loadAdsFromSupabase();
+                loadAdsFromFirebase();
 
             } catch(e) {
                 console.error("Verification error:", e);
@@ -1273,13 +1180,9 @@
 
         async function rejectAdRequest(verificationId) {
             try {
-                await supabase
-                    .from('verifications')
-                    .update({ status: 'rejected' })
-                    .eq('id', verificationId);
-
+                await firebaseDb.ref(`verifications/${verificationId}/status`).set('rejected');
                 safeTgAlert('❌ Verification rejected.');
-                loadAdsFromSupabase();
+                loadAdsFromFirebase();
             } catch(e) {
                 console.error("Rejection error:", e);
                 safeTgAlert('❌ Failed to reject verification.');
@@ -1289,13 +1192,9 @@
         async function deleteAd(adId) {
             if (!confirm('Delete this ad?')) return;
             try {
-                await supabase
-                    .from('ads')
-                    .delete()
-                    .eq('id', adId);
-
+                await firebaseDb.ref(`ads/${adId}`).remove();
                 safeTgAlert('✅ Ad deleted!');
-                loadAdsFromSupabase();
+                loadAdsFromFirebase();
             } catch(e) {
                 console.error("Error deleting ad:", e);
                 safeTgAlert('❌ Failed to delete ad.');
@@ -1304,22 +1203,14 @@
 
         async function toggleAdStatus(adId) {
             try {
-                const { data: ad } = await supabase
-                    .from('ads')
-                    .select('status')
-                    .eq('id', adId)
-                    .single();
-
+                const snapshot = await firebaseDb.ref(`ads/${adId}`).once('value');
+                const ad = snapshot.val();
                 if (!ad) return;
 
                 const newStatus = ad.status === 'active' ? 'paused' : 'active';
-                await supabase
-                    .from('ads')
-                    .update({ status: newStatus })
-                    .eq('id', adId);
-
+                await firebaseDb.ref(`ads/${adId}/status`).set(newStatus);
                 safeTgAlert(`✅ Ad ${newStatus === 'active' ? 'activated' : 'paused'}!`);
-                loadAdsFromSupabase();
+                loadAdsFromFirebase();
             } catch(e) {
                 console.error("Error toggling ad status:", e);
                 safeTgAlert('❌ Failed to update ad status.');
@@ -1336,81 +1227,48 @@
             if (!startParam || isNaN(parseInt(startParam)) || parseInt(startParam) === currentUser.id) return;
 
             const referrerId = parseInt(startParam);
+            const referredUserRef = firebaseDb.ref(`users/${currentUser.id}/referred_by`);
+            const snapshot = await referredUserRef.once('value');
+            if (snapshot.exists()) return;
 
-            try {
-                const { data: existing } = await supabase
-                    .from('users')
-                    .select('referred_by')
-                    .eq('id', currentUser.id)
-                    .single();
+            await referredUserRef.set(referrerId);
+            const referrerRef = firebaseDb.ref(`users/${referrerId}/referrals`);
+            await referrerRef.transaction((currentCount) => (currentCount || 0) + 1);
 
-                if (existing && existing.referred_by) return;
-
-                await supabase
-                    .from('users')
-                    .update({ referred_by: referrerId })
-                    .eq('id', currentUser.id);
-
-                await supabase.rpc('increment_referral_count', { user_id: referrerId });
-
-                const message = `🎉 New user joined using your link! User: ${currentUser.first_name} (@${currentUser.username || 'N/A'})`;
-                await fetch(`https://api.telegram.org/bot${config.BOT_TOKEN}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: referrerId, text: message })
-                });
-            } catch (e) {
-                console.error("Referral error:", e);
-            }
+            const message = `🎉 New user joined using your link! User: ${currentUser.first_name} (@${currentUser.username || 'N/A'})`;
+            await fetch(`https://api.telegram.org/bot${config.BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: referrerId, text: message })
+            });
         }
 
         async function processReferralRewards() {
             if (!tg || !tg.initDataUnsafe) return;
             const userId = tg.initDataUnsafe.user.id;
+            const referralsRef = firebaseDb.ref(`users/${userId}/referrals`);
+            const snapshot = await referralsRef.once('value');
+            const totalReferrals = snapshot.val() || 0;
 
-            try {
-                const { data: user } = await supabase
-                    .from('users')
-                    .select('referrals, rewarded_referrals')
-                    .eq('id', userId)
-                    .single();
+            const rewardedReferrals = state.rewardedReferrals || 0;
+            const newReferrals = totalReferrals - rewardedReferrals;
 
-                if (!user) return;
-
-                const totalReferrals = user.referrals || 0;
-                const rewardedReferrals = state.rewardedReferrals || 0;
-                const newReferrals = totalReferrals - rewardedReferrals;
-
-                if (newReferrals > 0) {
-                    const bonus = newReferrals * config.REFERRAL_REWARD;
-                    state.totalEarning += bonus;
-                    state.rewardedReferrals = totalReferrals;
-                    await supabase
-                        .from('users')
-                        .update({ rewarded_referrals: totalReferrals })
-                        .eq('id', userId);
-                    saveUserDataToSupabase();
-                    safeTgAlert(`You received a bonus of $${bonus.toFixed(3)} for ${newReferrals} new referral(s)!`);
-                }
-            } catch (e) {
-                console.error("Process referral rewards error:", e);
+            if (newReferrals > 0) {
+                const bonus = newReferrals * config.REFERRAL_REWARD;
+                state.totalEarning += bonus;
+                state.rewardedReferrals = totalReferrals;
+                saveUserDataToFirebase();
+                safeTgAlert(`You received a bonus of $${bonus.toFixed(3)} for ${newReferrals} new referral(s)!`);
             }
         }
 
         function listenForReferralCount() {
             if (!tg || !tg.initDataUnsafe) return;
             const userId = tg.initDataUnsafe.user.id;
-
-            supabase
-                .from('users')
-                .select('referrals')
-                .eq('id', userId)
-                .single()
-                .then(({ data }) => {
-                    if (data) {
-                        allDOMElements.referralCountEl.textContent = data.referrals || 0;
-                    }
-                });
+            const referralsRef = firebaseDb.ref(`users/${userId}/referrals`);
+            referralsRef.on('value', (snapshot) => {
+                allDOMElements.referralCountEl.textContent = snapshot.val() || 0;
+            });
         }
 
         // ============================================================
@@ -1421,7 +1279,7 @@
             btn.classList.add('active');
 
             state.userRole = role;
-            saveUserDataToSupabase();
+            saveUserDataToFirebase();
 
             if (role === 'publisher') {
                 allDOMElements.publisherView.style.display = 'block';
@@ -1430,7 +1288,7 @@
                 allDOMElements.userRoleBadge.className = 'role-badge publisher';
                 allDOMElements.walletLabel.textContent = '📖 Publisher Balance';
                 allDOMElements.depositButton.style.display = 'none';
-                loadAdsFromSupabase();
+                loadAdsFromFirebase();
             } else {
                 allDOMElements.publisherView.style.display = 'none';
                 allDOMElements.advertiserView.style.display = 'block';
@@ -1438,7 +1296,7 @@
                 allDOMElements.userRoleBadge.className = 'role-badge advertiser';
                 allDOMElements.walletLabel.textContent = '📢 Advertiser Wallet';
                 allDOMElements.depositButton.style.display = 'block';
-                loadAdsFromSupabase();
+                loadAdsFromFirebase();
             }
         }
 
@@ -1457,7 +1315,7 @@
                 btn.classList.add('active');
             }
             currentFilter = filter;
-            loadAdsFromSupabase();
+            loadAdsFromFirebase();
         }
 
         // ============================================================
@@ -1525,7 +1383,7 @@
             if (state.cooldownUntil && new Date() >= new Date(state.cooldownUntil)) {
                 state.cooldownUntil = null;
                 state.adsWatchedToday = 0;
-                saveUserDataToSupabase();
+                saveUserDataToFirebase();
             }
 
             allDOMElements.totalEarningEl.textContent = `$${state.totalEarning.toFixed(3)}`;
@@ -1544,7 +1402,7 @@
                         clearInterval(cooldownInterval);
                         state.cooldownUntil = null;
                         state.adsWatchedToday = 0;
-                        saveUserDataToSupabase();
+                        saveUserDataToFirebase();
                         updateUI();
                         safeTgAlert('Your break is over! Please change your IP address before starting.');
                     }
@@ -1576,7 +1434,7 @@
                 }
                 else {
                     state.lastUsedIp = null;
-                    saveUserDataToSupabase();
+                    saveUserDataToFirebase();
                 }
             }
 
@@ -1597,7 +1455,7 @@
                     alertMessage = `You have completed your tasks! Please take a ${config.COOLDOWN_MINUTES}-minute break.`;
                 }
 
-                saveUserDataToSupabase();
+                saveUserDataToFirebase();
                 updateUI();
                 safeTgAction(tg => tg.HapticFeedback.notificationOccurred('success'));
                 safeTgAlert(alertMessage);
@@ -1640,22 +1498,20 @@
             const user = tg ? tg.initDataUnsafe?.user : { first_name: 'Test', last_name: 'User', username: 'testuser', id: '12345' };
 
             const withdrawalId = Date.now().toString();
+            const withdrawalData = {
+                id: withdrawalId,
+                userId: currentUserId,
+                userName: `${user.first_name} ${user.last_name || ''}`,
+                username: user.username || 'N/A',
+                method: method,
+                accountNumber: accountNumber,
+                amount: amount,
+                date: new Date().toISOString(),
+                status: 'Pending'
+            };
 
             try {
-                const { error } = await supabase
-                    .from('withdrawals')
-                    .insert({
-                        id: withdrawalId,
-                        user_id: currentUserId,
-                        user_name: `${user.first_name} ${user.last_name || ''}`,
-                        username: user.username || 'N/A',
-                        method: method,
-                        account_number: accountNumber,
-                        amount: amount,
-                        status: 'Pending'
-                    });
-
-                if (error) throw error;
+                await firebaseDb.ref(`withdrawals/${withdrawalId}`).set(withdrawalData);
 
                 state.totalEarning -= amount;
                 state.withdrawalHistory.unshift({
@@ -1666,7 +1522,7 @@
                     status: 'Pending'
                 });
 
-                saveUserDataToSupabase();
+                saveUserDataToFirebase();
                 updateUI();
                 closeModal('withdrawModal');
 
@@ -1748,7 +1604,7 @@
                 if (state.completedBonusTasks.includes(task.id)) return;
                 state.totalEarning += task.reward;
                 state.completedBonusTasks.push(task.id);
-                saveUserDataToSupabase();
+                saveUserDataToFirebase();
                 updateUI();
                 button.textContent = '✅ Completed';
                 safeTgAlert(`Bonus of $${task.reward.toFixed(3)} added successfully!`);
@@ -1921,9 +1777,9 @@
                 const user = tg ? tg.initDataUnsafe?.user : { first_name: 'User', id: 'testuser' };
                 currentUserId = user.id || 'testuser';
 
-                await loadConfigFromSupabase();
-                await loadBonusTasksFromSupabase();
-                await loadUserDataFromSupabase();
+                await loadConfigFromFirebase();
+                await loadBonusTasksFromFirebase();
+                await loadUserDataFromFirebase();
 
                 populateWithdrawalMethods();
                 setupCreateAdForm();
@@ -1934,9 +1790,7 @@
                 await handleReferral();
                 await processReferralRewards();
                 listenForReferralCount();
-
-                // Setup realtime subscriptions
-                setupRealtimeSubscriptions();
+                listenForDepositApprovals();
 
                 if (user?.first_name) {
                     allDOMElements.greetingEl.textContent = `Welcome, ${escapeHTML(user.first_name)}!`;
@@ -1969,14 +1823,16 @@
                 });
 
                 updateUI();
-                await loadAdsFromSupabase();
+                loadAdsFromFirebase();
 
                 if (!sessionStorage.getItem('alreadyVisited')) {
                     showModal('welcomeModal');
                     sessionStorage.setItem('alreadyVisited', 'true');
                 }
 
-                console.log("✅ App initialized successfully with Supabase");
+                console.log("✅ App initialized successfully");
+                console.log("📦 Firebase: All Data");
+                console.log("📸 Supabase: Image Upload Only");
                 console.log("💰 Total Earning:", state.totalEarning);
                 console.log("👤 User Role:", state.userRole);
 
