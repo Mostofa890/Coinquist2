@@ -173,10 +173,10 @@
         .floating-coin { position: fixed; font-size: 24px; pointer-events: none; z-index: 999; animation: floatUp 1s ease-out forwards; }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-100px) scale(0.5); } }
         
-        /* Mining status indicator */
         .mining-status-indicator { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
-        .mining-status-indicator.active { background: #4ade80; animation: pulse 1.5s infinite; }
+        .mining-status-indicator.active { background: #4ade80; animation: pulseMining 1.5s infinite; }
         .mining-status-indicator.inactive { background: #ef4444; }
+        @keyframes pulseMining { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
     </style>
 </head>
 <body>
@@ -236,7 +236,7 @@
         <div class="mining-section">
             <h3 class="card-title">⛏️ Mining</h3>
             <div class="mining-circle" id="miningCircle">
-                <div class="start-overlay" id="startOverlay" onclick="startMining()">
+                <div class="start-overlay" id="startOverlay">
                     <div class="start-icon">⚡</div>
                     <div class="start-text">START MINING</div>
                 </div>
@@ -756,9 +756,11 @@
         }
 
         // ============================================================
-        // ===== MINING SYSTEM =====
+        // ===== MINING SYSTEM - FIXED =====
         // ============================================================
         function startMining() {
+            console.log("🟢 startMining() called");
+            
             // Check if already mining
             if (state.isMining) {
                 safeTgAlert('⛏️ Already mining!');
@@ -771,14 +773,20 @@
                 return;
             }
             
+            console.log("✅ Starting mining...");
+            
             // Start mining
             allDOMElements.startOverlay.classList.add('hidden');
             state.isMining = true;
             saveUserDataToFirebase();
             updateMiningStatusUI();
+            updateMiningUI();
             
             function mine() {
+                console.log("⛏️ Mining iteration, coins left:", state.miningCoins);
+                
                 if (!state.isMining || state.miningCoins <= 0) {
+                    console.log("⏹️ Stopping mining");
                     stopMining();
                     return;
                 }
@@ -800,6 +808,7 @@
         }
         
         function stopMining() {
+            console.log("🔴 stopMining() called");
             state.isMining = false;
             if (miningInterval) {
                 clearTimeout(miningInterval);
@@ -851,6 +860,34 @@
                 text.textContent = 'Idle';
             }
         }
+
+        // ============================================================
+        // Add click event listener to startOverlay
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            const startOverlay = document.getElementById('startOverlay');
+            if (startOverlay) {
+                // Remove existing onclick attribute and add event listener
+                startOverlay.removeAttribute('onclick');
+                startOverlay.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    startMining();
+                });
+                console.log("✅ Start overlay click handler attached");
+            }
+            
+            // Also attach click to the mining circle
+            const miningCircle = document.getElementById('miningCircle');
+            if (miningCircle) {
+                miningCircle.addEventListener('click', function(e) {
+                    // Only trigger if click is on the circle itself or inner elements
+                    // but not if it's on the start overlay (which has its own handler)
+                    if (!e.target.closest('.start-overlay')) {
+                        startMining();
+                    }
+                });
+            }
+        });
 
         // ============================================================
         // MONETAG IN-APP INTERSTITIAL
@@ -1232,6 +1269,36 @@
         }
 
         // ============================================================
+        // SHOW TOAST
+        // ============================================================
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 80px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0,0,0,0.8);
+                color: #fff;
+                padding: 12px 24px;
+                border-radius: 12px;
+                font-size: 14px;
+                font-weight: 600;
+                z-index: 9999;
+                animation: fadeIn 0.3s ease;
+                max-width: 90%;
+                text-align: center;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
+
+        // ============================================================
         // INITIALIZATION
         // ============================================================
         async function initApp() {
@@ -1327,6 +1394,10 @@
                     showModal('welcomeModal'); 
                     sessionStorage.setItem('alreadyVisited', 'true'); 
                 }
+                
+                console.log("✅ App initialized successfully");
+                console.log("🪙 Mining coins:", state.miningCoins);
+                console.log("⛏️ Is mining:", state.isMining);
                 
             } catch (error) { 
                 console.error("Initialization failed:", error); 
