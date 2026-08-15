@@ -29,6 +29,7 @@
     </script>
     
     <style>
+        /* ===== COMPLETE STYLES ===== */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         :root { --primary-color: #FF6B35; --primary-color-rgb: 255, 107, 53; --secondary-color: #E85D04; --background-color: #F0F2F5; --card-background: #FFFFFF; --text-color: #1D1D1F; --text-light: #6E6E73; --border-color: #E5E5EA; --glass-bg: rgba(240, 242, 245, 0.8); }
         [data-theme="dark"] { --primary-color: #FF8C42; --primary-color-rgb: 255, 140, 66; --secondary-color: #E85D04; --background-color: #000000; --card-background: #1C1C1E; --text-color: #F5F5F7; --text-light: #8E8E93; --border-color: #3A3A3C; --glass-bg: rgba(28, 28, 30, 0.8); }
@@ -347,7 +348,7 @@
         const tg = window.Telegram ? window.Telegram.WebApp : null;
         
         // ============================================================
-        // STATE
+        // STATE - NEW MINING SYSTEM
         // ============================================================
         let state = { 
             totalEarning: 0.0, 
@@ -362,12 +363,11 @@
             rewardedReferrals: 0, 
             originalUserId: null,
             
-            miningCoins: 0,
-            miningBalance: 0,
-            isMining: false,
-            
-            rechargeCooldown: null,
-            convertCooldown: null
+            // ===== NEW MINING SYSTEM =====
+            miningCoins: 0,        // Coins available to mine
+            miningBalance: 0,      // Coins earned from mining
+            isMining: false,       // Mining status
+            rechargeCooldown: null // Auto recharge cooldown
         };
         
         let currentUserId = null;
@@ -497,8 +497,7 @@
                 miningCoins: state.miningCoins,
                 miningBalance: state.miningBalance,
                 isMining: state.isMining,
-                rechargeCooldown: state.rechargeCooldown,
-                convertCooldown: state.convertCooldown
+                rechargeCooldown: state.rechargeCooldown
             };
             
             firebaseDb.ref(`users/${currentUserId}`).update(userData).catch(err => {
@@ -535,7 +534,6 @@
                         state.miningBalance = data.miningBalance !== undefined ? data.miningBalance : 0;
                         state.isMining = data.isMining || false;
                         state.rechargeCooldown = data.rechargeCooldown || null;
-                        state.convertCooldown = data.convertCooldown || null;
                         
                         const today = new Date().toLocaleDateString();
                         if (state.lastAdWatchedDate !== today) {
@@ -543,6 +541,7 @@
                             state.lastAdWatchedDate = today;
                         }
                         console.log("✅ User data loaded from Firebase");
+                        console.log("🪙 Mining coins:", state.miningCoins);
                     }
                     resolve();
                 }).catch(() => resolve());
@@ -660,8 +659,10 @@
         }
 
         // ============================================================
-        // ===== AUTO RECHARGE SYSTEM =====
+        // ===== NEW MINING SYSTEM =====
         // ============================================================
+        
+        // Update recharge timer
         function updateRechargeTimer() {
             const timerEl = allDOMElements.rechargeTimeDisplay;
             const statusEl = allDOMElements.rechargeStatus;
@@ -687,17 +688,18 @@
                 statusEl.textContent = '✅ Ready';
                 allDOMElements.rechargeTimer.style.borderColor = 'rgba(16,185,129,0.3)';
                 
-                // Check if miningCoins is 0 and no cooldown
                 if (state.miningCoins === 0 && !state.rechargeCooldown) {
                     performRecharge();
                 }
             }
         }
         
+        // Perform auto recharge
         function performRecharge() {
             if (state.miningCoins > 0) return;
             if (state.rechargeCooldown && new Date() < new Date(state.rechargeCooldown)) return;
             
+            console.log("🔄 Performing auto recharge...");
             state.miningCoins = config.rechargeAmount;
             state.rechargeCooldown = new Date(Date.now() + config.rechargeCooldownHours * 60 * 60 * 1000).toISOString();
             
@@ -709,9 +711,7 @@
             safeTgAction(tg => tg.HapticFeedback.notificationOccurred('success'));
         }
 
-        // ============================================================
         // ===== AUTO CONVERT SYSTEM (24 hours) =====
-        // ============================================================
         function updateConvertTimer() {
             const timerEl = allDOMElements.convertTimeDisplay;
             
@@ -755,12 +755,10 @@
             safeTgAction(tg => tg.HapticFeedback.notificationOccurred('success'));
         }
 
-        // ============================================================
-        // ===== MINING SYSTEM - COMPLETELY FIXED =====
-        // ============================================================
+        // ===== START MINING - NEW =====
         function startMining() {
-            console.log("🟢 START MINING CLICKED");
-            console.log("📊 Current state:", {
+            console.log("🟢 START MINING CLICKED - NEW SYSTEM");
+            console.log("📊 State:", {
                 isMining: state.isMining,
                 miningCoins: state.miningCoins,
                 miningBalance: state.miningBalance,
@@ -773,9 +771,9 @@
                 return;
             }
             
-            // If no coins, try to recharge first
+            // Check if there are coins to mine
             if (state.miningCoins <= 0) {
-                // If there's a cooldown, show message
+                // Check if recharge is in progress
                 if (state.rechargeCooldown && new Date() < new Date(state.rechargeCooldown)) {
                     const remaining = new Date(state.rechargeCooldown) - new Date();
                     const minutes = Math.floor(remaining / 60000);
@@ -784,14 +782,11 @@
                     return;
                 }
                 
-                // No cooldown, perform recharge
+                // Try to recharge
                 performRecharge();
-                // Wait a moment then try again
                 setTimeout(() => {
                     if (state.miningCoins > 0) {
                         startMining();
-                    } else {
-                        safeTgAlert('⏳ Recharge in progress...');
                     }
                 }, 500);
                 return;
@@ -799,13 +794,16 @@
             
             console.log("✅ STARTING MINING NOW!");
             
-            // Start mining
+            // Hide start overlay
             allDOMElements.startOverlay.classList.add('hidden');
+            
+            // Set mining state
             state.isMining = true;
             saveUserDataToFirebase();
             updateMiningStatusUI();
             updateMiningUI();
             
+            // Mining loop
             function mine() {
                 if (!state.isMining || state.miningCoins <= 0) {
                     console.log("⏹️ Stopping mining loop");
@@ -813,35 +811,44 @@
                     return;
                 }
                 
+                // Mine 1 coin
                 state.miningCoins -= 1;
                 state.miningBalance += 1;
                 
+                // Show floating coin animation
                 showFloatingCoin('+1 🪙');
                 
+                // Update UI
                 updateMiningUI();
                 saveUserDataToFirebase();
                 
+                // Schedule next mine
                 miningInterval = setTimeout(mine, 3000);
             }
             
+            // Start mining loop
             mine();
             showToast('⛏️ Mining started!');
             safeTgAction(tg => tg.HapticFeedback.notificationOccurred('success'));
         }
         
+        // ===== STOP MINING =====
         function stopMining() {
             console.log("🔴 STOP MINING");
             state.isMining = false;
+            
             if (miningInterval) {
                 clearTimeout(miningInterval);
                 miningInterval = null;
             }
+            
             allDOMElements.startOverlay.classList.remove('hidden');
             updateMiningUI();
             saveUserDataToFirebase();
             updateMiningStatusUI();
         }
         
+        // ===== SHOW FLOATING COIN =====
         function showFloatingCoin(text) {
             const coin = document.createElement('div');
             coin.className = 'floating-coin';
@@ -852,24 +859,29 @@
             setTimeout(() => coin.remove(), 1000);
         }
         
+        // ===== UPDATE MINING UI =====
         function updateMiningUI() {
-            const total = 1000;
+            const total = config.rechargeAmount || 1000;
             const progress = ((total - state.miningCoins) / total) * 100;
             
             allDOMElements.miningCoinCount.textContent = state.miningCoins;
             allDOMElements.miningStatus.textContent = state.isMining ? '⛏️ Mining...' : state.miningCoins <= 0 ? '⏳ Recharging' : 'Ready';
-            allDOMElements.miningProgress.textContent = Math.round(progress) + '%';
+            allDOMElements.miningProgress.textContent = Math.round(Math.min(progress, 100)) + '%';
             
+            // Update circle progress
             const circle = allDOMElements.miningCircle;
             circle.style.background = `conic-gradient(var(--primary-color) ${Math.min(progress, 100)}%, var(--border-color) ${Math.min(progress, 100)}%)`;
             
+            // Update mining balance display
             allDOMElements.miningBalanceDisplay.textContent = `${state.miningBalance} 🪙`;
             
+            // Update timers
             updateRechargeTimer();
             updateConvertTimer();
             updateMiningStatusUI();
         }
         
+        // ===== UPDATE MINING STATUS UI =====
         function updateMiningStatusUI() {
             const dot = allDOMElements.miningStatusDot;
             const text = allDOMElements.miningStatusText;
@@ -884,18 +896,18 @@
         }
 
         // ============================================================
-        // CLICK HANDLER - FIXED
+        // CLICK HANDLER
         // ============================================================
         function setupMiningClickHandler() {
             const startOverlay = document.getElementById('startOverlay');
             const miningCircle = document.getElementById('miningCircle');
             
             if (startOverlay) {
-                // Remove any existing onclick attributes
                 startOverlay.removeAttribute('onclick');
                 startOverlay.addEventListener('click', function(e) {
                     e.stopPropagation();
                     e.preventDefault();
+                    console.log("👆 START OVERLAY CLICKED");
                     startMining();
                 });
                 console.log("✅ Start overlay click handler attached");
@@ -903,8 +915,8 @@
             
             if (miningCircle) {
                 miningCircle.addEventListener('click', function(e) {
-                    // If click is on start overlay, don't trigger again
                     if (!e.target.closest('.start-overlay')) {
+                        console.log("👆 MINING CIRCLE CLICKED");
                         startMining();
                     }
                 });
@@ -1404,6 +1416,11 @@
                     });
                 });
                 
+                // Initial recharge if needed
+                if (state.miningCoins === 0 && !state.rechargeCooldown) {
+                    performRecharge();
+                }
+                
                 updateUI();
                 
                 setTimeout(initInAppInterstitial, 3000);
@@ -1421,7 +1438,7 @@
                     sessionStorage.setItem('alreadyVisited', 'true'); 
                 }
                 
-                console.log("✅ App initialized successfully");
+                console.log("✅ App initialized with NEW mining system");
                 console.log("🪙 Mining coins:", state.miningCoins);
                 console.log("⛏️ Is mining:", state.isMining);
                 
