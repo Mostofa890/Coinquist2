@@ -144,10 +144,18 @@
         #profile-pic img { width: 100%; height: 100%; object-fit: cover; }
         #greeting { font-size: 22px; font-weight: 800; }
         
-        .balance-card { position: relative; overflow: hidden; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; padding: 28px; border-radius: 24px; text-align: center; margin-bottom: 20px; box-shadow: 0 12px 25px rgba(var(--primary-color-rgb), 0.2); animation: fadeIn 0.6s ease-out; }
+        .balance-card { position: relative; overflow: hidden; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; padding: 28px; border-radius: 24px; text-align: center; margin-bottom: 16px; box-shadow: 0 12px 25px rgba(var(--primary-color-rgb), 0.2); animation: fadeIn 0.6s ease-out; }
         .balance-card::after { content: '\f51e'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; right: -20px; bottom: -30px; font-size: 120px; opacity: 0.1; transform: rotate(-15deg); pointer-events: none; }
-        .balance-card h3 { margin: 0 0 8px 0; font-size: 16px; font-weight: 500; opacity: 0.9; z-index: 1; position: relative; }
-        .balance-card .amount { font-size: 48px; font-weight: 800; line-height: 1.2; z-index: 1; position: relative; }
+        .balance-card h3 { margin: 0 0 4px 0; font-size: 14px; font-weight: 500; opacity: 0.9; z-index: 1; position: relative; }
+        .balance-card .amount { font-size: 40px; font-weight: 800; line-height: 1.2; z-index: 1; position: relative; }
+        
+        /* Mining Balance - Small Card Below Main */
+        .mining-balance-card { background: var(--card-background); padding: 12px 18px; border-radius: 14px; margin-bottom: 20px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .mining-balance-card .label { font-size: 13px; color: var(--text-light); font-weight: 500; }
+        .mining-balance-card .label i { margin-right: 6px; }
+        .mining-balance-card .value { font-size: 20px; font-weight: 800; color: var(--primary-color); }
+        .mining-balance-card .countdown { font-size: 12px; color: #10b981; font-weight: 600; }
+        .mining-balance-card .countdown.waiting { color: #f59e0b; }
         
         /* Mining Circle */
         .mining-section { background: var(--card-background); padding: 20px; border-radius: 18px; margin-bottom: 20px; border: 1px solid var(--border-color); text-align: center; }
@@ -234,16 +242,13 @@
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; font-size: 14px; font-weight: 600; color: var(--text-color); margin-bottom: 4px; }
         
-        .convert-section { background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 12px; padding: 16px; margin-top: 12px; }
-        .convert-section .convert-info { display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: var(--text-color); }
-        .convert-section .convert-info .label { color: var(--text-light); }
-        .convert-section .convert-info .value { font-weight: 700; color: #10b981; }
-        .convert-btn { background: linear-gradient(135deg, #10b981, #059669); color: #fff; padding: 10px 20px; border: none; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; width: 100%; transition: all 0.3s ease; margin-top: 8px; }
-        .convert-btn:active { transform: scale(0.96); }
-        .convert-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        
         .floating-coin { position: fixed; font-size: 24px; pointer-events: none; z-index: 999; animation: floatUp 1s ease-out forwards; }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-100px) scale(0.5); } }
+        
+        .auto-convert-info { background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 10px; padding: 10px 14px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .auto-convert-info .label { font-size: 12px; color: var(--text-light); }
+        .auto-convert-info .value { font-size: 14px; font-weight: 700; color: #10b981; }
+        .auto-convert-info .value.waiting { color: #f59e0b; }
     </style>
 </head>
 <body>
@@ -271,9 +276,19 @@
         
         <!-- ===== MAIN BALANCE CARD ===== -->
         <div class="balance-card">
-            <h3>Main Balance</h3>
+            <h3>💰 Main Balance</h3>
             <div class="amount" id="total-earning">$0.000</div>
-            <div style="font-size:14px; opacity:0.8; margin-top:4px;">🪙 <span id="coin-display">0</span> Coins</div>
+        </div>
+        
+        <!-- ===== MINING BALANCE CARD (Small) ===== -->
+        <div class="mining-balance-card">
+            <div>
+                <div class="label"><i class="fa-solid fa-coins"></i> Mining Balance</div>
+                <div class="value" id="mining-balance-display">0 🪙</div>
+            </div>
+            <div>
+                <div class="countdown" id="auto-convert-timer">⏳ 24h:00m</div>
+            </div>
         </div>
         
         <!-- ===== MINING SECTION ===== -->
@@ -300,27 +315,10 @@
             <div class="stat-item"><i class="fa-solid fa-users bg-icon"></i><div class="icon"><i class="fa-solid fa-users"></i></div><div class="value" id="referral-count">0</div><div class="label">Referrals</div></div>
         </div>
         
-        <!-- ===== CONVERT SECTION ===== -->
-        <div class="card">
-            <h3 class="card-title">💰 Convert Coins</h3>
-            <div class="convert-section">
-                <div class="convert-info">
-                    <span class="label">🪙 Coins to Convert</span>
-                    <span class="value" id="convert-coins">0</span>
-                </div>
-                <div class="convert-info">
-                    <span class="label">💵 Will Get</span>
-                    <span class="value" id="convert-usd">$0.0000</span>
-                </div>
-                <div class="convert-info" style="font-size:12px; color:var(--text-light);">
-                    <span>Rate: 1 USD = <span id="rate-info">1000</span> Coins</span>
-                    <span id="convert-timer">⏳ Ready</span>
-                </div>
-                <button class="convert-btn" id="convertBtn" onclick="performConversion()">🔄 Convert Now</button>
-                <div style="font-size:11px; color:var(--text-light); margin-top:6px; text-align:center;">
-                    ⏰ Next conversion available after 24 hours
-                </div>
-            </div>
+        <!-- ===== AUTO CONVERT INFO ===== -->
+        <div class="auto-convert-info">
+            <span class="label">🔄 Auto Convert</span>
+            <span class="value" id="auto-convert-status">✅ Ready (24h)</span>
         </div>
         
         <div class="card"><h3 class="card-title">Today's Task</h3><button class="action-button" id="watch-ad-button"><i class="fa-solid fa-play"></i><span>Watch Ad</span></button><button class="action-button secondary-button" id="join-channel-button"><i class="fa-brands fa-telegram"></i><span>Join Channel</span></button></div>
@@ -423,17 +421,20 @@
             originalUserId: null,
             
             // ===== MINING & CONVERT =====
-            miningCoins: 1000,        // Coins to convert
+            miningCoins: 1000,        // Remaining coins in mining pool
+            miningBalance: 0,         // Total coins mined (will auto convert)
             convertCooldown: null,    // 24 hours cooldown
             speedBoostActive: false,
             speedBoostCooldown: null,
             isMining: false,
-            miningMultiplier: 1       // Speed boost multiplier
+            miningMultiplier: 1,
+            lastConvertTime: null
         };
         
         let currentUserId = null;
         let currentIpAddress = null;
         let miningInterval = null;
+        let countdownInterval = null;
 
         const allDOMElements = { 
             preloader: document.getElementById('preloader'), 
@@ -467,12 +468,9 @@
             miningStatus: document.getElementById('miningStatus'),
             miningProgress: document.getElementById('miningProgress'),
             speedBoostBtn: document.getElementById('speedBoostBtn'),
-            coinDisplay: document.getElementById('coin-display'),
-            convertCoins: document.getElementById('convert-coins'),
-            convertUsd: document.getElementById('convert-usd'),
-            convertBtn: document.getElementById('convertBtn'),
-            convertTimer: document.getElementById('convert-timer'),
-            rateInfo: document.getElementById('rate-info')
+            miningBalanceDisplay: document.getElementById('mining-balance-display'),
+            autoConvertTimer: document.getElementById('auto-convert-timer'),
+            autoConvertStatus: document.getElementById('auto-convert-status')
         };
 
         // ============================================================
@@ -552,11 +550,13 @@
                 
                 // Mining & Convert
                 miningCoins: state.miningCoins,
+                miningBalance: state.miningBalance,
                 convertCooldown: state.convertCooldown,
                 speedBoostActive: state.speedBoostActive,
                 speedBoostCooldown: state.speedBoostCooldown,
                 isMining: state.isMining,
-                miningMultiplier: state.miningMultiplier
+                miningMultiplier: state.miningMultiplier,
+                lastConvertTime: state.lastConvertTime
             };
             
             firebaseDb.ref(`users/${currentUserId}`).update(userData).catch(err => {
@@ -584,11 +584,13 @@
                         
                         // Mining & Convert
                         state.miningCoins = data.miningCoins !== undefined ? data.miningCoins : 1000;
+                        state.miningBalance = data.miningBalance !== undefined ? data.miningBalance : 0;
                         state.convertCooldown = data.convertCooldown || null;
                         state.speedBoostActive = data.speedBoostActive || false;
                         state.speedBoostCooldown = data.speedBoostCooldown || null;
                         state.isMining = data.isMining || false;
                         state.miningMultiplier = data.miningMultiplier || 1;
+                        state.lastConvertTime = data.lastConvertTime || null;
                         
                         const today = new Date().toLocaleDateString();
                         if (state.lastAdWatchedDate !== today) {
@@ -713,7 +715,7 @@
         }
 
         // ============================================================
-        // ===== MINING SYSTEM (from CoinQuest) =====
+        // ===== MINING SYSTEM =====
         // ============================================================
         function startMining() {
             if (state.isMining || state.miningCoins <= 0) return;
@@ -728,22 +730,20 @@
                     return;
                 }
                 
-                // Calculate speed (1 coin per click, speed boost multiplies)
                 let speed = 1;
                 if (state.speedBoostActive) {
                     speed = state.miningMultiplier || 2;
                 }
                 
+                // Remove 1 from mining pool, add to mining balance
                 state.miningCoins -= 1;
+                state.miningBalance += speed;
                 
-                // Show floating coin animation
                 showFloatingCoin(`+${speed} 🪙`);
                 
-                // Update UI
                 updateMiningUI();
                 saveUserDataToFirebase();
                 
-                // Continue mining
                 const delay = state.speedBoostActive ? 3000 / speed : 3000;
                 miningInterval = setTimeout(mine, delay);
             }
@@ -781,15 +781,14 @@
             allDOMElements.miningStatus.textContent = state.isMining ? '⛏️ Mining...' : 'Ready';
             allDOMElements.miningProgress.textContent = Math.round(progress) + '%';
             
-            // Update circle progress
             const circle = allDOMElements.miningCircle;
             circle.style.background = `conic-gradient(var(--primary-color) ${progress}%, var(--border-color) ${progress}%)`;
             
-            // Update coin display
-            allDOMElements.coinDisplay.textContent = state.miningCoins;
+            // Update mining balance display
+            allDOMElements.miningBalanceDisplay.textContent = `${state.miningBalance} 🪙`;
             
-            // Update convert info
-            updateConvertUI();
+            // Update auto convert timer
+            updateAutoConvertTimer();
         }
         
         function updateSpeedBoostUI() {
@@ -819,9 +818,8 @@
             
             state.speedBoostActive = true;
             state.miningMultiplier = 2;
-            state.speedBoostCooldown = new Date(Date.now() + 5 * 60000).toISOString(); // 5 min cooldown
+            state.speedBoostCooldown = new Date(Date.now() + 5 * 60000).toISOString();
             
-            // Auto disable after 30 seconds
             setTimeout(() => {
                 state.speedBoostActive = false;
                 state.miningMultiplier = 1;
@@ -836,55 +834,52 @@
         }
 
         // ============================================================
-        // ===== CONVERT SYSTEM (24 hours cooldown) =====
+        // ===== AUTO CONVERT SYSTEM (24 hours) =====
         // ============================================================
-        function updateConvertUI() {
-            const rate = config.conversionRate || 1000;
-            const coins = state.miningCoins;
-            const usd = coins / rate;
+        function updateAutoConvertTimer() {
+            const timerEl = allDOMElements.autoConvertTimer;
+            const statusEl = allDOMElements.autoConvertStatus;
             
-            allDOMElements.convertCoins.textContent = coins;
-            allDOMElements.convertUsd.textContent = '$' + usd.toFixed(4);
-            allDOMElements.rateInfo.textContent = rate;
-            
-            // Check cooldown
             if (state.convertCooldown && new Date() < new Date(state.convertCooldown)) {
-                const remaining = Math.ceil((new Date(state.convertCooldown) - new Date()) / 3600000);
-                allDOMElements.convertTimer.textContent = `⏳ ${remaining}h remaining`;
-                allDOMElements.convertBtn.disabled = true;
-                allDOMElements.convertBtn.textContent = '⏳ Wait...';
+                const remaining = new Date(state.convertCooldown) - new Date();
+                const hours = Math.floor(remaining / 3600000);
+                const minutes = Math.floor((remaining % 3600000) / 60000);
+                const seconds = Math.floor((remaining % 60000) / 1000);
+                
+                timerEl.textContent = `⏳ ${hours}h:${String(minutes).padStart(2, '0')}m:${String(seconds).padStart(2, '0')}s`;
+                timerEl.className = 'countdown waiting';
+                statusEl.textContent = '⏳ Converting in...';
+                statusEl.className = 'value waiting';
             } else {
-                allDOMElements.convertTimer.textContent = '✅ Ready';
-                allDOMElements.convertBtn.disabled = coins <= 0;
-                allDOMElements.convertBtn.textContent = '🔄 Convert Now';
+                timerEl.textContent = '✅ Ready';
+                timerEl.className = 'countdown';
+                statusEl.textContent = '✅ Ready to Convert';
+                statusEl.className = 'value';
+                
+                // If there are coins to convert and no cooldown, auto convert
+                if (state.miningBalance > 0 && !state.convertCooldown) {
+                    performAutoConvert();
+                }
             }
         }
         
-        function performConversion() {
+        function performAutoConvert() {
             const rate = config.conversionRate || 1000;
-            const coins = state.miningCoins;
+            const coins = state.miningBalance;
             
-            if (coins <= 0) {
-                showToast('❌ No coins to convert!');
-                return;
-            }
-            
-            if (state.convertCooldown && new Date() < new Date(state.convertCooldown)) {
-                showToast('⏳ Please wait 24 hours between conversions!');
-                return;
-            }
+            if (coins <= 0) return;
             
             const usd = coins / rate;
             state.totalEarning += usd;
-            state.miningCoins = 0;
+            state.miningBalance = 0;
             state.convertCooldown = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+            state.lastConvertTime = new Date().toISOString();
             
             saveUserDataToFirebase();
             updateMiningUI();
-            updateConvertUI();
             updateUI();
             
-            showToast(`✅ Converted ${coins} coins → $${usd.toFixed(4)} USD!`);
+            showToast(`✅ Auto converted ${coins} coins → $${usd.toFixed(4)} USD!`);
             safeTgAction(tg => tg.HapticFeedback.notificationOccurred('success'));
         }
 
@@ -968,12 +963,11 @@
             watchAdButton.classList.toggle('pulsing', !watchAdButton.disabled);
             updateChart();
             updateMiningUI();
-            updateConvertUI();
             updateSpeedBoostUI();
         }
 
         // ============================================================
-        // WATCH AD FUNCTION - UPDATED WITH MONETAG
+        // WATCH AD FUNCTION
         // ============================================================
         async function watchAd() {
             if (state.lastUsedIp && !state.cooldownUntil) {
@@ -993,16 +987,15 @@
             try {
                 await show_11573980();
                 
-                // ===== AD REWARD GOES TO MINING COINS (not main balance) =====
-                const rewardCoins = 1; // 1 coin per ad
-                state.miningCoins += rewardCoins;
+                // ===== AD REWARD GOES TO MINING BALANCE =====
+                const rewardCoins = 1;
+                state.miningBalance += rewardCoins;
                 
-                // Also track ad count
                 state.adCount++; 
                 state.adsWatchedToday++; 
                 state.weeklyActivity[new Date().getDay()]++;
                 
-                let alertMessage = `Ad watched! +${rewardCoins} coin! You have ${config.DAILY_AD_LIMIT - state.adsWatchedToday} ads left.`;
+                let alertMessage = `Ad watched! +${rewardCoins} coin added to mining balance! You have ${config.DAILY_AD_LIMIT - state.adsWatchedToday} ads left.`;
                 if (state.adsWatchedToday >= config.DAILY_AD_LIMIT) {
                     const cdDate = new Date(); 
                     cdDate.setMinutes(cdDate.getMinutes() + config.COOLDOWN_MINUTES);
@@ -1351,16 +1344,15 @@
                     });
                 });
                 
-                // Load conversion rate
-                firebaseDb.ref('conversionRate').on('value', snap => {
-                    config.conversionRate = snap.val() || 1000;
-                    updateConvertUI();
-                });
-                
                 updateUI();
                 
                 // ===== INITIALIZE IN-APP INTERSTITIAL =====
                 setTimeout(initInAppInterstitial, 3000);
+                
+                // ===== AUTO CONVERT COUNTDOWN =====
+                setInterval(() => {
+                    updateAutoConvertTimer();
+                }, 1000);
                 
                 if (!sessionStorage.getItem('alreadyVisited')) { 
                     showModal('welcomeModal'); 
