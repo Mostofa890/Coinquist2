@@ -155,6 +155,12 @@
         .mining-balance-card .label i { margin-right: 6px; }
         .mining-balance-card .value { font-size: 20px; font-weight: 800; color: var(--primary-color); }
         
+        /* Convert Timer */
+        .convert-timer { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); border-radius: 12px; padding: 12px; margin-top: 8px; text-align: center; }
+        .convert-timer .timer-label { font-size: 12px; color: var(--text-light); }
+        .convert-timer .timer-time { font-size: 24px; font-weight: 900; color: #10b981; }
+        .convert-timer .timer-time.waiting { color: #f59e0b; }
+        
         /* Mining Circle */
         .mining-section { background: var(--card-background); padding: 20px; border-radius: 18px; margin-bottom: 20px; border: 1px solid var(--border-color); text-align: center; }
         .mining-circle { width: 200px; height: 200px; border-radius: 50%; margin: 15px auto; background: conic-gradient(var(--primary-color) 0%, var(--border-color) 0%); display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; transition: all 0.3s ease; }
@@ -333,6 +339,12 @@
             </div>
         </div>
         
+        <!-- ===== AUTO CONVERT TIMER ===== -->
+        <div class="convert-timer" id="convertTimer">
+            <div class="timer-label">🔄 Auto Convert in</div>
+            <div class="timer-time" id="convertTimeDisplay">--:--:--</div>
+        </div>
+        
         <!-- ===== MINING SECTION ===== -->
         <div class="mining-section">
             <h3 class="card-title">⛏️ Mining</h3>
@@ -468,7 +480,8 @@
             welcomeNotice: {
                 title: "Welcome to NexEarn!",
                 message: "Please follow the rules to ensure you receive your payment.\n\n💰 Reward per Ad: $0.001\n💝 After watching 15 ads, there is a 30-minute break.\n✅ 100% Payment Guarantee\n💸 Withdraw via Binance UID or Email\n🔥 Minimum withdrawal is only $0.10"
-            }
+            },
+            conversionRate: 1000
         };
 
         let firebaseDb;
@@ -498,6 +511,10 @@
             rechargeCooldown: null,
             rechargeAmount: 1000,
             rechargeHours: 1,
+            
+            // ===== AUTO CONVERT (24 hours) =====
+            convertCooldown: null,
+            conversionRate: 1000,
             
             // ===== SPIN WHEEL =====
             spinAdsWatched: 0,
@@ -545,6 +562,10 @@
             rechargeTimeDisplay: document.getElementById('rechargeTimeDisplay'),
             rechargeStatus: document.getElementById('rechargeStatus'),
             
+            // Convert Timer
+            convertTimer: document.getElementById('convertTimer'),
+            convertTimeDisplay: document.getElementById('convertTimeDisplay'),
+            
             // Spin
             fabSpinBtn: document.getElementById('fabSpinBtn'),
             spinBadge: document.getElementById('spinBadge'),
@@ -591,6 +612,7 @@
                         config.REFERRAL_REWARD = data.referralReward || config.REFERRAL_REWARD;
                         if (data.withdrawMethods) config.withdrawalMethods = data.withdrawMethods;
                         if (data.welcomeMessage) config.welcomeNotice.message = data.welcomeMessage;
+                        if (data.conversionRate) config.conversionRate = data.conversionRate;
                         console.log("✅ Config loaded from Firebase");
                     }
                     resolve();
@@ -636,6 +658,7 @@
                 miningBalance: state.miningBalance,
                 isMining: state.isMining,
                 rechargeCooldown: state.rechargeCooldown,
+                convertCooldown: state.convertCooldown,
                 
                 spinAdsWatched: state.spinAdsWatched,
                 spinTotalAds: state.spinTotalAds,
@@ -669,6 +692,7 @@
                         state.miningBalance = data.miningBalance !== undefined ? data.miningBalance : 0;
                         state.isMining = data.isMining || false;
                         state.rechargeCooldown = data.rechargeCooldown || null;
+                        state.convertCooldown = data.convertCooldown || null;
                         
                         state.spinAdsWatched = data.spinAdsWatched || 0;
                         state.spinTotalAds = data.spinTotalAds || 20;
@@ -824,7 +848,6 @@
                 statusEl.textContent = '✅ Ready';
                 allDOMElements.rechargeTimer.style.borderColor = 'rgba(16,185,129,0.3)';
                 
-                // Auto recharge when miningCoins is 0 and cooldown is over
                 if (state.miningCoins === 0 && !state.rechargeCooldown) {
                     performRecharge();
                 }
@@ -843,6 +866,53 @@
             updateUI();
             
             showToast(`✅ Auto recharge complete! +${state.rechargeAmount} coins added!`);
+            safeTgAction(tg => tg.HapticFeedback.notificationOccurred('success'));
+        }
+
+        // ============================================================
+        // ===== AUTO CONVERT SYSTEM (24 hours) =====
+        // ============================================================
+        function updateConvertTimer() {
+            const timerEl = allDOMElements.convertTimeDisplay;
+            
+            if (state.convertCooldown && new Date() < new Date(state.convertCooldown)) {
+                const remaining = new Date(state.convertCooldown) - new Date();
+                const hours = Math.floor(remaining / 3600000);
+                const minutes = Math.floor((remaining % 3600000) / 60000);
+                const seconds = Math.floor((remaining % 60000) / 1000);
+                
+                timerEl.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                timerEl.className = 'timer-time waiting';
+                allDOMElements.convertTimer.style.borderColor = 'rgba(245,158,11,0.3)';
+            } else {
+                timerEl.textContent = '✅ Ready';
+                timerEl.className = 'timer-time';
+                allDOMElements.convertTimer.style.borderColor = 'rgba(16,185,129,0.3)';
+                
+                // Auto convert when miningBalance > 0 and no cooldown
+                if (state.miningBalance > 0 && !state.convertCooldown) {
+                    performAutoConvert();
+                }
+            }
+        }
+        
+        function performAutoConvert() {
+            const rate = config.conversionRate || 1000;
+            const coins = state.miningBalance;
+            
+            if (coins <= 0) return;
+            if (state.convertCooldown && new Date() < new Date(state.convertCooldown)) return;
+            
+            const usd = coins / rate;
+            state.totalEarning += usd;
+            state.miningBalance = 0;
+            state.convertCooldown = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+            
+            saveUserDataToFirebase();
+            updateMiningUI();
+            updateUI();
+            
+            showToast(`✅ Auto converted ${coins} coins → $${usd.toFixed(4)} USD!`);
             safeTgAction(tg => tg.HapticFeedback.notificationOccurred('success'));
         }
 
@@ -917,6 +987,7 @@
             allDOMElements.miningBalanceDisplay.textContent = `${state.miningBalance} 🪙`;
             
             updateRechargeTimer();
+            updateConvertTimer();
         }
 
         // ============================================================
@@ -1002,7 +1073,6 @@
             allDOMElements.spinBtn.disabled = true;
             allDOMElements.spinResult.textContent = '🎡 Spinning...';
             
-            // Watch ad first
             try {
                 await show_11573980();
             } catch(e) {
@@ -1012,21 +1082,18 @@
                 return;
             }
             
-            // Spin animation
             const segments = allDOMElements.wheelSegments;
             const randomIndex = Math.floor(Math.random() * spinPrizes.length);
             const spinAngle = 360 * 5 + (randomIndex * (360 / spinPrizes.length));
             segments.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.25, 1)';
             segments.style.transform = `rotate(${spinAngle}deg)`;
             
-            // Update ad count
             state.spinAdsWatched++;
             const prize = spinPrizes[randomIndex];
             
-            // Set cooldown
             state.spinCooldown = new Date(Date.now() + 15 * 1000).toISOString();
             
-            // ===== GIVE REWARD - USD GOES TO MAIN BALANCE =====
+            // USD goes to MAIN BALANCE
             state.totalEarning += prize.value;
             allDOMElements.spinResult.textContent = `🎉 You won $${prize.value.toFixed(2)} USD!`;
             saveUserDataToFirebase();
@@ -1515,6 +1582,10 @@
                 
                 setInterval(() => {
                     updateRechargeTimer();
+                }, 1000);
+                
+                setInterval(() => {
+                    updateConvertTimer();
                 }, 1000);
                 
                 setInterval(() => {
