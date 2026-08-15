@@ -505,7 +505,6 @@
                 console.error("Error saving user data:", err);
             });
             
-            // Update mining status in separate node for admin
             firebaseDb.ref(`miningStatus/${currentUserId}`).set({
                 isMining: state.isMining,
                 name: state.name || 'User',
@@ -688,6 +687,7 @@
                 statusEl.textContent = '✅ Ready';
                 allDOMElements.rechargeTimer.style.borderColor = 'rgba(16,185,129,0.3)';
                 
+                // Check if miningCoins is 0 and no cooldown
                 if (state.miningCoins === 0 && !state.rechargeCooldown) {
                     performRecharge();
                 }
@@ -756,10 +756,16 @@
         }
 
         // ============================================================
-        // ===== MINING SYSTEM - FIXED =====
+        // ===== MINING SYSTEM - COMPLETELY FIXED =====
         // ============================================================
         function startMining() {
-            console.log("🟢 startMining() called");
+            console.log("🟢 START MINING CLICKED");
+            console.log("📊 Current state:", {
+                isMining: state.isMining,
+                miningCoins: state.miningCoins,
+                miningBalance: state.miningBalance,
+                rechargeCooldown: state.rechargeCooldown
+            });
             
             // Check if already mining
             if (state.isMining) {
@@ -767,13 +773,31 @@
                 return;
             }
             
-            // Check if there are coins to mine
+            // If no coins, try to recharge first
             if (state.miningCoins <= 0) {
-                safeTgAlert('⏳ No coins left! Auto recharge in progress...');
+                // If there's a cooldown, show message
+                if (state.rechargeCooldown && new Date() < new Date(state.rechargeCooldown)) {
+                    const remaining = new Date(state.rechargeCooldown) - new Date();
+                    const minutes = Math.floor(remaining / 60000);
+                    const seconds = Math.floor((remaining % 60000) / 1000);
+                    safeTgAlert(`⏳ Recharge in ${minutes}m ${seconds}s...`);
+                    return;
+                }
+                
+                // No cooldown, perform recharge
+                performRecharge();
+                // Wait a moment then try again
+                setTimeout(() => {
+                    if (state.miningCoins > 0) {
+                        startMining();
+                    } else {
+                        safeTgAlert('⏳ Recharge in progress...');
+                    }
+                }, 500);
                 return;
             }
             
-            console.log("✅ Starting mining...");
+            console.log("✅ STARTING MINING NOW!");
             
             // Start mining
             allDOMElements.startOverlay.classList.add('hidden');
@@ -783,10 +807,8 @@
             updateMiningUI();
             
             function mine() {
-                console.log("⛏️ Mining iteration, coins left:", state.miningCoins);
-                
                 if (!state.isMining || state.miningCoins <= 0) {
-                    console.log("⏹️ Stopping mining");
+                    console.log("⏹️ Stopping mining loop");
                     stopMining();
                     return;
                 }
@@ -808,7 +830,7 @@
         }
         
         function stopMining() {
-            console.log("🔴 stopMining() called");
+            console.log("🔴 STOP MINING");
             state.isMining = false;
             if (miningInterval) {
                 clearTimeout(miningInterval);
@@ -862,32 +884,32 @@
         }
 
         // ============================================================
-        // Add click event listener to startOverlay
+        // CLICK HANDLER - FIXED
         // ============================================================
-        document.addEventListener('DOMContentLoaded', function() {
+        function setupMiningClickHandler() {
             const startOverlay = document.getElementById('startOverlay');
+            const miningCircle = document.getElementById('miningCircle');
+            
             if (startOverlay) {
-                // Remove existing onclick attribute and add event listener
+                // Remove any existing onclick attributes
                 startOverlay.removeAttribute('onclick');
                 startOverlay.addEventListener('click', function(e) {
                     e.stopPropagation();
+                    e.preventDefault();
                     startMining();
                 });
                 console.log("✅ Start overlay click handler attached");
             }
             
-            // Also attach click to the mining circle
-            const miningCircle = document.getElementById('miningCircle');
             if (miningCircle) {
                 miningCircle.addEventListener('click', function(e) {
-                    // Only trigger if click is on the circle itself or inner elements
-                    // but not if it's on the start overlay (which has its own handler)
+                    // If click is on start overlay, don't trigger again
                     if (!e.target.closest('.start-overlay')) {
                         startMining();
                     }
                 });
             }
-        });
+        }
 
         // ============================================================
         // MONETAG IN-APP INTERSTITIAL
@@ -1288,6 +1310,7 @@
                 animation: fadeIn 0.3s ease;
                 max-width: 90%;
                 text-align: center;
+                pointer-events: none;
             `;
             toast.textContent = message;
             document.body.appendChild(toast);
@@ -1368,6 +1391,9 @@
                 window.onclick = (event) => { 
                     if (event.target.classList.contains('modal')) closeModal(event.target.id); 
                 };
+                
+                // Setup mining click handler
+                setupMiningClickHandler();
                 
                 safeTgAction(tg => {
                     tg.ready(); 
