@@ -11,7 +11,6 @@
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 
     <!-- Monetag SDK -->
     <script src='//libtl.com/sdk.js' data-zone='11573980' data-sdk='show_11573980'></script>
@@ -311,7 +310,7 @@
                     <div class="form-group">
                         <label>Ad Image (Optional)</label>
                         <input type="file" id="ad-image" accept="image/*">
-                        <div style="font-size:11px; color:var(--text-light); margin-top:4px;">Upload PNG, JPG or GIF (Max 2MB)</div>
+                        <div style="font-size:11px; color:var(--text-light); margin-top:4px;">Upload PNG, JPG or GIF (Max 32MB)</div>
                     </div>
                     <div class="form-group">
                         <label>Reward per View ($)</label>
@@ -410,7 +409,7 @@
             <div class="form-group">
                 <label>Upload Screenshot</label>
                 <input type="file" id="verify-screenshot" accept="image/*" required>
-                <div style="font-size:11px; color:var(--text-light); margin-top:4px;">Upload PNG, JPG or GIF (Max 2MB)</div>
+                <div style="font-size:11px; color:var(--text-light); margin-top:4px;">Upload PNG, JPG or GIF (Max 32MB)</div>
             </div>
             <button class="action-button" onclick="submitVerification()">
                 <i class="fa-solid fa-upload"></i> <span>Submit for Verification</span>
@@ -426,7 +425,7 @@
 
     <script>
         // ============================================================
-        // FIREBASE CONFIG WITH STORAGE
+        // FIREBASE CONFIG
         // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyC_WvNxSQQ58TcJhDcBw5NUrAZjOQe1T2g",
@@ -460,9 +459,63 @@
             depositMethods: []
         };
 
-        let firebaseDb, firebaseStorage;
+        let firebaseDb;
         const tg = window.Telegram ? window.Telegram.WebApp : null;
         
+        // ============================================================
+        // IMGBB API KEY (Get from https://api.imgbb.com/)
+        // ============================================================
+        const IMGBB_API_KEY = 'bc5a5bca9a50833046600a2cc94de6c6';
+
+        // ============================================================
+        // IMAGE UPLOAD FUNCTION
+        // ============================================================
+        async function uploadImageToImgBB(file) {
+            return new Promise((resolve, reject) => {
+                // Validate file type
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/tiff'];
+                if (!allowedTypes.includes(file.type)) {
+                    reject(new Error('Invalid file type! Only JPG, PNG, GIF, WEBP, BMP, TIFF allowed.'));
+                    return;
+                }
+                
+                // Check file size (max 32MB)
+                if (file.size > 32 * 1024 * 1024) {
+                    reject(new Error('File too large! Max 32MB allowed.'));
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('key', IMGBB_API_KEY);
+                formData.append('image', file);
+                formData.append('expiration', '600'); // 10 minutes
+
+                fetch('https://api.imgbb.com/1/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network error: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        console.log('✅ Image uploaded successfully!');
+                        console.log('📸 Image URL:', data.data.url);
+                        resolve(data.data.url);
+                    } else {
+                        reject(new Error(data.error?.message || 'Upload failed'));
+                    }
+                })
+                .catch(error => {
+                    console.error('ImgBB upload error:', error);
+                    reject(error);
+                });
+            });
+        }
+
         // ============================================================
         // STATE
         // ============================================================
@@ -535,7 +588,6 @@
             try {
                 firebase.initializeApp(firebaseConfig);
                 firebaseDb = firebase.database();
-                firebaseStorage = firebase.storage();
                 console.log("✅ Firebase Connected");
                 return true;
             } catch (e) {
@@ -891,21 +943,11 @@
                 return;
             }
             
-            // Check file size (max 2MB)
-            if (file.size > 2 * 1024 * 1024) {
-                safeTgAlert('❌ File too large! Max 2MB');
-                return;
-            }
-            
             try {
-                // Upload to Firebase Storage
-                const storageRef = firebaseStorage.ref(`verifications/${currentUserId}/${currentVerifyAdId}_${Date.now()}.jpg`);
-                const uploadTask = storageRef.put(file);
-                
                 showToast('📤 Uploading screenshot...');
                 
-                const snapshot = await uploadTask;
-                const downloadUrl = await snapshot.ref.getDownloadURL();
+                // Upload using ImgBB
+                const downloadUrl = await uploadImageToImgBB(file);
                 
                 // Save verification request
                 const verificationData = {
@@ -935,18 +977,17 @@
                 
             } catch(e) {
                 console.error("Verification error:", e);
-                safeTgAlert('❌ Failed to upload screenshot. Please try again.');
+                safeTgAlert('❌ Failed to upload screenshot: ' + e.message);
             }
         }
 
         // ============================================================
-        // ADVERTISER - CREATE AD (WITH BALANCE CHECK)
+        // ADVERTISER - CREATE AD (WITH BALANCE CHECK & IMGBB)
         // ============================================================
         function setupCreateAdForm() {
             const form = allDOMElements.createAdForm;
             if (!form) return;
             
-            // Update total views on budget/reward change
             document.getElementById('ad-budget').addEventListener('input', updateAdCostInfo);
             document.getElementById('ad-reward').addEventListener('input', updateAdCostInfo);
             
@@ -979,21 +1020,18 @@
                 
                 let imageUrl = '';
                 
-                // Upload image if provided
+                // Upload image using ImgBB if provided
                 if (fileInput.files.length > 0) {
                     const file = fileInput.files[0];
-                    if (file.size > 2 * 1024 * 1024) {
-                        safeTgAlert('❌ Image too large! Max 2MB');
-                        return;
-                    }
                     
                     try {
-                        const storageRef = firebaseStorage.ref(`ads/${currentUserId}/${Date.now()}_${file.name}`);
-                        const uploadTask = await storageRef.put(file);
-                        imageUrl = await uploadTask.ref.getDownloadURL();
+                        showToast('📤 Uploading image...');
+                        imageUrl = await uploadImageToImgBB(file);
+                        console.log('✅ Image uploaded:', imageUrl);
+                        showToast('✅ Image uploaded successfully!');
                     } catch(e) {
                         console.error("Image upload error:", e);
-                        safeTgAlert('❌ Failed to upload image. Please try again.');
+                        safeTgAlert('❌ Failed to upload image: ' + e.message);
                         return;
                     }
                 }
