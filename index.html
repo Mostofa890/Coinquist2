@@ -150,12 +150,10 @@
         .balance-card .amount { font-size: 40px; font-weight: 800; line-height: 1.2; z-index: 1; position: relative; }
         
         /* Mining Balance - Small Card Below Main */
-        .mining-balance-card { background: var(--card-background); padding: 12px 18px; border-radius: 14px; margin-bottom: 20px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .mining-balance-card { background: var(--card-background); padding: 12px 18px; border-radius: 14px; margin-bottom: 12px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
         .mining-balance-card .label { font-size: 13px; color: var(--text-light); font-weight: 500; }
         .mining-balance-card .label i { margin-right: 6px; }
         .mining-balance-card .value { font-size: 20px; font-weight: 800; color: var(--primary-color); }
-        .mining-balance-card .countdown { font-size: 12px; color: #10b981; font-weight: 600; }
-        .mining-balance-card .countdown.waiting { color: #f59e0b; }
         
         /* Mining Circle */
         .mining-section { background: var(--card-background); padding: 20px; border-radius: 18px; margin-bottom: 20px; border: 1px solid var(--border-color); text-align: center; }
@@ -170,12 +168,12 @@
         .mining-circle .start-overlay .start-text { color: #fff; font-weight: 700; font-size: 18px; margin-top: 5px; }
         .mining-circle .progress-text { position: absolute; bottom: -30px; font-size: 14px; font-weight: 700; color: var(--text-light); }
         
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        @keyframes spinCoin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
+        /* Auto Recharge Timer */
+        .recharge-timer { background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.2); border-radius: 12px; padding: 12px; margin-top: 10px; text-align: center; }
+        .recharge-timer .timer-label { font-size: 12px; color: var(--text-light); }
+        .recharge-timer .timer-time { font-size: 28px; font-weight: 900; color: #fbbf24; }
         
-        .speed-boost-btn { background: linear-gradient(135deg, #f97316, #f59e0b); color: #fff; padding: 12px 24px; border: none; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.3s ease; margin-top: 10px; }
-        .speed-boost-btn:active { transform: scale(0.95); }
-        .speed-boost-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
         .stat-item { position: relative; overflow: hidden; background-color: var(--card-background); padding: 20px; border-radius: 18px; text-align: center; border: 1px solid var(--border-color); animation: fadeIn 0.7s ease-out; transition: background-color 0.3s, border-color 0.3s; }
@@ -195,7 +193,7 @@
         .action-button:disabled { background-color: #8E8E93; cursor: not-allowed; }
         .secondary-button { background-color: transparent; color: var(--primary-color); border: 2px solid var(--primary-color); margin-top: 15px; }
         
-        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; max-width: 500px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); padding: 10px 15px; background: var(--glass-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid var(--border-color); transition: background-color 0.3s, border-color 0.3s; z-index: 100; }
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; max-width: 500px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); padding: 10px 15px; background: var(--glass-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid var(--border-color); transition: background-color 0.3s, border-color 0.3s; z-index: 100; }
         .nav-button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 8px; border-radius: 12px; color: var(--text-light); text-decoration: none; font-size: 12px; font-weight: 500; border: none; background: transparent; cursor: pointer; transition: all 0.2s ease; }
         .nav-button.active, .nav-button:hover { color: var(--primary-color); background-color: rgba(var(--primary-color-rgb), 0.1); }
         .nav-button i { font-size: 20px; }
@@ -244,11 +242,6 @@
         
         .floating-coin { position: fixed; font-size: 24px; pointer-events: none; z-index: 999; animation: floatUp 1s ease-out forwards; }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-100px) scale(0.5); } }
-        
-        .auto-convert-info { background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 10px; padding: 10px 14px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .auto-convert-info .label { font-size: 12px; color: var(--text-light); }
-        .auto-convert-info .value { font-size: 14px; font-weight: 700; color: #10b981; }
-        .auto-convert-info .value.waiting { color: #f59e0b; }
 
         /* ===== FAB BUTTON ===== */
         .fab-spin-btn {
@@ -329,14 +322,14 @@
             <div class="amount" id="total-earning">$0.000</div>
         </div>
         
-        <!-- ===== MINING BALANCE CARD (Small) ===== -->
+        <!-- ===== MINING BALANCE CARD ===== -->
         <div class="mining-balance-card">
             <div>
-                <div class="label"><i class="fa-solid fa-coins"></i> Convert Balance</div>
+                <div class="label"><i class="fa-solid fa-coins"></i> Mining Balance</div>
                 <div class="value" id="mining-balance-display">0 🪙</div>
             </div>
             <div>
-                <div class="countdown" id="auto-convert-timer">⏳ 24h:00m</div>
+                <span id="rechargeStatus" style="font-size:12px; color:#fbbf24;">⏳ 1h</span>
             </div>
         </div>
         
@@ -350,24 +343,23 @@
                 </div>
                 <div class="inner">
                     <div class="coin-icon">🪙</div>
-                    <div class="coin-count" id="miningCoinCount">1000</div>
-                    <div class="status" id="miningStatus">Ready</div>
+                    <div class="coin-count" id="miningCoinCount">0</div>
+                    <div class="status" id="miningStatus">⏳ Waiting</div>
                 </div>
-                <div class="progress-text" id="miningProgress">100%</div>
+                <div class="progress-text" id="miningProgress">0%</div>
             </div>
-            <button class="speed-boost-btn" id="speedBoostBtn" onclick="activateSpeedBoost()"><i class="fas fa-rocket"></i> Speed Boost</button>
+            
+            <!-- ===== AUTO RECHARGE TIMER ===== -->
+            <div class="recharge-timer" id="rechargeTimer">
+                <div class="timer-label">⏳ Auto Recharge in</div>
+                <div class="timer-time" id="rechargeTimeDisplay">--:--:--</div>
+            </div>
         </div>
         
         <div class="stats-grid">
             <div class="stat-item"><i class="fa-solid fa-rectangle-ad bg-icon"></i><div class="icon"><i class="fa-solid fa-rectangle-ad"></i></div><div class="value" id="ad-count">0</div><div class="label">Ads Watched</div></div>
             <div class="stat-item"><i class="fa-solid fa-calendar-day bg-icon"></i><div class="icon"><i class="fa-solid fa-calendar-day"></i></div><div class="value" id="ads-today-count">0 / 15</div><div class="label">Today's Ads</div></div>
             <div class="stat-item"><i class="fa-solid fa-users bg-icon"></i><div class="icon"><i class="fa-solid fa-users"></i></div><div class="value" id="referral-count">0</div><div class="label">Referrals</div></div>
-        </div>
-        
-        <!-- ===== AUTO CONVERT INFO ===== -->
-        <div class="auto-convert-info">
-            <span class="label">🔄 Auto Convert</span>
-            <span class="value" id="auto-convert-status">✅ Ready (24h)</span>
         </div>
         
         <div class="card"><h3 class="card-title">Today's Task</h3><button class="action-button" id="watch-ad-button"><i class="fa-solid fa-play"></i><span>Watch Ad</span></button><button class="action-button secondary-button" id="join-channel-button"><i class="fa-brands fa-telegram"></i><span>Join Channel</span></button></div>
@@ -407,7 +399,6 @@
         <button class="nav-button" onclick="showModal('withdrawModal', this)"><i class="fa-solid fa-money-bill-transfer"></i><span>Withdraw</span></button>
         <button class="nav-button" onclick="showModal('historyModal', this)"><i class="fa-solid fa-clock-rotate-left"></i><span>History</span></button>
         <button class="nav-button" onclick="showModal('inviteModal', this)"><i class="fa-solid fa-user-plus"></i><span>Invite</span></button>
-        <button class="nav-button" onclick="showModal('supportModal', this)"><i class="fa-solid fa-headset"></i><span>Support</span></button>
         <button class="nav-button" onclick="showModal('bonusTasksModal', this)"><i class="fa-solid fa-star"></i><span>Bonus</span></button>
     </div>
     
@@ -499,14 +490,14 @@
             rewardedReferrals: 0, 
             originalUserId: null,
             
-            miningCoins: 1000,
+            miningCoins: 0,
             miningBalance: 0,
-            convertCooldown: null,
-            speedBoostActive: false,
-            speedBoostCooldown: null,
             isMining: false,
-            miningMultiplier: 1,
-            lastConvertTime: null,
+            
+            // ===== AUTO RECHARGE =====
+            rechargeCooldown: null,
+            rechargeAmount: 1000,
+            rechargeHours: 1,
             
             // ===== SPIN WHEEL =====
             spinAdsWatched: 0,
@@ -549,10 +540,10 @@
             miningCoinCount: document.getElementById('miningCoinCount'),
             miningStatus: document.getElementById('miningStatus'),
             miningProgress: document.getElementById('miningProgress'),
-            speedBoostBtn: document.getElementById('speedBoostBtn'),
             miningBalanceDisplay: document.getElementById('mining-balance-display'),
-            autoConvertTimer: document.getElementById('auto-convert-timer'),
-            autoConvertStatus: document.getElementById('auto-convert-status'),
+            rechargeTimer: document.getElementById('rechargeTimer'),
+            rechargeTimeDisplay: document.getElementById('rechargeTimeDisplay'),
+            rechargeStatus: document.getElementById('rechargeStatus'),
             
             // Spin
             fabSpinBtn: document.getElementById('fabSpinBtn'),
@@ -643,12 +634,8 @@
                 
                 miningCoins: state.miningCoins,
                 miningBalance: state.miningBalance,
-                convertCooldown: state.convertCooldown,
-                speedBoostActive: state.speedBoostActive,
-                speedBoostCooldown: state.speedBoostCooldown,
                 isMining: state.isMining,
-                miningMultiplier: state.miningMultiplier,
-                lastConvertTime: state.lastConvertTime,
+                rechargeCooldown: state.rechargeCooldown,
                 
                 spinAdsWatched: state.spinAdsWatched,
                 spinTotalAds: state.spinTotalAds,
@@ -678,14 +665,10 @@
                         state.rewardedReferrals = data.rewardedReferrals || 0;
                         state.lastUsedIp = data.lastUsedIp || null;
                         
-                        state.miningCoins = data.miningCoins !== undefined ? data.miningCoins : 1000;
+                        state.miningCoins = data.miningCoins !== undefined ? data.miningCoins : 0;
                         state.miningBalance = data.miningBalance !== undefined ? data.miningBalance : 0;
-                        state.convertCooldown = data.convertCooldown || null;
-                        state.speedBoostActive = data.speedBoostActive || false;
-                        state.speedBoostCooldown = data.speedBoostCooldown || null;
                         state.isMining = data.isMining || false;
-                        state.miningMultiplier = data.miningMultiplier || 1;
-                        state.lastConvertTime = data.lastConvertTime || null;
+                        state.rechargeCooldown = data.rechargeCooldown || null;
                         
                         state.spinAdsWatched = data.spinAdsWatched || 0;
                         state.spinTotalAds = data.spinTotalAds || 20;
@@ -814,10 +797,65 @@
         }
 
         // ============================================================
+        // ===== AUTO RECHARGE SYSTEM =====
+        // ============================================================
+        function updateRechargeTimer() {
+            const timerEl = allDOMElements.rechargeTimeDisplay;
+            const statusEl = allDOMElements.rechargeStatus;
+            
+            if (state.miningCoins > 0) {
+                timerEl.textContent = '✅ Ready';
+                statusEl.textContent = '✅ Ready';
+                allDOMElements.rechargeTimer.style.borderColor = 'rgba(16,185,129,0.3)';
+                return;
+            }
+            
+            if (state.rechargeCooldown && new Date() < new Date(state.rechargeCooldown)) {
+                const remaining = new Date(state.rechargeCooldown) - new Date();
+                const hours = Math.floor(remaining / 3600000);
+                const minutes = Math.floor((remaining % 3600000) / 60000);
+                const seconds = Math.floor((remaining % 60000) / 1000);
+                
+                timerEl.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                statusEl.textContent = '⏳ Recharging...';
+                allDOMElements.rechargeTimer.style.borderColor = 'rgba(251,191,36,0.3)';
+            } else {
+                timerEl.textContent = '🔄 Ready';
+                statusEl.textContent = '✅ Ready';
+                allDOMElements.rechargeTimer.style.borderColor = 'rgba(16,185,129,0.3)';
+                
+                // Auto recharge when miningCoins is 0 and cooldown is over
+                if (state.miningCoins === 0 && !state.rechargeCooldown) {
+                    performRecharge();
+                }
+            }
+        }
+        
+        function performRecharge() {
+            if (state.miningCoins > 0) return;
+            if (state.rechargeCooldown && new Date() < new Date(state.rechargeCooldown)) return;
+            
+            state.miningCoins = state.rechargeAmount;
+            state.rechargeCooldown = new Date(Date.now() + state.rechargeHours * 60 * 60 * 1000).toISOString();
+            
+            saveUserDataToFirebase();
+            updateMiningUI();
+            updateUI();
+            
+            showToast(`✅ Auto recharge complete! +${state.rechargeAmount} coins added!`);
+            safeTgAction(tg => tg.HapticFeedback.notificationOccurred('success'));
+        }
+
+        // ============================================================
         // ===== MINING SYSTEM =====
         // ============================================================
         function startMining() {
-            if (state.isMining || state.miningCoins <= 0) return;
+            if (state.isMining || state.miningCoins <= 0) {
+                if (state.miningCoins <= 0) {
+                    safeTgAlert('⏳ No coins left! Auto recharge in progress...');
+                }
+                return;
+            }
             
             allDOMElements.startOverlay.classList.add('hidden');
             state.isMining = true;
@@ -829,21 +867,15 @@
                     return;
                 }
                 
-                let speed = 1;
-                if (state.speedBoostActive) {
-                    speed = state.miningMultiplier || 2;
-                }
-                
                 state.miningCoins -= 1;
-                state.miningBalance += speed;
+                state.miningBalance += 1;
                 
-                showFloatingCoin(`+${speed} 🪙`);
+                showFloatingCoin('+1 🪙');
                 
                 updateMiningUI();
                 saveUserDataToFirebase();
                 
-                const delay = state.speedBoostActive ? 3000 / speed : 3000;
-                miningInterval = setTimeout(mine, delay);
+                miningInterval = setTimeout(mine, 3000);
             }
             
             mine();
@@ -876,123 +908,33 @@
             const progress = ((total - state.miningCoins) / total) * 100;
             
             allDOMElements.miningCoinCount.textContent = state.miningCoins;
-            allDOMElements.miningStatus.textContent = state.isMining ? '⛏️ Mining...' : 'Ready';
+            allDOMElements.miningStatus.textContent = state.isMining ? '⛏️ Mining...' : state.miningCoins <= 0 ? '⏳ Recharging' : 'Ready';
             allDOMElements.miningProgress.textContent = Math.round(progress) + '%';
             
             const circle = allDOMElements.miningCircle;
-            circle.style.background = `conic-gradient(var(--primary-color) ${progress}%, var(--border-color) ${progress}%)`;
+            circle.style.background = `conic-gradient(var(--primary-color) ${Math.min(progress, 100)}%, var(--border-color) ${Math.min(progress, 100)}%)`;
             
             allDOMElements.miningBalanceDisplay.textContent = `${state.miningBalance} 🪙`;
-            updateAutoConvertTimer();
-        }
-        
-        function updateSpeedBoostUI() {
-            const btn = allDOMElements.speedBoostBtn;
-            if (state.speedBoostCooldown && new Date() < new Date(state.speedBoostCooldown)) {
-                const remaining = Math.ceil((new Date(state.speedBoostCooldown) - new Date()) / 60000);
-                btn.disabled = true;
-                btn.innerHTML = `<i class="fas fa-clock"></i> ${remaining}m cooldown`;
-            } else if (state.speedBoostActive) {
-                btn.disabled = true;
-                btn.innerHTML = `<i class="fas fa-rocket"></i> Active (${state.miningMultiplier}x)`;
-            } else {
-                btn.disabled = false;
-                btn.innerHTML = `<i class="fas fa-rocket"></i> Speed Boost (2x)`;
-            }
-        }
-        
-        function activateSpeedBoost() {
-            if (state.speedBoostActive) {
-                showToast('⚡ Speed boost already active!');
-                return;
-            }
-            if (state.speedBoostCooldown && new Date() < new Date(state.speedBoostCooldown)) {
-                showToast('⏳ Please wait for cooldown!');
-                return;
-            }
             
-            state.speedBoostActive = true;
-            state.miningMultiplier = 2;
-            state.speedBoostCooldown = new Date(Date.now() + 5 * 60000).toISOString();
-            
-            setTimeout(() => {
-                state.speedBoostActive = false;
-                state.miningMultiplier = 1;
-                saveUserDataToFirebase();
-                updateSpeedBoostUI();
-                showToast('⚡ Speed boost ended!');
-            }, 30000);
-            
-            saveUserDataToFirebase();
-            updateSpeedBoostUI();
-            showToast('⚡ Speed boost activated! (2x speed for 30s)');
+            updateRechargeTimer();
         }
 
         // ============================================================
-        // ===== AUTO CONVERT SYSTEM =====
-        // ============================================================
-        function updateAutoConvertTimer() {
-            const timerEl = allDOMElements.autoConvertTimer;
-            const statusEl = allDOMElements.autoConvertStatus;
-            
-            if (state.convertCooldown && new Date() < new Date(state.convertCooldown)) {
-                const remaining = new Date(state.convertCooldown) - new Date();
-                const hours = Math.floor(remaining / 3600000);
-                const minutes = Math.floor((remaining % 3600000) / 60000);
-                const seconds = Math.floor((remaining % 60000) / 1000);
-                
-                timerEl.textContent = `⏳ ${hours}h:${String(minutes).padStart(2, '0')}m:${String(seconds).padStart(2, '0')}s`;
-                timerEl.className = 'countdown waiting';
-                statusEl.textContent = '⏳ Converting in...';
-                statusEl.className = 'value waiting';
-            } else {
-                timerEl.textContent = '✅ Ready';
-                timerEl.className = 'countdown';
-                statusEl.textContent = '✅ Ready to Convert';
-                statusEl.className = 'value';
-                
-                if (state.miningBalance > 0 && !state.convertCooldown) {
-                    performAutoConvert();
-                }
-            }
-        }
-        
-        function performAutoConvert() {
-            const rate = config.conversionRate || 1000;
-            const coins = state.miningBalance;
-            
-            if (coins <= 0) return;
-            
-            const usd = coins / rate;
-            state.totalEarning += usd;
-            state.miningBalance = 0;
-            state.convertCooldown = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
-            state.lastConvertTime = new Date().toISOString();
-            
-            saveUserDataToFirebase();
-            updateMiningUI();
-            updateUI();
-            
-            showToast(`✅ Auto converted ${coins} coins → $${usd.toFixed(4)} USD!`);
-            safeTgAction(tg => tg.HapticFeedback.notificationOccurred('success'));
-        }
-
-        // ============================================================
-        // ===== SPIN WHEEL SYSTEM (FIXED) =====
+        // ===== SPIN WHEEL SYSTEM (Only USD) =====
         // ============================================================
         const spinPrizes = [
-            { label: '2🪙', type: 'coin', value: 2 },
-            { label: '$0.01', type: 'usd', value: 0.01 },
-            { label: '3🪙', type: 'coin', value: 3 },
-            { label: '$0.02', type: 'usd', value: 0.02 },
-            { label: '5🪙', type: 'coin', value: 5 },
-            { label: '$0.05', type: 'usd', value: 0.05 },
-            { label: '10🪙', type: 'coin', value: 10 },
-            { label: '$0.10', type: 'usd', value: 0.10 },
-            { label: '20🪙', type: 'coin', value: 20 },
-            { label: '$0.25', type: 'usd', value: 0.25 },
-            { label: '50🪙', type: 'coin', value: 50 },
-            { label: '$0.50', type: 'usd', value: 0.50 },
+            { label: '$0.01', value: 0.01 },
+            { label: '$0.02', value: 0.02 },
+            { label: '$0.05', value: 0.05 },
+            { label: '$0.10', value: 0.10 },
+            { label: '$0.20', value: 0.20 },
+            { label: '$0.50', value: 0.50 },
+            { label: '$1.00', value: 1.00 },
+            { label: '$2.00', value: 2.00 },
+            { label: '$5.00', value: 5.00 },
+            { label: '$0.03', value: 0.03 },
+            { label: '$0.08', value: 0.08 },
+            { label: '$0.15', value: 0.15 },
         ];
 
         function buildWheel() {
@@ -1084,24 +1026,12 @@
             // Set cooldown
             state.spinCooldown = new Date(Date.now() + 15 * 1000).toISOString();
             
-            // ===== GIVE REWARD - FIXED =====
-            if (prize.type === 'coin') {
-                // ✅ Coin goes to MINING CIRCLE (miningCoins)
-                state.miningCoins += prize.value;
-                allDOMElements.spinResult.textContent = `🎉 You won ${prize.value} 🪙 Mining Coins!`;
-                saveUserDataToFirebase();
-                updateMiningUI();
-                updateUI();
-                showFloatingCoin(`+${prize.value} 🪙`);
-            } else {
-                // ✅ USD goes to CONVERT BALANCE (miningBalance)
-                state.miningBalance += prize.value;
-                allDOMElements.spinResult.textContent = `🎉 You won $${prize.value.toFixed(2)} USD added to convert balance!`;
-                saveUserDataToFirebase();
-                updateMiningUI();
-                updateUI();
-                showFloatingCoin(`+$${prize.value.toFixed(2)}`);
-            }
+            // ===== GIVE REWARD - USD GOES TO MAIN BALANCE =====
+            state.totalEarning += prize.value;
+            allDOMElements.spinResult.textContent = `🎉 You won $${prize.value.toFixed(2)} USD!`;
+            saveUserDataToFirebase();
+            updateUI();
+            showFloatingCoin(`+$${prize.value.toFixed(2)}`);
             
             setTimeout(() => {
                 state.spinIsSpinning = false;
@@ -1197,7 +1127,6 @@
             watchAdButton.classList.toggle('pulsing', !watchAdButton.disabled);
             updateChart();
             updateMiningUI();
-            updateSpeedBoostUI();
             updateSpinUI();
         }
 
@@ -1229,7 +1158,7 @@
                 state.adsWatchedToday++; 
                 state.weeklyActivity[new Date().getDay()]++;
                 
-                let alertMessage = `Ad watched! +${rewardCoins} coin added to convert balance! You have ${config.DAILY_AD_LIMIT - state.adsWatchedToday} ads left.`;
+                let alertMessage = `Ad watched! +${rewardCoins} coin added to mining balance! You have ${config.DAILY_AD_LIMIT - state.adsWatchedToday} ads left.`;
                 if (state.adsWatchedToday >= config.DAILY_AD_LIMIT) {
                     const cdDate = new Date(); 
                     cdDate.setMinutes(cdDate.getMinutes() + config.COOLDOWN_MINUTES);
@@ -1569,7 +1498,6 @@
                     if (event.target.classList.contains('modal')) closeModal(event.target.id); 
                 };
                 
-                // Build spin wheel
                 buildWheel();
                 
                 safeTgAction(tg => {
@@ -1586,7 +1514,7 @@
                 setTimeout(initInAppInterstitial, 3000);
                 
                 setInterval(() => {
-                    updateAutoConvertTimer();
+                    updateRechargeTimer();
                 }, 1000);
                 
                 setInterval(() => {
