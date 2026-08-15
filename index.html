@@ -12,9 +12,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
-    <!-- Monetag SDK -->
-    <script src='//libtl.com/sdk.js' data-zone='11573980' data-sdk='show_11573980'></script>
-
     <script>
         (function() {
             try {
@@ -443,7 +440,6 @@
             BOT_USERNAME: 'NexEarn2_Bot',
             TELEGRAM_CHANNEL_LINK: 'https://t.me/nexearn2',
             ADMIN_SUPPORT_LINK: 'https://t.me/NexEarn2Support',
-            MONETAG_ZONE_ID: '11573980',
             AD_REWARD: 0.001,
             DAILY_AD_LIMIT: 15,
             MINIMUM_WITHDRAWAL: 0.10,
@@ -606,7 +602,6 @@
                         config.BOT_USERNAME = data.botUsername || config.BOT_USERNAME;
                         config.TELEGRAM_CHANNEL_LINK = data.channelLink || config.TELEGRAM_CHANNEL_LINK;
                         config.ADMIN_SUPPORT_LINK = data.supportLink || config.ADMIN_SUPPORT_LINK;
-                        config.MONETAG_ZONE_ID = data.zoneId || config.MONETAG_ZONE_ID;
                         config.AD_REWARD = data.adReward || config.AD_REWARD;
                         config.DAILY_AD_LIMIT = data.dailyLimit || config.DAILY_AD_LIMIT;
                         config.MINIMUM_WITHDRAWAL = data.minWithdraw || config.MINIMUM_WITHDRAWAL;
@@ -1418,40 +1413,6 @@
         }
 
         // ============================================================
-        // MONETAG IN-APP INTERSTITIAL
-        // ============================================================
-        let interstitialInitialized = false;
-
-        function initInAppInterstitial() {
-            try {
-                if (typeof show_11573980 !== 'function') {
-                    console.warn("Monetag SDK not loaded, retrying...");
-                    setTimeout(initInAppInterstitial, 2000);
-                    return;
-                }
-
-                if (interstitialInitialized) return;
-
-                show_11573980({
-                    type: 'inApp',
-                    inAppSettings: {
-                        frequency: 2,
-                        capping: 0.1,
-                        interval: 30,
-                        timeout: 5,
-                        everyPage: false
-                    }
-                });
-
-                interstitialInitialized = true;
-                console.log("✅ In-App Interstitial initialized");
-            } catch (e) {
-                console.error("Interstitial init error:", e);
-                setTimeout(initInAppInterstitial, 3000);
-            }
-        }
-
-        // ============================================================
         // UI FUNCTIONS
         // ============================================================
         let cooldownInterval;
@@ -1501,7 +1462,7 @@
         }
 
         // ============================================================
-        // WATCH AD FUNCTION (Regular - Fallback)
+        // WATCH AD FUNCTION (without interstitial)
         // ============================================================
         async function watchAd() {
             if (state.lastUsedIp && !state.cooldownUntil) {
@@ -1516,11 +1477,10 @@
                 }
             }
 
+            // Simulate ad watching without Monetag
             allDOMElements.adLoaderOverlay.style.display = 'flex';
-
-            try {
-                await show_11573980();
-
+            
+            setTimeout(() => {
                 state.totalEarning += config.AD_REWARD;
                 state.adCount++;
                 state.adsWatchedToday++;
@@ -1539,13 +1499,8 @@
                 updateUI();
                 safeTgAction(tg => tg.HapticFeedback.notificationOccurred('success'));
                 safeTgAlert(alertMessage);
-
-            } catch(e) {
-                console.error("Ad Error:", e);
-                safeTgAlert('Ad could not be completed. Please try again.');
-            } finally {
                 allDOMElements.adLoaderOverlay.style.display = 'none';
-            }
+            }, 2000);
         }
 
         // ============================================================
@@ -1915,8 +1870,6 @@
 
                 updateUI();
                 loadAdsFromFirebase();
-
-                setTimeout(initInAppInterstitial, 3000);
 
                 setInterval(() => {
                     updateConvertTimer();
