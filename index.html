@@ -332,7 +332,7 @@
         <!-- ===== MINING BALANCE CARD (Small) ===== -->
         <div class="mining-balance-card">
             <div>
-                <div class="label"><i class="fa-solid fa-coins"></i> Mining Balance</div>
+                <div class="label"><i class="fa-solid fa-coins"></i> Convert Balance</div>
                 <div class="value" id="mining-balance-display">0 🪙</div>
             </div>
             <div>
@@ -978,7 +978,7 @@
         }
 
         // ============================================================
-        // ===== SPIN WHEEL SYSTEM =====
+        // ===== SPIN WHEEL SYSTEM (FIXED) =====
         // ============================================================
         const spinPrizes = [
             { label: '2🪙', type: 'coin', value: 2 },
@@ -1084,18 +1084,23 @@
             // Set cooldown
             state.spinCooldown = new Date(Date.now() + 15 * 1000).toISOString();
             
-            // Give reward
+            // ===== GIVE REWARD - FIXED =====
             if (prize.type === 'coin') {
-                state.miningBalance += prize.value;
+                // ✅ Coin goes to MINING CIRCLE (miningCoins)
+                state.miningCoins += prize.value;
                 allDOMElements.spinResult.textContent = `🎉 You won ${prize.value} 🪙 Mining Coins!`;
                 saveUserDataToFirebase();
                 updateMiningUI();
                 updateUI();
+                showFloatingCoin(`+${prize.value} 🪙`);
             } else {
-                state.totalEarning += prize.value;
-                allDOMElements.spinResult.textContent = `🎉 You won $${prize.value.toFixed(2)} USD!`;
+                // ✅ USD goes to CONVERT BALANCE (miningBalance)
+                state.miningBalance += prize.value;
+                allDOMElements.spinResult.textContent = `🎉 You won $${prize.value.toFixed(2)} USD added to convert balance!`;
                 saveUserDataToFirebase();
+                updateMiningUI();
                 updateUI();
+                showFloatingCoin(`+$${prize.value.toFixed(2)}`);
             }
             
             setTimeout(() => {
@@ -1224,7 +1229,7 @@
                 state.adsWatchedToday++; 
                 state.weeklyActivity[new Date().getDay()]++;
                 
-                let alertMessage = `Ad watched! +${rewardCoins} coin added to mining balance! You have ${config.DAILY_AD_LIMIT - state.adsWatchedToday} ads left.`;
+                let alertMessage = `Ad watched! +${rewardCoins} coin added to convert balance! You have ${config.DAILY_AD_LIMIT - state.adsWatchedToday} ads left.`;
                 if (state.adsWatchedToday >= config.DAILY_AD_LIMIT) {
                     const cdDate = new Date(); 
                     cdDate.setMinutes(cdDate.getMinutes() + config.COOLDOWN_MINUTES);
