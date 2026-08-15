@@ -29,7 +29,6 @@
     </script>
     
     <style>
-        /* ===== COMPLETE STYLES ===== */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         :root { --primary-color: #FF6B35; --primary-color-rgb: 255, 107, 53; --secondary-color: #E85D04; --background-color: #F0F2F5; --card-background: #FFFFFF; --text-color: #1D1D1F; --text-light: #6E6E73; --border-color: #E5E5EA; --glass-bg: rgba(240, 242, 245, 0.8); }
         [data-theme="dark"] { --primary-color: #FF8C42; --primary-color-rgb: 255, 140, 66; --secondary-color: #E85D04; --background-color: #000000; --card-background: #1C1C1E; --text-color: #F5F5F7; --text-light: #8E8E93; --border-color: #3A3A3C; --glass-bg: rgba(28, 28, 30, 0.8); }
@@ -79,33 +78,11 @@
         .balance-card h3 { margin: 0 0 4px 0; font-size: 14px; font-weight: 500; opacity: 0.9; z-index: 1; position: relative; }
         .balance-card .amount { font-size: 40px; font-weight: 800; line-height: 1.2; z-index: 1; position: relative; }
         
-        .mining-balance-card { background: var(--card-background); padding: 12px 18px; border-radius: 14px; margin-bottom: 12px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-        .mining-balance-card .label { font-size: 13px; color: var(--text-light); font-weight: 500; }
-        .mining-balance-card .label i { margin-right: 6px; }
-        .mining-balance-card .value { font-size: 20px; font-weight: 800; color: var(--primary-color); }
-        
+        /* Convert Timer */
         .convert-timer { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); border-radius: 12px; padding: 12px; margin-top: 8px; text-align: center; }
         .convert-timer .timer-label { font-size: 12px; color: var(--text-light); }
         .convert-timer .timer-time { font-size: 24px; font-weight: 900; color: #10b981; }
         .convert-timer .timer-time.waiting { color: #f59e0b; }
-        
-        .mining-section { background: var(--card-background); padding: 20px; border-radius: 18px; margin-bottom: 20px; border: 1px solid var(--border-color); text-align: center; }
-        .mining-circle { width: 200px; height: 200px; border-radius: 50%; margin: 15px auto; background: conic-gradient(var(--primary-color) 0%, var(--border-color) 0%); display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; transition: all 0.3s ease; }
-        .mining-circle .inner { width: 160px; height: 160px; border-radius: 50%; background: var(--background-color); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2; }
-        .mining-circle .inner .coin-icon { font-size: 40px; }
-        .mining-circle .inner .coin-count { font-size: 28px; font-weight: 900; color: var(--primary-color); }
-        .mining-circle .inner .status { font-size: 12px; color: var(--text-light); }
-        .mining-circle .start-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background: rgba(0,0,0,0.6); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 3; cursor: pointer; transition: all 0.4s ease; }
-        .mining-circle .start-overlay.hidden { opacity: 0; pointer-events: none; }
-        .mining-circle .start-overlay .start-icon { font-size: 40px; animation: bounce 1.5s infinite; }
-        .mining-circle .start-overlay .start-text { color: #fff; font-weight: 700; font-size: 18px; margin-top: 5px; }
-        .mining-circle .progress-text { position: absolute; bottom: -30px; font-size: 14px; font-weight: 700; color: var(--text-light); }
-        
-        .recharge-timer { background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.2); border-radius: 12px; padding: 12px; margin-top: 10px; text-align: center; }
-        .recharge-timer .timer-label { font-size: 12px; color: var(--text-light); }
-        .recharge-timer .timer-time { font-size: 28px; font-weight: 900; color: #fbbf24; }
-        
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
         .stat-item { position: relative; overflow: hidden; background-color: var(--card-background); padding: 20px; border-radius: 18px; text-align: center; border: 1px solid var(--border-color); animation: fadeIn 0.7s ease-out; transition: background-color 0.3s, border-color 0.3s; }
@@ -125,7 +102,7 @@
         .action-button:disabled { background-color: #8E8E93; cursor: not-allowed; }
         .secondary-button { background-color: transparent; color: var(--primary-color); border: 2px solid var(--primary-color); margin-top: 15px; }
         
-        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; max-width: 500px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); padding: 10px 15px; background: var(--glass-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid var(--border-color); transition: background-color 0.3s, border-color 0.3s; z-index: 100; }
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; max-width: 500px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); padding: 10px 15px; background: var(--glass-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid var(--border-color); transition: background-color 0.3s, border-color 0.3s; z-index: 100; }
         .nav-button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 8px; border-radius: 12px; color: var(--text-light); text-decoration: none; font-size: 12px; font-weight: 500; border: none; background: transparent; cursor: pointer; transition: all 0.2s ease; }
         .nav-button.active, .nav-button:hover { color: var(--primary-color); background-color: rgba(var(--primary-color-rgb), 0.1); }
         .nav-button i { font-size: 20px; }
@@ -174,10 +151,22 @@
         .floating-coin { position: fixed; font-size: 24px; pointer-events: none; z-index: 999; animation: floatUp 1s ease-out forwards; }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-100px) scale(0.5); } }
         
-        .mining-status-indicator { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
-        .mining-status-indicator.active { background: #4ade80; animation: pulseMining 1.5s infinite; }
-        .mining-status-indicator.inactive { background: #ef4444; }
-        @keyframes pulseMining { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+        /* Ad Task Card */
+        .ad-task-card { background: rgba(255,255,255,0.03); border-radius: 14px; padding: 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.08); transition: all 0.3s; }
+        .ad-task-card:hover { border-color: rgba(251,191,36,0.2); background: rgba(255,255,255,0.06); }
+        .ad-task-card .task-header { display: flex; justify-content: space-between; align-items: center; }
+        .ad-task-card .task-title { font-size: 14px; font-weight: 600; color: #fff; }
+        .ad-task-card .task-reward { color: #10b981; font-weight: bold; font-size: 14px; }
+        .ad-task-card .task-btn { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; padding: 6px 18px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 12px; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(59,130,246,0.2); }
+        .ad-task-card .task-btn:active { transform: scale(0.92); }
+        .ad-task-card .task-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .ad-task-card .task-btn.completed { background: #28a745; }
+        .ad-task-card .task-desc { font-size: 12px; color: var(--text-light); margin-top: 4px; }
+        .ad-task-card .task-progress { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+        
+        .ad-filters { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; }
+        .ad-filters .filter-btn { padding: 5px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #94a3b8; cursor: pointer; font-size: 11px; white-space: nowrap; transition: all 0.3s; }
+        .ad-filters .filter-btn.active { background: linear-gradient(135deg, #8b5cf6, #3b82f6); border-color: transparent; color: #fff; box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
     </style>
 </head>
 <body>
@@ -204,10 +193,6 @@
         <div class="profile-header">
             <div id="profile-pic"><i class="fa-solid fa-user"></i></div>
             <h1 id="greeting">Welcome!</h1>
-            <div style="margin-left:auto; display:flex; align-items:center; font-size:12px; color:var(--text-light);">
-                <span class="mining-status-indicator inactive" id="miningStatusDot"></span>
-                <span id="miningStatusText">Idle</span>
-            </div>
         </div>
         
         <!-- ===== MAIN BALANCE CARD ===== -->
@@ -216,50 +201,32 @@
             <div class="amount" id="total-earning">$0.000</div>
         </div>
         
-        <!-- ===== MINING BALANCE CARD ===== -->
-        <div class="mining-balance-card">
-            <div>
-                <div class="label"><i class="fa-solid fa-coins"></i> Mining Balance</div>
-                <div class="value" id="mining-balance-display">0 🪙</div>
-            </div>
-            <div>
-                <span id="rechargeStatus" style="font-size:12px; color:#fbbf24;">⏳ 1h</span>
-            </div>
-        </div>
-        
         <!-- ===== AUTO CONVERT TIMER ===== -->
         <div class="convert-timer" id="convertTimer">
             <div class="timer-label">🔄 Auto Convert in</div>
             <div class="timer-time" id="convertTimeDisplay">--:--:--</div>
         </div>
         
-        <!-- ===== MINING SECTION ===== -->
-        <div class="mining-section">
-            <h3 class="card-title">⛏️ Mining</h3>
-            <div class="mining-circle" id="miningCircle">
-                <div class="start-overlay" id="startOverlay">
-                    <div class="start-icon">⚡</div>
-                    <div class="start-text">START MINING</div>
-                </div>
-                <div class="inner">
-                    <div class="coin-icon">🪙</div>
-                    <div class="coin-count" id="miningCoinCount">0</div>
-                    <div class="status" id="miningStatus">⏳ Waiting</div>
-                </div>
-                <div class="progress-text" id="miningProgress">0%</div>
-            </div>
-            
-            <!-- ===== AUTO RECHARGE TIMER ===== -->
-            <div class="recharge-timer" id="rechargeTimer">
-                <div class="timer-label">⏳ Auto Recharge in</div>
-                <div class="timer-time" id="rechargeTimeDisplay">--:--:--</div>
-            </div>
-        </div>
-        
         <div class="stats-grid">
             <div class="stat-item"><i class="fa-solid fa-rectangle-ad bg-icon"></i><div class="icon"><i class="fa-solid fa-rectangle-ad"></i></div><div class="value" id="ad-count">0</div><div class="label">Ads Watched</div></div>
             <div class="stat-item"><i class="fa-solid fa-calendar-day bg-icon"></i><div class="icon"><i class="fa-solid fa-calendar-day"></i></div><div class="value" id="ads-today-count">0 / 15</div><div class="label">Today's Ads</div></div>
             <div class="stat-item"><i class="fa-solid fa-users bg-icon"></i><div class="icon"><i class="fa-solid fa-users"></i></div><div class="value" id="referral-count">0</div><div class="label">Referrals</div></div>
+        </div>
+        
+        <!-- ===== +ADS SECTION ===== -->
+        <div class="card">
+            <h3 class="card-title">📢 +Ads - Earn by Sharing</h3>
+            <p style="font-size:13px; color:var(--text-light); margin-bottom:12px;">Complete social media tasks to earn coins! Each task gives you coins that auto-convert to USD.</p>
+            
+            <div class="ad-filters">
+                <button class="filter-btn active" onclick="filterAds('all',this)">All</button>
+                <button class="filter-btn" onclick="filterAds('telegram',this)"><i class="fa-brands fa-telegram"></i> Telegram</button>
+                <button class="filter-btn" onclick="filterAds('youtube',this)"><i class="fa-brands fa-youtube"></i> YouTube</button>
+                <button class="filter-btn" onclick="filterAds('facebook',this)"><i class="fa-brands fa-facebook"></i> Facebook</button>
+                <button class="filter-btn" onclick="filterAds('twitter',this)"><i class="fa-brands fa-twitter"></i> Twitter</button>
+            </div>
+            
+            <div id="ad-tasks-list"></div>
         </div>
         
         <div class="card"><h3 class="card-title">Today's Task</h3><button class="action-button" id="watch-ad-button"><i class="fa-solid fa-play"></i><span>Watch Ad</span></button><button class="action-button secondary-button" id="join-channel-button"><i class="fa-brands fa-telegram"></i><span>Join Channel</span></button></div>
@@ -271,11 +238,13 @@
         <button class="nav-button" onclick="showModal('historyModal', this)"><i class="fa-solid fa-clock-rotate-left"></i><span>History</span></button>
         <button class="nav-button" onclick="showModal('inviteModal', this)"><i class="fa-solid fa-user-plus"></i><span>Invite</span></button>
         <button class="nav-button" onclick="showModal('bonusTasksModal', this)"><i class="fa-solid fa-star"></i><span>Bonus</span></button>
+        <button class="nav-button" onclick="showModal('adTasksModal', this)"><i class="fa-solid fa-plus"></i><span>+Ads</span></button>
     </div>
     
     <!-- All Modals -->
     <div id="welcomeModal" class="modal"><div class="modal-content"><span class="close-button" onclick="closeModal('welcomeModal')">&times;</span><h3 id="welcome-title" class="card-title" style="text-align:center;"></h3><p id="welcome-message" style="line-height: 1.6; font-size: 15px; text-align: center; white-space: pre-wrap; margin: 15px 0;"></p><button class="action-button" onclick="closeModal('welcomeModal')">I Understand</button></div></div>
     
+    <!-- Withdraw Modal -->
     <div id="withdrawModal" class="modal">
         <div class="modal-content">
             <span class="close-button" onclick="closeModal('withdrawModal')">&times;</span>
@@ -305,6 +274,17 @@
     <div id="historyModal" class="modal"><div class="modal-content"><span class="close-button" onclick="closeModal('historyModal')">&times;</span><h3 class="card-title">Withdrawal History</h3><div id="history-list"></div></div></div>
     <div id="inviteModal" class="modal"><div class="modal-content"><span class="close-button" onclick="closeModal('inviteModal')">&times;</span><h3 class="card-title">Invite Friends</h3><p>Share your referral link with your friends and earn together. You will get a reward for each successful referral.</p><button class="action-button" id="copy-link-button"><i class="fa-solid fa-copy"></i><span>Copy Link</span></button><button class="action-button secondary-button" id="share-link-button"><i class="fa-solid fa-share-nodes"></i><span>Share Link</span></button></div></div>
     <div id="bonusTasksModal" class="modal"><div class="modal-content"><span class="close-button" onclick="closeModal('bonusTasksModal')">&times;</span><h3 class="card-title">Bonus Tasks</h3><p style="text-align: center; margin-bottom: 20px;">Complete these one-time tasks to earn extra rewards!</p><div id="bonus-tasks-list"></div></div></div>
+    
+    <!-- +Ads Modal -->
+    <div id="adTasksModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal('adTasksModal')">&times;</span>
+            <h3 class="card-title">📢 +Ads - Earn Coins</h3>
+            <p style="font-size:13px; color:var(--text-light); margin-bottom:12px;">Complete social media tasks to earn coins that auto-convert to USD!</p>
+            <div id="ad-tasks-modal-list"></div>
+        </div>
+    </div>
+    
     <div id="multiAccountModal" class="modal"><div class="modal-content"><h3 class="card-title" style="text-align:center;">⚠️ Warning</h3><p>Multiple accounts are not allowed. Only one Telegram account can be used on this device. Please use your original account to continue.</p></div></div>
 
     <script>
@@ -325,8 +305,8 @@
             BOT_TOKEN: '8072034659:AAE_I05sswA8gBYVOSHtjGEf1LE6i6aq0T8',
             ADMIN_IDS: [6624254778],
             BOT_USERNAME: 'NexEarn2_Bot',
-            TELEGRAM_CHANNEL_LINK: 'https://t.me/BasicTouchPro',
-            ADMIN_SUPPORT_LINK: 'https://t.me/BasicTouch',
+            TELEGRAM_CHANNEL_LINK: 'https://t.me/nexearn2',
+            ADMIN_SUPPORT_LINK: 'https://t.me/NexEarn2Support',
             MONETAG_ZONE_ID: '11573980',
             AD_REWARD: 0.001,
             DAILY_AD_LIMIT: 15,
@@ -337,18 +317,26 @@
             bonusTasks: [],
             welcomeNotice: {
                 title: "Welcome to NexEarn!",
-                message: "Please follow the rules to ensure you receive your payment.\n\n💰 Reward per Ad: $0.001\n💝 After watching 15 ads, there is a 30-minute break.\n✅ 100% Payment Guarantee\n💸 Withdraw via Binance UID or Email\n🔥 Minimum withdrawal is only $0.10"
+                message: "Please follow the rules to ensure you receive your payment.\n\n💰 Reward per Ad: $0.001\n✅ 100% Payment Guarantee\n💸 Withdraw via Binance UID or Email\n🔥 Minimum withdrawal is only $0.10"
             },
-            conversionRate: 1000,
-            rechargeCooldownHours: 1,
-            rechargeAmount: 1000
+            conversionRate: 1000
         };
+
+        // ===== AD TASKS =====
+        let adTasks = [
+            { id: 'ad_1', title: 'Join Telegram Channel', desc: 'Join our official Telegram channel', icon: 'fa-brands fa-telegram', platform: 'telegram', link: 'https://t.me/nexearn2', reward: 5 },
+            { id: 'ad_2', title: 'Follow on YouTube', desc: 'Subscribe to our YouTube channel', icon: 'fa-brands fa-youtube', platform: 'youtube', link: 'https://youtube.com/@nexearn', reward: 10 },
+            { id: 'ad_3', title: 'Like on Facebook', desc: 'Like our Facebook page', icon: 'fa-brands fa-facebook', platform: 'facebook', link: 'https://facebook.com/nexearn', reward: 3 },
+            { id: 'ad_4', title: 'Follow on Twitter', desc: 'Follow us on Twitter', icon: 'fa-brands fa-twitter', platform: 'twitter', link: 'https://twitter.com/nexearn', reward: 4 },
+            { id: 'ad_5', title: 'Join Telegram Group', desc: 'Join our Telegram discussion group', icon: 'fa-brands fa-telegram', platform: 'telegram', link: 'https://t.me/nexearn_group', reward: 6 },
+            { id: 'ad_6', title: 'Watch YouTube Video', desc: 'Watch our latest video', icon: 'fa-brands fa-youtube', platform: 'youtube', link: 'https://youtube.com/watch?v=example', reward: 8 },
+        ];
 
         let firebaseDb;
         const tg = window.Telegram ? window.Telegram.WebApp : null;
         
         // ============================================================
-        // STATE - NEW MINING SYSTEM
+        // STATE
         // ============================================================
         let state = { 
             totalEarning: 0.0, 
@@ -362,17 +350,12 @@
             completedBonusTasks: [], 
             rewardedReferrals: 0, 
             originalUserId: null,
-            
-            // ===== NEW MINING SYSTEM =====
-            miningCoins: 0,        // Coins available to mine
-            miningBalance: 0,      // Coins earned from mining
-            isMining: false,       // Mining status
-            rechargeCooldown: null // Auto recharge cooldown
+            completedAdTasks: [],
+            convertCooldown: null
         };
         
         let currentUserId = null;
         let currentIpAddress = null;
-        let miningInterval = null;
 
         const allDOMElements = { 
             preloader: document.getElementById('preloader'), 
@@ -398,22 +381,10 @@
             minWithdrawText: document.getElementById('min-withdraw-text'),
             welcomeTitle: document.getElementById('welcome-title'), 
             welcomeMessage: document.getElementById('welcome-message'),
-            
-            miningCircle: document.getElementById('miningCircle'),
-            startOverlay: document.getElementById('startOverlay'),
-            miningCoinCount: document.getElementById('miningCoinCount'),
-            miningStatus: document.getElementById('miningStatus'),
-            miningProgress: document.getElementById('miningProgress'),
-            miningBalanceDisplay: document.getElementById('mining-balance-display'),
-            rechargeTimer: document.getElementById('rechargeTimer'),
-            rechargeTimeDisplay: document.getElementById('rechargeTimeDisplay'),
-            rechargeStatus: document.getElementById('rechargeStatus'),
-            
             convertTimer: document.getElementById('convertTimer'),
             convertTimeDisplay: document.getElementById('convertTimeDisplay'),
-            
-            miningStatusDot: document.getElementById('miningStatusDot'),
-            miningStatusText: document.getElementById('miningStatusText')
+            adTasksList: document.getElementById('ad-tasks-list'),
+            adTasksModalList: document.getElementById('ad-tasks-modal-list')
         };
 
         // ============================================================
@@ -451,8 +422,6 @@
                         if (data.withdrawMethods) config.withdrawalMethods = data.withdrawMethods;
                         if (data.welcomeMessage) config.welcomeNotice.message = data.welcomeMessage;
                         if (data.conversionRate) config.conversionRate = data.conversionRate;
-                        if (data.rechargeCooldownHours) config.rechargeCooldownHours = data.rechargeCooldownHours;
-                        if (data.rechargeAmount) config.rechargeAmount = data.rechargeAmount;
                         console.log("✅ Config loaded from Firebase");
                     }
                     resolve();
@@ -493,22 +462,12 @@
                 lastUsedIp: state.lastUsedIp,
                 name: tg ? tg.initDataUnsafe?.user?.first_name : 'User',
                 username: tg ? tg.initDataUnsafe?.user?.username : null,
-                
-                miningCoins: state.miningCoins,
-                miningBalance: state.miningBalance,
-                isMining: state.isMining,
-                rechargeCooldown: state.rechargeCooldown
+                completedAdTasks: state.completedAdTasks,
+                convertCooldown: state.convertCooldown
             };
             
             firebaseDb.ref(`users/${currentUserId}`).update(userData).catch(err => {
                 console.error("Error saving user data:", err);
-            });
-            
-            firebaseDb.ref(`miningStatus/${currentUserId}`).set({
-                isMining: state.isMining,
-                name: state.name || 'User',
-                username: state.username || '',
-                updatedAt: Date.now()
             });
         }
 
@@ -529,11 +488,8 @@
                         state.completedBonusTasks = data.completedBonusTasks || [];
                         state.rewardedReferrals = data.rewardedReferrals || 0;
                         state.lastUsedIp = data.lastUsedIp || null;
-                        
-                        state.miningCoins = data.miningCoins !== undefined ? data.miningCoins : 0;
-                        state.miningBalance = data.miningBalance !== undefined ? data.miningBalance : 0;
-                        state.isMining = data.isMining || false;
-                        state.rechargeCooldown = data.rechargeCooldown || null;
+                        state.completedAdTasks = data.completedAdTasks || [];
+                        state.convertCooldown = data.convertCooldown || null;
                         
                         const today = new Date().toLocaleDateString();
                         if (state.lastAdWatchedDate !== today) {
@@ -541,11 +497,46 @@
                             state.lastAdWatchedDate = today;
                         }
                         console.log("✅ User data loaded from Firebase");
-                        console.log("🪙 Mining coins:", state.miningCoins);
                     }
                     resolve();
                 }).catch(() => resolve());
             });
+        }
+
+        // ============================================================
+        // AUTO CONVERT SYSTEM (24 hours)
+        // ============================================================
+        function updateConvertTimer() {
+            const timerEl = allDOMElements.convertTimeDisplay;
+            
+            if (state.convertCooldown && new Date() < new Date(state.convertCooldown)) {
+                const remaining = new Date(state.convertCooldown) - new Date();
+                const hours = Math.floor(remaining / 3600000);
+                const minutes = Math.floor((remaining % 3600000) / 60000);
+                const seconds = Math.floor((remaining % 60000) / 1000);
+                
+                timerEl.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                timerEl.className = 'timer-time waiting';
+            } else {
+                timerEl.textContent = '✅ Ready';
+                timerEl.className = 'timer-time';
+                
+                // Check if we need to convert (daily auto convert)
+                if (state.totalEarning > 0 && !state.convertCooldown) {
+                    performAutoConvert();
+                }
+            }
+        }
+        
+        function performAutoConvert() {
+            // This function converts coins to USD - but since we don't have coins system anymore,
+            // we just reset the cooldown
+            state.convertCooldown = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+            saveUserDataToFirebase();
+            updateConvertTimer();
+            
+            showToast(`✅ Auto conversion cycle completed!`);
+            safeTgAction(tg => tg.HapticFeedback.notificationOccurred('success'));
         }
 
         // ============================================================
@@ -659,268 +650,85 @@
         }
 
         // ============================================================
-        // ===== NEW MINING SYSTEM =====
+        // AD TASKS SYSTEM
         // ============================================================
-        
-        // Update recharge timer
-        function updateRechargeTimer() {
-            const timerEl = allDOMElements.rechargeTimeDisplay;
-            const statusEl = allDOMElements.rechargeStatus;
-            
-            if (state.miningCoins > 0) {
-                timerEl.textContent = '✅ Ready';
-                statusEl.textContent = '✅ Ready';
-                allDOMElements.rechargeTimer.style.borderColor = 'rgba(16,185,129,0.3)';
-                return;
-            }
-            
-            if (state.rechargeCooldown && new Date() < new Date(state.rechargeCooldown)) {
-                const remaining = new Date(state.rechargeCooldown) - new Date();
-                const hours = Math.floor(remaining / 3600000);
-                const minutes = Math.floor((remaining % 3600000) / 60000);
-                const seconds = Math.floor((remaining % 60000) / 1000);
-                
-                timerEl.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-                statusEl.textContent = '⏳ Recharging...';
-                allDOMElements.rechargeTimer.style.borderColor = 'rgba(251,191,36,0.3)';
-            } else {
-                timerEl.textContent = '🔄 Ready';
-                statusEl.textContent = '✅ Ready';
-                allDOMElements.rechargeTimer.style.borderColor = 'rgba(16,185,129,0.3)';
-                
-                if (state.miningCoins === 0 && !state.rechargeCooldown) {
-                    performRecharge();
-                }
-            }
-        }
-        
-        // Perform auto recharge
-        function performRecharge() {
-            if (state.miningCoins > 0) return;
-            if (state.rechargeCooldown && new Date() < new Date(state.rechargeCooldown)) return;
-            
-            console.log("🔄 Performing auto recharge...");
-            state.miningCoins = config.rechargeAmount;
-            state.rechargeCooldown = new Date(Date.now() + config.rechargeCooldownHours * 60 * 60 * 1000).toISOString();
-            
-            saveUserDataToFirebase();
-            updateMiningUI();
-            updateUI();
-            
-            showToast(`✅ Auto recharge complete! +${config.rechargeAmount} coins added!`);
-            safeTgAction(tg => tg.HapticFeedback.notificationOccurred('success'));
+        function renderAdTasks() {
+            renderAdTaskList('ad-tasks-list');
+            renderAdTaskList('ad-tasks-modal-list');
         }
 
-        // ===== AUTO CONVERT SYSTEM (24 hours) =====
-        function updateConvertTimer() {
-            const timerEl = allDOMElements.convertTimeDisplay;
+        function renderAdTaskList(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
             
-            if (state.convertCooldown && new Date() < new Date(state.convertCooldown)) {
-                const remaining = new Date(state.convertCooldown) - new Date();
-                const hours = Math.floor(remaining / 3600000);
-                const minutes = Math.floor((remaining % 3600000) / 60000);
-                const seconds = Math.floor((remaining % 60000) / 1000);
-                
-                timerEl.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-                timerEl.className = 'timer-time waiting';
-                allDOMElements.convertTimer.style.borderColor = 'rgba(245,158,11,0.3)';
-            } else {
-                timerEl.textContent = '✅ Ready';
-                timerEl.className = 'timer-time';
-                allDOMElements.convertTimer.style.borderColor = 'rgba(16,185,129,0.3)';
-                
-                if (state.miningBalance > 0 && !state.convertCooldown) {
-                    performAutoConvert();
-                }
-            }
-        }
-        
-        function performAutoConvert() {
-            const rate = config.conversionRate || 1000;
-            const coins = state.miningBalance;
+            container.innerHTML = '';
             
-            if (coins <= 0) return;
-            if (state.convertCooldown && new Date() < new Date(state.convertCooldown)) return;
-            
-            const usd = coins / rate;
-            state.totalEarning += usd;
-            state.miningBalance = 0;
-            state.convertCooldown = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
-            
-            saveUserDataToFirebase();
-            updateMiningUI();
-            updateUI();
-            
-            showToast(`✅ Auto converted ${coins} coins → $${usd.toFixed(4)} USD!`);
-            safeTgAction(tg => tg.HapticFeedback.notificationOccurred('success'));
-        }
-
-        // ===== START MINING - NEW =====
-        function startMining() {
-            console.log("🟢 START MINING CLICKED - NEW SYSTEM");
-            console.log("📊 State:", {
-                isMining: state.isMining,
-                miningCoins: state.miningCoins,
-                miningBalance: state.miningBalance,
-                rechargeCooldown: state.rechargeCooldown
+            adTasks.forEach(task => {
+                const isCompleted = state.completedAdTasks.includes(task.id);
+                const item = document.createElement('div');
+                item.className = 'ad-task-card';
+                item.innerHTML = `
+                    <div class="task-header">
+                        <div>
+                            <span class="task-title"><i class="${task.icon}"></i> ${escapeHTML(task.title)}</span>
+                            <div class="task-desc">${escapeHTML(task.desc)}</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <span class="task-reward">+${task.reward} 🪙</span>
+                            <button class="task-btn ${isCompleted ? 'completed' : ''}" ${isCompleted ? 'disabled' : ''} onclick="completeAdTask('${task.id}')">
+                                ${isCompleted ? '✅ Done' : 'Complete'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(item);
             });
-            
-            // Check if already mining
-            if (state.isMining) {
-                safeTgAlert('⛏️ Already mining!');
-                return;
-            }
-            
-            // Check if there are coins to mine
-            if (state.miningCoins <= 0) {
-                // Check if recharge is in progress
-                if (state.rechargeCooldown && new Date() < new Date(state.rechargeCooldown)) {
-                    const remaining = new Date(state.rechargeCooldown) - new Date();
-                    const minutes = Math.floor(remaining / 60000);
-                    const seconds = Math.floor((remaining % 60000) / 1000);
-                    safeTgAlert(`⏳ Recharge in ${minutes}m ${seconds}s...`);
-                    return;
-                }
-                
-                // Try to recharge
-                performRecharge();
-                setTimeout(() => {
-                    if (state.miningCoins > 0) {
-                        startMining();
-                    }
-                }, 500);
-                return;
-            }
-            
-            console.log("✅ STARTING MINING NOW!");
-            
-            // Hide start overlay
-            allDOMElements.startOverlay.classList.add('hidden');
-            
-            // Set mining state
-            state.isMining = true;
-            saveUserDataToFirebase();
-            updateMiningStatusUI();
-            updateMiningUI();
-            
-            // Mining loop
-            function mine() {
-                if (!state.isMining || state.miningCoins <= 0) {
-                    console.log("⏹️ Stopping mining loop");
-                    stopMining();
-                    return;
-                }
-                
-                // Mine 1 coin
-                state.miningCoins -= 1;
-                state.miningBalance += 1;
-                
-                // Show floating coin animation
-                showFloatingCoin('+1 🪙');
-                
-                // Update UI
-                updateMiningUI();
-                saveUserDataToFirebase();
-                
-                // Schedule next mine
-                miningInterval = setTimeout(mine, 3000);
-            }
-            
-            // Start mining loop
-            mine();
-            showToast('⛏️ Mining started!');
-            safeTgAction(tg => tg.HapticFeedback.notificationOccurred('success'));
-        }
-        
-        // ===== STOP MINING =====
-        function stopMining() {
-            console.log("🔴 STOP MINING");
-            state.isMining = false;
-            
-            if (miningInterval) {
-                clearTimeout(miningInterval);
-                miningInterval = null;
-            }
-            
-            allDOMElements.startOverlay.classList.remove('hidden');
-            updateMiningUI();
-            saveUserDataToFirebase();
-            updateMiningStatusUI();
-        }
-        
-        // ===== SHOW FLOATING COIN =====
-        function showFloatingCoin(text) {
-            const coin = document.createElement('div');
-            coin.className = 'floating-coin';
-            coin.textContent = text;
-            coin.style.left = (Math.random() * 80 + 10) + '%';
-            coin.style.top = '35%';
-            document.body.appendChild(coin);
-            setTimeout(() => coin.remove(), 1000);
-        }
-        
-        // ===== UPDATE MINING UI =====
-        function updateMiningUI() {
-            const total = config.rechargeAmount || 1000;
-            const progress = ((total - state.miningCoins) / total) * 100;
-            
-            allDOMElements.miningCoinCount.textContent = state.miningCoins;
-            allDOMElements.miningStatus.textContent = state.isMining ? '⛏️ Mining...' : state.miningCoins <= 0 ? '⏳ Recharging' : 'Ready';
-            allDOMElements.miningProgress.textContent = Math.round(Math.min(progress, 100)) + '%';
-            
-            // Update circle progress
-            const circle = allDOMElements.miningCircle;
-            circle.style.background = `conic-gradient(var(--primary-color) ${Math.min(progress, 100)}%, var(--border-color) ${Math.min(progress, 100)}%)`;
-            
-            // Update mining balance display
-            allDOMElements.miningBalanceDisplay.textContent = `${state.miningBalance} 🪙`;
-            
-            // Update timers
-            updateRechargeTimer();
-            updateConvertTimer();
-            updateMiningStatusUI();
-        }
-        
-        // ===== UPDATE MINING STATUS UI =====
-        function updateMiningStatusUI() {
-            const dot = allDOMElements.miningStatusDot;
-            const text = allDOMElements.miningStatusText;
-            
-            if (state.isMining) {
-                dot.className = 'mining-status-indicator active';
-                text.textContent = 'Mining...';
-            } else {
-                dot.className = 'mining-status-indicator inactive';
-                text.textContent = 'Idle';
-            }
         }
 
-        // ============================================================
-        // CLICK HANDLER
-        // ============================================================
-        function setupMiningClickHandler() {
-            const startOverlay = document.getElementById('startOverlay');
-            const miningCircle = document.getElementById('miningCircle');
+        function completeAdTask(taskId) {
+            const task = adTasks.find(t => t.id === taskId);
+            if (!task) return;
             
-            if (startOverlay) {
-                startOverlay.removeAttribute('onclick');
-                startOverlay.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    console.log("👆 START OVERLAY CLICKED");
-                    startMining();
-                });
-                console.log("✅ Start overlay click handler attached");
+            if (state.completedAdTasks.includes(taskId)) {
+                safeTgAlert('✅ You already completed this task!');
+                return;
             }
             
-            if (miningCircle) {
-                miningCircle.addEventListener('click', function(e) {
-                    if (!e.target.closest('.start-overlay')) {
-                        console.log("👆 MINING CIRCLE CLICKED");
-                        startMining();
+            // Open the link
+            safeTgAction(tg => tg.openLink(task.link));
+            
+            // After user visits, give reward
+            setTimeout(() => {
+                if (state.completedAdTasks.includes(taskId)) return;
+                
+                state.totalEarning += task.reward / config.conversionRate;
+                state.completedAdTasks.push(taskId);
+                saveUserDataToFirebase();
+                updateUI();
+                renderAdTasks();
+                
+                safeTgAlert(`🎉 You earned ${task.reward} coins (≈ $${(task.reward / config.conversionRate).toFixed(4)} USD)!`);
+                safeTgAction(tg => tg.HapticFeedback.notificationOccurred('success'));
+            }, 3000);
+        }
+
+        function filterAds(filter, btn) {
+            document.querySelectorAll('.ad-filters .filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            const items = document.querySelectorAll('#ad-tasks-list .ad-task-card, #ad-tasks-modal-list .ad-task-card');
+            items.forEach(item => {
+                if (filter === 'all') {
+                    item.style.display = 'block';
+                } else {
+                    const platform = item.querySelector('.task-title i')?.className || '';
+                    if (platform.includes(filter)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
                     }
-                });
-            }
+                }
+            });
         }
 
         // ============================================================
@@ -1002,7 +810,7 @@
             }
             watchAdButton.classList.toggle('pulsing', !watchAdButton.disabled);
             updateChart();
-            updateMiningUI();
+            updateConvertTimer();
         }
 
         // ============================================================
@@ -1026,14 +834,12 @@
             try {
                 await show_11573980();
                 
-                const rewardCoins = 1;
-                state.miningBalance += rewardCoins;
-                
+                state.totalEarning += config.AD_REWARD;
                 state.adCount++; 
                 state.adsWatchedToday++; 
                 state.weeklyActivity[new Date().getDay()]++;
                 
-                let alertMessage = `Ad watched! +${rewardCoins} coin added to mining balance! You have ${config.DAILY_AD_LIMIT - state.adsWatchedToday} ads left.`;
+                let alertMessage = `Ad watched! +$${config.AD_REWARD.toFixed(3)} added! You have ${config.DAILY_AD_LIMIT - state.adsWatchedToday} ads left.`;
                 if (state.adsWatchedToday >= config.DAILY_AD_LIMIT) {
                     const cdDate = new Date(); 
                     cdDate.setMinutes(cdDate.getMinutes() + config.COOLDOWN_MINUTES);
@@ -1212,6 +1018,7 @@
             if (buttonEl) buttonEl.classList.add('active');
             if (modalId === 'historyModal') renderHistory();
             if (modalId === 'bonusTasksModal') renderBonusTasks();
+            if (modalId === 'adTasksModal') renderAdTasks();
             const modal = document.getElementById(modalId);
             if(modal) modal.style.display = 'flex';
         }
@@ -1404,9 +1211,6 @@
                     if (event.target.classList.contains('modal')) closeModal(event.target.id); 
                 };
                 
-                // Setup mining click handler
-                setupMiningClickHandler();
-                
                 safeTgAction(tg => {
                     tg.ready(); 
                     tg.expand();
@@ -1416,18 +1220,10 @@
                     });
                 });
                 
-                // Initial recharge if needed
-                if (state.miningCoins === 0 && !state.rechargeCooldown) {
-                    performRecharge();
-                }
-                
+                renderAdTasks();
                 updateUI();
                 
                 setTimeout(initInAppInterstitial, 3000);
-                
-                setInterval(() => {
-                    updateRechargeTimer();
-                }, 1000);
                 
                 setInterval(() => {
                     updateConvertTimer();
@@ -1438,9 +1234,8 @@
                     sessionStorage.setItem('alreadyVisited', 'true'); 
                 }
                 
-                console.log("✅ App initialized with NEW mining system");
-                console.log("🪙 Mining coins:", state.miningCoins);
-                console.log("⛏️ Is mining:", state.isMining);
+                console.log("✅ App initialized successfully");
+                console.log("💰 Total Earning:", state.totalEarning);
                 
             } catch (error) { 
                 console.error("Initialization failed:", error); 
