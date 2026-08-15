@@ -156,7 +156,6 @@
         .mining-balance-card .value { font-size: 20px; font-weight: 800; color: var(--primary-color); }
         .mining-balance-card .countdown { font-size: 12px; color: #10b981; font-weight: 600; }
         .mining-balance-card .countdown.waiting { color: #f59e0b; }
-        .mining-balance-card .ad-reward-badge { background: rgba(251,191,36,0.15); color: #fbbf24; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
         
         /* Mining Circle */
         .mining-section { background: var(--card-background); padding: 20px; border-radius: 18px; margin-bottom: 20px; border: 1px solid var(--border-color); text-align: center; }
@@ -195,12 +194,6 @@
         .action-button:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 4px 10px rgba(var(--primary-color-rgb), 0.2); }
         .action-button:disabled { background-color: #8E8E93; cursor: not-allowed; }
         .secondary-button { background-color: transparent; color: var(--primary-color); border: 2px solid var(--primary-color); margin-top: 15px; }
-        
-        /* Ad Watch Modal */
-        .ad-watch-modal .modal-content { text-align: center; }
-        .ad-watch-modal .ad-counter { font-size: 48px; font-weight: 900; color: var(--primary-color); }
-        .ad-watch-modal .ad-progress { width: 100%; height: 6px; background: var(--border-color); border-radius: 4px; overflow: hidden; margin: 15px 0; }
-        .ad-watch-modal .ad-progress .fill { height: 100%; background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); border-radius: 4px; transition: width 0.5s ease; }
         
         .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; max-width: 500px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); padding: 10px 15px; background: var(--glass-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid var(--border-color); transition: background-color 0.3s, border-color 0.3s; z-index: 100; }
         .nav-button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 8px; border-radius: 12px; color: var(--text-light); text-decoration: none; font-size: 12px; font-weight: 500; border: none; background: transparent; cursor: pointer; transition: all 0.2s ease; }
@@ -256,6 +249,55 @@
         .auto-convert-info .label { font-size: 12px; color: var(--text-light); }
         .auto-convert-info .value { font-size: 14px; font-weight: 700; color: #10b981; }
         .auto-convert-info .value.waiting { color: #f59e0b; }
+
+        /* ===== FAB BUTTON ===== */
+        .fab-spin-btn {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f97316, #f59e0b);
+            color: #fff;
+            border: none;
+            box-shadow: 0 4px 20px rgba(249, 115, 22, 0.4);
+            cursor: pointer;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .fab-spin-btn:active { transform: scale(0.92); }
+        .fab-spin-btn .spin-icon { font-size: 28px; animation: spinFloat 4s linear infinite; }
+        .fab-spin-btn .spin-badge { position: absolute; top: -5px; right: -5px; background: #ef4444; color: #fff; border-radius: 50%; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+        @keyframes spinFloat { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* ===== SPIN WHEEL MODAL ===== */
+        .spin-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 99999; display: none; align-items: center; justify-content: center; }
+        .spin-modal-overlay.show { display: flex; }
+        .spin-modal-content { background: rgba(30,41,59,0.95); padding: 25px; border-radius: 24px; width: 90%; max-width: 400px; text-align: center; border: 1px solid rgba(255,255,255,0.1); position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
+        .spin-modal-content .close-modal-btn { position: absolute; top: 10px; right: 15px; background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; z-index: 20; }
+        .wheel-wrapper { position: relative; width: 260px; height: 260px; margin: 0 auto 15px; display: flex; justify-content: center; align-items: center; }
+        .wheel-outer-rim { position: absolute; width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(from 0deg, #7c3aed, #6d28d9, #7c3aed, #6d28d9, #7c3aed); padding: 10px; box-shadow: 0 0 30px rgba(124,58,237,0.3); }
+        .wheel-inner { position: absolute; width: calc(100% - 20px); height: calc(100% - 20px); border-radius: 50%; overflow: hidden; background: #1a1a2e; }
+        .wheel-segments { width: 100%; height: 100%; position: relative; transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1); }
+        .wheel-segment { position: absolute; width: 50%; height: 50%; top: 0; left: 50%; transform-origin: 0% 100%; display: flex; align-items: center; justify-content: flex-start; padding-left: 15%; font-size: 11px; font-weight: 700; color: #0f172a; }
+        .wheel-segment span { background: rgba(255,255,255,0.8); padding: 2px 6px; border-radius: 4px; font-size: 11px; }
+        .wheel-center-logo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #fbbf24, #f59e0b); display: flex; align-items: center; justify-content: center; font-size: 24px; color: #0f172a; font-weight: 900; box-shadow: 0 0 30px rgba(251,191,36,0.3); z-index: 10; border: 3px solid #7c3aed; }
+        .wheel-pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 28px solid #fbbf24; z-index: 15; filter: drop-shadow(0 4px 10px rgba(251,191,36,0.5)); }
+        .spin-btn-wheel { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; padding: 14px 40px; border: none; border-radius: 30px; font-weight: 900; font-size: 18px; cursor: pointer; transition: all 0.3s ease; width: 100%; max-width: 220px; margin-top: 5px; box-shadow: 0 4px 15px rgba(251,191,36,0.3); }
+        .spin-btn-wheel:active { transform: scale(0.92); }
+        .spin-btn-wheel:disabled { opacity: 0.5; cursor: not-allowed; }
+        .spin-timer-box { display: none; background: rgba(249,115,22,0.15); border: 2px solid rgba(249,115,22,0.3); border-radius: 15px; padding: 12px; margin-top: 10px; text-align: center; }
+        .spin-timer-box.show { display: block; }
+        .spin-timer-box .timer-label { font-size: 12px; color: #94a3b8; }
+        .spin-timer-box .timer-time { font-size: 24px; font-weight: 700; color: #fbbf24; }
+        .spin-result { margin-top: 10px; font-size: 18px; font-weight: 700; color: #10b981; min-height: 30px; }
+        .spin-ad-counter { color: #94a3b8; font-size: 14px; margin-bottom: 10px; }
+        .spin-ad-counter strong { color: #fbbf24; }
     </style>
 </head>
 <body>
@@ -294,7 +336,6 @@
                 <div class="value" id="mining-balance-display">0 🪙</div>
             </div>
             <div>
-                <span class="ad-reward-badge" id="adRewardBadge" style="display:none;">📺 Watch Ads</span>
                 <div class="countdown" id="auto-convert-timer">⏳ 24h:00m</div>
             </div>
         </div>
@@ -333,25 +374,32 @@
         <div class="card"><h3 class="card-title">Weekly Activity</h3><div class="chart-container"><canvas id="activityChart"></canvas></div></div>
     </div>
     
-    <!-- ===== AD WATCH MODAL (for mining balance) ===== -->
-    <div id="adWatchModal" class="modal ad-watch-modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeAdWatchModal()">&times;</span>
-            <h3 class="card-title">📺 Watch Ads to Earn Coins</h3>
-            <p style="color:var(--text-light); font-size:14px;">Your mining balance is 0. Watch ads to earn coins!</p>
-            <div style="margin: 15px 0;">
-                <div class="ad-counter" id="adWatchCounter">0 / <span id="adWatchTotal">10</span></div>
-                <div class="ad-progress"><div class="fill" id="adWatchProgress" style="width:0%;"></div></div>
+    <!-- ===== FAB SPIN BUTTON ===== -->
+    <button class="fab-spin-btn" id="fabSpinBtn" onclick="openSpinModal()">
+        <span class="spin-icon">🎰</span>
+        <span class="spin-badge" id="spinBadge">20</span>
+    </button>
+    
+    <!-- ===== SPIN WHEEL MODAL ===== -->
+    <div class="spin-modal-overlay" id="spinModal">
+        <div class="spin-modal-content">
+            <button class="close-modal-btn" onclick="closeSpinModal()"><i class="fas fa-times"></i></button>
+            <h3 style="color:#fbbf24; margin-bottom:5px;">🎰 Lucky Spin</h3>
+            <div class="spin-ad-counter">📺 <strong id="spinAdRemaining">20</strong> ads remaining</div>
+            <div class="wheel-wrapper">
+                <div class="wheel-outer-rim"></div>
+                <div class="wheel-inner">
+                    <div class="wheel-segments" id="wheelSegments"></div>
+                </div>
+                <div class="wheel-center-logo">🎯</div>
+                <div class="wheel-pointer"></div>
             </div>
-            <button class="action-button" id="adWatchBtn" onclick="watchAdForMining()">
-                <i class="fa-solid fa-play"></i> <span>Watch Ad</span>
-            </button>
-            <button class="action-button secondary-button" onclick="closeAdWatchModal()" style="margin-top:10px;">
-                <i class="fa-solid fa-times"></i> <span>Close</span>
-            </button>
-            <div style="margin-top:10px; font-size:12px; color:var(--text-light);">
-                💰 +1 coin per ad | <span id="adWatchRemaining">10</span> ads remaining
+            <button class="spin-btn-wheel" id="spinBtn" onclick="spinWheel()">🎡 SPIN</button>
+            <div class="spin-timer-box" id="spinTimerBox">
+                <div class="timer-label">⏳ Cooldown</div>
+                <div class="timer-time" id="spinTimerDisplay">00:15</div>
             </div>
+            <div class="spin-result" id="spinResult"></div>
         </div>
     </div>
     
@@ -436,7 +484,7 @@
         const tg = window.Telegram ? window.Telegram.WebApp : null;
         
         // ============================================================
-        // STATE - WITH MINING & CONVERT
+        // STATE
         // ============================================================
         let state = { 
             totalEarning: 0.0, 
@@ -451,7 +499,6 @@
             rewardedReferrals: 0, 
             originalUserId: null,
             
-            // ===== MINING & CONVERT =====
             miningCoins: 1000,
             miningBalance: 0,
             convertCooldown: null,
@@ -461,16 +508,16 @@
             miningMultiplier: 1,
             lastConvertTime: null,
             
-            // ===== AD WATCH FOR MINING =====
-            adWatchCount: 0,
-            adWatchTotal: 0,
-            adWatchActive: false
+            // ===== SPIN WHEEL =====
+            spinAdsWatched: 0,
+            spinTotalAds: 20,
+            spinCooldown: null,
+            spinIsSpinning: false
         };
         
         let currentUserId = null;
         let currentIpAddress = null;
         let miningInterval = null;
-        let countdownInterval = null;
 
         const allDOMElements = { 
             preloader: document.getElementById('preloader'), 
@@ -497,7 +544,6 @@
             welcomeTitle: document.getElementById('welcome-title'), 
             welcomeMessage: document.getElementById('welcome-message'),
             
-            // Mining elements
             miningCircle: document.getElementById('miningCircle'),
             startOverlay: document.getElementById('startOverlay'),
             miningCoinCount: document.getElementById('miningCoinCount'),
@@ -507,15 +553,17 @@
             miningBalanceDisplay: document.getElementById('mining-balance-display'),
             autoConvertTimer: document.getElementById('auto-convert-timer'),
             autoConvertStatus: document.getElementById('auto-convert-status'),
-            adRewardBadge: document.getElementById('adRewardBadge'),
             
-            // Ad Watch Modal
-            adWatchModal: document.getElementById('adWatchModal'),
-            adWatchCounter: document.getElementById('adWatchCounter'),
-            adWatchTotal: document.getElementById('adWatchTotal'),
-            adWatchProgress: document.getElementById('adWatchProgress'),
-            adWatchBtn: document.getElementById('adWatchBtn'),
-            adWatchRemaining: document.getElementById('adWatchRemaining')
+            // Spin
+            fabSpinBtn: document.getElementById('fabSpinBtn'),
+            spinBadge: document.getElementById('spinBadge'),
+            spinModal: document.getElementById('spinModal'),
+            spinAdRemaining: document.getElementById('spinAdRemaining'),
+            wheelSegments: document.getElementById('wheelSegments'),
+            spinBtn: document.getElementById('spinBtn'),
+            spinTimerBox: document.getElementById('spinTimerBox'),
+            spinTimerDisplay: document.getElementById('spinTimerDisplay'),
+            spinResult: document.getElementById('spinResult')
         };
 
         // ============================================================
@@ -602,9 +650,9 @@
                 miningMultiplier: state.miningMultiplier,
                 lastConvertTime: state.lastConvertTime,
                 
-                adWatchCount: state.adWatchCount,
-                adWatchTotal: state.adWatchTotal,
-                adWatchActive: state.adWatchActive
+                spinAdsWatched: state.spinAdsWatched,
+                spinTotalAds: state.spinTotalAds,
+                spinCooldown: state.spinCooldown
             };
             
             firebaseDb.ref(`users/${currentUserId}`).update(userData).catch(err => {
@@ -639,9 +687,9 @@
                         state.miningMultiplier = data.miningMultiplier || 1;
                         state.lastConvertTime = data.lastConvertTime || null;
                         
-                        state.adWatchCount = data.adWatchCount || 0;
-                        state.adWatchTotal = data.adWatchTotal || 0;
-                        state.adWatchActive = data.adWatchActive || false;
+                        state.spinAdsWatched = data.spinAdsWatched || 0;
+                        state.spinTotalAds = data.spinTotalAds || 20;
+                        state.spinCooldown = data.spinCooldown || null;
                         
                         const today = new Date().toLocaleDateString();
                         if (state.lastAdWatchedDate !== today) {
@@ -769,18 +817,7 @@
         // ===== MINING SYSTEM =====
         // ============================================================
         function startMining() {
-            // Check if mining balance is 0 - show ad watch modal
-            if (state.miningBalance === 0 && state.miningCoins === 0) {
-                openAdWatchModal();
-                return;
-            }
-            
-            if (state.isMining || state.miningCoins <= 0) {
-                if (state.miningCoins <= 0 && state.miningBalance === 0) {
-                    openAdWatchModal();
-                }
-                return;
-            }
+            if (state.isMining || state.miningCoins <= 0) return;
             
             allDOMElements.startOverlay.classList.add('hidden');
             state.isMining = true;
@@ -846,17 +883,6 @@
             circle.style.background = `conic-gradient(var(--primary-color) ${progress}%, var(--border-color) ${progress}%)`;
             
             allDOMElements.miningBalanceDisplay.textContent = `${state.miningBalance} 🪙`;
-            
-            // Show ad watch badge if mining balance is 0
-            if (state.miningBalance === 0 && state.miningCoins === 0) {
-                allDOMElements.adRewardBadge.style.display = 'inline-block';
-                allDOMElements.adRewardBadge.textContent = '📺 Watch Ads';
-                allDOMElements.adRewardBadge.style.cursor = 'pointer';
-                allDOMElements.adRewardBadge.onclick = openAdWatchModal;
-            } else {
-                allDOMElements.adRewardBadge.style.display = 'none';
-            }
-            
             updateAutoConvertTimer();
         }
         
@@ -903,85 +929,7 @@
         }
 
         // ============================================================
-        // ===== AD WATCH FOR MINING (when balance is 0) =====
-        // ============================================================
-        function openAdWatchModal() {
-            // Generate random number between 10-12
-            const total = Math.floor(Math.random() * 3) + 10; // 10, 11, or 12
-            state.adWatchTotal = total;
-            state.adWatchCount = 0;
-            state.adWatchActive = true;
-            
-            allDOMElements.adWatchTotal.textContent = total;
-            allDOMElements.adWatchCounter.textContent = `0 / ${total}`;
-            allDOMElements.adWatchProgress.style.width = '0%';
-            allDOMElements.adWatchRemaining.textContent = total;
-            allDOMElements.adWatchBtn.disabled = false;
-            allDOMElements.adWatchBtn.querySelector('span').textContent = 'Watch Ad';
-            
-            allDOMElements.adWatchModal.style.display = 'flex';
-            saveUserDataToFirebase();
-        }
-        
-        function closeAdWatchModal() {
-            allDOMElements.adWatchModal.style.display = 'none';
-            state.adWatchActive = false;
-            saveUserDataToFirebase();
-        }
-        
-        async function watchAdForMining() {
-            if (state.adWatchCount >= state.adWatchTotal) {
-                safeTgAlert('🎉 You have completed all ads! Start mining again!');
-                closeAdWatchModal();
-                return;
-            }
-            
-            allDOMElements.adWatchBtn.disabled = true;
-            allDOMElements.adWatchBtn.querySelector('span').textContent = 'Loading...';
-            
-            try {
-                await show_11573980();
-                
-                // Add 1 coin to mining balance
-                state.miningBalance += 1;
-                state.adWatchCount++;
-                
-                // Update UI
-                const total = state.adWatchTotal;
-                allDOMElements.adWatchCounter.textContent = `${state.adWatchCount} / ${total}`;
-                allDOMElements.adWatchProgress.style.width = `${(state.adWatchCount / total) * 100}%`;
-                allDOMElements.adWatchRemaining.textContent = total - state.adWatchCount;
-                
-                saveUserDataToFirebase();
-                updateMiningUI();
-                updateUI();
-                
-                safeTgAction(tg => tg.HapticFeedback.notificationOccurred('success'));
-                
-                if (state.adWatchCount >= total) {
-                    allDOMElements.adWatchBtn.querySelector('span').textContent = '✅ Completed!';
-                    allDOMElements.adWatchBtn.disabled = true;
-                    safeTgAlert('🎉 All ads completed! You earned ' + total + ' coins! Start mining now!');
-                    setTimeout(() => {
-                        closeAdWatchModal();
-                        allDOMElements.startOverlay.classList.remove('hidden');
-                        startMining();
-                    }, 1500);
-                } else {
-                    allDOMElements.adWatchBtn.querySelector('span').textContent = 'Watch Ad';
-                    allDOMElements.adWatchBtn.disabled = false;
-                }
-                
-            } catch(e) {
-                console.error("Ad Error:", e);
-                safeTgAlert('Ad could not be completed. Please try again.');
-                allDOMElements.adWatchBtn.querySelector('span').textContent = 'Watch Ad';
-                allDOMElements.adWatchBtn.disabled = false;
-            }
-        }
-
-        // ============================================================
-        // ===== AUTO CONVERT SYSTEM (24 hours) =====
+        // ===== AUTO CONVERT SYSTEM =====
         // ============================================================
         function updateAutoConvertTimer() {
             const timerEl = allDOMElements.autoConvertTimer;
@@ -1026,6 +974,141 @@
             updateUI();
             
             showToast(`✅ Auto converted ${coins} coins → $${usd.toFixed(4)} USD!`);
+            safeTgAction(tg => tg.HapticFeedback.notificationOccurred('success'));
+        }
+
+        // ============================================================
+        // ===== SPIN WHEEL SYSTEM =====
+        // ============================================================
+        const spinPrizes = [
+            { label: '2🪙', type: 'coin', value: 2 },
+            { label: '$0.01', type: 'usd', value: 0.01 },
+            { label: '3🪙', type: 'coin', value: 3 },
+            { label: '$0.02', type: 'usd', value: 0.02 },
+            { label: '5🪙', type: 'coin', value: 5 },
+            { label: '$0.05', type: 'usd', value: 0.05 },
+            { label: '10🪙', type: 'coin', value: 10 },
+            { label: '$0.10', type: 'usd', value: 0.10 },
+            { label: '20🪙', type: 'coin', value: 20 },
+            { label: '$0.25', type: 'usd', value: 0.25 },
+            { label: '50🪙', type: 'coin', value: 50 },
+            { label: '$0.50', type: 'usd', value: 0.50 },
+        ];
+
+        function buildWheel() {
+            const segments = allDOMElements.wheelSegments;
+            const total = spinPrizes.length;
+            const angle = 360 / total;
+            
+            segments.innerHTML = '';
+            spinPrizes.forEach((prize, i) => {
+                const div = document.createElement('div');
+                div.className = 'wheel-segment';
+                const colors = ['#fbbf24', '#f59e0b', '#f97316', '#fb923c', '#facc15', '#eab308'];
+                div.style.background = `conic-gradient(from ${i * angle}deg, ${colors[i % colors.length]}, ${colors[(i + 1) % colors.length]})`;
+                div.style.transform = `rotate(${i * angle}deg)`;
+                div.innerHTML = `<span>${prize.label}</span>`;
+                segments.appendChild(div);
+            });
+        }
+
+        function updateSpinUI() {
+            const remaining = state.spinTotalAds - state.spinAdsWatched;
+            allDOMElements.spinAdRemaining.textContent = remaining;
+            allDOMElements.spinBadge.textContent = remaining;
+            
+            if (state.spinCooldown && new Date() < new Date(state.spinCooldown)) {
+                allDOMElements.spinBtn.disabled = true;
+                allDOMElements.spinTimerBox.classList.add('show');
+                const remainingTime = new Date(state.spinCooldown) - new Date();
+                const secs = Math.ceil(remainingTime / 1000);
+                allDOMElements.spinTimerDisplay.textContent = `00:${String(secs).padStart(2, '0')}`;
+            } else if (remaining <= 0) {
+                allDOMElements.spinBtn.disabled = true;
+                allDOMElements.spinTimerBox.classList.add('show');
+                allDOMElements.spinTimerDisplay.textContent = '✅ Completed!';
+                allDOMElements.spinResult.textContent = '🎉 All ads completed!';
+            } else {
+                allDOMElements.spinBtn.disabled = false;
+                allDOMElements.spinTimerBox.classList.remove('show');
+            }
+        }
+
+        function openSpinModal() {
+            allDOMElements.spinModal.classList.add('show');
+            allDOMElements.spinResult.textContent = '';
+            updateSpinUI();
+        }
+
+        function closeSpinModal() {
+            allDOMElements.spinModal.classList.remove('show');
+        }
+
+        async function spinWheel() {
+            const remaining = state.spinTotalAds - state.spinAdsWatched;
+            if (remaining <= 0) {
+                safeTgAlert('🎉 You have completed all spins!');
+                return;
+            }
+            if (state.spinCooldown && new Date() < new Date(state.spinCooldown)) {
+                safeTgAlert('⏳ Please wait for cooldown!');
+                return;
+            }
+            if (state.spinIsSpinning) return;
+            
+            state.spinIsSpinning = true;
+            allDOMElements.spinBtn.disabled = true;
+            allDOMElements.spinResult.textContent = '🎡 Spinning...';
+            
+            // Watch ad first
+            try {
+                await show_11573980();
+            } catch(e) {
+                safeTgAlert('Ad could not load. Please try again.');
+                state.spinIsSpinning = false;
+                allDOMElements.spinBtn.disabled = false;
+                return;
+            }
+            
+            // Spin animation
+            const segments = allDOMElements.wheelSegments;
+            const randomIndex = Math.floor(Math.random() * spinPrizes.length);
+            const spinAngle = 360 * 5 + (randomIndex * (360 / spinPrizes.length));
+            segments.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.25, 1)';
+            segments.style.transform = `rotate(${spinAngle}deg)`;
+            
+            // Update ad count
+            state.spinAdsWatched++;
+            const prize = spinPrizes[randomIndex];
+            
+            // Set cooldown
+            state.spinCooldown = new Date(Date.now() + 15 * 1000).toISOString();
+            
+            // Give reward
+            if (prize.type === 'coin') {
+                state.miningBalance += prize.value;
+                allDOMElements.spinResult.textContent = `🎉 You won ${prize.value} 🪙 Mining Coins!`;
+                saveUserDataToFirebase();
+                updateMiningUI();
+                updateUI();
+            } else {
+                state.totalEarning += prize.value;
+                allDOMElements.spinResult.textContent = `🎉 You won $${prize.value.toFixed(2)} USD!`;
+                saveUserDataToFirebase();
+                updateUI();
+            }
+            
+            setTimeout(() => {
+                state.spinIsSpinning = false;
+                updateSpinUI();
+                if (state.spinAdsWatched >= state.spinTotalAds) {
+                    allDOMElements.spinResult.textContent = '🎉 All 20 spins completed!';
+                    allDOMElements.spinBtn.disabled = true;
+                } else {
+                    allDOMElements.spinBtn.disabled = false;
+                }
+            }, 4200);
+            
             safeTgAction(tg => tg.HapticFeedback.notificationOccurred('success'));
         }
 
@@ -1110,6 +1193,7 @@
             updateChart();
             updateMiningUI();
             updateSpeedBoostUI();
+            updateSpinUI();
         }
 
         // ============================================================
@@ -1480,6 +1564,9 @@
                     if (event.target.classList.contains('modal')) closeModal(event.target.id); 
                 };
                 
+                // Build spin wheel
+                buildWheel();
+                
                 safeTgAction(tg => {
                     tg.ready(); 
                     tg.expand();
@@ -1495,6 +1582,10 @@
                 
                 setInterval(() => {
                     updateAutoConvertTimer();
+                }, 1000);
+                
+                setInterval(() => {
+                    updateSpinUI();
                 }, 1000);
                 
                 if (!sessionStorage.getItem('alreadyVisited')) { 
