@@ -30,8 +30,8 @@
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-        :root { --primary-color: #FF6B35; --primary-color-rgb: 255, 107, 53; --secondary-color: #E85D04; --background-color: #F0F2F5; --card-background: #FFFFFF; --text-color: #1D1D1F; --text-light: #6E6E73; --border-color: #E5E5EA; --glass-bg: rgba(240, 242, 245, 0.8); }
-        [data-theme="dark"] { --primary-color: #FF8C42; --primary-color-rgb: 255, 140, 66; --secondary-color: #E85D04; --background-color: #000000; --card-background: #1C1C1E; --text-color: #F5F5F7; --text-light: #8E8E93; --border-color: #3A3A3C; --glass-bg: rgba(28, 28, 30, 0.8); }
+        :root { --primary-color: #FF6B35; --primary-color-rgb: 255, 107, 53; --secondary-color: #E85D04; --background-color: #F0F2F5; --card-background: #FFFFFF; --text-color: #1D1D1F; --text-light: #6E6E73; --border-color: #E5E5EA; --glass-bg: rgba(240, 242, 245, 0.8); --advertiser-color: #3b82f6; --publisher-color: #10b981; }
+        [data-theme="dark"] { --primary-color: #FF8C42; --primary-color-rgb: 255, 140, 66; --secondary-color: #E85D04; --background-color: #000000; --card-background: #1C1C1E; --text-color: #F5F5F7; --text-light: #8E8E93; --border-color: #3A3A3C; --glass-bg: rgba(28, 28, 30, 0.8); --advertiser-color: #60a5fa; --publisher-color: #34d399; }
         
         * { box-sizing: border-box; }
         html, body { overscroll-behavior-y: contain; }
@@ -73,6 +73,15 @@
         #profile-pic img { width: 100%; height: 100%; object-fit: cover; }
         #greeting { font-size: 22px; font-weight: 800; }
         
+        /* Role Selector */
+        .role-selector { display: flex; gap: 10px; margin-bottom: 16px; }
+        .role-btn { flex: 1; padding: 12px; border-radius: 12px; border: 2px solid var(--border-color); background: var(--card-background); color: var(--text-light); font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-align: center; }
+        .role-btn.active { border-color: var(--primary-color); background: rgba(var(--primary-color-rgb), 0.1); color: var(--primary-color); }
+        .role-btn.advertiser.active { border-color: var(--advertiser-color); background: rgba(59,130,246,0.1); color: var(--advertiser-color); }
+        .role-btn.publisher.active { border-color: var(--publisher-color); background: rgba(16,185,129,0.1); color: var(--publisher-color); }
+        .role-btn i { display: block; font-size: 24px; margin-bottom: 4px; }
+        .role-btn span { font-size: 12px; }
+        
         .balance-card { position: relative; overflow: hidden; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; padding: 28px; border-radius: 24px; text-align: center; margin-bottom: 16px; box-shadow: 0 12px 25px rgba(var(--primary-color-rgb), 0.2); animation: fadeIn 0.6s ease-out; }
         .balance-card::after { content: '\f51e'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; right: -20px; bottom: -30px; font-size: 120px; opacity: 0.1; transform: rotate(-15deg); pointer-events: none; }
         .balance-card h3 { margin: 0 0 4px 0; font-size: 14px; font-weight: 500; opacity: 0.9; z-index: 1; position: relative; }
@@ -113,6 +122,8 @@
         .close-button { color: #aaa; float: right; font-size: 28px; line-height: 1; font-weight: bold; cursor: pointer; }
         .modal-content input, .modal-content select { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid var(--border-color); border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 16px; background-color: var(--background-color); color: var(--text-color); transition: border-color 0.2s, box-shadow 0.2s; }
         .modal-content input:focus, .modal-content select:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.2); }
+        .modal-content textarea { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid var(--border-color); border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 14px; background-color: var(--background-color); color: var(--text-color); min-height: 80px; resize: vertical; transition: border-color 0.2s, box-shadow 0.2s; }
+        .modal-content textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.2); }
         
         #bonus-tasks-list .bonus-item { display: flex; align-items: center; justify-content: space-between; padding: 15px; background-color: var(--background-color); border-radius: 12px; margin-bottom: 12px; border: 1px solid var(--border-color); }
         .bonus-item .details { display: flex; flex-direction: column; gap: 4px; }
@@ -148,25 +159,35 @@
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; font-size: 14px; font-weight: 600; color: var(--text-color); margin-bottom: 4px; }
         
-        .floating-coin { position: fixed; font-size: 24px; pointer-events: none; z-index: 999; animation: floatUp 1s ease-out forwards; }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-100px) scale(0.5); } }
-        
-        /* Ad Task Card */
-        .ad-task-card { background: rgba(255,255,255,0.03); border-radius: 14px; padding: 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.08); transition: all 0.3s; }
-        .ad-task-card:hover { border-color: rgba(251,191,36,0.2); background: rgba(255,255,255,0.06); }
-        .ad-task-card .task-header { display: flex; justify-content: space-between; align-items: center; }
-        .ad-task-card .task-title { font-size: 14px; font-weight: 600; color: #fff; }
-        .ad-task-card .task-reward { color: #10b981; font-weight: bold; font-size: 14px; }
-        .ad-task-card .task-btn { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; padding: 6px 18px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 12px; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(59,130,246,0.2); }
-        .ad-task-card .task-btn:active { transform: scale(0.92); }
-        .ad-task-card .task-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .ad-task-card .task-btn.completed { background: #28a745; }
-        .ad-task-card .task-desc { font-size: 12px; color: var(--text-light); margin-top: 4px; }
-        .ad-task-card .task-progress { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+        /* Ad Cards */
+        .ad-card { background: var(--card-background); border-radius: 14px; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border-color); transition: all 0.3s ease; }
+        .ad-card:hover { border-color: var(--primary-color); }
+        .ad-card .ad-header { display: flex; justify-content: space-between; align-items: center; }
+        .ad-card .ad-title { font-size: 15px; font-weight: 700; color: var(--text-color); }
+        .ad-card .ad-reward { font-size: 14px; font-weight: 700; color: #10b981; }
+        .ad-card .ad-desc { font-size: 13px; color: var(--text-light); margin-top: 4px; }
+        .ad-card .ad-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color); }
+        .ad-card .ad-views { font-size: 12px; color: var(--text-light); }
+        .ad-card .ad-btn { padding: 8px 20px; border-radius: 10px; border: none; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.3s ease; }
+        .ad-card .ad-btn.view { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; }
+        .ad-card .ad-btn.view:active { transform: scale(0.92); }
+        .ad-card .ad-btn.view:disabled { opacity: 0.5; cursor: not-allowed; }
+        .ad-card .ad-btn.view.completed { background: #28a745; }
+        .ad-card .ad-status { font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 20px; }
+        .ad-card .ad-status.active { background: rgba(16,185,129,0.1); color: #10b981; }
+        .ad-card .ad-status.pending { background: rgba(245,158,11,0.1); color: #f59e0b; }
+        .ad-card .ad-status.completed { background: rgba(59,130,246,0.1); color: #3b82f6; }
         
         .ad-filters { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; }
         .ad-filters .filter-btn { padding: 5px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #94a3b8; cursor: pointer; font-size: 11px; white-space: nowrap; transition: all 0.3s; }
         .ad-filters .filter-btn.active { background: linear-gradient(135deg, #8b5cf6, #3b82f6); border-color: transparent; color: #fff; box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
+        
+        .role-badge { display: inline-block; padding: 3px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .role-badge.advertiser { background: rgba(59,130,246,0.15); color: #3b82f6; }
+        .role-badge.publisher { background: rgba(16,185,129,0.15); color: #10b981; }
+        
+        .floating-coin { position: fixed; font-size: 24px; pointer-events: none; z-index: 999; animation: floatUp 1s ease-out forwards; }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-100px) scale(0.5); } }
     </style>
 </head>
 <body>
@@ -192,12 +213,32 @@
     <div class="container">
         <div class="profile-header">
             <div id="profile-pic"><i class="fa-solid fa-user"></i></div>
-            <h1 id="greeting">Welcome!</h1>
+            <div>
+                <h1 id="greeting">Welcome!</h1>
+                <span id="userRoleBadge" class="role-badge publisher">📖 Publisher</span>
+            </div>
+            <div style="margin-left:auto; text-align:right;">
+                <button onclick="switchRole()" style="background:rgba(255,255,255,0.1); border:none; color:var(--text-color); padding:4px 12px; border-radius:8px; font-size:11px; cursor:pointer;">Switch Role</button>
+            </div>
+        </div>
+        
+        <!-- ===== ROLE SELECTOR ===== -->
+        <div class="role-selector" id="roleSelector">
+            <button class="role-btn publisher active" onclick="selectRole('publisher', this)">
+                <i class="fa-solid fa-eye"></i>
+                <span>📖 Publisher</span>
+                <span style="font-size:10px; color:var(--text-light);">Watch & Earn</span>
+            </button>
+            <button class="role-btn advertiser" onclick="selectRole('advertiser', this)">
+                <i class="fa-solid fa-bullhorn"></i>
+                <span>📢 Advertiser</span>
+                <span style="font-size:10px; color:var(--text-light);">Create Ads</span>
+            </button>
         </div>
         
         <!-- ===== MAIN BALANCE CARD ===== -->
         <div class="balance-card">
-            <h3>💰 Main Balance</h3>
+            <h3>💰 Balance</h3>
             <div class="amount" id="total-earning">$0.000</div>
         </div>
         
@@ -208,28 +249,63 @@
         </div>
         
         <div class="stats-grid">
-            <div class="stat-item"><i class="fa-solid fa-rectangle-ad bg-icon"></i><div class="icon"><i class="fa-solid fa-rectangle-ad"></i></div><div class="value" id="ad-count">0</div><div class="label">Ads Watched</div></div>
-            <div class="stat-item"><i class="fa-solid fa-calendar-day bg-icon"></i><div class="icon"><i class="fa-solid fa-calendar-day"></i></div><div class="value" id="ads-today-count">0 / 15</div><div class="label">Today's Ads</div></div>
+            <div class="stat-item"><i class="fa-solid fa-rectangle-ad bg-icon"></i><div class="icon"><i class="fa-solid fa-rectangle-ad"></i></div><div class="value" id="ad-count">0</div><div class="label">Ads Viewed</div></div>
+            <div class="stat-item"><i class="fa-solid fa-calendar-day bg-icon"></i><div class="icon"><i class="fa-solid fa-calendar-day"></i></div><div class="value" id="ads-today-count">0 / 15</div><div class="label">Today's Views</div></div>
             <div class="stat-item"><i class="fa-solid fa-users bg-icon"></i><div class="icon"><i class="fa-solid fa-users"></i></div><div class="value" id="referral-count">0</div><div class="label">Referrals</div></div>
         </div>
         
-        <!-- ===== +ADS SECTION ===== -->
-        <div class="card">
-            <h3 class="card-title">📢 +Ads - Earn by Sharing</h3>
-            <p style="font-size:13px; color:var(--text-light); margin-bottom:12px;">Complete social media tasks to earn coins! Each task gives you coins that auto-convert to USD.</p>
-            
-            <div class="ad-filters">
-                <button class="filter-btn active" onclick="filterAds('all',this)">All</button>
-                <button class="filter-btn" onclick="filterAds('telegram',this)"><i class="fa-brands fa-telegram"></i> Telegram</button>
-                <button class="filter-btn" onclick="filterAds('youtube',this)"><i class="fa-brands fa-youtube"></i> YouTube</button>
-                <button class="filter-btn" onclick="filterAds('facebook',this)"><i class="fa-brands fa-facebook"></i> Facebook</button>
-                <button class="filter-btn" onclick="filterAds('twitter',this)"><i class="fa-brands fa-twitter"></i> Twitter</button>
+        <!-- ===== PUBLISHER VIEW ===== -->
+        <div id="publisherView">
+            <div class="card">
+                <h3 class="card-title">📺 Available Ads</h3>
+                <div class="ad-filters">
+                    <button class="filter-btn active" onclick="filterAds('all',this)">All</button>
+                    <button class="filter-btn" onclick="filterAds('viewed',this)">👁 Viewed</button>
+                    <button class="filter-btn" onclick="filterAds('pending',this)">⏳ Pending</button>
+                </div>
+                <div id="ad-list-container"></div>
             </div>
             
-            <div id="ad-tasks-list"></div>
+            <div class="card"><h3 class="card-title">Today's Task</h3><button class="action-button" id="watch-ad-button"><i class="fa-solid fa-play"></i><span>Watch Ad</span></button><button class="action-button secondary-button" id="join-channel-button"><i class="fa-brands fa-telegram"></i><span>Join Channel</span></button></div>
         </div>
         
-        <div class="card"><h3 class="card-title">Today's Task</h3><button class="action-button" id="watch-ad-button"><i class="fa-solid fa-play"></i><span>Watch Ad</span></button><button class="action-button secondary-button" id="join-channel-button"><i class="fa-brands fa-telegram"></i><span>Join Channel</span></button></div>
+        <!-- ===== ADVERTISER VIEW ===== -->
+        <div id="advertiserView" style="display:none;">
+            <div class="card">
+                <h3 class="card-title">📢 Create New Ad</h3>
+                <form id="create-ad-form">
+                    <div class="form-group">
+                        <label>Ad Title</label>
+                        <input type="text" id="ad-title" placeholder="Enter ad title" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="ad-desc" placeholder="Describe your ad"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Link URL</label>
+                        <input type="url" id="ad-link" placeholder="https://example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Reward per View ($)</label>
+                        <input type="number" id="ad-reward" step="0.001" value="0.001" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Total Budget ($)</label>
+                        <input type="number" id="ad-budget" step="0.01" value="1.00" required>
+                    </div>
+                    <button type="submit" class="action-button" id="create-ad-btn">
+                        <i class="fa-solid fa-plus"></i> <span>Create Ad</span>
+                    </button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h3 class="card-title">📊 My Ads</h3>
+                <div id="my-ads-container"></div>
+            </div>
+        </div>
+        
         <div class="card"><h3 class="card-title">Weekly Activity</h3><div class="chart-container"><canvas id="activityChart"></canvas></div></div>
     </div>
     
@@ -238,7 +314,7 @@
         <button class="nav-button" onclick="showModal('historyModal', this)"><i class="fa-solid fa-clock-rotate-left"></i><span>History</span></button>
         <button class="nav-button" onclick="showModal('inviteModal', this)"><i class="fa-solid fa-user-plus"></i><span>Invite</span></button>
         <button class="nav-button" onclick="showModal('bonusTasksModal', this)"><i class="fa-solid fa-star"></i><span>Bonus</span></button>
-        <button class="nav-button" onclick="showModal('adTasksModal', this)"><i class="fa-solid fa-plus"></i><span>+Ads</span></button>
+        <button class="nav-button" onclick="showModal('supportModal', this)"><i class="fa-solid fa-headset"></i><span>Support</span></button>
     </div>
     
     <!-- All Modals -->
@@ -274,17 +350,6 @@
     <div id="historyModal" class="modal"><div class="modal-content"><span class="close-button" onclick="closeModal('historyModal')">&times;</span><h3 class="card-title">Withdrawal History</h3><div id="history-list"></div></div></div>
     <div id="inviteModal" class="modal"><div class="modal-content"><span class="close-button" onclick="closeModal('inviteModal')">&times;</span><h3 class="card-title">Invite Friends</h3><p>Share your referral link with your friends and earn together. You will get a reward for each successful referral.</p><button class="action-button" id="copy-link-button"><i class="fa-solid fa-copy"></i><span>Copy Link</span></button><button class="action-button secondary-button" id="share-link-button"><i class="fa-solid fa-share-nodes"></i><span>Share Link</span></button></div></div>
     <div id="bonusTasksModal" class="modal"><div class="modal-content"><span class="close-button" onclick="closeModal('bonusTasksModal')">&times;</span><h3 class="card-title">Bonus Tasks</h3><p style="text-align: center; margin-bottom: 20px;">Complete these one-time tasks to earn extra rewards!</p><div id="bonus-tasks-list"></div></div></div>
-    
-    <!-- +Ads Modal -->
-    <div id="adTasksModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeModal('adTasksModal')">&times;</span>
-            <h3 class="card-title">📢 +Ads - Earn Coins</h3>
-            <p style="font-size:13px; color:var(--text-light); margin-bottom:12px;">Complete social media tasks to earn coins that auto-convert to USD!</p>
-            <div id="ad-tasks-modal-list"></div>
-        </div>
-    </div>
-    
     <div id="multiAccountModal" class="modal"><div class="modal-content"><h3 class="card-title" style="text-align:center;">⚠️ Warning</h3><p>Multiple accounts are not allowed. Only one Telegram account can be used on this device. Please use your original account to continue.</p></div></div>
 
     <script>
@@ -322,16 +387,6 @@
             conversionRate: 1000
         };
 
-        // ===== AD TASKS =====
-        let adTasks = [
-            { id: 'ad_1', title: 'Join Telegram Channel', desc: 'Join our official Telegram channel', icon: 'fa-brands fa-telegram', platform: 'telegram', link: 'https://t.me/nexearn2', reward: 5 },
-            { id: 'ad_2', title: 'Follow on YouTube', desc: 'Subscribe to our YouTube channel', icon: 'fa-brands fa-youtube', platform: 'youtube', link: 'https://youtube.com/@nexearn', reward: 10 },
-            { id: 'ad_3', title: 'Like on Facebook', desc: 'Like our Facebook page', icon: 'fa-brands fa-facebook', platform: 'facebook', link: 'https://facebook.com/nexearn', reward: 3 },
-            { id: 'ad_4', title: 'Follow on Twitter', desc: 'Follow us on Twitter', icon: 'fa-brands fa-twitter', platform: 'twitter', link: 'https://twitter.com/nexearn', reward: 4 },
-            { id: 'ad_5', title: 'Join Telegram Group', desc: 'Join our Telegram discussion group', icon: 'fa-brands fa-telegram', platform: 'telegram', link: 'https://t.me/nexearn_group', reward: 6 },
-            { id: 'ad_6', title: 'Watch YouTube Video', desc: 'Watch our latest video', icon: 'fa-brands fa-youtube', platform: 'youtube', link: 'https://youtube.com/watch?v=example', reward: 8 },
-        ];
-
         let firebaseDb;
         const tg = window.Telegram ? window.Telegram.WebApp : null;
         
@@ -350,12 +405,15 @@
             completedBonusTasks: [], 
             rewardedReferrals: 0, 
             originalUserId: null,
-            completedAdTasks: [],
-            convertCooldown: null
+            convertCooldown: null,
+            userRole: 'publisher', // publisher or advertiser
+            viewedAds: [],
+            myAds: []
         };
         
         let currentUserId = null;
         let currentIpAddress = null;
+        let currentFilter = 'all';
 
         const allDOMElements = { 
             preloader: document.getElementById('preloader'), 
@@ -383,8 +441,12 @@
             welcomeMessage: document.getElementById('welcome-message'),
             convertTimer: document.getElementById('convertTimer'),
             convertTimeDisplay: document.getElementById('convertTimeDisplay'),
-            adTasksList: document.getElementById('ad-tasks-list'),
-            adTasksModalList: document.getElementById('ad-tasks-modal-list')
+            adListContainer: document.getElementById('ad-list-container'),
+            myAdsContainer: document.getElementById('my-ads-container'),
+            userRoleBadge: document.getElementById('userRoleBadge'),
+            publisherView: document.getElementById('publisherView'),
+            advertiserView: document.getElementById('advertiserView'),
+            createAdForm: document.getElementById('create-ad-form')
         };
 
         // ============================================================
@@ -462,8 +524,10 @@
                 lastUsedIp: state.lastUsedIp,
                 name: tg ? tg.initDataUnsafe?.user?.first_name : 'User',
                 username: tg ? tg.initDataUnsafe?.user?.username : null,
-                completedAdTasks: state.completedAdTasks,
-                convertCooldown: state.convertCooldown
+                convertCooldown: state.convertCooldown,
+                userRole: state.userRole,
+                viewedAds: state.viewedAds,
+                myAds: state.myAds
             };
             
             firebaseDb.ref(`users/${currentUserId}`).update(userData).catch(err => {
@@ -488,8 +552,10 @@
                         state.completedBonusTasks = data.completedBonusTasks || [];
                         state.rewardedReferrals = data.rewardedReferrals || 0;
                         state.lastUsedIp = data.lastUsedIp || null;
-                        state.completedAdTasks = data.completedAdTasks || [];
                         state.convertCooldown = data.convertCooldown || null;
+                        state.userRole = data.userRole || 'publisher';
+                        state.viewedAds = data.viewedAds || [];
+                        state.myAds = data.myAds || [];
                         
                         const today = new Date().toLocaleDateString();
                         if (state.lastAdWatchedDate !== today) {
@@ -501,6 +567,261 @@
                     resolve();
                 }).catch(() => resolve());
             });
+        }
+
+        // ============================================================
+        // AD SYSTEM - PUBLISHER & ADVERTISER
+        // ============================================================
+        
+        // Load all ads from Firebase
+        function loadAdsFromFirebase() {
+            if (!firebaseDb) return;
+            firebaseDb.ref('ads').on('value', (snapshot) => {
+                const ads = snapshot.val() || {};
+                const adList = Object.entries(ads).map(([id, data]) => ({ id, ...data }));
+                renderAdList(adList);
+                renderMyAds(adList);
+            });
+        }
+
+        // Render ads for publisher
+        function renderAdList(ads) {
+            const container = allDOMElements.adListContainer;
+            if (!container) return;
+            
+            // Filter based on viewed status
+            let filteredAds = ads;
+            if (currentFilter === 'viewed') {
+                filteredAds = ads.filter(ad => state.viewedAds.includes(ad.id));
+            } else if (currentFilter === 'pending') {
+                filteredAds = ads.filter(ad => !state.viewedAds.includes(ad.id) && ad.status === 'active');
+            }
+            
+            // Sort by newest first
+            filteredAds.sort((a, b) => b.createdAt - a.createdAt);
+            
+            if (filteredAds.length === 0) {
+                container.innerHTML = `<p style="text-align:center; color:var(--text-light); padding:20px;">No ads available</p>`;
+                return;
+            }
+            
+            container.innerHTML = filteredAds.map(ad => {
+                const isViewed = state.viewedAds.includes(ad.id);
+                const isActive = ad.status === 'active';
+                const views = ad.views || 0;
+                const totalViews = ad.totalViews || 0;
+                
+                return `
+                    <div class="ad-card" data-id="${ad.id}">
+                        <div class="ad-header">
+                            <span class="ad-title">${escapeHTML(ad.title || 'Untitled')}</span>
+                            <span class="ad-reward">+$${ad.reward?.toFixed(3) || '0.001'}</span>
+                        </div>
+                        <div class="ad-desc">${escapeHTML(ad.desc || 'No description')}</div>
+                        <div class="ad-footer">
+                            <span class="ad-views"><i class="fa-solid fa-eye"></i> ${views}/${totalViews || 100}</span>
+                            <span class="ad-status ${isViewed ? 'completed' : (isActive ? 'active' : 'pending')}">
+                                ${isViewed ? '✅ Viewed' : (isActive ? '🟢 Active' : '⏳ Pending')}
+                            </span>
+                            <button class="ad-btn view ${isViewed ? 'completed' : ''}" 
+                                    onclick="viewAd('${ad.id}')" 
+                                    ${isViewed || !isActive ? 'disabled' : ''}>
+                                ${isViewed ? '✓ Viewed' : '👁 View'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // View an ad (publisher)
+        async function viewAd(adId) {
+            if (state.viewedAds.includes(adId)) {
+                safeTgAlert('✅ You already viewed this ad!');
+                return;
+            }
+            
+            // Check daily limit
+            if (state.adsWatchedToday >= config.DAILY_AD_LIMIT) {
+                safeTgAlert(`📊 Daily limit reached! (${config.DAILY_AD_LIMIT})`);
+                return;
+            }
+            
+            // Get ad data
+            const snapshot = await firebaseDb.ref(`ads/${adId}`).once('value');
+            const ad = snapshot.val();
+            if (!ad) {
+                safeTgAlert('❌ Ad not found!');
+                return;
+            }
+            
+            if (ad.status !== 'active') {
+                safeTgAlert('⏳ This ad is not active!');
+                return;
+            }
+            
+            // Open link
+            safeTgAction(tg => tg.openLink(ad.link));
+            
+            // Show loader
+            allDOMElements.adLoaderOverlay.style.display = 'flex';
+            
+            try {
+                // Show Monetag ad
+                await show_11573980();
+                
+                // Update counts
+                state.totalEarning += ad.reward || 0.001;
+                state.adCount++;
+                state.adsWatchedToday++;
+                state.weeklyActivity[new Date().getDay()]++;
+                state.viewedAds.push(adId);
+                
+                // Update ad views
+                await firebaseDb.ref(`ads/${adId}/views`).transaction((current) => (current || 0) + 1);
+                
+                saveUserDataToFirebase();
+                updateUI();
+                
+                safeTgAlert(`🎉 You earned $${(ad.reward || 0.001).toFixed(3)}!`);
+                safeTgAction(tg => tg.HapticFeedback.notificationOccurred('success'));
+                
+            } catch(e) {
+                console.error("Ad Error:", e);
+                safeTgAlert('Ad could not be completed. Please try again.');
+            } finally {
+                allDOMElements.adLoaderOverlay.style.display = 'none';
+            }
+        }
+
+        // Render my ads (advertiser)
+        function renderMyAds(ads) {
+            const container = allDOMElements.myAdsContainer;
+            if (!container) return;
+            
+            const myAds = ads.filter(ad => ad.createdBy === currentUserId);
+            
+            if (myAds.length === 0) {
+                container.innerHTML = `<p style="text-align:center; color:var(--text-light); padding:20px;">You haven't created any ads yet</p>`;
+                return;
+            }
+            
+            container.innerHTML = myAds.map(ad => {
+                const views = ad.views || 0;
+                const totalViews = ad.totalViews || 100;
+                const progress = Math.min((views / totalViews) * 100, 100);
+                
+                return `
+                    <div class="ad-card" data-id="${ad.id}">
+                        <div class="ad-header">
+                            <span class="ad-title">${escapeHTML(ad.title || 'Untitled')}</span>
+                            <span class="ad-status ${ad.status === 'active' ? 'active' : 'pending'}">
+                                ${ad.status === 'active' ? '🟢 Active' : '⏳ Pending'}
+                            </span>
+                        </div>
+                        <div class="ad-desc">${escapeHTML(ad.desc || 'No description')}</div>
+                        <div style="margin-top:8px;">
+                            <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-light);">
+                                <span>Views: ${views}/${totalViews}</span>
+                                <span>Reward: $${ad.reward?.toFixed(3) || '0.001'}</span>
+                            </div>
+                            <div style="width:100%; height:4px; background:var(--border-color); border-radius:4px; margin-top:4px; overflow:hidden;">
+                                <div style="width:${progress}%; height:100%; background:linear-gradient(90deg, #10b981, #3b82f6); border-radius:4px; transition:width 0.3s;"></div>
+                            </div>
+                        </div>
+                        <div class="ad-footer" style="margin-top:8px; padding-top:8px;">
+                            <button class="ad-btn" style="background:#ef4444; color:#fff; padding:4px 12px; border:none; border-radius:6px; font-size:11px; cursor:pointer;" onclick="deleteAd('${ad.id}')">
+                                <i class="fa-solid fa-trash"></i> Delete
+                            </button>
+                            <button class="ad-btn" style="background:#f59e0b; color:#fff; padding:4px 12px; border:none; border-radius:6px; font-size:11px; cursor:pointer;" onclick="toggleAdStatus('${ad.id}')">
+                                ${ad.status === 'active' ? '⏸ Pause' : '▶️ Activate'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Create new ad (advertiser)
+        function setupCreateAdForm() {
+            const form = allDOMElements.createAdForm;
+            if (!form) return;
+            
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const title = document.getElementById('ad-title').value.trim();
+                const desc = document.getElementById('ad-desc').value.trim();
+                const link = document.getElementById('ad-link').value.trim();
+                const reward = parseFloat(document.getElementById('ad-reward').value) || 0.001;
+                const budget = parseFloat(document.getElementById('ad-budget').value) || 1.00;
+                
+                if (!title || !link) {
+                    safeTgAlert('❌ Please fill all required fields!');
+                    return;
+                }
+                
+                const totalViews = Math.floor(budget / reward);
+                if (totalViews < 1) {
+                    safeTgAlert('❌ Budget too low for the reward amount!');
+                    return;
+                }
+                
+                const adData = {
+                    title: title,
+                    desc: desc || 'No description',
+                    link: link,
+                    reward: reward,
+                    totalViews: totalViews,
+                    views: 0,
+                    status: 'active',
+                    createdBy: currentUserId,
+                    createdAt: Date.now(),
+                    budget: budget
+                };
+                
+                try {
+                    const newRef = firebaseDb.ref('ads').push();
+                    await newRef.set(adData);
+                    
+                    safeTgAlert('✅ Ad created successfully!');
+                    form.reset();
+                    loadAdsFromFirebase();
+                } catch(e) {
+                    console.error("Error creating ad:", e);
+                    safeTgAlert('❌ Failed to create ad. Please try again.');
+                }
+            });
+        }
+
+        // Delete ad
+        async function deleteAd(adId) {
+            if (!confirm('Delete this ad?')) return;
+            try {
+                await firebaseDb.ref(`ads/${adId}`).remove();
+                safeTgAlert('✅ Ad deleted!');
+                loadAdsFromFirebase();
+            } catch(e) {
+                console.error("Error deleting ad:", e);
+                safeTgAlert('❌ Failed to delete ad.');
+            }
+        }
+
+        // Toggle ad status
+        async function toggleAdStatus(adId) {
+            try {
+                const snapshot = await firebaseDb.ref(`ads/${adId}`).once('value');
+                const ad = snapshot.val();
+                if (!ad) return;
+                
+                const newStatus = ad.status === 'active' ? 'paused' : 'active';
+                await firebaseDb.ref(`ads/${adId}/status`).set(newStatus);
+                safeTgAlert(`✅ Ad ${newStatus === 'active' ? 'activated' : 'paused'}!`);
+                loadAdsFromFirebase();
+            } catch(e) {
+                console.error("Error toggling ad status:", e);
+                safeTgAlert('❌ Failed to update ad status.');
+            }
         }
 
         // ============================================================
@@ -521,22 +842,13 @@
                 timerEl.textContent = '✅ Ready';
                 timerEl.className = 'timer-time';
                 
-                // Check if we need to convert (daily auto convert)
                 if (state.totalEarning > 0 && !state.convertCooldown) {
-                    performAutoConvert();
+                    state.convertCooldown = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+                    saveUserDataToFirebase();
+                    updateConvertTimer();
+                    showToast(`✅ Auto conversion cycle completed!`);
                 }
             }
-        }
-        
-        function performAutoConvert() {
-            // This function converts coins to USD - but since we don't have coins system anymore,
-            // we just reset the cooldown
-            state.convertCooldown = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
-            saveUserDataToFirebase();
-            updateConvertTimer();
-            
-            showToast(`✅ Auto conversion cycle completed!`);
-            safeTgAction(tg => tg.HapticFeedback.notificationOccurred('success'));
         }
 
         // ============================================================
@@ -594,6 +906,49 @@
         }
 
         // ============================================================
+        // ROLE MANAGEMENT
+        // ============================================================
+        function selectRole(role, btn) {
+            document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            state.userRole = role;
+            saveUserDataToFirebase();
+            
+            if (role === 'publisher') {
+                allDOMElements.publisherView.style.display = 'block';
+                allDOMElements.advertiserView.style.display = 'none';
+                allDOMElements.userRoleBadge.textContent = '📖 Publisher';
+                allDOMElements.userRoleBadge.className = 'role-badge publisher';
+                loadAdsFromFirebase();
+            } else {
+                allDOMElements.publisherView.style.display = 'none';
+                allDOMElements.advertiserView.style.display = 'block';
+                allDOMElements.userRoleBadge.textContent = '📢 Advertiser';
+                allDOMElements.userRoleBadge.className = 'role-badge advertiser';
+                loadAdsFromFirebase();
+            }
+        }
+
+        function switchRole() {
+            const newRole = state.userRole === 'publisher' ? 'advertiser' : 'publisher';
+            const btn = document.querySelector(`.role-btn.${newRole}`);
+            if (btn) selectRole(newRole, btn);
+        }
+
+        // ============================================================
+        // FILTER ADS
+        // ============================================================
+        function filterAds(filter, btn) {
+            if (btn) {
+                document.querySelectorAll('.ad-filters .filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+            currentFilter = filter;
+            loadAdsFromFirebase();
+        }
+
+        // ============================================================
         // UTILITY FUNCTIONS
         // ============================================================
         function safeTgAction(action, fallback = () => {}) { 
@@ -645,88 +1000,6 @@
                     const fieldId = selected.toLowerCase() + '-field';
                     const field = document.getElementById(fieldId);
                     if (field) field.classList.add('active');
-                }
-            });
-        }
-
-        // ============================================================
-        // AD TASKS SYSTEM
-        // ============================================================
-        function renderAdTasks() {
-            renderAdTaskList('ad-tasks-list');
-            renderAdTaskList('ad-tasks-modal-list');
-        }
-
-        function renderAdTaskList(containerId) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-            
-            container.innerHTML = '';
-            
-            adTasks.forEach(task => {
-                const isCompleted = state.completedAdTasks.includes(task.id);
-                const item = document.createElement('div');
-                item.className = 'ad-task-card';
-                item.innerHTML = `
-                    <div class="task-header">
-                        <div>
-                            <span class="task-title"><i class="${task.icon}"></i> ${escapeHTML(task.title)}</span>
-                            <div class="task-desc">${escapeHTML(task.desc)}</div>
-                        </div>
-                        <div style="text-align:right;">
-                            <span class="task-reward">+${task.reward} 🪙</span>
-                            <button class="task-btn ${isCompleted ? 'completed' : ''}" ${isCompleted ? 'disabled' : ''} onclick="completeAdTask('${task.id}')">
-                                ${isCompleted ? '✅ Done' : 'Complete'}
-                            </button>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(item);
-            });
-        }
-
-        function completeAdTask(taskId) {
-            const task = adTasks.find(t => t.id === taskId);
-            if (!task) return;
-            
-            if (state.completedAdTasks.includes(taskId)) {
-                safeTgAlert('✅ You already completed this task!');
-                return;
-            }
-            
-            // Open the link
-            safeTgAction(tg => tg.openLink(task.link));
-            
-            // After user visits, give reward
-            setTimeout(() => {
-                if (state.completedAdTasks.includes(taskId)) return;
-                
-                state.totalEarning += task.reward / config.conversionRate;
-                state.completedAdTasks.push(taskId);
-                saveUserDataToFirebase();
-                updateUI();
-                renderAdTasks();
-                
-                safeTgAlert(`🎉 You earned ${task.reward} coins (≈ $${(task.reward / config.conversionRate).toFixed(4)} USD)!`);
-                safeTgAction(tg => tg.HapticFeedback.notificationOccurred('success'));
-            }, 3000);
-        }
-
-        function filterAds(filter, btn) {
-            document.querySelectorAll('.ad-filters .filter-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            
-            const items = document.querySelectorAll('#ad-tasks-list .ad-task-card, #ad-tasks-modal-list .ad-task-card');
-            items.forEach(item => {
-                if (filter === 'all') {
-                    item.style.display = 'block';
-                } else {
-                    const platform = item.querySelector('.task-title i')?.className || '';
-                    if (platform.includes(filter)) {
-                        item.style.display = 'block';
-                    } else {
-                        item.style.display = 'none';
-                    }
                 }
             });
         }
@@ -814,7 +1087,7 @@
         }
 
         // ============================================================
-        // WATCH AD FUNCTION (Regular)
+        // WATCH AD FUNCTION (Regular - Fallback)
         // ============================================================
         async function watchAd() {
             if (state.lastUsedIp && !state.cooldownUntil) {
@@ -1018,7 +1291,6 @@
             if (buttonEl) buttonEl.classList.add('active');
             if (modalId === 'historyModal') renderHistory();
             if (modalId === 'bonusTasksModal') renderBonusTasks();
-            if (modalId === 'adTasksModal') renderAdTasks();
             const modal = document.getElementById(modalId);
             if(modal) modal.style.display = 'flex';
         }
@@ -1186,6 +1458,7 @@
                 await loadUserDataFromFirebase();
                 
                 populateWithdrawalMethods();
+                setupCreateAdForm();
                 
                 allDOMElements.welcomeTitle.textContent = config.welcomeNotice.title || "Welcome!";
                 allDOMElements.welcomeMessage.textContent = config.welcomeNotice.message || "Welcome to the app!";
@@ -1211,6 +1484,11 @@
                     if (event.target.classList.contains('modal')) closeModal(event.target.id); 
                 };
                 
+                // Set initial role
+                const initialRole = state.userRole || 'publisher';
+                const roleBtn = document.querySelector(`.role-btn.${initialRole}`);
+                if (roleBtn) selectRole(initialRole, roleBtn);
+                
                 safeTgAction(tg => {
                     tg.ready(); 
                     tg.expand();
@@ -1220,8 +1498,8 @@
                     });
                 });
                 
-                renderAdTasks();
                 updateUI();
+                loadAdsFromFirebase();
                 
                 setTimeout(initInAppInterstitial, 3000);
                 
@@ -1236,6 +1514,7 @@
                 
                 console.log("✅ App initialized successfully");
                 console.log("💰 Total Earning:", state.totalEarning);
+                console.log("👤 User Role:", state.userRole);
                 
             } catch (error) { 
                 console.error("Initialization failed:", error); 
