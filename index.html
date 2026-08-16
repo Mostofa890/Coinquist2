@@ -9,7 +9,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- Firebase (সমস্ত ডেটার জন্য) -->
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
@@ -416,7 +416,7 @@
 
     <script>
         // ============================================================
-        // FIREBASE CONFIG (সমস্ত ডেটার জন্য)
+        // FIREBASE CONFIG
         // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyC_WvNxSQQ58TcJhDcBw5NUrAZjOQe1T2g",
@@ -437,13 +437,12 @@
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const firebaseDb = firebase.database();
-        const firebaseStorage = firebase.storage();
 
-        // Initialize Supabase (শুধুমাত্র ইমেজ আপলোডের জন্য)
+        // Initialize Supabase
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // ============================================================
-        // CONFIG
+        // CONFIG (ডিফল্ট কনফিগ)
         // ============================================================
         let config = {
             BOT_TOKEN: '8072034659:AAE_I05sswA8gBYVOSHtjGEf1LE6i6aq0T8',
@@ -457,13 +456,21 @@
             COOLDOWN_MINUTES: 30,
             withdrawalMethods: ['Binance', 'Bikash', 'Nogad'],
             REFERRAL_REWARD: 0.01,
-            bonusTasks: [],
+            bonusTasks: [
+                { id: 'task1', title: 'Join Telegram Channel', reward: 0.02, link: 'https://t.me/nexearn2', duration: 5 },
+                { id: 'task2', title: 'Follow on Twitter', reward: 0.015, link: 'https://twitter.com/nexearn', duration: 5 },
+                { id: 'task3', title: 'Join WhatsApp Group', reward: 0.01, link: 'https://chat.whatsapp.com/nexearn', duration: 5 }
+            ],
             welcomeNotice: {
                 title: "Welcome to NexEarn!",
                 message: "Please follow the rules to ensure you receive your payment.\n\n💰 Reward per Ad: $0.001\n✅ 100% Payment Guarantee\n💸 Withdraw via Binance UID or Email\n🔥 Minimum withdrawal is only $0.10"
             },
             conversionRate: 1000,
-            depositMethods: []
+            depositMethods: [
+                { name: 'Bikash', number: '01712345678', icon: '📱' },
+                { name: 'Nogad', number: '01712345679', icon: '📱' },
+                { name: 'Binance', number: '123456789', icon: '💰' }
+            ]
         };
 
         const tg = window.Telegram ? window.Telegram.WebApp : null;
@@ -534,7 +541,7 @@
         };
 
         // ============================================================
-        // IMAGE UPLOAD FUNCTION (Supabase Storage ব্যবহার করে)
+        // IMAGE UPLOAD FUNCTION (Supabase Storage)
         // ============================================================
         async function uploadImageToSupabase(file) {
             return new Promise((resolve, reject) => {
@@ -552,7 +559,6 @@
                 const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
                 const filePath = `ads/${fileName}`;
 
-                // Supabase Storage এ আপলোড করুন
                 supabase.storage
                     .from('images')
                     .upload(filePath, file, {
@@ -565,7 +571,6 @@
                             return;
                         }
 
-                        // Public URL পান
                         const { data: urlData } = supabase.storage
                             .from('images')
                             .getPublicUrl(filePath);
@@ -585,11 +590,11 @@
         }
 
         // ============================================================
-        // FIREBASE FUNCTIONS (সমস্ত ডেটা)
+        // FIREBASE FUNCTIONS
         // ============================================================
         function loadConfigFromFirebase() {
             return new Promise((resolve) => {
-                firebaseDb.ref('adminConfig').on('value', (snapshot) => {
+                firebaseDb.ref('adminConfig').once('value', (snapshot) => {
                     const data = snapshot.val();
                     if (data) {
                         config.BOT_TOKEN = data.botToken || config.BOT_TOKEN;
@@ -607,8 +612,28 @@
                         if (data.conversionRate) config.conversionRate = data.conversionRate;
                         if (data.depositMethods) config.depositMethods = data.depositMethods;
                         console.log("✅ Config loaded from Firebase");
-                        renderDepositMethods();
+                    } else {
+                        // Firebase এ কনফিগ না থাকলে ডিফল্ট কনফিগ সেট করুন
+                        console.log("⚠️ No config in Firebase, using defaults");
+                        // ডিফল্ট কনফিগ Firebase এ সেভ করুন
+                        firebaseDb.ref('adminConfig').set({
+                            botToken: config.BOT_TOKEN,
+                            adminIds: config.ADMIN_IDS,
+                            botUsername: config.BOT_USERNAME,
+                            channelLink: config.TELEGRAM_CHANNEL_LINK,
+                            supportLink: config.ADMIN_SUPPORT_LINK,
+                            adReward: config.AD_REWARD,
+                            dailyLimit: config.DAILY_AD_LIMIT,
+                            minWithdraw: config.MINIMUM_WITHDRAWAL,
+                            cooldown: config.COOLDOWN_MINUTES,
+                            referralReward: config.REFERRAL_REWARD,
+                            withdrawMethods: config.withdrawalMethods,
+                            welcomeMessage: config.welcomeNotice.message,
+                            conversionRate: config.conversionRate,
+                            depositMethods: config.depositMethods
+                        }).catch(err => console.error("Error saving default config:", err));
                     }
+                    renderDepositMethods();
                     resolve();
                 });
             });
@@ -616,14 +641,18 @@
 
         function loadBonusTasksFromFirebase() {
             return new Promise((resolve) => {
-                firebaseDb.ref('bonusTasks').on('value', (snapshot) => {
+                firebaseDb.ref('bonusTasks').once('value', (snapshot) => {
                     const data = snapshot.val();
                     if (data && Array.isArray(data)) {
                         config.bonusTasks = data;
                         console.log("✅ Bonus tasks loaded from Firebase");
-                        if (document.getElementById('bonusTasksModal').style.display === 'flex') {
-                            renderBonusTasks();
-                        }
+                    } else {
+                        // ডিফল্ট বোনাস টাস্ক সেট করুন
+                        console.log("⚠️ No bonus tasks in Firebase, using defaults");
+                        firebaseDb.ref('bonusTasks').set(config.bonusTasks).catch(err => console.error("Error saving bonus tasks:", err));
+                    }
+                    if (document.getElementById('bonusTasksModal').style.display === 'flex') {
+                        renderBonusTasks();
                     }
                     resolve();
                 });
@@ -685,6 +714,28 @@
                             state.lastAdWatchedDate = today;
                         }
                         console.log("✅ User data loaded from Firebase");
+                    } else {
+                        // নতুন ইউজার তৈরি করুন
+                        console.log("🆕 New user, creating default data");
+                        const userData = {
+                            totalEarning: 0,
+                            adCount: 0,
+                            adsWatchedToday: 0,
+                            lastAdWatchedDate: new Date().toLocaleDateString(),
+                            cooldownUntil: null,
+                            weeklyActivity: [0,0,0,0,0,0,0],
+                            withdrawalHistory: [],
+                            completedBonusTasks: [],
+                            rewardedReferrals: 0,
+                            lastUsedIp: null,
+                            name: tg ? tg.initDataUnsafe?.user?.first_name : 'User',
+                            username: tg ? tg.initDataUnsafe?.user?.username : null,
+                            userRole: 'publisher',
+                            viewedAds: [],
+                            walletBalance: 0,
+                            myAds: []
+                        };
+                        firebaseDb.ref(`users/${currentUserId}`).set(userData).catch(err => console.error("Error creating user:", err));
                     }
                     resolve();
                 }).catch(() => resolve());
@@ -716,7 +767,7 @@
         }
 
         // ============================================================
-        // DEPOSIT SYSTEM (Advertiser only)
+        // DEPOSIT SYSTEM
         // ============================================================
         function renderDepositMethods() {
             const container = allDOMElements.depositMethodsList;
@@ -810,7 +861,7 @@
         }
 
         // ============================================================
-        // AD SYSTEM WITH VERIFICATION
+        // AD SYSTEM
         // ============================================================
         function renderAdList(ads) {
             const container = allDOMElements.adListContainer;
@@ -933,7 +984,6 @@
             try {
                 showToast('📤 Uploading screenshot...');
 
-                // Supabase Storage ব্যবহার করে ইমেজ আপলোড করুন
                 const downloadUrl = await uploadImageToSupabase(file);
 
                 const verificationData = {
@@ -966,7 +1016,7 @@
         }
 
         // ============================================================
-        // ADVERTISER - CREATE AD (WITH BALANCE CHECK)
+        // ADVERTISER - CREATE AD
         // ============================================================
         function setupCreateAdForm() {
             const form = allDOMElements.createAdForm;
@@ -1065,7 +1115,7 @@
         }
 
         // ============================================================
-        // RENDER MY ADS & VERIFICATION REQUESTS
+        // RENDER FUNCTIONS
         // ============================================================
         function renderMyAds(ads) {
             const container = allDOMElements.myAdsContainer;
@@ -1777,6 +1827,7 @@
                 const user = tg ? tg.initDataUnsafe?.user : { first_name: 'User', id: 'testuser' };
                 currentUserId = user.id || 'testuser';
 
+                // Firebase থেকে কনফিগ লোড করুন (ডিফল্ট থাকবে)
                 await loadConfigFromFirebase();
                 await loadBonusTasksFromFirebase();
                 await loadUserDataFromFirebase();
@@ -1838,7 +1889,8 @@
 
             } catch (error) {
                 console.error("Initialization failed:", error);
-                safeTgAlert('Failed to load app. Please try again later.');
+                // Error হলেও অ্যাপ চালু করার চেষ্টা করুন
+                allDOMElements.preloaderPercentage.textContent = 'Loading...';
             } finally {
                 appReady = true;
                 if (percentage < 100) {
