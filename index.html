@@ -1083,6 +1083,68 @@
             margin-bottom: 12px;
             opacity: 0.3;
         }
+
+        /* ===== REJECT REASON MODAL ===== */
+        #rejectReasonModal .modal-content {
+            max-width: 480px;
+        }
+
+        #rejectReasonModal textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            background: var(--background-color);
+            color: var(--text-color);
+            resize: vertical;
+            min-height: 80px;
+            transition: var(--transition);
+        }
+
+        #rejectReasonModal textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.15);
+        }
+
+        .reject-reason-text {
+            padding: 10px 12px;
+            background: rgba(239, 68, 68, 0.08);
+            border-radius: 8px;
+            border-left: 3px solid var(--danger);
+            margin-top: 8px;
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        .reject-reason-text strong {
+            color: var(--danger);
+        }
+
+        .verification-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .verification-status.approved {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+
+        .verification-status.rejected {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+        }
+
+        .verification-status.pending {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+        }
     </style>
 </head>
 <body>
@@ -1399,7 +1461,7 @@
         </div>
     </div>
 
-    <!-- Verify Ad Modal (Updated with Title & Description) -->
+    <!-- Verify Ad Modal -->
     <div id="verifyAdModal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal('verifyAdModal')">&times;</button>
@@ -1427,6 +1489,30 @@
             <button class="action-button" onclick="submitVerification()">
                 <i class="fa-solid fa-upload"></i> <span>Submit for Verification</span>
             </button>
+        </div>
+    </div>
+
+    <!-- Reject Reason Modal (For Advertisers) -->
+    <div id="rejectReasonModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('rejectReasonModal')">&times;</button>
+            <h3 class="card-title">❌ Reject Verification</h3>
+            <p style="font-size:13px; color:var(--text-light); margin-bottom:12px;">Please provide a reason for rejecting this verification request.</p>
+            
+            <div class="form-group">
+                <label>Rejection Reason *</label>
+                <textarea id="reject-reason" placeholder="Explain why this verification is being rejected..." rows="4" required></textarea>
+                <div class="form-hint">The user will see this reason</div>
+            </div>
+            
+            <div style="display:flex; gap:10px; margin-top:12px;">
+                <button class="action-button" onclick="confirmReject()" style="flex:1; background:var(--danger);">
+                    <i class="fa-solid fa-times"></i> Reject
+                </button>
+                <button class="action-button secondary" onclick="closeModal('rejectReasonModal')" style="flex:1; margin-top:0;">
+                    Cancel
+                </button>
+            </div>
         </div>
     </div>
     
@@ -1518,6 +1604,7 @@
 
         let firebaseDb = null;
         const tg = window.Telegram ? window.Telegram.WebApp : null;
+        let pendingRejectVerificationId = null;
 
         // ============================================================
         // STATE
@@ -1544,7 +1631,8 @@
             currentVerifyAdId: null,
             selectedDepositMethod: null,
             selectedDepositNumber: null,
-            bonusTasks: []
+            bonusTasks: [],
+            verifications: []
         };
 
         // ============================================================
@@ -1602,6 +1690,7 @@
             DOM.convertInput = document.getElementById('convert-input');
             DOM.convertAmountDisplay = document.getElementById('convert-amount-display');
             DOM.convertMaxDisplay = document.getElementById('convert-max-display');
+            DOM.rejectReason = document.getElementById('reject-reason');
         }
 
         // ============================================================
@@ -1754,6 +1843,18 @@
             if (!firebaseDb || !state.currentUserId) return;
             firebaseDb.ref(`users/${state.currentUserId}/referrals`).on('value', (snapshot) => {
                 DOM.referralCount.textContent = snapshot.val() || 0;
+            });
+        }
+
+        // Listen for verification updates (for users to see rejection reasons)
+        function listenUserVerifications() {
+            if (!firebaseDb || !state.currentUserId) return;
+            
+            firebaseDb.ref('verifications').orderByChild('userId').equalTo(state.currentUserId).on('value', (snapshot) => {
+                const data = snapshot.val() || {};
+                state.verifications = Object.entries(data).map(([id, item]) => ({ id, ...item }));
+                // Update verification status in ad list if needed
+                listenAds();
             });
         }
 
@@ -1973,7 +2074,7 @@
         }
 
         // ============================================================
-        // RENDER ADS
+        // RENDER ADS - Updated to show verification status
         // ============================================================
         function renderAdList(ads) {
             if (!DOM.adListContainer) return;
@@ -2003,9 +2104,26 @@
                 const isVerified = ad.verified || false;
                 const imageUrl = ad.imageUrl || '';
 
+                // Check verification status for this ad
+                const userVerification = state.verifications.find(v => v.adId === ad.id);
+                let verificationStatus = '';
+                let rejectionReason = '';
+
+                if (userVerification) {
+                    if (userVerification.status === 'approved') {
+                        verificationStatus = '✅ Verified';
+                    } else if (userVerification.status === 'rejected') {
+                        verificationStatus = '❌ Rejected';
+                        rejectionReason = userVerification.rejectReason || 'No reason provided';
+                    } else {
+                        verificationStatus = '⏳ Pending';
+                    }
+                }
+
                 let statusText = '🟢 Active';
                 let statusClass = 'active';
                 if (isVerified) { statusText = '✅ Verified'; statusClass = 'completed'; }
+                else if (isViewed && verificationStatus === 'rejected') { statusText = '❌ Rejected'; statusClass = 'pending'; }
                 else if (isViewed) { statusText = '⏳ Pending'; statusClass = 'pending'; }
 
                 let btnText = '👁 View';
@@ -2013,7 +2131,15 @@
                 let btnDisabled = !isActive;
 
                 if (isVerified) { btnText = '✓ Verified'; btnDisabled = true; }
-                else if (isViewed) { btnText = '📸 Verify'; btnAction = `openVerifyModal('${ad.id}')`; }
+                else if (isViewed) { 
+                    if (verificationStatus === 'rejected') {
+                        btnText = '❌ Rejected';
+                        btnDisabled = true;
+                    } else {
+                        btnText = '📸 Verify'; 
+                        btnAction = `openVerifyModal('${ad.id}')`;
+                    }
+                }
 
                 return `
                     <div class="ad-card">
@@ -2023,6 +2149,7 @@
                         </div>
                         ${imageUrl ? `<img src="${imageUrl}" class="ad-image" alt="Ad image" loading="lazy">` : ''}
                         <div class="ad-desc">${escapeHTML(ad.desc || 'No description')}</div>
+                        ${rejectionReason ? `<div class="reject-reason-text"><strong>❌ Rejected:</strong> ${escapeHTML(rejectionReason)}</div>` : ''}
                         <div class="ad-footer">
                             <span class="ad-views"><i class="fa-solid fa-eye"></i> ${views}/${totalViews}</span>
                             <span class="ad-status ${statusClass}">${statusText}</span>
@@ -2041,6 +2168,13 @@
         // VIEW AD
         // ============================================================
         async function viewAd(adId) {
+            // Check if already submitted and rejected
+            const existingVerification = state.verifications.find(v => v.adId === adId);
+            if (existingVerification && existingVerification.status === 'rejected') {
+                showToast(`❌ This verification was rejected. Reason: ${existingVerification.rejectReason || 'No reason provided'}`, 'error');
+                return;
+            }
+
             if (state.viewedAds.includes(adId)) {
                 openVerifyModal(adId);
                 return;
@@ -2074,9 +2208,16 @@
         }
 
         // ============================================================
-        // VERIFICATION (Updated with Title & Description)
+        // VERIFICATION - Updated
         // ============================================================
         function openVerifyModal(adId) {
+            // Check if already rejected
+            const existingVerification = state.verifications.find(v => v.adId === adId);
+            if (existingVerification && existingVerification.status === 'rejected') {
+                showToast(`❌ This verification was rejected. Reason: ${existingVerification.rejectReason || 'No reason provided'}`, 'error');
+                return;
+            }
+
             state.currentVerifyAdId = adId;
             const modal = document.getElementById('verifyAdModal');
 
@@ -2141,6 +2282,7 @@
                     adDescription: desc,
                     screenshot: downloadUrl,
                     status: 'pending',
+                    rejectReason: '',
                     createdAt: Date.now()
                 };
 
@@ -2338,7 +2480,7 @@
         }
 
         // ============================================================
-        // VERIFICATION REQUESTS (Advertiser - Updated)
+        // VERIFICATION REQUESTS (Advertiser - Updated with Reject Reason)
         // ============================================================
         function renderVerificationRequests(ads) {
             if (!DOM.verificationContainer || state.userRole !== 'advertiser') return;
@@ -2365,18 +2507,61 @@
                             <strong>Title:</strong> ${escapeHTML(v.adTitle || 'N/A')}<br>
                             <strong>Description:</strong> ${escapeHTML(v.adDescription || 'N/A')}
                         </div>
-                        ${v.screenshot ? `<img src="${v.screenshot}" class="ad-image" alt="Screenshot" style="cursor:pointer;" onclick="window.open('${v.screenshot}','_blank')" loading="lazy">` : ''}
+                        ${v.screenshot ? `<img src="${v.screenshot}" class="ad-image" alt="Screenshot" style="cursor:pointer; max-height:80px;" onclick="window.open('${v.screenshot}','_blank')" loading="lazy">` : ''}
                         <div class="ad-footer" style="margin-top:8px;">
                             <button class="ad-btn" style="background:#10b981; color:#fff; padding:4px 14px; border:none; border-radius:6px; font-size:11px; cursor:pointer;" onclick="verifyAdRequest('${v.id}')">
                                 ✅ Approve
                             </button>
-                            <button class="ad-btn" style="background:#ef4444; color:#fff; padding:4px 14px; border:none; border-radius:6px; font-size:11px; cursor:pointer;" onclick="rejectAdRequest('${v.id}')">
+                            <button class="ad-btn" style="background:#ef4444; color:#fff; padding:4px 14px; border:none; border-radius:6px; font-size:11px; cursor:pointer;" onclick="openRejectModal('${v.id}')">
                                 ❌ Reject
                             </button>
                         </div>
                     </div>
                 `).join('');
             });
+        }
+
+        // Open reject modal with reason
+        function openRejectModal(verificationId) {
+            pendingRejectVerificationId = verificationId;
+            DOM.rejectReason.value = '';
+            document.getElementById('rejectReasonModal').style.display = 'flex';
+        }
+
+        // Confirm reject with reason
+        async function confirmReject() {
+            const reason = DOM.rejectReason.value.trim();
+            
+            if (!reason || reason.length < 3) {
+                showToast('❌ Please provide a valid rejection reason (min 3 characters)', 'error');
+                return;
+            }
+
+            if (!pendingRejectVerificationId) {
+                showToast('❌ No verification selected', 'error');
+                return;
+            }
+
+            try {
+                await firebaseDb.ref(`verifications/${pendingRejectVerificationId}/status`).set('rejected');
+                await firebaseDb.ref(`verifications/${pendingRejectVerificationId}/rejectReason`).set(reason);
+                
+                // Get the verification data to find the user
+                const snapshot = await firebaseDb.ref(`verifications/${pendingRejectVerificationId}`).once('value');
+                const data = snapshot.val();
+                
+                // Send notification to user (optional)
+                // You can add a notification system here
+                
+                closeModal('rejectReasonModal');
+                pendingRejectVerificationId = null;
+                showToast('❌ Verification rejected with reason', 'error');
+                listenAds();
+
+            } catch (e) {
+                console.error("Reject error:", e);
+                showToast('❌ Failed to reject verification.', 'error');
+            }
         }
 
         async function verifyAdRequest(verificationId) {
@@ -2402,17 +2587,6 @@
             } catch (e) {
                 console.error("Verify error:", e);
                 showToast('❌ Failed to approve verification.', 'error');
-            }
-        }
-
-        async function rejectAdRequest(verificationId) {
-            try {
-                await firebaseDb.ref(`verifications/${verificationId}/status`).set('rejected');
-                showToast('❌ Verification rejected.', 'error');
-                listenAds();
-            } catch (e) {
-                console.error("Reject error:", e);
-                showToast('❌ Failed to reject verification.', 'error');
             }
         }
 
@@ -3044,6 +3218,7 @@
                 listenReferrals();
                 listenDeposits();
                 listenAds();
+                listenUserVerifications();
 
                 if (user?.first_name) {
                     DOM.greeting.textContent = `Welcome, ${escapeHTML(user.first_name)}!`;
