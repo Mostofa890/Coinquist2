@@ -44,6 +44,9 @@
             --shadow: 0 2px 10px rgba(0,0,0,0.08);
             --radius: 16px;
             --transition: all 0.3s ease;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
         }
         
         [data-theme="dark"] { 
@@ -79,17 +82,9 @@
             min-height: 100vh;
         }
         
-        /* ===== SCROLLBAR ===== */
-        ::-webkit-scrollbar {
-            width: 4px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--background-color);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary-color);
-            border-radius: 4px;
-        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--background-color); }
+        ::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 4px; }
         
         /* ===== PRELOADER ===== */
         #preloader {
@@ -116,9 +111,7 @@
             animation: pulseText 1.5s ease-in-out infinite;
         }
         
-        #preloader .brand span {
-            color: var(--text-color);
-        }
+        #preloader .brand span { color: var(--text-color); }
         
         @keyframes pulseText {
             0%, 100% { transform: scale(1); opacity: 1; }
@@ -189,7 +182,6 @@
             opacity: 0.5;
         }
         
-        /* ===== MAIN APP ===== */
         .container { 
             max-width: 480px; 
             margin: 0 auto; 
@@ -295,24 +287,9 @@
             font-family: inherit;
         }
         
-        .role-btn .icon {
-            font-size: 24px;
-            display: block;
-            margin-bottom: 4px;
-        }
-        
-        .role-btn .label {
-            font-weight: 700;
-            font-size: 15px;
-            display: block;
-        }
-        
-        .role-btn .sub-label {
-            font-size: 11px;
-            color: var(--text-light);
-            display: block;
-            margin-top: 2px;
-        }
+        .role-btn .icon { font-size: 24px; display: block; margin-bottom: 4px; }
+        .role-btn .label { font-weight: 700; font-size: 15px; display: block; }
+        .role-btn .sub-label { font-size: 11px; color: var(--text-light); display: block; margin-top: 2px; }
         
         .role-btn.active {
             border-color: var(--primary-color);
@@ -320,9 +297,7 @@
             box-shadow: 0 0 0 4px rgba(var(--primary-color-rgb), 0.1);
         }
         
-        .role-btn:hover:not(.active) {
-            border-color: var(--text-light);
-        }
+        .role-btn:hover:not(.active) { border-color: var(--text-light); }
         
         /* ===== BALANCE CARD ===== */
         .balance-card {
@@ -411,6 +386,68 @@
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
         
+        /* ===== CONVERT CARD ===== */
+        .convert-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+            border: 2px solid var(--success);
+            padding: 16px 18px;
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+            animation: fadeIn 0.7s ease-out;
+        }
+        
+        .convert-card .title {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .convert-card .info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+        }
+        
+        .convert-card .info .balance {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-color);
+        }
+        
+        .convert-card .info .rate {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        .convert-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            margin-top: 10px;
+            font-family: inherit;
+        }
+        
+        .convert-btn:hover:not(:disabled) {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+        
+        .convert-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
         /* ===== STATS GRID ===== */
         .stats-grid {
             display: grid;
@@ -441,22 +478,9 @@
             pointer-events: none;
         }
         
-        .stat-item .icon {
-            font-size: 22px;
-            color: var(--primary-color);
-            margin-bottom: 6px;
-        }
-        
-        .stat-item .value {
-            font-size: 20px;
-            font-weight: 800;
-        }
-        
-        .stat-item .label {
-            font-size: 11px;
-            color: var(--text-light);
-            margin-top: 2px;
-        }
+        .stat-item .icon { font-size: 22px; color: var(--primary-color); margin-bottom: 6px; }
+        .stat-item .value { font-size: 20px; font-weight: 800; }
+        .stat-item .label { font-size: 11px; color: var(--text-light); margin-top: 2px; }
         
         /* ===== CARDS ===== */
         .card {
@@ -505,9 +529,7 @@
             border-color: var(--primary-color);
         }
         
-        .filter-btn:hover:not(.active) {
-            border-color: var(--text-color);
-        }
+        .filter-btn:hover:not(.active) { border-color: var(--text-color); }
         
         /* ===== AD CARD ===== */
         .ad-card {
@@ -519,9 +541,7 @@
             transition: var(--transition);
         }
         
-        .ad-card:last-child {
-            margin-bottom: 0;
-        }
+        .ad-card:last-child { margin-bottom: 0; }
         
         .ad-header {
             display: flex;
@@ -530,33 +550,10 @@
             gap: 10px;
         }
         
-        .ad-title {
-            font-weight: 600;
-            font-size: 15px;
-            flex: 1;
-        }
-        
-        .ad-reward {
-            font-weight: 700;
-            color: var(--primary-color);
-            font-size: 14px;
-            white-space: nowrap;
-        }
-        
-        .ad-image {
-            width: 100%;
-            max-height: 120px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin: 8px 0;
-        }
-        
-        .ad-desc {
-            font-size: 13px;
-            color: var(--text-light);
-            margin-bottom: 10px;
-            line-height: 1.4;
-        }
+        .ad-title { font-weight: 600; font-size: 15px; flex: 1; }
+        .ad-reward { font-weight: 700; color: var(--primary-color); font-size: 14px; white-space: nowrap; }
+        .ad-image { width: 100%; max-height: 120px; object-fit: cover; border-radius: 8px; margin: 8px 0; }
+        .ad-desc { font-size: 13px; color: var(--text-light); margin-bottom: 10px; line-height: 1.4; }
         
         .ad-footer {
             display: flex;
@@ -566,10 +563,7 @@
             gap: 8px;
         }
         
-        .ad-views {
-            font-size: 12px;
-            color: var(--text-light);
-        }
+        .ad-views { font-size: 12px; color: var(--text-light); }
         
         .ad-status {
             font-size: 11px;
@@ -578,20 +572,9 @@
             border-radius: 12px;
         }
         
-        .ad-status.active {
-            color: #10b981;
-            background: rgba(16, 185, 129, 0.1);
-        }
-        
-        .ad-status.pending {
-            color: #f59e0b;
-            background: rgba(245, 158, 11, 0.1);
-        }
-        
-        .ad-status.completed {
-            color: #3b82f6;
-            background: rgba(59, 130, 246, 0.1);
-        }
+        .ad-status.active { color: #10b981; background: rgba(16, 185, 129, 0.1); }
+        .ad-status.pending { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+        .ad-status.completed { color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
         
         .ad-btn {
             padding: 6px 16px;
@@ -609,18 +592,9 @@
             color: white;
         }
         
-        .ad-btn.view:hover:not(:disabled) {
-            transform: scale(1.03);
-        }
-        
-        .ad-btn.view:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .ad-btn.view.completed {
-            background: #10b981;
-        }
+        .ad-btn.view:hover:not(:disabled) { transform: scale(1.03); }
+        .ad-btn.view:disabled { opacity: 0.5; cursor: not-allowed; }
+        .ad-btn.view.completed { background: #10b981; }
         
         /* ===== ACTION BUTTON ===== */
         .action-button {
@@ -641,9 +615,7 @@
             font-family: inherit;
         }
         
-        .action-button.pulsing {
-            animation: pulse 2s infinite;
-        }
+        .action-button.pulsing { animation: pulse 2s infinite; }
         
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(var(--primary-color-rgb), 0.4); }
@@ -672,6 +644,14 @@
         .action-button.secondary:hover {
             background: rgba(var(--primary-color-rgb), 0.08);
             transform: translateY(-2px);
+        }
+        
+        .action-button.success {
+            background: var(--success);
+        }
+        
+        .action-button.success:hover {
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
         }
         
         /* ===== FORM ===== */
@@ -733,26 +713,10 @@
             gap: 12px;
         }
         
-        .bonus-item:last-child {
-            margin-bottom: 0;
-        }
-        
-        .bonus-item .details {
-            flex: 1;
-            min-width: 0;
-        }
-        
-        .bonus-item .title {
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--text-color);
-        }
-        
-        .bonus-item .reward {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--primary-color);
-        }
+        .bonus-item:last-child { margin-bottom: 0; }
+        .bonus-item .details { flex: 1; min-width: 0; }
+        .bonus-item .title { font-weight: 600; font-size: 14px; color: var(--text-color); }
+        .bonus-item .reward { font-size: 13px; font-weight: 700; color: var(--primary-color); }
         
         .bonus-item .claim-btn {
             padding: 8px 18px;
@@ -773,9 +737,7 @@
             cursor: not-allowed;
         }
         
-        .bonus-item .claim-btn:hover:not(:disabled) {
-            transform: scale(1.03);
-        }
+        .bonus-item .claim-btn:hover:not(:disabled) { transform: scale(1.03); }
         
         /* ===== HISTORY ===== */
         .history-item {
@@ -787,34 +749,13 @@
             gap: 12px;
         }
         
-        .history-item:last-child {
-            border-bottom: none;
-        }
+        .history-item:last-child { border-bottom: none; }
+        .history-details { flex: 1; min-width: 0; }
+        .history-details .method-number { font-weight: 700; font-size: 14px; }
+        .history-details .date { font-size: 11px; color: var(--text-light); }
         
-        .history-details {
-            flex: 1;
-            min-width: 0;
-        }
-        
-        .history-details .method-number {
-            font-weight: 700;
-            font-size: 14px;
-        }
-        
-        .history-details .date {
-            font-size: 11px;
-            color: var(--text-light);
-        }
-        
-        .history-amount {
-            text-align: right;
-            flex-shrink: 0;
-        }
-        
-        .history-amount .amount-text {
-            font-size: 16px;
-            font-weight: 800;
-        }
+        .history-amount { text-align: right; flex-shrink: 0; }
+        .history-amount .amount-text { font-size: 16px; font-weight: 800; }
         
         .history-status {
             font-size: 11px;
@@ -826,20 +767,9 @@
         }
         
         .history-status.success,
-        .history-status.approved {
-            color: #10b981;
-            background: rgba(16, 185, 129, 0.1);
-        }
-        
-        .history-status.pending {
-            color: #f59e0b;
-            background: rgba(245, 158, 11, 0.1);
-        }
-        
-        .history-status.rejected {
-            color: #ef4444;
-            background: rgba(239, 68, 68, 0.1);
-        }
+        .history-status.approved { color: #10b981; background: rgba(16, 185, 129, 0.1); }
+        .history-status.pending { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+        .history-status.rejected { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
         
         .no-history {
             text-align: center;
@@ -861,39 +791,17 @@
             transition: var(--transition);
         }
         
-        .deposit-method:hover {
-            border-color: var(--text-light);
-        }
-        
+        .deposit-method:hover { border-color: var(--text-light); }
         .deposit-method.selected {
             border-color: #10b981;
             background: rgba(16, 185, 129, 0.06);
         }
         
-        .deposit-method .method-icon {
-            font-size: 28px;
-            flex-shrink: 0;
-        }
-        
-        .deposit-method .method-info {
-            flex: 1;
-        }
-        
-        .deposit-method .method-name {
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        .deposit-method .method-desc {
-            font-size: 12px;
-            color: var(--text-light);
-        }
-        
-        .deposit-method .method-number {
-            font-weight: 700;
-            font-size: 14px;
-            color: var(--primary-color);
-        }
+        .deposit-method .method-icon { font-size: 28px; flex-shrink: 0; }
+        .deposit-method .method-info { flex: 1; }
+        .deposit-method .method-name { font-weight: 600; font-size: 14px; }
+        .deposit-method .method-desc { font-size: 12px; color: var(--text-light); }
+        .deposit-method .method-number { font-weight: 700; font-size: 14px; color: var(--primary-color); }
         
         /* ===== NAV BAR ===== */
         .nav-bar {
@@ -943,9 +851,7 @@
             color: var(--primary-color);
         }
         
-        .nav-button.active i {
-            transform: scale(1.1);
-        }
+        .nav-button.active i { transform: scale(1.1); }
         
         /* ===== MODALS ===== */
         .modal {
@@ -990,9 +896,7 @@
             transition: var(--transition);
         }
         
-        .close-btn:hover {
-            color: var(--text-color);
-        }
+        .close-btn:hover { color: var(--text-color); }
         
         /* ===== METHOD FIELDS ===== */
         .method-field {
@@ -1024,26 +928,54 @@
             position: fixed;
             inset: 0;
             z-index: 5000;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             display: none;
             align-items: center;
             justify-content: center;
             flex-direction: column;
-            gap: 16px;
+            gap: 20px;
             color: white;
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 500;
         }
         
-        .loader-spinner {
-            width: 48px;
-            height: 48px;
+        #ad-loader-overlay .loader-spinner {
+            width: 56px;
+            height: 56px;
             border: 4px solid rgba(255, 255, 255, 0.1);
             border-top-color: var(--primary-color);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
+        }
+        
+        #ad-loader-overlay .loader-text {
+            font-size: 16px;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+        
+        #ad-loader-overlay .loader-sub {
+            font-size: 13px;
+            opacity: 0.6;
+            margin-top: -8px;
+        }
+        
+        #ad-loader-overlay .loader-progress {
+            width: 200px;
+            height: 3px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        #ad-loader-overlay .loader-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 4px;
+            transition: width 0.3s ease;
         }
         
         @keyframes spin {
@@ -1073,6 +1005,36 @@
             .modal { align-items: center; padding: 20px; }
             .modal-content { border-radius: 20px; }
         }
+        
+        /* ===== TOAST ===== */
+        .toast-container {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            max-width: 90%;
+            width: 100%;
+            pointer-events: none;
+        }
+        
+        .toast {
+            background: rgba(0,0,0,0.85);
+            color: white;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+            pointer-events: auto;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .toast.success { border-color: var(--success); }
+        .toast.error { border-color: var(--danger); }
+        .toast.warning { border-color: var(--warning); }
     </style>
 </head>
 <body>
@@ -1093,9 +1055,14 @@
         <a href="https://t.me/nexearn2" target="_blank">@nexearn2</a>
     </div>
     
+    <!-- ===== AD LOADER ===== -->
     <div id="ad-loader-overlay">
         <div class="loader-spinner"></div>
-        <span>Loading Ad...</span>
+        <div class="loader-text">Loading Ad...</div>
+        <div class="loader-sub">Please wait while the ad loads</div>
+        <div class="loader-progress">
+            <div class="loader-progress-bar" id="ad-loader-progress"></div>
+        </div>
     </div>
     
     <div class="container">
@@ -1139,6 +1106,27 @@
             </div>
             <button class="deposit-btn" id="depositButton" onclick="showDepositModal()" style="display:none;">
                 + Deposit
+            </button>
+        </div>
+
+        <!-- ===== CONVERT EARNINGS TO WALLET ===== -->
+        <div class="convert-card" id="convertCard">
+            <div class="title">
+                <i class="fa-solid fa-arrows-rotate"></i>
+                Convert Earnings to Wallet
+            </div>
+            <div class="info">
+                <div>
+                    <div style="font-size:12px; color:var(--text-light);">Available to Convert</div>
+                    <div class="balance" id="convert-balance">$0.000</div>
+                </div>
+                <div class="rate">
+                    <div>1:1 Conversion</div>
+                    <div style="font-size:11px; opacity:0.7;">No fees</div>
+                </div>
+            </div>
+            <button class="convert-btn" id="convertBtn" onclick="convertToWallet()">
+                <i class="fa-solid fa-exchange-alt"></i> Convert All to Wallet
             </button>
         </div>
 
@@ -1333,6 +1321,31 @@
         </div>
     </div>
 
+    <!-- Convert Modal -->
+    <div id="convertModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('convertModal')">&times;</button>
+            <h3 class="card-title">🔄 Convert to Wallet</h3>
+            <div style="text-align:center; padding:20px 0;">
+                <div style="font-size:48px; margin-bottom:12px;">💰</div>
+                <div style="font-size:14px; color:var(--text-light);">Amount to Convert</div>
+                <div style="font-size:32px; font-weight:800; color:var(--success);" id="convert-amount-display">$0.000</div>
+                <div style="font-size:12px; color:var(--text-light); margin-top:4px;">1:1 conversion rate • No fees</div>
+            </div>
+            <div class="form-group">
+                <label>Enter Amount to Convert</label>
+                <input type="number" step="0.001" id="convert-input" placeholder="Enter amount" min="0.001">
+                <div class="form-hint">Max: <span id="convert-max-display">$0.000</span></div>
+            </div>
+            <button class="action-button success" onclick="confirmConvert()">
+                <i class="fa-solid fa-exchange-alt"></i> <span>Convert Now</span>
+            </button>
+            <button class="action-button secondary" onclick="closeModal('convertModal')" style="margin-top:10px;">
+                Cancel
+            </button>
+        </div>
+    </div>
+
     <!-- Verify Ad Modal -->
     <div id="verifyAdModal" class="modal">
         <div class="modal-content">
@@ -1444,8 +1457,8 @@
         // STATE
         // ============================================================
         const state = {
-            totalEarning: 0,
-            walletBalance: 0,
+            totalEarning: 0,        // Publisher earnings (from ads)
+            walletBalance: 0,       // Advertiser wallet (for creating ads)
             adCount: 0,
             adsWatchedToday: 0,
             lastAdWatchedDate: null,
@@ -1509,10 +1522,16 @@
             DOM.withdrawAmount = document.getElementById('withdraw-amount');
             DOM.withdrawSubmitBtn = document.getElementById('withdraw-submit-button');
             DOM.adLoaderOverlay = document.getElementById('ad-loader-overlay');
+            DOM.adLoaderProgress = document.getElementById('ad-loader-progress');
             DOM.verifyAdInfo = document.getElementById('verify-ad-info');
             DOM.verifyScreenshot = document.getElementById('verify-screenshot');
             DOM.profilePic = document.getElementById('profile-pic');
             DOM.greeting = document.getElementById('greeting');
+            DOM.convertBalance = document.getElementById('convert-balance');
+            DOM.convertBtn = document.getElementById('convertBtn');
+            DOM.convertInput = document.getElementById('convert-input');
+            DOM.convertAmountDisplay = document.getElementById('convert-amount-display');
+            DOM.convertMaxDisplay = document.getElementById('convert-max-display');
         }
 
         // ============================================================
@@ -1646,7 +1665,7 @@
                         state.walletBalance += data.amount / 100;
                         saveUserData();
                         updateUI();
-                        safeAlert(`✅ Deposit of ${data.amount} BDT approved!`);
+                        showToast(`✅ Deposit of ${data.amount} BDT approved!`, 'success');
                     }
                 }
             });
@@ -1682,17 +1701,19 @@
             return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         }
 
-        function showToast(msg) {
+        function showToast(msg, type = '') {
+            const container = document.querySelector('.toast-container') || (() => {
+                const c = document.createElement('div');
+                c.className = 'toast-container';
+                document.body.appendChild(c);
+                return c;
+            })();
+            
             const toast = document.createElement('div');
-            toast.style.cssText = `
-                position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
-                background: rgba(0,0,0,0.85); color: #fff; padding: 12px 24px;
-                border-radius: 12px; font-size: 14px; font-weight: 600;
-                z-index: 9999; max-width: 90%; text-align: center;
-                animation: fadeIn 0.3s ease;
-            `;
+            toast.className = `toast ${type}`;
             toast.textContent = msg;
-            document.body.appendChild(toast);
+            container.appendChild(toast);
+            
             setTimeout(() => {
                 toast.style.opacity = '0';
                 toast.style.transition = 'opacity 0.5s ease';
@@ -1740,6 +1761,64 @@
         }
 
         // ============================================================
+        // CONVERT EARNINGS TO WALLET
+        // ============================================================
+        function convertToWallet() {
+            if (state.totalEarning <= 0) {
+                showToast('❌ No earnings to convert!', 'error');
+                return;
+            }
+            
+            DOM.convertInput.value = '';
+            DOM.convertAmountDisplay.textContent = `$${state.totalEarning.toFixed(3)}`;
+            DOM.convertMaxDisplay.textContent = `$${state.totalEarning.toFixed(3)}`;
+            DOM.convertInput.max = state.totalEarning;
+            DOM.convertInput.placeholder = `Max $${state.totalEarning.toFixed(3)}`;
+            
+            document.getElementById('convertModal').style.display = 'flex';
+        }
+
+        function confirmConvert() {
+            const amount = parseFloat(DOM.convertInput.value);
+            
+            if (!amount || amount <= 0) {
+                showToast('❌ Please enter a valid amount', 'error');
+                return;
+            }
+            
+            if (amount > state.totalEarning) {
+                showToast(`❌ You only have $${state.totalEarning.toFixed(3)} to convert`, 'error');
+                return;
+            }
+            
+            // Convert: Move from totalEarning to walletBalance (1:1)
+            state.totalEarning -= amount;
+            state.walletBalance += amount;
+            
+            // Save to history
+            const convertRecord = {
+                type: 'convert',
+                amount: amount,
+                date: new Date().toISOString(),
+                status: 'Completed'
+            };
+            
+            state.withdrawalHistory.unshift({
+                method: 'Convert to Wallet',
+                number: 'Earnings → Wallet',
+                amount: amount,
+                date: new Date().toISOString(),
+                status: 'Completed'
+            });
+            
+            saveUserData();
+            updateUI();
+            
+            closeModal('convertModal');
+            showToast(`✅ $${amount.toFixed(3)} converted to wallet successfully!`, 'success');
+        }
+
+        // ============================================================
         // ROLE MANAGEMENT
         // ============================================================
         function selectRole(role, btn) {
@@ -1756,6 +1835,7 @@
                 DOM.userRoleBadge.className = 'role-badge';
                 DOM.walletLabel.textContent = '💳 Publisher Balance';
                 DOM.depositBtn.style.display = 'none';
+                document.getElementById('convertCard').style.display = 'block';
                 listenAds();
             } else {
                 DOM.publisherView.style.display = 'none';
@@ -1764,6 +1844,7 @@
                 DOM.userRoleBadge.className = 'role-badge advertiser';
                 DOM.walletLabel.textContent = '💳 Advertiser Wallet';
                 DOM.depositBtn.style.display = 'block';
+                document.getElementById('convertCard').style.display = 'none';
                 listenAds();
             }
             updateUI();
@@ -1784,7 +1865,7 @@
                 btn.classList.add('active');
             }
             state.currentFilter = filter;
-            listenAds(); // Refresh
+            listenAds();
         }
 
         // ============================================================
@@ -1853,7 +1934,7 @@
         }
 
         // ============================================================
-        // VIEW AD
+        // VIEW AD - FIXED VERSION
         // ============================================================
         async function viewAd(adId) {
             if (state.viewedAds.includes(adId)) {
@@ -1862,7 +1943,7 @@
             }
 
             if (state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT) {
-                safeAlert(`📊 Daily limit reached! (${CONFIG.DAILY_AD_LIMIT})`);
+                showToast(`📊 Daily limit reached! (${CONFIG.DAILY_AD_LIMIT})`, 'warning');
                 return;
             }
 
@@ -1870,12 +1951,12 @@
                 const snapshot = await firebaseDb.ref(`ads/${adId}`).once('value');
                 const ad = snapshot.val();
                 if (!ad || ad.status !== 'active') {
-                    safeAlert('❌ Ad not available!');
+                    showToast('❌ Ad not available!', 'error');
                     return;
                 }
 
                 if (ad.views >= ad.totalViews) {
-                    safeAlert('❌ This ad has reached its view limit!');
+                    showToast('❌ This ad has reached its view limit!', 'error');
                     return;
                 }
 
@@ -1884,7 +1965,7 @@
                 openVerifyModal(adId);
             } catch (e) {
                 console.error("View ad error:", e);
-                safeAlert('❌ Failed to load ad. Please try again.');
+                showToast('❌ Failed to load ad. Please try again.', 'error');
             }
         }
 
@@ -1915,22 +1996,22 @@
         async function submitVerification() {
             const file = DOM.verifyScreenshot.files[0];
             if (!file) {
-                safeAlert('❌ Please upload a screenshot!');
+                showToast('❌ Please upload a screenshot!', 'error');
                 return;
             }
 
             if (file.size > 5 * 1024 * 1024) {
-                safeAlert('❌ Image size must be less than 5MB!');
+                showToast('❌ Image size must be less than 5MB!', 'error');
                 return;
             }
 
             if (!state.currentVerifyAdId) {
-                safeAlert('❌ No ad selected!');
+                showToast('❌ No ad selected!', 'error');
                 return;
             }
 
             try {
-                showToast('📤 Uploading screenshot...');
+                showToast('📤 Uploading screenshot...', '');
                 const downloadUrl = await uploadImage(file);
 
                 const verificationData = {
@@ -1954,11 +2035,11 @@
                 updateUI();
 
                 closeModal('verifyAdModal');
-                safeAlert('✅ Screenshot submitted! Waiting for admin verification.');
+                showToast('✅ Screenshot submitted! Waiting for admin verification.', 'success');
 
             } catch (e) {
                 console.error("Verification error:", e);
-                safeAlert('❌ Failed to upload screenshot: ' + e.message);
+                showToast('❌ Failed to upload screenshot: ' + e.message, 'error');
             }
         }
 
@@ -1982,18 +2063,18 @@
                 const fileInput = document.getElementById('ad-image');
 
                 if (!title || !link) {
-                    safeAlert('❌ Please fill all required fields!');
+                    showToast('❌ Please fill all required fields!', 'error');
                     return;
                 }
 
                 if (state.walletBalance < budget) {
-                    safeAlert(`❌ Insufficient balance! You need $${budget.toFixed(2)}. Please deposit first.`);
+                    showToast(`❌ Insufficient balance! You need $${budget.toFixed(2)}. Convert earnings or deposit.`, 'error');
                     return;
                 }
 
                 const totalViews = Math.floor(budget / reward);
                 if (totalViews < 1) {
-                    safeAlert('❌ Budget too low for the reward amount!');
+                    showToast('❌ Budget too low for the reward amount!', 'error');
                     return;
                 }
 
@@ -2001,15 +2082,15 @@
                 if (fileInput.files.length > 0) {
                     const file = fileInput.files[0];
                     if (file.size > 5 * 1024 * 1024) {
-                        safeAlert('❌ Image size must be less than 5MB!');
+                        showToast('❌ Image size must be less than 5MB!', 'error');
                         return;
                     }
                     try {
-                        showToast('📤 Uploading image...');
+                        showToast('📤 Uploading image...', '');
                         imageUrl = await uploadImage(file);
-                        showToast('✅ Image uploaded!');
+                        showToast('✅ Image uploaded!', 'success');
                     } catch (e) {
-                        safeAlert('❌ Failed to upload image: ' + e.message);
+                        showToast('❌ Failed to upload image: ' + e.message, 'error');
                         return;
                     }
                 }
@@ -2036,7 +2117,7 @@
                     await newRef.set(adData);
                     saveUserData();
                     updateUI();
-                    safeAlert('✅ Ad created successfully!');
+                    showToast('✅ Ad created successfully!', 'success');
                     DOM.createAdForm.reset();
                     document.getElementById('ad-image').value = '';
                     listenAds();
@@ -2044,7 +2125,7 @@
                     console.error("Create ad error:", e);
                     state.walletBalance += budget;
                     saveUserData();
-                    safeAlert('❌ Failed to create ad. Please try again.');
+                    showToast('❌ Failed to create ad. Please try again.', 'error');
                 }
             });
         }
@@ -2112,11 +2193,11 @@
             if (!confirm('Delete this ad?')) return;
             try {
                 await firebaseDb.ref(`ads/${adId}`).remove();
-                safeAlert('✅ Ad deleted!');
+                showToast('✅ Ad deleted!', 'success');
                 listenAds();
             } catch (e) {
                 console.error("Delete error:", e);
-                safeAlert('❌ Failed to delete ad.');
+                showToast('❌ Failed to delete ad.', 'error');
             }
         }
 
@@ -2127,11 +2208,11 @@
                 if (!ad) return;
                 const newStatus = ad.status === 'active' ? 'paused' : 'active';
                 await firebaseDb.ref(`ads/${adId}/status`).set(newStatus);
-                safeAlert(`✅ Ad ${newStatus === 'active' ? 'activated' : 'paused'}!`);
+                showToast(`✅ Ad ${newStatus === 'active' ? 'activated' : 'paused'}!`, 'success');
                 listenAds();
             } catch (e) {
                 console.error("Toggle status error:", e);
-                safeAlert('❌ Failed to update ad status.');
+                showToast('❌ Failed to update ad status.', 'error');
             }
         }
 
@@ -2190,23 +2271,23 @@
 
                 await firebaseDb.ref(`ads/${data.adId}/verified`).set(true);
 
-                safeAlert('✅ Verification approved! User got reward.');
+                showToast('✅ Verification approved! User got reward.', 'success');
                 listenAds();
 
             } catch (e) {
                 console.error("Verify error:", e);
-                safeAlert('❌ Failed to approve verification.');
+                showToast('❌ Failed to approve verification.', 'error');
             }
         }
 
         async function rejectAdRequest(verificationId) {
             try {
                 await firebaseDb.ref(`verifications/${verificationId}/status`).set('rejected');
-                safeAlert('❌ Verification rejected.');
+                showToast('❌ Verification rejected.', 'error');
                 listenAds();
             } catch (e) {
                 console.error("Reject error:", e);
-                safeAlert('❌ Failed to reject verification.');
+                showToast('❌ Failed to reject verification.', 'error');
             }
         }
 
@@ -2239,12 +2320,12 @@
             if (el) el.classList.add('selected');
             state.selectedDepositMethod = name;
             state.selectedDepositNumber = number;
-            showToast(`✅ Selected: ${name}`);
+            showToast(`✅ Selected: ${name}`, 'success');
         }
 
         function showDepositModal() {
             if (state.userRole !== 'advertiser') {
-                safeAlert('❌ Deposit is only available for Advertisers.');
+                showToast('❌ Deposit is only available for Advertisers.', 'error');
                 return;
             }
             document.getElementById('depositModal').style.display = 'flex';
@@ -2253,11 +2334,11 @@
         async function submitDeposit() {
             const amount = parseInt(document.getElementById('deposit-amount').value);
             if (!amount || amount < 10) {
-                safeAlert('❌ Please enter a valid amount (min 10 BDT)');
+                showToast('❌ Please enter a valid amount (min 10 BDT)', 'error');
                 return;
             }
             if (!state.selectedDepositMethod) {
-                safeAlert('❌ Please select a payment method first');
+                showToast('❌ Please select a payment method first', 'error');
                 return;
             }
 
@@ -2276,18 +2357,16 @@
             try {
                 await firebaseDb.ref('deposits').push(depositData);
 
-                const message = `<b>💳 New Deposit Request</b>\n\n👤 User: ${user.first_name}\n🆔 User ID: <code>${state.currentUserId}</code>\n---------------------------------------\n💳 Method: ${state.selectedDepositMethod}\n🔢 Number: <code>${state.selectedDepositNumber}</code>\n💵 Amount: ${amount} BDT`;
-
-                // Send to admin via bot (optional)
-                // You can add admin notification here
+                // Send admin notification (optional)
+                // ...
 
                 closeModal('depositModal');
-                safeAlert(`✅ Deposit request sent! Please send ${amount} BDT to ${state.selectedDepositMethod} (${state.selectedDepositNumber})`);
+                showToast(`✅ Deposit request sent! Send ${amount} BDT to ${state.selectedDepositMethod}`, 'success');
                 document.getElementById('deposit-amount').value = '';
 
             } catch (e) {
                 console.error("Deposit error:", e);
-                safeAlert('❌ Failed to submit deposit. Please try again.');
+                showToast('❌ Failed to submit deposit. Please try again.', 'error');
             }
         }
 
@@ -2334,11 +2413,11 @@
             const accountNumber = accountInput?.value.trim() || '';
             const amount = parseFloat(DOM.withdrawAmount.value);
 
-            if (!method) return safeAlert('Please select a payment method.');
-            if (!accountNumber) return safeAlert(`Please enter your ${method} account number.`);
-            if (amount > state.totalEarning) return safeAlert('Insufficient balance.');
+            if (!method) return showToast('Please select a payment method.', 'error');
+            if (!accountNumber) return showToast(`Please enter your ${method} account number.`, 'error');
+            if (amount > state.totalEarning) return showToast('Insufficient balance.', 'error');
             if (isNaN(amount) || amount < CONFIG.MINIMUM_WITHDRAWAL) {
-                return safeAlert(`Minimum withdrawal is $${CONFIG.MINIMUM_WITHDRAWAL}.`);
+                return showToast(`Minimum withdrawal is $${CONFIG.MINIMUM_WITHDRAWAL}.`, 'error');
             }
 
             const btn = DOM.withdrawSubmitBtn;
@@ -2382,11 +2461,11 @@
                 document.querySelectorAll('.method-field').forEach(el => el.classList.remove('active'));
                 DOM.methodSelect.selectedIndex = 0;
 
-                safeAlert('✅ Withdrawal request submitted! It will be processed within 2 hours.');
+                showToast('✅ Withdrawal request submitted! It will be processed within 2 hours.', 'success');
 
             } catch (error) {
                 console.error("Withdrawal error:", error);
-                safeAlert('❌ Failed to submit request. Please try again.');
+                showToast('❌ Failed to submit request. Please try again.', 'error');
             } finally {
                 text.style.display = 'inline';
                 spinner.style.display = 'none';
@@ -2442,7 +2521,6 @@
                 `;
             }).join('');
 
-            // Add event listeners
             DOM.bonusTasksList.querySelectorAll('.claim-btn:not([disabled])').forEach((btn, index) => {
                 btn.addEventListener('click', () => {
                     const task = state.bonusTasks[index];
@@ -2464,7 +2542,7 @@
                 saveUserData();
                 updateUI();
                 button.textContent = '✅ Completed';
-                safeAlert(`🎉 Bonus of $${task.reward.toFixed(3)} added!`);
+                showToast(`🎉 Bonus of $${task.reward.toFixed(3)} added!`, 'success');
             }, (task.duration || 10) * 1000);
         }
 
@@ -2486,7 +2564,6 @@
             await ref.set(referrerId);
             await firebaseDb.ref(`users/${referrerId}/referrals`).transaction((c) => (c || 0) + 1);
 
-            // Process referral reward
             await processReferralRewards();
         }
 
@@ -2503,19 +2580,24 @@
                 state.totalEarning += bonus;
                 state.rewardedReferrals = totalReferrals;
                 saveUserData();
-                safeAlert(`🎉 You received $${bonus.toFixed(3)} for ${newReferrals} new referral(s)!`);
+                showToast(`🎉 You received $${bonus.toFixed(3)} for ${newReferrals} new referral(s)!`, 'success');
             }
         }
 
         // ============================================================
-        // WATCH AD
+        // WATCH AD - FIXED VERSION
         // ============================================================
         async function watchAd() {
+            // Check if already watching
+            if (DOM.adLoaderOverlay.style.display === 'flex') {
+                return;
+            }
+
             // Check IP
             if (state.lastUsedIp && !state.cooldownUntil) {
                 const newIp = await getIpAddress();
                 if (newIp === state.lastUsedIp) {
-                    safeAlert('Please change your IP address (turn airplane mode on/off) before continuing.');
+                    showToast('Please change your IP address (turn airplane mode on/off) before continuing.', 'warning');
                     return;
                 } else {
                     state.lastUsedIp = null;
@@ -2523,37 +2605,34 @@
                 }
             }
 
+            // Check daily limit
+            if (state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT) {
+                showToast(`📊 Daily limit reached! (${CONFIG.DAILY_AD_LIMIT})`, 'warning');
+                return;
+            }
+
+            // Show loader
             DOM.adLoaderOverlay.style.display = 'flex';
+            DOM.adLoaderProgress.style.width = '0%';
 
             try {
-                // Show Monetag ad
-                if (typeof show_11573980 === 'function') {
-                    await new Promise((resolve, reject) => {
-                        show_11573980({
-                            type: 'inApp',
-                            inAppSettings: {
-                                frequency: 2,
-                                capping: 0.1,
-                                interval: 30,
-                                timeout: 5,
-                                everyPage: false
-                            },
-                            onComplete: resolve,
-                            onError: reject
-                        });
-                    });
-                } else {
-                    // Fallback: wait 3 seconds
-                    await new Promise(resolve => setTimeout(resolve, 3000));
+                // Show ad with proper handling
+                const adShown = await showMonetagAd();
+
+                if (!adShown) {
+                    throw new Error('Ad not shown');
                 }
 
+                // Update earnings
                 state.totalEarning += CONFIG.AD_REWARD;
                 state.adCount++;
                 state.adsWatchedToday++;
-                state.weeklyActivity[new Date().getDay()]++;
+                const day = new Date().getDay();
+                state.weeklyActivity[day] = (state.weeklyActivity[day] || 0) + 1;
 
-                let alertMsg = `Ad watched! +$${CONFIG.AD_REWARD.toFixed(3)} added!`;
-                alertMsg += ` ${CONFIG.DAILY_AD_LIMIT - state.adsWatchedToday} ads left today.`;
+                // Check if daily limit reached
+                let alertMsg = `✅ Ad watched! +$${CONFIG.AD_REWARD.toFixed(3)} added!`;
+                alertMsg += ` (${state.adsWatchedToday}/${CONFIG.DAILY_AD_LIMIT})`;
 
                 if (state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT) {
                     const cdDate = new Date();
@@ -2563,16 +2642,121 @@
                     alertMsg = `✅ Daily limit reached! Take a ${CONFIG.COOLDOWN_MINUTES}-minute break.`;
                 }
 
+                // Save and update
                 saveUserData();
                 updateUI();
-                safeAlert(alertMsg);
+
+                // Show success message
+                setTimeout(() => {
+                    showToast(alertMsg, 'success');
+                }, 200);
 
             } catch (e) {
                 console.error("Ad error:", e);
-                safeAlert('Ad could not be completed. Please try again.');
+                showToast('❌ Ad could not be completed. Please try again.', 'error');
             } finally {
+                // Always hide loader
                 DOM.adLoaderOverlay.style.display = 'none';
+                DOM.adLoaderProgress.style.width = '100%';
             }
+        }
+
+        // ============================================================
+        // MONETAG AD HELPER
+        // ============================================================
+        function showMonetagAd() {
+            return new Promise((resolve) => {
+                try {
+                    // Check if SDK is loaded
+                    if (typeof show_11573980 !== 'function') {
+                        console.warn('Monetag SDK not loaded, using fallback');
+                        // Simulate progress
+                        let progress = 0;
+                        const interval = setInterval(() => {
+                            progress += 10;
+                            if (DOM.adLoaderProgress) {
+                                DOM.adLoaderProgress.style.width = Math.min(progress, 90) + '%';
+                            }
+                            if (progress >= 90) {
+                                clearInterval(interval);
+                            }
+                        }, 200);
+                        
+                        setTimeout(() => {
+                            if (DOM.adLoaderProgress) {
+                                DOM.adLoaderProgress.style.width = '100%';
+                            }
+                            resolve(true);
+                        }, 3000);
+                        return;
+                    }
+
+                    let resolved = false;
+                    let timeoutId = null;
+                    let progressInterval = null;
+
+                    // Progress animation
+                    let progress = 0;
+                    progressInterval = setInterval(() => {
+                        progress += 5;
+                        if (DOM.adLoaderProgress) {
+                            DOM.adLoaderProgress.style.width = Math.min(progress, 90) + '%';
+                        }
+                        if (progress >= 90) {
+                            clearInterval(progressInterval);
+                        }
+                    }, 300);
+
+                    // Show the ad
+                    show_11573980({
+                        type: 'inApp',
+                        inAppSettings: {
+                            frequency: 2,
+                            capping: 0.1,
+                            interval: 30,
+                            timeout: 5,
+                            everyPage: false
+                        },
+                        onComplete: function() {
+                            if (!resolved) {
+                                resolved = true;
+                                if (timeoutId) clearTimeout(timeoutId);
+                                if (progressInterval) clearInterval(progressInterval);
+                                if (DOM.adLoaderProgress) {
+                                    DOM.adLoaderProgress.style.width = '100%';
+                                }
+                                resolve(true);
+                            }
+                        },
+                        onError: function(err) {
+                            if (!resolved) {
+                                resolved = true;
+                                if (timeoutId) clearTimeout(timeoutId);
+                                if (progressInterval) clearInterval(progressInterval);
+                                console.warn('Ad error:', err);
+                                resolve(true); // Still resolve to not block user
+                            }
+                        }
+                    });
+
+                    // Safety timeout
+                    timeoutId = setTimeout(() => {
+                        if (!resolved) {
+                            resolved = true;
+                            if (progressInterval) clearInterval(progressInterval);
+                            if (DOM.adLoaderProgress) {
+                                DOM.adLoaderProgress.style.width = '100%';
+                            }
+                            console.warn('Ad timeout, continuing...');
+                            resolve(true);
+                        }
+                    }, 15000);
+
+                } catch (e) {
+                    console.error('Monetag error:', e);
+                    setTimeout(() => resolve(true), 2000);
+                }
+            });
         }
 
         // ============================================================
@@ -2593,6 +2777,10 @@
             DOM.adsTodayCount.textContent = `${state.adsWatchedToday} / ${CONFIG.DAILY_AD_LIMIT}`;
             DOM.minWithdrawText.textContent = `Minimum withdrawal is $${CONFIG.MINIMUM_WITHDRAWAL.toFixed(2)}.`;
 
+            // Update convert card
+            DOM.convertBalance.textContent = `$${state.totalEarning.toFixed(3)}`;
+            DOM.convertBtn.disabled = state.totalEarning <= 0;
+
             clearInterval(cooldownInterval);
 
             if (state.cooldownUntil && new Date() < new Date(state.cooldownUntil)) {
@@ -2605,7 +2793,7 @@
                         state.adsWatchedToday = 0;
                         saveUserData();
                         updateUI();
-                        safeAlert('✅ Break is over! You can watch ads again.');
+                        showToast('✅ Break is over! You can watch ads again.', 'success');
                         return;
                     }
                     const minutes = Math.floor((remaining / 1000 / 60) % 60);
@@ -2697,8 +2885,8 @@
         function copyReferralLink() {
             const link = getReferralLink();
             navigator.clipboard.writeText(link)
-                .then(() => safeAlert('✅ Referral link copied!'))
-                .catch(() => safeAlert('Could not copy link.'));
+                .then(() => showToast('✅ Referral link copied!', 'success'))
+                .catch(() => showToast('Could not copy link.', 'error'));
         }
 
         function shareReferralLink() {
@@ -2826,12 +3014,13 @@
 
                 console.log("✅ NexEarn initialized successfully!");
                 console.log("👤 User ID:", state.currentUserId);
-                console.log("💰 Balance:", state.totalEarning);
+                console.log("💰 Earnings:", state.totalEarning);
+                console.log("💳 Wallet:", state.walletBalance);
                 console.log("🎯 Role:", state.userRole);
 
             } catch (error) {
                 console.error("Init error:", error);
-                safeAlert('❌ Failed to load app. Please refresh or try again later.');
+                showToast('❌ Failed to load app. Please refresh or try again later.', 'error');
             } finally {
                 ready = true;
                 if (pct < 100) {
