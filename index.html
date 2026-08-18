@@ -1399,18 +1399,31 @@
         </div>
     </div>
 
-    <!-- Verify Ad Modal -->
+    <!-- Verify Ad Modal (Updated with Title & Description) -->
     <div id="verifyAdModal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal('verifyAdModal')">&times;</button>
-            <h3 class="card-title">📸 Submit Proof</h3>
-            <p style="font-size:13px; color:var(--text-light); margin-bottom:12px;">Take a screenshot of the ad and upload it here</p>
+            <h3 class="card-title">📸 Submit Ad Verification</h3>
+            <p style="font-size:13px; color:var(--text-light); margin-bottom:12px;">Please provide details about the ad you watched and upload a screenshot as proof.</p>
+            
             <div id="verify-ad-info"></div>
+            
+            <div class="form-group">
+                <label>Ad Title *</label>
+                <input type="text" id="verify-ad-title" placeholder="Enter the ad title" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Ad Description *</label>
+                <textarea id="verify-ad-desc" placeholder="Describe the ad you watched" rows="3" required></textarea>
+            </div>
+            
             <div class="form-group">
                 <label>Upload Screenshot *</label>
                 <input type="file" id="verify-screenshot" accept="image/*" required>
                 <div class="form-hint">Upload PNG, JPG or GIF (Max 5MB)</div>
             </div>
+            
             <button class="action-button" onclick="submitVerification()">
                 <i class="fa-solid fa-upload"></i> <span>Submit for Verification</span>
             </button>
@@ -1510,8 +1523,8 @@
         // STATE
         // ============================================================
         const state = {
-            balance: 0,              // Main balance (for withdrawals)
-            walletBalance: 0,        // Wallet balance (for creating ads)
+            balance: 0,
+            walletBalance: 0,
             adCount: 0,
             adsWatchedToday: 0,
             lastAdWatchedDate: null,
@@ -1580,6 +1593,8 @@
             DOM.adLoaderProgress = document.getElementById('ad-loader-progress');
             DOM.verifyAdInfo = document.getElementById('verify-ad-info');
             DOM.verifyScreenshot = document.getElementById('verify-screenshot');
+            DOM.verifyAdTitle = document.getElementById('verify-ad-title');
+            DOM.verifyAdDesc = document.getElementById('verify-ad-desc');
             DOM.profilePic = document.getElementById('profile-pic');
             DOM.greeting = document.getElementById('greeting');
             DOM.convertBalance = document.getElementById('convert-balance');
@@ -1724,7 +1739,6 @@
                 saveUserData();
             });
             
-            // Listen for deposit approval
             firebaseDb.ref('deposits').orderByChild('userId').equalTo(state.currentUserId).on('child_changed', (snapshot) => {
                 const data = snapshot.val();
                 if (data?.status === 'approved') {
@@ -1856,7 +1870,6 @@
                 return;
             }
             
-            // Convert: Move from balance to walletBalance (1:1)
             state.balance -= amount;
             state.walletBalance += amount;
             
@@ -2061,7 +2074,7 @@
         }
 
         // ============================================================
-        // VERIFICATION
+        // VERIFICATION (Updated with Title & Description)
         // ============================================================
         function openVerifyModal(adId) {
             state.currentVerifyAdId = adId;
@@ -2081,11 +2094,26 @@
             });
 
             DOM.verifyScreenshot.value = '';
+            DOM.verifyAdTitle.value = '';
+            DOM.verifyAdDesc.value = '';
             modal.style.display = 'flex';
         }
 
         async function submitVerification() {
+            const title = DOM.verifyAdTitle.value.trim();
+            const desc = DOM.verifyAdDesc.value.trim();
             const file = DOM.verifyScreenshot.files[0];
+
+            if (!title || title.length < 3) {
+                showToast('❌ Please enter a valid ad title (min 3 characters)', 'error');
+                return;
+            }
+
+            if (!desc || desc.length < 5) {
+                showToast('❌ Please enter a valid description (min 5 characters)', 'error');
+                return;
+            }
+
             if (!file) {
                 showToast('❌ Please upload a screenshot!', 'error');
                 return;
@@ -2109,6 +2137,8 @@
                     adId: state.currentVerifyAdId,
                     userId: state.currentUserId,
                     userName: tg?.initDataUnsafe?.user?.first_name || 'User',
+                    adTitle: title,
+                    adDescription: desc,
                     screenshot: downloadUrl,
                     status: 'pending',
                     createdAt: Date.now()
@@ -2126,11 +2156,11 @@
                 updateUI();
 
                 closeModal('verifyAdModal');
-                showToast('✅ Screenshot submitted! Waiting for admin verification.', 'success');
+                showToast('✅ Verification submitted! Waiting for admin approval.', 'success');
 
             } catch (e) {
                 console.error("Verification error:", e);
-                showToast('❌ Failed to upload screenshot: ' + e.message, 'error');
+                showToast('❌ Failed to submit verification: ' + e.message, 'error');
             }
         }
 
@@ -2308,7 +2338,7 @@
         }
 
         // ============================================================
-        // VERIFICATION REQUESTS (Advertiser)
+        // VERIFICATION REQUESTS (Advertiser - Updated)
         // ============================================================
         function renderVerificationRequests(ads) {
             if (!DOM.verificationContainer || state.userRole !== 'advertiser') return;
@@ -2330,6 +2360,10 @@
                         <div class="ad-header">
                             <span class="ad-title">Verification from ${escapeHTML(v.userName || 'User')}</span>
                             <span class="ad-status pending">⏳ Pending</span>
+                        </div>
+                        <div style="font-size:13px; color:var(--text-light); margin:6px 0;">
+                            <strong>Title:</strong> ${escapeHTML(v.adTitle || 'N/A')}<br>
+                            <strong>Description:</strong> ${escapeHTML(v.adDescription || 'N/A')}
                         </div>
                         ${v.screenshot ? `<img src="${v.screenshot}" class="ad-image" alt="Screenshot" style="cursor:pointer;" onclick="window.open('${v.screenshot}','_blank')" loading="lazy">` : ''}
                         <div class="ad-footer" style="margin-top:8px;">
@@ -2673,7 +2707,7 @@
         }
 
         // ============================================================
-        // WATCH AD - FIXED VERSION
+        // WATCH AD
         // ============================================================
         async function watchAd() {
             if (DOM.adLoaderOverlay.style.display === 'flex') return;
@@ -2701,7 +2735,6 @@
                 const adShown = await showMonetagAd();
                 if (!adShown) throw new Error('Ad not shown');
 
-                // Add reward to balance
                 state.balance += CONFIG.AD_REWARD;
                 state.adCount++;
                 state.adsWatchedToday++;
@@ -2835,7 +2868,6 @@
             DOM.adsTodayCount.textContent = `${state.adsWatchedToday} / ${CONFIG.DAILY_AD_LIMIT}`;
             DOM.minWithdrawText.textContent = `Minimum withdrawal is $${CONFIG.MINIMUM_WITHDRAWAL.toFixed(2)}.`;
 
-            // Update convert card
             DOM.convertBalance.textContent = `$${state.balance.toFixed(3)}`;
             DOM.convertBtn.disabled = state.balance <= 0;
 
