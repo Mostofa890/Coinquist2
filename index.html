@@ -15,19 +15,6 @@
     <!-- Monetag SDK -->
     <script src='//libtl.com/sdk.js' data-zone='11573980' data-sdk='show_11573980'></script>
 
-    <script>
-        (function() {
-            try {
-                const tg = window.Telegram.WebApp;
-                const isDark = tg.colorScheme === 'dark';
-                document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-            } catch (e) {
-                const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-                document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-            }
-        })();
-    </script>
-    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         
@@ -47,6 +34,7 @@
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
+            --info: #3b82f6;
         }
         
         [data-theme="dark"] { 
@@ -343,7 +331,7 @@
             z-index: 1;
         }
         
-        /* ===== WALLET CARD ===== */
+        /* ===== WALLET CARD - Only for Advertiser ===== */
         .wallet-card {
             display: flex;
             justify-content: space-between;
@@ -355,6 +343,7 @@
             margin-bottom: 16px;
             animation: fadeIn 0.7s ease-out;
             transition: var(--transition);
+            display: none;
         }
         
         .wallet-card .label {
@@ -575,6 +564,7 @@
         .ad-status.active { color: #10b981; background: rgba(16, 185, 129, 0.1); }
         .ad-status.pending { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
         .ad-status.completed { color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+        .ad-status.expired { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
         
         .ad-btn {
             padding: 6px 16px;
@@ -1123,27 +1113,32 @@
             color: var(--danger);
         }
 
-        .verification-status {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
+        /* ===== AD CAMPAIGN INFO ===== */
+        .campaign-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin: 8px 0;
+            padding: 8px;
+            background: var(--background-color);
+            border-radius: 8px;
         }
-
-        .verification-status.approved {
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--success);
+        
+        .campaign-info .info-item {
+            display: flex;
+            flex-direction: column;
         }
-
-        .verification-status.rejected {
-            background: rgba(239, 68, 68, 0.15);
-            color: var(--danger);
+        
+        .campaign-info .info-item .label {
+            font-size: 10px;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-
-        .verification-status.pending {
-            background: rgba(245, 158, 11, 0.15);
-            color: var(--warning);
+        
+        .campaign-info .info-item .value {
+            font-size: 14px;
+            font-weight: 700;
         }
     </style>
 </head>
@@ -1208,13 +1203,13 @@
             <div class="amount" id="total-earning">$0.000</div>
         </div>
 
-        <!-- ===== WALLET CARD (Deposit) ===== -->
-        <div class="wallet-card">
+        <!-- ===== WALLET CARD - Only for Advertiser ===== -->
+        <div class="wallet-card" id="walletCard">
             <div>
                 <div class="label" id="walletLabel">💳 Wallet Balance</div>
                 <div class="value" id="wallet-balance">$0.000</div>
             </div>
-            <button class="deposit-btn" id="depositButton" onclick="showDepositModal()" style="display:none;">
+            <button class="deposit-btn" id="depositButton" onclick="showDepositModal()">
                 + Deposit
             </button>
         </div>
@@ -1291,7 +1286,7 @@
         <!-- ===== ADVERTISER VIEW ===== -->
         <div id="advertiserView" style="display:none;">
             <div class="card">
-                <div class="card-title">📢 Create New Ad</div>
+                <div class="card-title">📢 Create New Ad Campaign</div>
                 <form id="create-ad-form">
                     <div class="form-group">
                         <label>Ad Title *</label>
@@ -1318,17 +1313,24 @@
                         <label>Total Budget ($)</label>
                         <input type="number" id="ad-budget" step="0.01" value="1.00" min="0.10" required>
                     </div>
+                    <div class="form-group">
+                        <label>Campaign Duration (Days)</label>
+                        <input type="number" id="ad-duration" value="7" min="1" max="30" required>
+                        <div class="form-hint">How many days should this ad run?</div>
+                    </div>
                     <div id="ad-budget-info" style="font-size:12px; color:var(--text-light); margin-bottom:12px;">
-                        Total Views: <span id="ad-total-views">1000</span> | Cost per view: $<span id="ad-cost-per-view">0.001</span>
+                        Total Views: <span id="ad-total-views">1000</span> | 
+                        Cost per view: $<span id="ad-cost-per-view">0.001</span> | 
+                        Duration: <span id="ad-duration-display">7</span> days
                     </div>
                     <button type="submit" class="action-button" id="create-ad-btn">
-                        <i class="fa-solid fa-plus"></i> <span>Create Ad</span>
+                        <i class="fa-solid fa-plus"></i> <span>Create Ad Campaign</span>
                     </button>
                 </form>
             </div>
 
             <div class="card">
-                <div class="card-title">📊 My Ads</div>
+                <div class="card-title">📊 My Ad Campaigns</div>
                 <div id="my-ads-container"></div>
             </div>
 
@@ -1610,8 +1612,8 @@
         // STATE
         // ============================================================
         const state = {
-            balance: 0,
-            walletBalance: 0,
+            balance: 0,              // Publisher balance (earnings from watching ads)
+            walletBalance: 0,        // Advertiser wallet (for creating ads)
             adCount: 0,
             adsWatchedToday: 0,
             lastAdWatchedDate: null,
@@ -1648,6 +1650,7 @@
             DOM.container = document.querySelector('.container');
             DOM.totalEarning = document.getElementById('total-earning');
             DOM.walletBalance = document.getElementById('wallet-balance');
+            DOM.walletCard = document.getElementById('walletCard');
             DOM.adCount = document.getElementById('ad-count');
             DOM.adsTodayCount = document.getElementById('ads-today-count');
             DOM.referralCount = document.getElementById('referral-count');
@@ -1691,6 +1694,8 @@
             DOM.convertAmountDisplay = document.getElementById('convert-amount-display');
             DOM.convertMaxDisplay = document.getElementById('convert-max-display');
             DOM.rejectReason = document.getElementById('reject-reason');
+            DOM.adDuration = document.getElementById('ad-duration');
+            DOM.adDurationDisplay = document.getElementById('ad-duration-display');
         }
 
         // ============================================================
@@ -1846,14 +1851,12 @@
             });
         }
 
-        // Listen for verification updates (for users to see rejection reasons)
         function listenUserVerifications() {
             if (!firebaseDb || !state.currentUserId) return;
             
             firebaseDb.ref('verifications').orderByChild('userId').equalTo(state.currentUserId).on('value', (snapshot) => {
                 const data = snapshot.val() || {};
                 state.verifications = Object.entries(data).map(([id, item]) => ({ id, ...item }));
-                // Update verification status in ad list if needed
                 listenAds();
             });
         }
@@ -2038,8 +2041,7 @@
                 DOM.advertiserView.style.display = 'none';
                 DOM.userRoleBadge.textContent = '📖 Publisher';
                 DOM.userRoleBadge.className = 'role-badge';
-                DOM.walletLabel.textContent = '💳 Wallet Balance';
-                DOM.depositBtn.style.display = 'none';
+                DOM.walletCard.style.display = 'none';
                 document.getElementById('convertCard').style.display = 'block';
                 listenAds();
             } else {
@@ -2047,8 +2049,7 @@
                 DOM.advertiserView.style.display = 'block';
                 DOM.userRoleBadge.textContent = '📢 Advertiser';
                 DOM.userRoleBadge.className = 'role-badge advertiser';
-                DOM.walletLabel.textContent = '💳 Wallet Balance';
-                DOM.depositBtn.style.display = 'block';
+                DOM.walletCard.style.display = 'flex';
                 document.getElementById('convertCard').style.display = 'none';
                 listenAds();
             }
@@ -2074,10 +2075,18 @@
         }
 
         // ============================================================
-        // RENDER ADS - Updated to show verification status
+        // RENDER ADS
         // ============================================================
         function renderAdList(ads) {
             if (!DOM.adListContainer) return;
+
+            // Check for expired ads
+            const now = Date.now();
+            ads.forEach(ad => {
+                if (ad.endDate && ad.endDate < now && ad.status === 'active') {
+                    firebaseDb.ref(`ads/${ad.id}/status`).set('expired');
+                }
+            });
 
             let filtered = ads.filter(ad => ad.status === 'active' || ad.status === 'paused');
 
@@ -2103,8 +2112,8 @@
                 const totalViews = ad.totalViews || 100;
                 const isVerified = ad.verified || false;
                 const imageUrl = ad.imageUrl || '';
+                const daysLeft = ad.endDate ? Math.ceil((ad.endDate - Date.now()) / (1000 * 60 * 60 * 24)) : 0;
 
-                // Check verification status for this ad
                 const userVerification = state.verifications.find(v => v.adId === ad.id);
                 let verificationStatus = '';
                 let rejectionReason = '';
@@ -2122,15 +2131,17 @@
 
                 let statusText = '🟢 Active';
                 let statusClass = 'active';
-                if (isVerified) { statusText = '✅ Verified'; statusClass = 'completed'; }
+                if (ad.status === 'expired') { statusText = '⏰ Expired'; statusClass = 'expired'; }
+                else if (isVerified) { statusText = '✅ Verified'; statusClass = 'completed'; }
                 else if (isViewed && verificationStatus === 'rejected') { statusText = '❌ Rejected'; statusClass = 'pending'; }
                 else if (isViewed) { statusText = '⏳ Pending'; statusClass = 'pending'; }
 
                 let btnText = '👁 View';
                 let btnAction = `viewAd('${ad.id}')`;
-                let btnDisabled = !isActive;
+                let btnDisabled = !isActive || ad.status === 'expired';
 
-                if (isVerified) { btnText = '✓ Verified'; btnDisabled = true; }
+                if (ad.status === 'expired') { btnText = '⏰ Expired'; btnDisabled = true; }
+                else if (isVerified) { btnText = '✓ Verified'; btnDisabled = true; }
                 else if (isViewed) { 
                     if (verificationStatus === 'rejected') {
                         btnText = '❌ Rejected';
@@ -2150,8 +2161,17 @@
                         ${imageUrl ? `<img src="${imageUrl}" class="ad-image" alt="Ad image" loading="lazy">` : ''}
                         <div class="ad-desc">${escapeHTML(ad.desc || 'No description')}</div>
                         ${rejectionReason ? `<div class="reject-reason-text"><strong>❌ Rejected:</strong> ${escapeHTML(rejectionReason)}</div>` : ''}
+                        <div class="campaign-info">
+                            <div class="info-item">
+                                <span class="label">Views</span>
+                                <span class="value">${views}/${totalViews}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Days Left</span>
+                                <span class="value">${daysLeft > 0 ? daysLeft : 'Expired'}</span>
+                            </div>
+                        </div>
                         <div class="ad-footer">
-                            <span class="ad-views"><i class="fa-solid fa-eye"></i> ${views}/${totalViews}</span>
                             <span class="ad-status ${statusClass}">${statusText}</span>
                             <button class="ad-btn view ${isViewed ? 'completed' : ''}"
                                     onclick="${btnAction}"
@@ -2168,7 +2188,6 @@
         // VIEW AD
         // ============================================================
         async function viewAd(adId) {
-            // Check if already submitted and rejected
             const existingVerification = state.verifications.find(v => v.adId === adId);
             if (existingVerification && existingVerification.status === 'rejected') {
                 showToast(`❌ This verification was rejected. Reason: ${existingVerification.rejectReason || 'No reason provided'}`, 'error');
@@ -2198,6 +2217,11 @@
                     return;
                 }
 
+                if (ad.endDate && ad.endDate < Date.now()) {
+                    showToast('❌ This ad has expired!', 'error');
+                    return;
+                }
+
                 safeOpenLink(ad.link);
                 state.currentVerifyAdId = adId;
                 openVerifyModal(adId);
@@ -2208,10 +2232,9 @@
         }
 
         // ============================================================
-        // VERIFICATION - Updated
+        // VERIFICATION
         // ============================================================
         function openVerifyModal(adId) {
-            // Check if already rejected
             const existingVerification = state.verifications.find(v => v.adId === adId);
             if (existingVerification && existingVerification.status === 'rejected') {
                 showToast(`❌ This verification was rejected. Reason: ${existingVerification.rejectReason || 'No reason provided'}`, 'error');
@@ -2307,13 +2330,17 @@
         }
 
         // ============================================================
-        // ADVERTISER - CREATE AD
+        // ADVERTISER - CREATE AD with Duration
         // ============================================================
         function setupCreateAdForm() {
             if (!DOM.createAdForm) return;
 
             document.getElementById('ad-budget').addEventListener('input', updateAdCost);
             document.getElementById('ad-reward').addEventListener('input', updateAdCost);
+            DOM.adDuration.addEventListener('input', function() {
+                DOM.adDurationDisplay.textContent = this.value;
+                updateAdCost();
+            });
 
             DOM.createAdForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
@@ -2323,6 +2350,7 @@
                 const link = document.getElementById('ad-link').value.trim();
                 const reward = parseFloat(document.getElementById('ad-reward').value) || 0.001;
                 const budget = parseFloat(document.getElementById('ad-budget').value) || 1.00;
+                const duration = parseInt(document.getElementById('ad-duration').value) || 7;
                 const fileInput = document.getElementById('ad-image');
 
                 if (!title || !link) {
@@ -2331,7 +2359,7 @@
                 }
 
                 if (state.walletBalance < budget) {
-                    showToast(`❌ Insufficient balance! You need $${budget.toFixed(2)}. Please deposit or convert earnings.`, 'error');
+                    showToast(`❌ Insufficient wallet balance! You need $${budget.toFixed(2)}. Please deposit or convert earnings.`, 'error');
                     return;
                 }
 
@@ -2360,6 +2388,8 @@
 
                 state.walletBalance -= budget;
 
+                const endDate = Date.now() + (duration * 24 * 60 * 60 * 1000);
+
                 const adData = {
                     title,
                     desc: desc || 'No description',
@@ -2372,7 +2402,9 @@
                     createdAt: Date.now(),
                     budget,
                     imageUrl,
-                    verified: false
+                    verified: false,
+                    duration: duration,
+                    endDate: endDate
                 };
 
                 try {
@@ -2380,7 +2412,7 @@
                     await newRef.set(adData);
                     saveUserData();
                     updateUI();
-                    showToast('✅ Ad created successfully!', 'success');
+                    showToast(`✅ Ad campaign created successfully! Runs for ${duration} days.`, 'success');
                     DOM.createAdForm.reset();
                     document.getElementById('ad-image').value = '';
                     listenAds();
@@ -2396,9 +2428,11 @@
         function updateAdCost() {
             const reward = parseFloat(document.getElementById('ad-reward').value) || 0.001;
             const budget = parseFloat(document.getElementById('ad-budget').value) || 1.00;
+            const duration = parseInt(document.getElementById('ad-duration').value) || 7;
             const totalViews = Math.floor(budget / reward);
             document.getElementById('ad-total-views').textContent = totalViews || 0;
             document.getElementById('ad-cost-per-view').textContent = reward.toFixed(4);
+            document.getElementById('ad-duration-display').textContent = duration;
         }
 
         // ============================================================
@@ -2410,7 +2444,7 @@
             const myAds = ads.filter(ad => ad.createdBy === state.currentUserId);
 
             if (myAds.length === 0) {
-                DOM.myAdsContainer.innerHTML = `<div class="empty-state"><i class="fa-solid fa-rectangle-ad"></i><p>You haven't created any ads yet</p></div>`;
+                DOM.myAdsContainer.innerHTML = `<div class="empty-state"><i class="fa-solid fa-rectangle-ad"></i><p>You haven't created any ad campaigns yet</p></div>`;
                 return;
             }
 
@@ -2419,33 +2453,51 @@
                 const totalViews = ad.totalViews || 100;
                 const progress = Math.min((views / totalViews) * 100, 100);
                 const imageUrl = ad.imageUrl || '';
+                const daysLeft = ad.endDate ? Math.ceil((ad.endDate - Date.now()) / (1000 * 60 * 60 * 24)) : 0;
+                const isExpired = ad.endDate && ad.endDate < Date.now();
+
+                let statusText = ad.status === 'active' ? '🟢 Active' : '⏳ Paused';
+                let statusClass = ad.status === 'active' ? 'active' : 'pending';
+                if (isExpired) { statusText = '⏰ Expired'; statusClass = 'expired'; }
 
                 return `
                     <div class="ad-card">
                         <div class="ad-header">
                             <span class="ad-title">${escapeHTML(ad.title || 'Untitled')}</span>
-                            <span class="ad-status ${ad.status === 'active' ? 'active' : 'pending'}">
-                                ${ad.status === 'active' ? '🟢 Active' : '⏳ Paused'}
-                            </span>
+                            <span class="ad-status ${statusClass}">${statusText}</span>
                         </div>
                         ${imageUrl ? `<img src="${imageUrl}" class="ad-image" alt="Ad image" loading="lazy">` : ''}
                         <div class="ad-desc">${escapeHTML(ad.desc || 'No description')}</div>
-                        <div style="margin-top:8px;">
-                            <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-light);">
-                                <span>Views: ${views}/${totalViews}</span>
-                                <span>Reward: $${ad.reward?.toFixed(3) || '0.001'}</span>
+                        <div class="campaign-info">
+                            <div class="info-item">
+                                <span class="label">Views</span>
+                                <span class="value">${views}/${totalViews}</span>
                             </div>
-                            <div style="width:100%; height:4px; background:var(--border-color); border-radius:4px; margin-top:4px; overflow:hidden;">
-                                <div style="width:${progress}%; height:100%; background:linear-gradient(90deg, #10b981, #3b82f6); border-radius:4px; transition:width 0.3s;"></div>
+                            <div class="info-item">
+                                <span class="label">Budget</span>
+                                <span class="value">$${ad.budget?.toFixed(2) || '0.00'}</span>
                             </div>
+                            <div class="info-item">
+                                <span class="label">Days Left</span>
+                                <span class="value">${daysLeft > 0 ? daysLeft : 'Expired'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Reward/View</span>
+                                <span class="value">$${ad.reward?.toFixed(3) || '0.001'}</span>
+                            </div>
+                        </div>
+                        <div style="width:100%; height:4px; background:var(--border-color); border-radius:4px; margin-top:8px; overflow:hidden;">
+                            <div style="width:${progress}%; height:100%; background:linear-gradient(90deg, #10b981, #3b82f6); border-radius:4px; transition:width 0.3s;"></div>
                         </div>
                         <div class="ad-footer" style="margin-top:8px; padding-top:8px; border-top:1px solid var(--border-color);">
                             <button class="ad-btn" style="background:#ef4444; color:#fff; padding:4px 14px; border:none; border-radius:6px; font-size:11px; cursor:pointer;" onclick="deleteAd('${ad.id}')">
                                 <i class="fa-solid fa-trash"></i> Delete
                             </button>
-                            <button class="ad-btn" style="background:#f59e0b; color:#fff; padding:4px 14px; border:none; border-radius:6px; font-size:11px; cursor:pointer;" onclick="toggleAdStatus('${ad.id}')">
-                                ${ad.status === 'active' ? '⏸ Pause' : '▶️ Activate'}
-                            </button>
+                            ${!isExpired ? `
+                                <button class="ad-btn" style="background:#f59e0b; color:#fff; padding:4px 14px; border:none; border-radius:6px; font-size:11px; cursor:pointer;" onclick="toggleAdStatus('${ad.id}')">
+                                    ${ad.status === 'active' ? '⏸ Pause' : '▶️ Activate'}
+                                </button>
+                            ` : ''}
                         </div>
                     </div>
                 `;
@@ -2453,10 +2505,10 @@
         }
 
         async function deleteAd(adId) {
-            if (!confirm('Delete this ad?')) return;
+            if (!confirm('Delete this ad campaign?')) return;
             try {
                 await firebaseDb.ref(`ads/${adId}`).remove();
-                showToast('✅ Ad deleted!', 'success');
+                showToast('✅ Ad campaign deleted!', 'success');
                 listenAds();
             } catch (e) {
                 console.error("Delete error:", e);
@@ -2469,6 +2521,10 @@
                 const snapshot = await firebaseDb.ref(`ads/${adId}`).once('value');
                 const ad = snapshot.val();
                 if (!ad) return;
+                if (ad.endDate && ad.endDate < Date.now()) {
+                    showToast('❌ This ad has expired!', 'error');
+                    return;
+                }
                 const newStatus = ad.status === 'active' ? 'paused' : 'active';
                 await firebaseDb.ref(`ads/${adId}/status`).set(newStatus);
                 showToast(`✅ Ad ${newStatus === 'active' ? 'activated' : 'paused'}!`, 'success');
@@ -2480,7 +2536,7 @@
         }
 
         // ============================================================
-        // VERIFICATION REQUESTS (Advertiser - Updated with Reject Reason)
+        // VERIFICATION REQUESTS (Advertiser)
         // ============================================================
         function renderVerificationRequests(ads) {
             if (!DOM.verificationContainer || state.userRole !== 'advertiser') return;
@@ -2521,14 +2577,12 @@
             });
         }
 
-        // Open reject modal with reason
         function openRejectModal(verificationId) {
             pendingRejectVerificationId = verificationId;
             DOM.rejectReason.value = '';
             document.getElementById('rejectReasonModal').style.display = 'flex';
         }
 
-        // Confirm reject with reason
         async function confirmReject() {
             const reason = DOM.rejectReason.value.trim();
             
@@ -2545,13 +2599,6 @@
             try {
                 await firebaseDb.ref(`verifications/${pendingRejectVerificationId}/status`).set('rejected');
                 await firebaseDb.ref(`verifications/${pendingRejectVerificationId}/rejectReason`).set(reason);
-                
-                // Get the verification data to find the user
-                const snapshot = await firebaseDb.ref(`verifications/${pendingRejectVerificationId}`).once('value');
-                const data = snapshot.val();
-                
-                // Send notification to user (optional)
-                // You can add a notification system here
                 
                 closeModal('rejectReasonModal');
                 pendingRejectVerificationId = null;
