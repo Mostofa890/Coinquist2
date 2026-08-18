@@ -1166,6 +1166,61 @@
             margin: 12px 0;
             border-left: 3px solid var(--danger);
         }
+
+        /* ===== DEPOSIT FORM ===== */
+        .deposit-form-group {
+            margin-bottom: 12px;
+        }
+        
+        .deposit-form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 4px;
+        }
+        
+        .deposit-form-group input,
+        .deposit-form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            background: var(--background-color);
+            color: var(--text-color);
+            transition: var(--transition);
+        }
+        
+        .deposit-form-group input:focus,
+        .deposit-form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.15);
+        }
+        
+        .deposit-form-group textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
+        
+        .deposit-form-group .form-hint {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        /* ===== WITHDRAW DISABLED ===== */
+        .withdraw-disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        
+        .withdraw-disabled .nav-button {
+            opacity: 0.5;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -1340,12 +1395,17 @@
                         <input type="number" id="ad-budget" step="0.01" value="1.00" min="0.10" required>
                     </div>
                     <div class="form-group">
+                        <label>Target Views</label>
+                        <input type="number" id="ad-target-views" value="100" min="10" required>
+                        <div class="form-hint">How many people should see this ad?</div>
+                    </div>
+                    <div class="form-group">
                         <label>Campaign Duration (Days)</label>
                         <input type="number" id="ad-duration" value="7" min="1" max="30" required>
                         <div class="form-hint">How many days should this ad run?</div>
                     </div>
                     <div id="ad-budget-info" style="font-size:12px; color:var(--text-light); margin-bottom:12px;">
-                        Total Views: <span id="ad-total-views">1000</span> | 
+                        Total Views: <span id="ad-total-views">100</span> | 
                         Cost per view: $<span id="ad-cost-per-view">0.001</span> | 
                         Duration: <span id="ad-duration-display">7</span> days
                     </div>
@@ -1382,7 +1442,7 @@
 
     <!-- ===== NAV BAR ===== -->
     <div class="nav-bar">
-        <button class="nav-button" onclick="showModal('withdrawModal', this)">
+        <button class="nav-button" id="withdrawNavBtn" onclick="showModal('withdrawModal', this)">
             <i class="fa-solid fa-money-bill-transfer"></i>
             <span>Withdraw</span>
         </button>
@@ -1450,17 +1510,33 @@
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal('depositModal')">&times;</button>
             <h3 class="card-title">💳 Deposit Funds</h3>
-            <p style="font-size:13px; color:var(--text-light); margin-bottom:14px;">Select a payment method and enter amount</p>
-            <div id="deposit-methods-list"></div>
-            <div style="margin-top:12px;">
-                <div class="form-group">
-                    <label>Amount (BDT)</label>
-                    <input type="number" id="deposit-amount" step="1" placeholder="Enter amount in BDT" min="10">
-                </div>
-                <button class="action-button" onclick="submitDeposit()">
-                    <i class="fa-solid fa-check"></i> <span>Confirm Deposit</span>
-                </button>
+            <p style="font-size:13px; color:var(--text-light); margin-bottom:14px;">Select a payment method and provide transaction details</p>
+            
+            <div class="deposit-form-group">
+                <label>Payment Method *</label>
+                <div id="deposit-methods-list"></div>
             </div>
+            
+            <div class="deposit-form-group">
+                <label>Sender Number *</label>
+                <input type="text" id="deposit-sender" placeholder="Enter your sending number">
+                <div class="form-hint">The number you sent money from</div>
+            </div>
+            
+            <div class="deposit-form-group">
+                <label>Transaction ID *</label>
+                <input type="text" id="deposit-trxid" placeholder="Enter transaction ID">
+                <div class="form-hint">The transaction ID from your payment</div>
+            </div>
+            
+            <div class="deposit-form-group">
+                <label>Amount (BDT) *</label>
+                <input type="number" id="deposit-amount" step="1" placeholder="Enter amount in BDT" min="10">
+            </div>
+            
+            <button class="action-button" onclick="submitDeposit()">
+                <i class="fa-solid fa-check"></i> <span>Submit Deposit Request</span>
+            </button>
         </div>
     </div>
 
@@ -1646,8 +1722,8 @@
             MINIMUM_WITHDRAWAL: 0.10,
             COOLDOWN_MINUTES: 30,
             REFERRAL_REWARD: 0.01,
-            REFUND_PERCENTAGE: 60, // 60% refund on ad deletion
-            COMPANY_FEE_PERCENTAGE: 40, // 40% company fee
+            REFUND_PERCENTAGE: 60,
+            COMPANY_FEE_PERCENTAGE: 40,
             withdrawalMethods: ['Binance', 'Bikash', 'Nogad'],
             welcomeNotice: {
                 title: "Welcome to NexEarn! 🎉",
@@ -1745,6 +1821,7 @@
             DOM.methodFieldsContainer = document.getElementById('method-fields-container');
             DOM.withdrawAmount = document.getElementById('withdraw-amount');
             DOM.withdrawSubmitBtn = document.getElementById('withdraw-submit-button');
+            DOM.withdrawNavBtn = document.getElementById('withdrawNavBtn');
             DOM.adLoaderOverlay = document.getElementById('ad-loader-overlay');
             DOM.adLoaderProgress = document.getElementById('ad-loader-progress');
             DOM.verifyAdInfo = document.getElementById('verify-ad-info');
@@ -1761,9 +1838,13 @@
             DOM.rejectReason = document.getElementById('reject-reason');
             DOM.adDuration = document.getElementById('ad-duration');
             DOM.adDurationDisplay = document.getElementById('ad-duration-display');
+            DOM.adTargetViews = document.getElementById('ad-target-views');
             DOM.deleteBudget = document.getElementById('delete-budget');
             DOM.deleteRefund = document.getElementById('delete-refund');
             DOM.deleteFee = document.getElementById('delete-fee');
+            DOM.depositSender = document.getElementById('deposit-sender');
+            DOM.depositTrxid = document.getElementById('deposit-trxid');
+            DOM.depositAmount = document.getElementById('deposit-amount');
         }
 
         // ============================================================
@@ -2111,6 +2192,8 @@
                 DOM.userRoleBadge.className = 'role-badge';
                 DOM.walletCard.style.display = 'none';
                 document.getElementById('convertCard').style.display = 'block';
+                DOM.withdrawNavBtn.style.opacity = '1';
+                DOM.withdrawNavBtn.style.pointerEvents = 'auto';
                 listenAds();
             } else {
                 DOM.publisherView.style.display = 'none';
@@ -2119,6 +2202,8 @@
                 DOM.userRoleBadge.className = 'role-badge advertiser';
                 DOM.walletCard.style.display = 'flex';
                 document.getElementById('convertCard').style.display = 'none';
+                DOM.withdrawNavBtn.style.opacity = '0.5';
+                DOM.withdrawNavBtn.style.pointerEvents = 'none';
                 listenAds();
             }
             updateUI();
@@ -2397,7 +2482,7 @@
         }
 
         // ============================================================
-        // ADVERTISER - CREATE AD with Duration
+        // ADVERTISER - CREATE AD with Target Views
         // ============================================================
         function setupCreateAdForm() {
             if (!DOM.createAdForm) return;
@@ -2408,6 +2493,7 @@
                 DOM.adDurationDisplay.textContent = this.value;
                 updateAdCost();
             });
+            DOM.adTargetViews.addEventListener('input', updateAdCost);
 
             DOM.createAdForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
@@ -2418,6 +2504,7 @@
                 const reward = parseFloat(document.getElementById('ad-reward').value) || 0.001;
                 const budget = parseFloat(document.getElementById('ad-budget').value) || 1.00;
                 const duration = parseInt(document.getElementById('ad-duration').value) || 7;
+                const targetViews = parseInt(document.getElementById('ad-target-views').value) || 100;
                 const fileInput = document.getElementById('ad-image');
 
                 if (!title || !link) {
@@ -2431,8 +2518,8 @@
                 }
 
                 const totalViews = Math.floor(budget / reward);
-                if (totalViews < 1) {
-                    showToast('❌ Budget too low for the reward amount!', 'error');
+                if (totalViews < targetViews) {
+                    showToast(`❌ Budget too low for ${targetViews} views! Need $${(targetViews * reward).toFixed(2)}`, 'error');
                     return;
                 }
 
@@ -2462,7 +2549,7 @@
                     desc: desc || 'No description',
                     link,
                     reward,
-                    totalViews,
+                    totalViews: targetViews,
                     views: 0,
                     status: 'active',
                     createdBy: state.currentUserId,
@@ -2479,7 +2566,7 @@
                     await newRef.set(adData);
                     saveUserData();
                     updateUI();
-                    showToast(`✅ Ad campaign created successfully! Runs for ${duration} days.`, 'success');
+                    showToast(`✅ Ad campaign created! ${targetViews} views, ${duration} days.`, 'success');
                     DOM.createAdForm.reset();
                     document.getElementById('ad-image').value = '';
                     listenAds();
@@ -2496,14 +2583,15 @@
             const reward = parseFloat(document.getElementById('ad-reward').value) || 0.001;
             const budget = parseFloat(document.getElementById('ad-budget').value) || 1.00;
             const duration = parseInt(document.getElementById('ad-duration').value) || 7;
+            const targetViews = parseInt(document.getElementById('ad-target-views').value) || 100;
             const totalViews = Math.floor(budget / reward);
-            document.getElementById('ad-total-views').textContent = totalViews || 0;
+            document.getElementById('ad-total-views').textContent = targetViews || 0;
             document.getElementById('ad-cost-per-view').textContent = reward.toFixed(4);
             document.getElementById('ad-duration-display').textContent = duration;
         }
 
         // ============================================================
-        // DELETE AD WITH REFUND (60% refund, 40% company fee)
+        // DELETE AD WITH REFUND
         // ============================================================
         function openDeleteConfirm(adId) {
             pendingDeleteAdId = adId;
@@ -2542,21 +2630,8 @@
                 const refund = budget * (CONFIG.REFUND_PERCENTAGE / 100);
                 const fee = budget * (CONFIG.COMPANY_FEE_PERCENTAGE / 100);
 
-                // Add refund to wallet balance
                 state.walletBalance += refund;
-                
-                // Remove the ad
                 await firebaseDb.ref(`ads/${pendingDeleteAdId}`).remove();
-
-                // Save to history
-                const deleteRecord = {
-                    type: 'ad_deleted',
-                    adTitle: ad.title || 'Untitled',
-                    budget: budget,
-                    refund: refund,
-                    fee: fee,
-                    date: new Date().toISOString()
-                };
 
                 state.withdrawalHistory.unshift({
                     method: 'Ad Deleted (Refund)',
@@ -2773,7 +2848,7 @@
         }
 
         // ============================================================
-        // DEPOSIT SYSTEM
+        // DEPOSIT SYSTEM - Updated with Sender Number, Transaction ID
         // ============================================================
         function renderDepositMethods() {
             if (!DOM.depositMethodsList) return;
@@ -2813,11 +2888,25 @@
         }
 
         async function submitDeposit() {
-            const amount = parseInt(document.getElementById('deposit-amount').value);
+            const sender = DOM.depositSender.value.trim();
+            const trxid = DOM.depositTrxid.value.trim();
+            const amount = parseInt(DOM.depositAmount.value);
+
+            if (!sender) {
+                showToast('❌ Please enter your sender number', 'error');
+                return;
+            }
+
+            if (!trxid) {
+                showToast('❌ Please enter the transaction ID', 'error');
+                return;
+            }
+
             if (!amount || amount < 10) {
                 showToast('❌ Please enter a valid amount (min 10 BDT)', 'error');
                 return;
             }
+
             if (!state.selectedDepositMethod) {
                 showToast('❌ Please select a payment method first', 'error');
                 return;
@@ -2830,6 +2919,8 @@
                 userName: user.first_name || 'User',
                 method: state.selectedDepositMethod,
                 number: state.selectedDepositNumber,
+                senderNumber: sender,
+                transactionId: trxid,
                 amount: amount,
                 status: 'pending',
                 createdAt: Date.now()
@@ -2839,8 +2930,11 @@
                 await firebaseDb.ref('deposits').push(depositData);
 
                 closeModal('depositModal');
-                showToast(`✅ Deposit request sent! Send ${amount} BDT to ${state.selectedDepositMethod}`, 'success');
-                document.getElementById('deposit-amount').value = '';
+                showToast(`✅ Deposit request sent! We'll verify your transaction.`, 'success');
+                
+                DOM.depositSender.value = '';
+                DOM.depositTrxid.value = '';
+                DOM.depositAmount.value = '';
 
             } catch (e) {
                 console.error("Deposit error:", e);
@@ -2849,7 +2943,7 @@
         }
 
         // ============================================================
-        // WITHDRAWAL
+        // WITHDRAWAL - Only for Publisher
         // ============================================================
         function populateWithdrawalMethods() {
             if (!DOM.methodSelect) return;
@@ -2885,6 +2979,11 @@
 
         async function handleWithdrawal(e) {
             e.preventDefault();
+
+            if (state.userRole !== 'publisher') {
+                showToast('❌ Only Publishers can withdraw!', 'error');
+                return;
+            }
 
             const method = DOM.methodSelect.value;
             const accountInput = document.getElementById(method?.toLowerCase() + '-account');
