@@ -1260,30 +1260,36 @@
             border-radius: 10px;
             margin-bottom: 14px;
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 6px;
         }
         
         .calc-result .calc-item {
             display: flex;
             flex-direction: column;
+            text-align: center;
         }
         
         .calc-result .calc-item .label {
-            font-size: 10px;
+            font-size: 9px;
             color: var(--text-light);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         
         .calc-result .calc-item .value {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             color: var(--text-color);
         }
         
         .calc-result .calc-item .value.highlight {
             color: var(--primary-color);
+        }
+        
+        .calc-result .calc-item .value.reward {
+            color: var(--success);
+            font-size: 18px;
         }
     </style>
 </head>
@@ -1454,28 +1460,19 @@
                     <!-- Auto Calculate Section -->
                     <div class="calc-result" id="calcResult">
                         <div class="calc-item">
-                            <span class="label">💵 Total Views</span>
+                            <span class="label">👁 Total Views</span>
                             <span class="value highlight" id="calcViews">0</span>
-                        </div>
-                        <div class="calc-item">
-                            <span class="label">💰 Reward per View</span>
-                            <span class="value highlight" id="calcReward">$0.001</span>
                         </div>
                         <div class="calc-item">
                             <span class="label">📅 Duration</span>
                             <span class="value" id="calcDuration">7 days</span>
                         </div>
                         <div class="calc-item">
-                            <span class="label">💳 Total Budget</span>
-                            <span class="value" id="calcBudget">$1.00</span>
+                            <span class="label">💰 Reward per View</span>
+                            <span class="value reward" id="calcReward">$0.0000</span>
                         </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label>Reward per View ($)</label>
-                        <input type="number" id="ad-reward" step="0.001" value="0.001" min="0.0001" required>
-                        <div class="form-hint">How much each user earns per view</div>
-                    </div>
                     <div class="form-group">
                         <label>Total Budget ($)</label>
                         <input type="number" id="ad-budget" step="0.01" value="1.00" min="0.10" required>
@@ -1495,7 +1492,7 @@
                     <div id="ad-budget-info" style="font-size:12px; color:var(--text-light); margin-bottom:12px; background:var(--background-color); padding:10px; border-radius:8px;">
                         <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:4px;">
                             <span>Total Views: <strong id="ad-total-views">100</strong></span>
-                            <span>Cost per view: <strong>$<span id="ad-cost-per-view">0.001</span></strong></span>
+                            <span>Cost per view: <strong>$<span id="ad-cost-per-view">0.0000</span></strong></span>
                             <span>Duration: <strong id="ad-duration-display">7</strong> days</span>
                         </div>
                     </div>
@@ -1937,7 +1934,6 @@
             DOM.adDuration = document.getElementById('ad-duration');
             DOM.adDurationDisplay = document.getElementById('ad-duration-display');
             DOM.adTargetViews = document.getElementById('ad-target-views');
-            DOM.adReward = document.getElementById('ad-reward');
             DOM.adBudget = document.getElementById('ad-budget');
             DOM.adTotalViews = document.getElementById('ad-total-views');
             DOM.adCostPerView = document.getElementById('ad-cost-per-view');
@@ -1953,7 +1949,6 @@
             DOM.calcViews = document.getElementById('calcViews');
             DOM.calcReward = document.getElementById('calcReward');
             DOM.calcDuration = document.getElementById('calcDuration');
-            DOM.calcBudget = document.getElementById('calcBudget');
             DOM.calcResult = document.getElementById('calcResult');
         }
 
@@ -2346,38 +2341,35 @@
         }
 
         // ============================================================
-        // AUTO CALCULATE AD COST
+        // AUTO CALCULATE AD COST - REWARD CALCULATION
         // ============================================================
         function updateAdCalculation() {
-            const reward = parseFloat(DOM.adReward.value) || 0.001;
             const budget = parseFloat(DOM.adBudget.value) || 1.00;
             const targetViews = parseInt(DOM.adTargetViews.value) || 100;
             const duration = parseInt(DOM.adDuration.value) || 7;
             
-            // Calculate total views based on budget and reward
-            const calculatedViews = Math.floor(budget / reward);
+            // Calculate reward per view (budget / targetViews)
+            const rewardPerView = budget / targetViews;
             
             // Update display
-            DOM.adTotalViews.textContent = calculatedViews || 0;
-            DOM.adCostPerView.textContent = reward.toFixed(4);
+            DOM.adTotalViews.textContent = targetViews || 0;
+            DOM.adCostPerView.textContent = rewardPerView.toFixed(4);
             DOM.adDurationDisplay.textContent = duration;
             
             // Update calculator
-            DOM.calcViews.textContent = calculatedViews || 0;
-            DOM.calcReward.textContent = `$${reward.toFixed(4)}`;
+            DOM.calcViews.textContent = targetViews || 0;
+            DOM.calcReward.textContent = `$${rewardPerView.toFixed(4)}`;
             DOM.calcDuration.textContent = `${duration} days`;
-            DOM.calcBudget.textContent = `$${budget.toFixed(2)}`;
             
-            // Update target views placeholder if needed
-            DOM.adTargetViews.placeholder = `Max ${calculatedViews}`;
-            
-            // Check if target views is valid
-            if (targetViews > calculatedViews) {
-                DOM.adTargetViews.style.borderColor = 'var(--danger)';
+            // Check if reward is valid
+            if (rewardPerView < 0.0001) {
+                DOM.calcReward.style.color = 'var(--danger)';
+                DOM.adCostPerView.style.color = 'var(--danger)';
                 DOM.calcResult.style.borderColor = 'var(--danger)';
                 DOM.calcResult.style.background = 'rgba(239, 68, 68, 0.06)';
             } else {
-                DOM.adTargetViews.style.borderColor = 'var(--border-color)';
+                DOM.calcReward.style.color = 'var(--success)';
+                DOM.adCostPerView.style.color = 'var(--text-color)';
                 DOM.calcResult.style.borderColor = 'rgba(16, 185, 129, 0.2)';
                 DOM.calcResult.style.background = 'rgba(16, 185, 129, 0.06)';
             }
@@ -2390,7 +2382,6 @@
             if (!DOM.createAdForm) return;
 
             // Auto calculate on input change
-            DOM.adReward.addEventListener('input', updateAdCalculation);
             DOM.adBudget.addEventListener('input', updateAdCalculation);
             DOM.adTargetViews.addEventListener('input', updateAdCalculation);
             DOM.adDuration.addEventListener('input', updateAdCalculation);
@@ -2404,7 +2395,6 @@
                 const title = document.getElementById('ad-title').value.trim();
                 const desc = document.getElementById('ad-desc').value.trim();
                 const link = document.getElementById('ad-link').value.trim();
-                const reward = parseFloat(DOM.adReward.value) || 0.001;
                 const budget = parseFloat(DOM.adBudget.value) || 1.00;
                 const duration = parseInt(DOM.adDuration.value) || 7;
                 const targetViews = parseInt(DOM.adTargetViews.value) || 100;
@@ -2420,10 +2410,10 @@
                     return;
                 }
 
-                // Calculate total views based on budget and reward
-                const calculatedViews = Math.floor(budget / reward);
-                if (calculatedViews < targetViews) {
-                    showToast(`❌ Budget too low for ${targetViews} views! Need $${(targetViews * reward).toFixed(2)}`, 'error');
+                // Calculate reward per view
+                const reward = budget / targetViews;
+                if (reward < 0.0001) {
+                    showToast(`❌ Reward per view is too low! Minimum is $0.0001. Either increase budget or decrease target views.`, 'error');
                     return;
                 }
 
@@ -2452,14 +2442,14 @@
                     title,
                     desc: desc || 'No description',
                     link,
-                    reward,
+                    reward: reward,
                     totalViews: targetViews,
                     views: 0,
                     status: 'active',
                     approved: false,
                     createdBy: state.currentUserId,
                     createdAt: Date.now(),
-                    budget,
+                    budget: budget,
                     imageUrl,
                     verified: false,
                     duration: duration,
@@ -2471,7 +2461,7 @@
                     await newRef.set(adData);
                     saveUserData();
                     updateUI();
-                    showToast(`✅ Ad campaign created! ${targetViews} views, ${duration} days. Waiting for admin approval.`, 'success');
+                    showToast(`✅ Ad campaign created! ${targetViews} views, $${reward.toFixed(4)} per view, ${duration} days. Waiting for admin approval.`, 'success');
                     DOM.createAdForm.reset();
                     document.getElementById('ad-image').value = '';
                     updateAdCalculation();
@@ -2857,6 +2847,10 @@
                             <div class="info-item">
                                 <span class="label">Budget</span>
                                 <span class="value">$${budget.toFixed(2)}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Reward/View</span>
+                                <span class="value">$${ad.reward?.toFixed(4) || '0.001'}</span>
                             </div>
                             <div class="info-item">
                                 <span class="label">Days Left</span>
