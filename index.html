@@ -565,6 +565,7 @@
         .ad-status.pending { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
         .ad-status.completed { color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
         .ad-status.expired { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+        .ad-status.approved { color: var(--success); background: rgba(16, 185, 129, 0.1); }
         
         .ad-btn {
             padding: 6px 16px;
@@ -1220,6 +1221,35 @@
         .withdraw-disabled .nav-button {
             opacity: 0.5;
             pointer-events: none;
+        }
+
+        /* ===== AD STATUS BADGE ===== */
+        .ad-status-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        
+        .ad-status-badge.pending {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+        
+        .ad-status-badge.approved {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+        
+        .ad-status-badge.rejected {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+        
+        .ad-status-badge.active {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--info);
         }
     </style>
 </head>
@@ -2228,7 +2258,7 @@
         }
 
         // ============================================================
-        // RENDER ADS
+        // RENDER ADS - Updated with approval system
         // ============================================================
         function renderAdList(ads) {
             if (!DOM.adListContainer) return;
@@ -2240,7 +2270,11 @@
                 }
             });
 
-            let filtered = ads.filter(ad => ad.status === 'active' || ad.status === 'paused');
+            // Only show approved ads to users
+            let filtered = ads.filter(ad => 
+                (ad.status === 'active' || ad.status === 'paused') && 
+                ad.approved === true
+            );
 
             if (state.currentFilter === 'viewed') {
                 filtered = filtered.filter(ad => state.viewedAds.includes(ad.id));
@@ -2359,8 +2393,8 @@
             try {
                 const snapshot = await firebaseDb.ref(`ads/${adId}`).once('value');
                 const ad = snapshot.val();
-                if (!ad || ad.status !== 'active') {
-                    showToast('❌ Ad not available!', 'error');
+                if (!ad || ad.status !== 'active' || !ad.approved) {
+                    showToast('❌ Ad not available or pending approval!', 'error');
                     return;
                 }
 
@@ -2374,6 +2408,12 @@
                     return;
                 }
 
+                // Check if the ad creator is viewing their own ad
+                if (ad.createdBy === state.currentUserId) {
+                    showToast('❌ You cannot view your own ad!', 'error');
+                    return;
+                }
+
                 safeOpenLink(ad.link);
                 state.currentVerifyAdId = adId;
                 openVerifyModal(adId);
@@ -2384,7 +2424,7 @@
         }
 
         // ============================================================
-        // VERIFICATION
+        // VERIFICATION - Add reward on success
         // ============================================================
         function openVerifyModal(adId) {
             const existingVerification = state.verifications.find(v => v.adId === adId);
@@ -2467,6 +2507,7 @@
                     state.viewedAds.push(state.currentVerifyAdId);
                 }
 
+                // Update view count
                 await firebaseDb.ref(`ads/${state.currentVerifyAdId}/views`).transaction((current) => (current || 0) + 1);
 
                 saveUserData();
@@ -2482,7 +2523,7 @@
         }
 
         // ============================================================
-        // ADVERTISER - CREATE AD with Target Views
+        // ADVERTISER - CREATE AD with Approval Status
         // ============================================================
         function setupCreateAdForm() {
             if (!DOM.createAdForm) return;
@@ -2552,6 +2593,7 @@
                     totalViews: targetViews,
                     views: 0,
                     status: 'active',
+                    approved: false, // Needs admin approval
                     createdBy: state.currentUserId,
                     createdAt: Date.now(),
                     budget,
@@ -2566,7 +2608,7 @@
                     await newRef.set(adData);
                     saveUserData();
                     updateUI();
-                    showToast(`✅ Ad campaign created! ${targetViews} views, ${duration} days.`, 'success');
+                    showToast(`✅ Ad campaign created! Waiting for admin approval.`, 'success');
                     DOM.createAdForm.reset();
                     document.getElementById('ad-image').value = '';
                     listenAds();
@@ -2657,7 +2699,7 @@
         }
 
         // ============================================================
-        // RENDER MY ADS
+        // RENDER MY ADS - Updated with approval status
         // ============================================================
         function renderMyAds(ads) {
             if (!DOM.myAdsContainer) return;
@@ -2677,10 +2719,12 @@
                 const daysLeft = ad.endDate ? Math.ceil((ad.endDate - Date.now()) / (1000 * 60 * 60 * 24)) : 0;
                 const isExpired = ad.endDate && ad.endDate < Date.now();
                 const budget = ad.budget || 0;
+                const isApproved = ad.approved || false;
 
                 let statusText = ad.status === 'active' ? '🟢 Active' : '⏳ Paused';
                 let statusClass = ad.status === 'active' ? 'active' : 'pending';
                 if (isExpired) { statusText = '⏰ Expired'; statusClass = 'expired'; }
+                if (!isApproved) { statusText = '⏳ Pending Approval'; statusClass = 'pending'; }
 
                 return `
                     <div class="ad-card">
@@ -2704,8 +2748,8 @@
                                 <span class="value">${daysLeft > 0 ? daysLeft : 'Expired'}</span>
                             </div>
                             <div class="info-item">
-                                <span class="label">Reward/View</span>
-                                <span class="value">$${ad.reward?.toFixed(3) || '0.001'}</span>
+                                <span class="label">Status</span>
+                                <span class="value"><span class="ad-status-badge ${isApproved ? 'approved' : 'pending'}">${isApproved ? '✅ Approved' : '⏳ Pending'}</span></span>
                             </div>
                         </div>
                         <div style="width:100%; height:4px; background:var(--border-color); border-radius:4px; margin-top:8px; overflow:hidden;">
@@ -2715,7 +2759,7 @@
                             <button class="ad-btn" style="background:#ef4444; color:#fff; padding:4px 14px; border:none; border-radius:6px; font-size:11px; cursor:pointer;" onclick="openDeleteConfirm('${ad.id}')">
                                 <i class="fa-solid fa-trash"></i> Delete
                             </button>
-                            ${!isExpired ? `
+                            ${!isExpired && isApproved ? `
                                 <button class="ad-btn" style="background:#f59e0b; color:#fff; padding:4px 14px; border:none; border-radius:6px; font-size:11px; cursor:pointer;" onclick="toggleAdStatus('${ad.id}')">
                                     ${ad.status === 'active' ? '⏸ Pause' : '▶️ Activate'}
                                 </button>
@@ -2735,6 +2779,10 @@
                     showToast('❌ This ad has expired!', 'error');
                     return;
                 }
+                if (!ad.approved) {
+                    showToast('❌ This ad is pending approval!', 'error');
+                    return;
+                }
                 const newStatus = ad.status === 'active' ? 'paused' : 'active';
                 await firebaseDb.ref(`ads/${adId}/status`).set(newStatus);
                 showToast(`✅ Ad ${newStatus === 'active' ? 'activated' : 'paused'}!`, 'success');
@@ -2746,7 +2794,7 @@
         }
 
         // ============================================================
-        // VERIFICATION REQUESTS (Advertiser)
+        // VERIFICATION REQUESTS (Advertiser) - Updated
         // ============================================================
         function renderVerificationRequests(ads) {
             if (!DOM.verificationContainer || state.userRole !== 'advertiser') return;
@@ -2833,6 +2881,7 @@
                 const ad = adSnapshot.val();
 
                 if (ad) {
+                    // Add reward to user's balance
                     await firebaseDb.ref(`users/${data.userId}/balance`).transaction((current) => (current || 0) + ad.reward);
                 }
 
@@ -2848,7 +2897,7 @@
         }
 
         // ============================================================
-        // DEPOSIT SYSTEM - Updated with Sender Number, Transaction ID
+        // DEPOSIT SYSTEM
         // ============================================================
         function renderDepositMethods() {
             if (!DOM.depositMethodsList) return;
