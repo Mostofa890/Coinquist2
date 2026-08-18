@@ -1251,6 +1251,40 @@
             background: rgba(59, 130, 246, 0.2);
             color: var(--info);
         }
+
+        /* ===== AD CALCULATOR ===== */
+        .calc-result {
+            background: rgba(16, 185, 129, 0.06);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 12px 14px;
+            border-radius: 10px;
+            margin-bottom: 14px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+        
+        .calc-result .calc-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .calc-result .calc-item .label {
+            font-size: 10px;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .calc-result .calc-item .value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+        
+        .calc-result .calc-item .value.highlight {
+            color: var(--primary-color);
+        }
     </style>
 </head>
 <body>
@@ -1416,17 +1450,40 @@
                         <input type="file" id="ad-image" accept="image/*">
                         <div class="form-hint">Upload PNG, JPG or GIF (Max 5MB)</div>
                     </div>
+                    
+                    <!-- Auto Calculate Section -->
+                    <div class="calc-result" id="calcResult">
+                        <div class="calc-item">
+                            <span class="label">💵 Total Views</span>
+                            <span class="value highlight" id="calcViews">0</span>
+                        </div>
+                        <div class="calc-item">
+                            <span class="label">💰 Reward per View</span>
+                            <span class="value highlight" id="calcReward">$0.001</span>
+                        </div>
+                        <div class="calc-item">
+                            <span class="label">📅 Duration</span>
+                            <span class="value" id="calcDuration">7 days</span>
+                        </div>
+                        <div class="calc-item">
+                            <span class="label">💳 Total Budget</span>
+                            <span class="value" id="calcBudget">$1.00</span>
+                        </div>
+                    </div>
+                    
                     <div class="form-group">
                         <label>Reward per View ($)</label>
-                        <input type="number" id="ad-reward" step="0.001" value="0.001" min="0.001" required>
+                        <input type="number" id="ad-reward" step="0.001" value="0.001" min="0.0001" required>
+                        <div class="form-hint">How much each user earns per view</div>
                     </div>
                     <div class="form-group">
                         <label>Total Budget ($)</label>
                         <input type="number" id="ad-budget" step="0.01" value="1.00" min="0.10" required>
+                        <div class="form-hint">Total amount you want to spend</div>
                     </div>
                     <div class="form-group">
                         <label>Target Views</label>
-                        <input type="number" id="ad-target-views" value="100" min="10" required>
+                        <input type="number" id="ad-target-views" value="100" min="1" required>
                         <div class="form-hint">How many people should see this ad?</div>
                     </div>
                     <div class="form-group">
@@ -1434,11 +1491,15 @@
                         <input type="number" id="ad-duration" value="7" min="1" max="30" required>
                         <div class="form-hint">How many days should this ad run?</div>
                     </div>
-                    <div id="ad-budget-info" style="font-size:12px; color:var(--text-light); margin-bottom:12px;">
-                        Total Views: <span id="ad-total-views">100</span> | 
-                        Cost per view: $<span id="ad-cost-per-view">0.001</span> | 
-                        Duration: <span id="ad-duration-display">7</span> days
+                    
+                    <div id="ad-budget-info" style="font-size:12px; color:var(--text-light); margin-bottom:12px; background:var(--background-color); padding:10px; border-radius:8px;">
+                        <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:4px;">
+                            <span>Total Views: <strong id="ad-total-views">100</strong></span>
+                            <span>Cost per view: <strong>$<span id="ad-cost-per-view">0.001</span></strong></span>
+                            <span>Duration: <strong id="ad-duration-display">7</strong> days</span>
+                        </div>
                     </div>
+                    
                     <button type="submit" class="action-button" id="create-ad-btn">
                         <i class="fa-solid fa-plus"></i> <span>Create Ad Campaign</span>
                     </button>
@@ -1751,7 +1812,7 @@
             AD_REWARD: 0.001,
             DAILY_AD_LIMIT: 15,
             MINIMUM_WITHDRAWAL: 0.10,
-            MINIMUM_DEPOSIT: 10, // Minimum deposit in BDT
+            MINIMUM_DEPOSIT: 10,
             COOLDOWN_MINUTES: 30,
             REFERRAL_REWARD: 0.01,
             REFUND_PERCENTAGE: 60,
@@ -1876,6 +1937,10 @@
             DOM.adDuration = document.getElementById('ad-duration');
             DOM.adDurationDisplay = document.getElementById('ad-duration-display');
             DOM.adTargetViews = document.getElementById('ad-target-views');
+            DOM.adReward = document.getElementById('ad-reward');
+            DOM.adBudget = document.getElementById('ad-budget');
+            DOM.adTotalViews = document.getElementById('ad-total-views');
+            DOM.adCostPerView = document.getElementById('ad-cost-per-view');
             DOM.deleteBudget = document.getElementById('delete-budget');
             DOM.deleteRefund = document.getElementById('delete-refund');
             DOM.deleteFee = document.getElementById('delete-fee');
@@ -1883,6 +1948,13 @@
             DOM.depositTrxid = document.getElementById('deposit-trxid');
             DOM.depositAmount = document.getElementById('deposit-amount');
             DOM.depositMinAmount = document.getElementById('deposit-min-amount');
+            
+            // Calculator elements
+            DOM.calcViews = document.getElementById('calcViews');
+            DOM.calcReward = document.getElementById('calcReward');
+            DOM.calcDuration = document.getElementById('calcDuration');
+            DOM.calcBudget = document.getElementById('calcBudget');
+            DOM.calcResult = document.getElementById('calcResult');
         }
 
         // ============================================================
@@ -2274,6 +2346,146 @@
         }
 
         // ============================================================
+        // AUTO CALCULATE AD COST
+        // ============================================================
+        function updateAdCalculation() {
+            const reward = parseFloat(DOM.adReward.value) || 0.001;
+            const budget = parseFloat(DOM.adBudget.value) || 1.00;
+            const targetViews = parseInt(DOM.adTargetViews.value) || 100;
+            const duration = parseInt(DOM.adDuration.value) || 7;
+            
+            // Calculate total views based on budget and reward
+            const calculatedViews = Math.floor(budget / reward);
+            
+            // Update display
+            DOM.adTotalViews.textContent = calculatedViews || 0;
+            DOM.adCostPerView.textContent = reward.toFixed(4);
+            DOM.adDurationDisplay.textContent = duration;
+            
+            // Update calculator
+            DOM.calcViews.textContent = calculatedViews || 0;
+            DOM.calcReward.textContent = `$${reward.toFixed(4)}`;
+            DOM.calcDuration.textContent = `${duration} days`;
+            DOM.calcBudget.textContent = `$${budget.toFixed(2)}`;
+            
+            // Update target views placeholder if needed
+            DOM.adTargetViews.placeholder = `Max ${calculatedViews}`;
+            
+            // Check if target views is valid
+            if (targetViews > calculatedViews) {
+                DOM.adTargetViews.style.borderColor = 'var(--danger)';
+                DOM.calcResult.style.borderColor = 'var(--danger)';
+                DOM.calcResult.style.background = 'rgba(239, 68, 68, 0.06)';
+            } else {
+                DOM.adTargetViews.style.borderColor = 'var(--border-color)';
+                DOM.calcResult.style.borderColor = 'rgba(16, 185, 129, 0.2)';
+                DOM.calcResult.style.background = 'rgba(16, 185, 129, 0.06)';
+            }
+        }
+
+        // ============================================================
+        // ADVERTISER - CREATE AD
+        // ============================================================
+        function setupCreateAdForm() {
+            if (!DOM.createAdForm) return;
+
+            // Auto calculate on input change
+            DOM.adReward.addEventListener('input', updateAdCalculation);
+            DOM.adBudget.addEventListener('input', updateAdCalculation);
+            DOM.adTargetViews.addEventListener('input', updateAdCalculation);
+            DOM.adDuration.addEventListener('input', updateAdCalculation);
+
+            // Initial calculation
+            updateAdCalculation();
+
+            DOM.createAdForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const title = document.getElementById('ad-title').value.trim();
+                const desc = document.getElementById('ad-desc').value.trim();
+                const link = document.getElementById('ad-link').value.trim();
+                const reward = parseFloat(DOM.adReward.value) || 0.001;
+                const budget = parseFloat(DOM.adBudget.value) || 1.00;
+                const duration = parseInt(DOM.adDuration.value) || 7;
+                const targetViews = parseInt(DOM.adTargetViews.value) || 100;
+                const fileInput = document.getElementById('ad-image');
+
+                if (!title || !link) {
+                    showToast('❌ Please fill all required fields!', 'error');
+                    return;
+                }
+
+                if (state.walletBalance < budget) {
+                    showToast(`❌ Insufficient wallet balance! You need $${budget.toFixed(2)}. Please deposit or convert earnings.`, 'error');
+                    return;
+                }
+
+                // Calculate total views based on budget and reward
+                const calculatedViews = Math.floor(budget / reward);
+                if (calculatedViews < targetViews) {
+                    showToast(`❌ Budget too low for ${targetViews} views! Need $${(targetViews * reward).toFixed(2)}`, 'error');
+                    return;
+                }
+
+                let imageUrl = '';
+                if (fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    if (file.size > 5 * 1024 * 1024) {
+                        showToast('❌ Image size must be less than 5MB!', 'error');
+                        return;
+                    }
+                    try {
+                        showToast('📤 Uploading image...', '');
+                        imageUrl = await uploadImage(file);
+                        showToast('✅ Image uploaded!', 'success');
+                    } catch (e) {
+                        showToast('❌ Failed to upload image: ' + e.message, 'error');
+                        return;
+                    }
+                }
+
+                state.walletBalance -= budget;
+
+                const endDate = Date.now() + (duration * 24 * 60 * 60 * 1000);
+
+                const adData = {
+                    title,
+                    desc: desc || 'No description',
+                    link,
+                    reward,
+                    totalViews: targetViews,
+                    views: 0,
+                    status: 'active',
+                    approved: false,
+                    createdBy: state.currentUserId,
+                    createdAt: Date.now(),
+                    budget,
+                    imageUrl,
+                    verified: false,
+                    duration: duration,
+                    endDate: endDate
+                };
+
+                try {
+                    const newRef = firebaseDb.ref('ads').push();
+                    await newRef.set(adData);
+                    saveUserData();
+                    updateUI();
+                    showToast(`✅ Ad campaign created! ${targetViews} views, ${duration} days. Waiting for admin approval.`, 'success');
+                    DOM.createAdForm.reset();
+                    document.getElementById('ad-image').value = '';
+                    updateAdCalculation();
+                    listenAds();
+                } catch (e) {
+                    console.error("Create ad error:", e);
+                    state.walletBalance += budget;
+                    saveUserData();
+                    showToast('❌ Failed to create ad. Please try again.', 'error');
+                }
+            });
+        }
+
+        // ============================================================
         // RENDER ADS
         // ============================================================
         function renderAdList(ads) {
@@ -2357,7 +2569,7 @@
                     <div class="ad-card">
                         <div class="ad-header">
                             <span class="ad-title">${escapeHTML(ad.title || 'Untitled')}</span>
-                            <span class="ad-reward">+$${ad.reward?.toFixed(3) || '0.001'}</span>
+                            <span class="ad-reward">+$${ad.reward?.toFixed(4) || '0.001'}</span>
                         </div>
                         ${imageUrl ? `<img src="${imageUrl}" class="ad-image" alt="Ad image" loading="lazy">` : ''}
                         <div class="ad-desc">${escapeHTML(ad.desc || 'No description')}</div>
@@ -2423,7 +2635,6 @@
                     return;
                 }
 
-                // Check if the ad creator is viewing their own ad
                 if (ad.createdBy === state.currentUserId) {
                     showToast('❌ You cannot view your own ad!', 'error');
                     return;
@@ -2457,7 +2668,7 @@
                     DOM.verifyAdInfo.innerHTML = `
                         <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:10px; margin-bottom:12px;">
                             <strong>${escapeHTML(ad.title)}</strong>
-                            <div style="font-size:12px; color:var(--text-light);">Reward: $${ad.reward?.toFixed(3) || '0.001'}</div>
+                            <div style="font-size:12px; color:var(--text-light);">Reward: $${ad.reward?.toFixed(4) || '0.001'}</div>
                             ${ad.imageUrl ? `<img src="${ad.imageUrl}" style="width:100%; max-height:100px; object-fit:cover; border-radius:6px; margin-top:6px;" loading="lazy">` : ''}
                         </div>
                     `;
@@ -2534,117 +2745,6 @@
                 console.error("Verification error:", e);
                 showToast('❌ Failed to submit verification: ' + e.message, 'error');
             }
-        }
-
-        // ============================================================
-        // ADVERTISER - CREATE AD
-        // ============================================================
-        function setupCreateAdForm() {
-            if (!DOM.createAdForm) return;
-
-            document.getElementById('ad-budget').addEventListener('input', updateAdCost);
-            document.getElementById('ad-reward').addEventListener('input', updateAdCost);
-            DOM.adDuration.addEventListener('input', function() {
-                DOM.adDurationDisplay.textContent = this.value;
-                updateAdCost();
-            });
-            DOM.adTargetViews.addEventListener('input', updateAdCost);
-
-            DOM.createAdForm.addEventListener('submit', async function(e) {
-                e.preventDefault();
-
-                const title = document.getElementById('ad-title').value.trim();
-                const desc = document.getElementById('ad-desc').value.trim();
-                const link = document.getElementById('ad-link').value.trim();
-                const reward = parseFloat(document.getElementById('ad-reward').value) || 0.001;
-                const budget = parseFloat(document.getElementById('ad-budget').value) || 1.00;
-                const duration = parseInt(document.getElementById('ad-duration').value) || 7;
-                const targetViews = parseInt(document.getElementById('ad-target-views').value) || 100;
-                const fileInput = document.getElementById('ad-image');
-
-                if (!title || !link) {
-                    showToast('❌ Please fill all required fields!', 'error');
-                    return;
-                }
-
-                if (state.walletBalance < budget) {
-                    showToast(`❌ Insufficient wallet balance! You need $${budget.toFixed(2)}. Please deposit or convert earnings.`, 'error');
-                    return;
-                }
-
-                // Calculate total views based on budget and reward
-                const calculatedViews = Math.floor(budget / reward);
-                if (calculatedViews < targetViews) {
-                    showToast(`❌ Budget too low for ${targetViews} views! Need $${(targetViews * reward).toFixed(2)}`, 'error');
-                    return;
-                }
-
-                let imageUrl = '';
-                if (fileInput.files.length > 0) {
-                    const file = fileInput.files[0];
-                    if (file.size > 5 * 1024 * 1024) {
-                        showToast('❌ Image size must be less than 5MB!', 'error');
-                        return;
-                    }
-                    try {
-                        showToast('📤 Uploading image...', '');
-                        imageUrl = await uploadImage(file);
-                        showToast('✅ Image uploaded!', 'success');
-                    } catch (e) {
-                        showToast('❌ Failed to upload image: ' + e.message, 'error');
-                        return;
-                    }
-                }
-
-                state.walletBalance -= budget;
-
-                const endDate = Date.now() + (duration * 24 * 60 * 60 * 1000);
-
-                const adData = {
-                    title,
-                    desc: desc || 'No description',
-                    link,
-                    reward,
-                    totalViews: targetViews,
-                    views: 0,
-                    status: 'active',
-                    approved: false,
-                    createdBy: state.currentUserId,
-                    createdAt: Date.now(),
-                    budget,
-                    imageUrl,
-                    verified: false,
-                    duration: duration,
-                    endDate: endDate
-                };
-
-                try {
-                    const newRef = firebaseDb.ref('ads').push();
-                    await newRef.set(adData);
-                    saveUserData();
-                    updateUI();
-                    showToast(`✅ Ad campaign created! ${targetViews} views, ${duration} days. Waiting for admin approval.`, 'success');
-                    DOM.createAdForm.reset();
-                    document.getElementById('ad-image').value = '';
-                    listenAds();
-                } catch (e) {
-                    console.error("Create ad error:", e);
-                    state.walletBalance += budget;
-                    saveUserData();
-                    showToast('❌ Failed to create ad. Please try again.', 'error');
-                }
-            });
-        }
-
-        function updateAdCost() {
-            const reward = parseFloat(document.getElementById('ad-reward').value) || 0.001;
-            const budget = parseFloat(document.getElementById('ad-budget').value) || 1.00;
-            const duration = parseInt(document.getElementById('ad-duration').value) || 7;
-            const targetViews = parseInt(document.getElementById('ad-target-views').value) || 100;
-            const calculatedViews = Math.floor(budget / reward);
-            document.getElementById('ad-total-views').textContent = calculatedViews || 0;
-            document.getElementById('ad-cost-per-view').textContent = reward.toFixed(4);
-            document.getElementById('ad-duration-display').textContent = duration;
         }
 
         // ============================================================
@@ -2911,7 +3011,7 @@
         }
 
         // ============================================================
-        // DEPOSIT SYSTEM - Updated with Min Amount
+        // DEPOSIT SYSTEM
         // ============================================================
         function renderDepositMethods() {
             if (!DOM.depositMethodsList) return;
@@ -3260,7 +3360,7 @@
                 const day = new Date().getDay();
                 state.weeklyActivity[day] = (state.weeklyActivity[day] || 0) + 1;
 
-                let alertMsg = `✅ Ad watched! +$${CONFIG.AD_REWARD.toFixed(3)} added!`;
+                let alertMsg = `✅ Ad watched! +$${CONFIG.AD_REWARD.toFixed(4)} added!`;
                 alertMsg += ` (${state.adsWatchedToday}/${CONFIG.DAILY_AD_LIMIT})`;
 
                 if (state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT) {
