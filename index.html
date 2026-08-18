@@ -343,6 +343,111 @@
             z-index: 1;
         }
         
+        /* ===== WALLET CARD ===== */
+        .wallet-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-background);
+            padding: 14px 18px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            margin-bottom: 16px;
+            animation: fadeIn 0.7s ease-out;
+            transition: var(--transition);
+        }
+        
+        .wallet-card .label {
+            font-size: 13px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+        
+        .wallet-card .value {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-color);
+        }
+        
+        .wallet-card .deposit-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .wallet-card .deposit-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        
+        /* ===== CONVERT CARD ===== */
+        .convert-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+            border: 2px solid var(--success);
+            padding: 16px 18px;
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+            animation: fadeIn 0.7s ease-out;
+        }
+        
+        .convert-card .title {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .convert-card .info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+        }
+        
+        .convert-card .info .balance {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-color);
+        }
+        
+        .convert-card .info .rate {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        .convert-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            margin-top: 10px;
+            font-family: inherit;
+        }
+        
+        .convert-btn:hover:not(:disabled) {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+        
+        .convert-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
         /* ===== STATS GRID ===== */
         .stats-grid {
             display: grid;
@@ -1041,6 +1146,38 @@
             <div class="amount" id="total-earning">$0.000</div>
         </div>
 
+        <!-- ===== WALLET CARD (Deposit) ===== -->
+        <div class="wallet-card">
+            <div>
+                <div class="label" id="walletLabel">💳 Wallet Balance</div>
+                <div class="value" id="wallet-balance">$0.000</div>
+            </div>
+            <button class="deposit-btn" id="depositButton" onclick="showDepositModal()" style="display:none;">
+                + Deposit
+            </button>
+        </div>
+
+        <!-- ===== CONVERT CARD ===== -->
+        <div class="convert-card" id="convertCard">
+            <div class="title">
+                <i class="fa-solid fa-arrows-rotate"></i>
+                Convert Earnings to Wallet
+            </div>
+            <div class="info">
+                <div>
+                    <div style="font-size:12px; color:var(--text-light);">Available to Convert</div>
+                    <div class="balance" id="convert-balance">$0.000</div>
+                </div>
+                <div class="rate">
+                    <div>1:1 Conversion</div>
+                    <div style="font-size:11px; opacity:0.7;">No fees</div>
+                </div>
+            </div>
+            <button class="convert-btn" id="convertBtn" onclick="convertToWallet()">
+                <i class="fa-solid fa-exchange-alt"></i> Convert All to Wallet
+            </button>
+        </div>
+
         <!-- ===== STATS ===== -->
         <div class="stats-grid">
             <div class="stat-item">
@@ -1237,6 +1374,31 @@
         </div>
     </div>
 
+    <!-- Convert Modal -->
+    <div id="convertModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('convertModal')">&times;</button>
+            <h3 class="card-title">🔄 Convert to Wallet</h3>
+            <div style="text-align:center; padding:20px 0;">
+                <div style="font-size:48px; margin-bottom:12px;">💰</div>
+                <div style="font-size:14px; color:var(--text-light);">Amount to Convert</div>
+                <div style="font-size:32px; font-weight:800; color:var(--success);" id="convert-amount-display">$0.000</div>
+                <div style="font-size:12px; color:var(--text-light); margin-top:4px;">1:1 conversion rate • No fees</div>
+            </div>
+            <div class="form-group">
+                <label>Enter Amount to Convert</label>
+                <input type="number" step="0.001" id="convert-input" placeholder="Enter amount" min="0.001">
+                <div class="form-hint">Max: <span id="convert-max-display">$0.000</span></div>
+            </div>
+            <button class="action-button success" onclick="confirmConvert()">
+                <i class="fa-solid fa-exchange-alt"></i> <span>Convert Now</span>
+            </button>
+            <button class="action-button secondary" onclick="closeModal('convertModal')" style="margin-top:10px;">
+                Cancel
+            </button>
+        </div>
+    </div>
+
     <!-- Verify Ad Modal -->
     <div id="verifyAdModal" class="modal">
         <div class="modal-content">
@@ -1348,7 +1510,8 @@
         // STATE
         // ============================================================
         const state = {
-            balance: 0,              // Main balance (single balance)
+            balance: 0,              // Main balance (for withdrawals)
+            walletBalance: 0,        // Wallet balance (for creating ads)
             adCount: 0,
             adsWatchedToday: 0,
             lastAdWatchedDate: null,
@@ -1383,6 +1546,7 @@
             DOM.preloaderPercentage = document.getElementById('preloader-percentage');
             DOM.container = document.querySelector('.container');
             DOM.totalEarning = document.getElementById('total-earning');
+            DOM.walletBalance = document.getElementById('wallet-balance');
             DOM.adCount = document.getElementById('ad-count');
             DOM.adsTodayCount = document.getElementById('ads-today-count');
             DOM.referralCount = document.getElementById('referral-count');
@@ -1396,6 +1560,8 @@
             DOM.minWithdrawText = document.getElementById('min-withdraw-text');
             DOM.welcomeTitle = document.getElementById('welcome-title');
             DOM.welcomeMessage = document.getElementById('welcome-message');
+            DOM.walletLabel = document.getElementById('walletLabel');
+            DOM.depositBtn = document.getElementById('depositButton');
             DOM.userRoleBadge = document.getElementById('userRoleBadge');
             DOM.publisherView = document.getElementById('publisherView');
             DOM.advertiserView = document.getElementById('advertiserView');
@@ -1416,6 +1582,11 @@
             DOM.verifyScreenshot = document.getElementById('verify-screenshot');
             DOM.profilePic = document.getElementById('profile-pic');
             DOM.greeting = document.getElementById('greeting');
+            DOM.convertBalance = document.getElementById('convert-balance');
+            DOM.convertBtn = document.getElementById('convertBtn');
+            DOM.convertInput = document.getElementById('convert-input');
+            DOM.convertAmountDisplay = document.getElementById('convert-amount-display');
+            DOM.convertMaxDisplay = document.getElementById('convert-max-display');
         }
 
         // ============================================================
@@ -1473,6 +1644,7 @@
             
             const data = {
                 balance: state.balance,
+                walletBalance: state.walletBalance,
                 adCount: state.adCount,
                 adsWatchedToday: state.adsWatchedToday,
                 lastAdWatchedDate: state.lastAdWatchedDate,
@@ -1503,6 +1675,7 @@
                     const data = snapshot.val();
                     if (data) {
                         state.balance = data.balance || 0;
+                        state.walletBalance = data.walletBalance || 0;
                         state.adCount = data.adCount || 0;
                         state.adsWatchedToday = data.adsWatchedToday || 0;
                         state.lastAdWatchedDate = data.lastAdWatchedDate || null;
@@ -1543,13 +1716,23 @@
         function listenDeposits() {
             if (!firebaseDb || !state.currentUserId) return;
             
-            // Listen for user's deposits
             firebaseDb.ref('deposits').orderByChild('userId').equalTo(state.currentUserId).on('value', (snapshot) => {
                 const data = snapshot.val() || {};
                 const list = Object.entries(data).map(([id, item]) => ({ id, ...item }));
                 state.depositHistory = list;
                 renderDepositHistory(list);
                 saveUserData();
+            });
+            
+            // Listen for deposit approval
+            firebaseDb.ref('deposits').orderByChild('userId').equalTo(state.currentUserId).on('child_changed', (snapshot) => {
+                const data = snapshot.val();
+                if (data?.status === 'approved') {
+                    state.walletBalance += data.amount / 100;
+                    saveUserData();
+                    updateUI();
+                    showToast(`✅ Deposit of ${data.amount} BDT approved!`, 'success');
+                }
             });
         }
 
@@ -1643,6 +1826,48 @@
         }
 
         // ============================================================
+        // CONVERT EARNINGS TO WALLET
+        // ============================================================
+        function convertToWallet() {
+            if (state.balance <= 0) {
+                showToast('❌ No earnings to convert!', 'error');
+                return;
+            }
+            
+            DOM.convertInput.value = '';
+            DOM.convertAmountDisplay.textContent = `$${state.balance.toFixed(3)}`;
+            DOM.convertMaxDisplay.textContent = `$${state.balance.toFixed(3)}`;
+            DOM.convertInput.max = state.balance;
+            DOM.convertInput.placeholder = `Max $${state.balance.toFixed(3)}`;
+            
+            document.getElementById('convertModal').style.display = 'flex';
+        }
+
+        function confirmConvert() {
+            const amount = parseFloat(DOM.convertInput.value);
+            
+            if (!amount || amount <= 0) {
+                showToast('❌ Please enter a valid amount', 'error');
+                return;
+            }
+            
+            if (amount > state.balance) {
+                showToast(`❌ You only have $${state.balance.toFixed(3)} to convert`, 'error');
+                return;
+            }
+            
+            // Convert: Move from balance to walletBalance (1:1)
+            state.balance -= amount;
+            state.walletBalance += amount;
+            
+            saveUserData();
+            updateUI();
+            
+            closeModal('convertModal');
+            showToast(`✅ $${amount.toFixed(3)} converted to wallet successfully!`, 'success');
+        }
+
+        // ============================================================
         // RENDER DEPOSIT HISTORY
         // ============================================================
         function renderDepositHistory(deposits) {
@@ -1699,12 +1924,18 @@
                 DOM.advertiserView.style.display = 'none';
                 DOM.userRoleBadge.textContent = '📖 Publisher';
                 DOM.userRoleBadge.className = 'role-badge';
+                DOM.walletLabel.textContent = '💳 Wallet Balance';
+                DOM.depositBtn.style.display = 'none';
+                document.getElementById('convertCard').style.display = 'block';
                 listenAds();
             } else {
                 DOM.publisherView.style.display = 'none';
                 DOM.advertiserView.style.display = 'block';
                 DOM.userRoleBadge.textContent = '📢 Advertiser';
                 DOM.userRoleBadge.className = 'role-badge advertiser';
+                DOM.walletLabel.textContent = '💳 Wallet Balance';
+                DOM.depositBtn.style.display = 'block';
+                document.getElementById('convertCard').style.display = 'none';
                 listenAds();
             }
             updateUI();
@@ -1927,8 +2158,8 @@
                     return;
                 }
 
-                if (state.balance < budget) {
-                    showToast(`❌ Insufficient balance! You need $${budget.toFixed(2)}. Please deposit first.`, 'error');
+                if (state.walletBalance < budget) {
+                    showToast(`❌ Insufficient balance! You need $${budget.toFixed(2)}. Please deposit or convert earnings.`, 'error');
                     return;
                 }
 
@@ -1955,7 +2186,7 @@
                     }
                 }
 
-                state.balance -= budget;
+                state.walletBalance -= budget;
 
                 const adData = {
                     title,
@@ -1983,7 +2214,7 @@
                     listenAds();
                 } catch (e) {
                     console.error("Create ad error:", e);
-                    state.balance += budget;
+                    state.walletBalance += budget;
                     saveUserData();
                     showToast('❌ Failed to create ad. Please try again.', 'error');
                 }
@@ -2445,12 +2676,8 @@
         // WATCH AD - FIXED VERSION
         // ============================================================
         async function watchAd() {
-            // Check if already watching
-            if (DOM.adLoaderOverlay.style.display === 'flex') {
-                return;
-            }
+            if (DOM.adLoaderOverlay.style.display === 'flex') return;
 
-            // Check IP
             if (state.lastUsedIp && !state.cooldownUntil) {
                 const newIp = await getIpAddress();
                 if (newIp === state.lastUsedIp) {
@@ -2462,32 +2689,25 @@
                 }
             }
 
-            // Check daily limit
             if (state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT) {
                 showToast(`📊 Daily limit reached! (${CONFIG.DAILY_AD_LIMIT})`, 'warning');
                 return;
             }
 
-            // Show loader
             DOM.adLoaderOverlay.style.display = 'flex';
             DOM.adLoaderProgress.style.width = '0%';
 
             try {
-                // Show ad with proper handling
                 const adShown = await showMonetagAd();
+                if (!adShown) throw new Error('Ad not shown');
 
-                if (!adShown) {
-                    throw new Error('Ad not shown');
-                }
-
-                // Update earnings - directly to balance
+                // Add reward to balance
                 state.balance += CONFIG.AD_REWARD;
                 state.adCount++;
                 state.adsWatchedToday++;
                 const day = new Date().getDay();
                 state.weeklyActivity[day] = (state.weeklyActivity[day] || 0) + 1;
 
-                // Check if daily limit reached
                 let alertMsg = `✅ Ad watched! +$${CONFIG.AD_REWARD.toFixed(3)} added!`;
                 alertMsg += ` (${state.adsWatchedToday}/${CONFIG.DAILY_AD_LIMIT})`;
 
@@ -2499,11 +2719,9 @@
                     alertMsg = `✅ Daily limit reached! Take a ${CONFIG.COOLDOWN_MINUTES}-minute break.`;
                 }
 
-                // Save and update
                 saveUserData();
                 updateUI();
 
-                // Show success message
                 setTimeout(() => {
                     showToast(alertMsg, 'success');
                 }, 200);
@@ -2512,7 +2730,6 @@
                 console.error("Ad error:", e);
                 showToast('❌ Ad could not be completed. Please try again.', 'error');
             } finally {
-                // Always hide loader
                 DOM.adLoaderOverlay.style.display = 'none';
                 DOM.adLoaderProgress.style.width = '100%';
             }
@@ -2524,25 +2741,18 @@
         function showMonetagAd() {
             return new Promise((resolve) => {
                 try {
-                    // Check if SDK is loaded
                     if (typeof show_11573980 !== 'function') {
-                        console.warn('Monetag SDK not loaded, using fallback');
-                        // Simulate progress
                         let progress = 0;
                         const interval = setInterval(() => {
                             progress += 10;
                             if (DOM.adLoaderProgress) {
                                 DOM.adLoaderProgress.style.width = Math.min(progress, 90) + '%';
                             }
-                            if (progress >= 90) {
-                                clearInterval(interval);
-                            }
+                            if (progress >= 90) clearInterval(interval);
                         }, 200);
                         
                         setTimeout(() => {
-                            if (DOM.adLoaderProgress) {
-                                DOM.adLoaderProgress.style.width = '100%';
-                            }
+                            if (DOM.adLoaderProgress) DOM.adLoaderProgress.style.width = '100%';
                             resolve(true);
                         }, 3000);
                         return;
@@ -2552,19 +2762,15 @@
                     let timeoutId = null;
                     let progressInterval = null;
 
-                    // Progress animation
                     let progress = 0;
                     progressInterval = setInterval(() => {
                         progress += 5;
                         if (DOM.adLoaderProgress) {
                             DOM.adLoaderProgress.style.width = Math.min(progress, 90) + '%';
                         }
-                        if (progress >= 90) {
-                            clearInterval(progressInterval);
-                        }
+                        if (progress >= 90) clearInterval(progressInterval);
                     }, 300);
 
-                    // Show the ad
                     show_11573980({
                         type: 'inApp',
                         inAppSettings: {
@@ -2579,9 +2785,7 @@
                                 resolved = true;
                                 if (timeoutId) clearTimeout(timeoutId);
                                 if (progressInterval) clearInterval(progressInterval);
-                                if (DOM.adLoaderProgress) {
-                                    DOM.adLoaderProgress.style.width = '100%';
-                                }
+                                if (DOM.adLoaderProgress) DOM.adLoaderProgress.style.width = '100%';
                                 resolve(true);
                             }
                         },
@@ -2591,19 +2795,16 @@
                                 if (timeoutId) clearTimeout(timeoutId);
                                 if (progressInterval) clearInterval(progressInterval);
                                 console.warn('Ad error:', err);
-                                resolve(true); // Still resolve to not block user
+                                resolve(true);
                             }
                         }
                     });
 
-                    // Safety timeout
                     timeoutId = setTimeout(() => {
                         if (!resolved) {
                             resolved = true;
                             if (progressInterval) clearInterval(progressInterval);
-                            if (DOM.adLoaderProgress) {
-                                DOM.adLoaderProgress.style.width = '100%';
-                            }
+                            if (DOM.adLoaderProgress) DOM.adLoaderProgress.style.width = '100%';
                             console.warn('Ad timeout, continuing...');
                             resolve(true);
                         }
@@ -2629,9 +2830,14 @@
             }
 
             DOM.totalEarning.textContent = `$${state.balance.toFixed(3)}`;
+            DOM.walletBalance.textContent = `$${state.walletBalance.toFixed(3)}`;
             DOM.adCount.textContent = state.adCount;
             DOM.adsTodayCount.textContent = `${state.adsWatchedToday} / ${CONFIG.DAILY_AD_LIMIT}`;
             DOM.minWithdrawText.textContent = `Minimum withdrawal is $${CONFIG.MINIMUM_WITHDRAWAL.toFixed(2)}.`;
+
+            // Update convert card
+            DOM.convertBalance.textContent = `$${state.balance.toFixed(3)}`;
+            DOM.convertBtn.disabled = state.balance <= 0;
 
             clearInterval(cooldownInterval);
 
@@ -2766,7 +2972,6 @@
                 }
             };
 
-            // Preloader animation
             let pct = 0;
             const loaderInterval = setInterval(() => {
                 pct += Math.floor(Math.random() * 4) + 1;
@@ -2781,51 +2986,40 @@
             }, 80);
 
             try {
-                // Init DOM
                 initDOM();
 
-                // Firebase
                 if (!initFirebase()) {
                     throw new Error("Firebase initialization failed");
                 }
 
-                // Get user
                 const user = tg?.initDataUnsafe?.user || { first_name: 'User', id: 'testuser_' + Date.now() };
                 state.currentUserId = user.id || 'testuser';
 
-                // Load config & data
                 await loadConfigFromFirebase();
                 await loadUserData();
                 await loadBonusTasks();
 
-                // Setup UI
                 populateWithdrawalMethods();
                 setupCreateAdForm();
                 renderDepositMethods();
 
-                // Welcome
                 DOM.welcomeTitle.textContent = CONFIG.welcomeNotice.title;
                 DOM.welcomeMessage.textContent = CONFIG.welcomeNotice.message;
 
-                // Handle referral
                 await handleReferral();
                 await processReferralRewards();
 
-                // Listeners
                 listenReferrals();
                 listenDeposits();
                 listenAds();
 
-                // User info
                 if (user?.first_name) {
                     DOM.greeting.textContent = `Welcome, ${escapeHTML(user.first_name)}!`;
                     DOM.profilePic.innerHTML = `<span>${escapeHTML(user.first_name.charAt(0))}</span>`;
                 }
 
-                // Get IP
                 state.currentIp = await getIpAddress();
 
-                // Event listeners
                 DOM.watchAdBtn.addEventListener('click', watchAd);
                 DOM.joinChannelBtn.addEventListener('click', () => safeOpenTelegramLink(CONFIG.CHANNEL_LINK));
                 DOM.supportBtn.addEventListener('click', () => safeOpenTelegramLink(CONFIG.SUPPORT_LINK));
@@ -2833,19 +3027,16 @@
                 DOM.shareLinkBtn.addEventListener('click', shareReferralLink);
                 DOM.withdrawForm.addEventListener('submit', handleWithdrawal);
 
-                // Close modals on background click
                 window.onclick = (event) => {
                     if (event.target.classList.contains('modal')) {
                         closeModal(event.target.id);
                     }
                 };
 
-                // Set initial role
                 const initialRole = state.userRole || 'publisher';
                 const roleBtn = document.querySelector(`.role-btn.${initialRole}`);
                 if (roleBtn) selectRole(initialRole, roleBtn);
 
-                // Telegram WebApp
                 if (tg) {
                     tg.ready();
                     tg.expand();
@@ -2855,18 +3046,17 @@
                     });
                 }
 
-                // Show welcome modal if first visit
                 if (!sessionStorage.getItem('alreadyVisited')) {
                     setTimeout(() => showModal('welcomeModal'), 500);
                     sessionStorage.setItem('alreadyVisited', 'true');
                 }
 
-                // Update UI
                 updateUI();
 
                 console.log("✅ NexEarn initialized successfully!");
                 console.log("👤 User ID:", state.currentUserId);
                 console.log("💰 Balance:", state.balance);
+                console.log("💳 Wallet:", state.walletBalance);
                 console.log("🎯 Role:", state.userRole);
 
             } catch (error) {
@@ -2884,7 +3074,6 @@
             }
         }
 
-        // Start the app
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
