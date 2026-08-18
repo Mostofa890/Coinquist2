@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>NexEarn</title>
+    <title>NexEarn Admin</title>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -12,54 +12,23 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
-    <!-- Monetag SDK -->
-    <script src='//libtl.com/sdk.js' data-zone='11573980' data-sdk='show_11573980'></script>
-
-    <script>
-        (function() {
-            try {
-                const tg = window.Telegram.WebApp;
-                const isDark = tg.colorScheme === 'dark';
-                document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-            } catch (e) {
-                const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-                document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-            }
-        })();
-    </script>
-    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         
         :root { 
-            --primary-color: #FF6B35; 
-            --primary-color-rgb: 255, 107, 53; 
-            --secondary-color: #E85D04; 
-            --background-color: #F0F2F5; 
-            --card-background: #FFFFFF; 
-            --text-color: #1D1D1F; 
-            --text-light: #6E6E73; 
-            --border-color: #E5E5EA; 
-            --glass-bg: rgba(240, 242, 245, 0.8); 
-            --shadow: 0 2px 10px rgba(0,0,0,0.08);
-            --radius: 16px;
-            --transition: all 0.3s ease;
+            --primary: #FF6B35; 
+            --primary-rgb: 255, 107, 53; 
+            --secondary: #E85D04; 
+            --bg: #0a0a0f; 
+            --card: #14141e; 
+            --text: #ffffff; 
+            --text-light: #8e8ea0; 
+            --border: #2a2a3a; 
             --success: #10b981;
-            --warning: #f59e0b;
             --danger: #ef4444;
-        }
-        
-        [data-theme="dark"] { 
-            --primary-color: #FF8C42; 
-            --primary-color-rgb: 255, 140, 66; 
-            --secondary-color: #E85D04; 
-            --background-color: #000000; 
-            --card-background: #1C1C1E; 
-            --text-color: #F5F5F7; 
-            --text-light: #8E8E93; 
-            --border-color: #3A3A3C; 
-            --glass-bg: rgba(28, 28, 30, 0.8); 
-            --shadow: 0 2px 10px rgba(0,0,0,0.3);
+            --warning: #f59e0b;
+            --radius: 16px;
+            --shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
         
         * { 
@@ -68,23 +37,17 @@
             padding: 0;
         }
         
-        html, body { 
-            overscroll-behavior-y: contain; 
-            font-family: 'Inter', sans-serif; 
-            background-color: var(--background-color); 
-            color: var(--text-color); 
-            -webkit-font-smoothing: antialiased; 
-            transition: var(--transition);
-        }
-        
         body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
             padding: 16px 12px 90px 12px; 
             min-height: 100vh;
         }
         
         ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: var(--background-color); }
-        ::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
         
         /* ===== PRELOADER ===== */
         #preloader {
@@ -94,7 +57,7 @@
             width: 100%;
             height: 100%;
             z-index: 9999;
-            background: var(--background-color);
+            background: var(--bg);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -106,12 +69,12 @@
         #preloader .brand {
             font-size: 42px;
             font-weight: 900;
-            color: var(--primary-color);
+            color: var(--primary);
             letter-spacing: -1px;
             animation: pulseText 1.5s ease-in-out infinite;
         }
         
-        #preloader .brand span { color: var(--text-color); }
+        #preloader .brand span { color: var(--text); }
         
         @keyframes pulseText {
             0%, 100% { transform: scale(1); opacity: 1; }
@@ -121,7 +84,7 @@
         #preloader .loader-bar-container {
             width: 200px;
             height: 4px;
-            background: var(--border-color);
+            background: var(--border);
             border-radius: 4px;
             overflow: hidden;
         }
@@ -129,7 +92,7 @@
         #preloader .loader-bar {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
             border-radius: 4px;
             transition: width 0.3s ease;
         }
@@ -151,7 +114,7 @@
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: var(--primary-color);
+            background: var(--primary);
             animation: dotBounce 1.4s ease-in-out infinite;
         }
         
@@ -161,25 +124,6 @@
         @keyframes dotBounce {
             0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
             40% { transform: scale(1); opacity: 1; }
-        }
-        
-        #preloader-footer {
-            position: fixed;
-            bottom: 30px;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            padding: 15px;
-            z-index: 10000;
-            transition: opacity 0.5s ease;
-        }
-        
-        #preloader-footer a {
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-light);
-            text-decoration: none;
-            opacity: 0.5;
         }
         
         .container { 
@@ -198,6 +142,19 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
+        /* ===== ADMIN BADGE ===== */
+        .admin-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
         /* ===== PROFILE HEADER ===== */
         .profile-header {
             display: flex;
@@ -211,7 +168,7 @@
             width: 48px;
             height: 48px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             display: flex;
             align-items: center;
             justify-content: center;
@@ -219,52 +176,11 @@
             font-weight: 700;
             color: white;
             flex-shrink: 0;
-            box-shadow: 0 2px 8px rgba(var(--primary-color-rgb), 0.3);
         }
         
-        .profile-info {
-            flex: 1;
-            min-width: 0;
-        }
-        
-        #greeting {
-            font-size: 20px;
-            font-weight: 800;
-            line-height: 1.2;
-        }
-        
-        .role-badge {
-            display: inline-block;
-            font-size: 11px;
-            font-weight: 600;
-            padding: 3px 12px;
-            border-radius: 20px;
-            background: rgba(var(--primary-color-rgb), 0.15);
-            color: var(--primary-color);
-            margin-top: 2px;
-        }
-        
-        .role-badge.advertiser {
-            background: rgba(16, 185, 129, 0.15);
-            color: #10b981;
-        }
-        
-        .switch-role-btn {
-            background: rgba(var(--primary-color-rgb), 0.1);
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            padding: 4px 12px;
-            border-radius: 8px;
-            font-size: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            white-space: nowrap;
-        }
-        
-        .switch-role-btn:hover {
-            background: rgba(var(--primary-color-rgb), 0.2);
-        }
+        .profile-info { flex: 1; min-width: 0; }
+        #greeting { font-size: 20px; font-weight: 800; line-height: 1.2; }
+        .role-badge { font-size: 11px; font-weight: 600; color: var(--text-light); }
         
         /* ===== ROLE SELECTOR ===== */
         .role-selector {
@@ -278,11 +194,11 @@
         .role-btn {
             padding: 14px 12px;
             border-radius: var(--radius);
-            border: 2px solid var(--border-color);
-            background: var(--card-background);
-            color: var(--text-color);
+            border: 2px solid var(--border);
+            background: var(--card);
+            color: var(--text);
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.3s ease;
             text-align: center;
             font-family: inherit;
         }
@@ -292,9 +208,9 @@
         .role-btn .sub-label { font-size: 11px; color: var(--text-light); display: block; margin-top: 2px; }
         
         .role-btn.active {
-            border-color: var(--primary-color);
-            background: rgba(var(--primary-color-rgb), 0.08);
-            box-shadow: 0 0 0 4px rgba(var(--primary-color-rgb), 0.1);
+            border-color: var(--primary);
+            background: rgba(var(--primary-rgb), 0.1);
+            box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.1);
         }
         
         .role-btn:hover:not(.active) { border-color: var(--text-light); }
@@ -303,13 +219,13 @@
         .balance-card {
             position: relative;
             overflow: hidden;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
             padding: 24px 20px;
             border-radius: var(--radius);
             text-align: center;
             margin-bottom: 16px;
-            box-shadow: 0 8px 25px rgba(var(--primary-color-rgb), 0.25);
+            box-shadow: 0 8px 25px rgba(var(--primary-rgb), 0.25);
             animation: fadeIn 0.6s ease-out;
         }
         
@@ -343,111 +259,6 @@
             z-index: 1;
         }
         
-        /* ===== WALLET CARD ===== */
-        .wallet-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--card-background);
-            padding: 14px 18px;
-            border-radius: var(--radius);
-            border: 1px solid var(--border-color);
-            margin-bottom: 16px;
-            animation: fadeIn 0.7s ease-out;
-            transition: var(--transition);
-        }
-        
-        .wallet-card .label {
-            font-size: 13px;
-            color: var(--text-light);
-            font-weight: 500;
-        }
-        
-        .wallet-card .value {
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--text-color);
-        }
-        
-        .wallet-card .deposit-btn {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 12px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        
-        .wallet-card .deposit-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        }
-        
-        /* ===== CONVERT CARD ===== */
-        .convert-card {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
-            border: 2px solid var(--success);
-            padding: 16px 18px;
-            border-radius: var(--radius);
-            margin-bottom: 16px;
-            animation: fadeIn 0.7s ease-out;
-        }
-        
-        .convert-card .title {
-            font-weight: 700;
-            font-size: 14px;
-            color: var(--success);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .convert-card .info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 8px;
-        }
-        
-        .convert-card .info .balance {
-            font-size: 18px;
-            font-weight: 800;
-            color: var(--text-color);
-        }
-        
-        .convert-card .info .rate {
-            font-size: 12px;
-            color: var(--text-light);
-        }
-        
-        .convert-btn {
-            background: var(--success);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            transition: var(--transition);
-            width: 100%;
-            margin-top: 10px;
-            font-family: inherit;
-        }
-        
-        .convert-btn:hover:not(:disabled) {
-            transform: scale(1.02);
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-        }
-        
-        .convert-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
         /* ===== STATS GRID ===== */
         .stats-grid {
             display: grid;
@@ -457,40 +268,27 @@
         }
         
         .stat-item {
-            position: relative;
-            overflow: hidden;
-            background: var(--card-background);
+            background: var(--card);
             padding: 16px 12px;
             border-radius: var(--radius);
             text-align: center;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border);
             animation: fadeIn 0.8s ease-out;
-            transition: var(--transition);
+            transition: all 0.3s ease;
         }
         
-        .stat-item .bg-icon {
-            position: absolute;
-            right: 2px;
-            bottom: 2px;
-            font-size: 40px;
-            opacity: 0.06;
-            color: var(--text-color);
-            pointer-events: none;
-        }
-        
-        .stat-item .icon { font-size: 22px; color: var(--primary-color); margin-bottom: 6px; }
+        .stat-item .icon { font-size: 22px; color: var(--primary); margin-bottom: 6px; }
         .stat-item .value { font-size: 20px; font-weight: 800; }
         .stat-item .label { font-size: 11px; color: var(--text-light); margin-top: 2px; }
         
         /* ===== CARDS ===== */
         .card {
-            background: var(--card-background);
+            background: var(--card);
             padding: 18px 16px;
             border-radius: var(--radius);
             margin-bottom: 16px;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border);
             animation: fadeIn 0.9s ease-out;
-            transition: var(--transition);
         }
         
         .card-title {
@@ -502,99 +300,97 @@
             gap: 8px;
         }
         
-        /* ===== AD FILTERS ===== */
-        .ad-filters {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 14px;
-            flex-wrap: wrap;
+        /* ===== TABLES ===== */
+        .table-container {
+            overflow-x: auto;
         }
         
-        .filter-btn {
-            padding: 6px 14px;
-            border-radius: 20px;
-            border: 1px solid var(--border-color);
-            background: transparent;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        
+        th {
+            text-align: left;
+            padding: 10px 8px;
             color: var(--text-light);
-            font-size: 12px;
             font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            font-family: inherit;
+            border-bottom: 1px solid var(--border);
         }
         
-        .filter-btn.active {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
+        td {
+            padding: 10px 8px;
+            border-bottom: 1px solid var(--border);
         }
         
-        .filter-btn:hover:not(.active) { border-color: var(--text-color); }
-        
-        /* ===== AD CARD ===== */
-        .ad-card {
-            background: var(--background-color);
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 12px;
-            border: 1px solid var(--border-color);
-            transition: var(--transition);
-        }
-        
-        .ad-card:last-child { margin-bottom: 0; }
-        
-        .ad-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 10px;
-        }
-        
-        .ad-title { font-weight: 600; font-size: 15px; flex: 1; }
-        .ad-reward { font-weight: 700; color: var(--primary-color); font-size: 14px; white-space: nowrap; }
-        .ad-image { width: 100%; max-height: 120px; object-fit: cover; border-radius: 8px; margin: 8px 0; }
-        .ad-desc { font-size: 13px; color: var(--text-light); margin-bottom: 10px; line-height: 1.4; }
-        
-        .ad-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        
-        .ad-views { font-size: 12px; color: var(--text-light); }
-        
-        .ad-status {
-            font-size: 11px;
-            font-weight: 600;
+        .status-badge {
             padding: 2px 10px;
             border-radius: 12px;
-        }
-        
-        .ad-status.active { color: #10b981; background: rgba(16, 185, 129, 0.1); }
-        .ad-status.pending { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
-        .ad-status.completed { color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
-        
-        .ad-btn {
-            padding: 6px 16px;
-            border-radius: 8px;
-            border: none;
+            font-size: 11px;
             font-weight: 600;
-            font-size: 12px;
+        }
+        
+        .status-badge.pending { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .status-badge.approved { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .status-badge.rejected { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        
+        .action-btn {
+            padding: 4px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.3s ease;
             font-family: inherit;
+            margin: 2px;
         }
         
-        .ad-btn.view {
-            background: var(--primary-color);
-            color: white;
+        .action-btn.approve { background: var(--success); color: white; }
+        .action-btn.approve:hover { opacity: 0.8; }
+        .action-btn.reject { background: var(--danger); color: white; }
+        .action-btn.reject:hover { opacity: 0.8; }
+        
+        /* ===== ADMIN SETTINGS ===== */
+        .setting-group {
+            margin-bottom: 16px;
         }
         
-        .ad-btn.view:hover:not(:disabled) { transform: scale(1.03); }
-        .ad-btn.view:disabled { opacity: 0.5; cursor: not-allowed; }
-        .ad-btn.view.completed { background: #10b981; }
+        .setting-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text-light);
+        }
+        
+        .setting-group input,
+        .setting-group select,
+        .setting-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            background: var(--bg);
+            color: var(--text);
+            transition: all 0.3s ease;
+        }
+        
+        .setting-group input:focus,
+        .setting-group select:focus,
+        .setting-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15);
+        }
+        
+        .setting-group textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
         
         /* ===== ACTION BUTTON ===== */
         .action-button {
@@ -603,205 +399,36 @@
             justify-content: center;
             gap: 10px;
             width: 100%;
-            padding: 16px;
+            padding: 14px;
             border: none;
             border-radius: var(--radius);
-            background: var(--primary-color);
+            background: var(--primary);
             color: white;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.3s ease;
             font-family: inherit;
-        }
-        
-        .action-button.pulsing { animation: pulse 2s infinite; }
-        
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(var(--primary-color-rgb), 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(var(--primary-color-rgb), 0); }
-            100% { box-shadow: 0 0 0 0 rgba(var(--primary-color-rgb), 0); }
         }
         
         .action-button:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(var(--primary-color-rgb), 0.25);
+            box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.25);
         }
         
         .action-button:disabled {
-            background: #8E8E93;
+            opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
         }
         
         .action-button.secondary {
             background: transparent;
-            color: var(--primary-color);
-            border: 2px solid var(--primary-color);
-            margin-top: 10px;
+            color: var(--primary);
+            border: 2px solid var(--primary);
         }
         
-        .action-button.secondary:hover {
-            background: rgba(var(--primary-color-rgb), 0.08);
-            transform: translateY(-2px);
-        }
-        
-        .action-button.success {
-            background: var(--success);
-        }
-        
-        .action-button.success:hover {
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-        }
-        
-        /* ===== FORM ===== */
-        .form-group {
-            margin-bottom: 14px;
-        }
-        
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-color);
-            margin-bottom: 4px;
-        }
-        
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            font-family: 'Inter', sans-serif;
-            font-size: 15px;
-            background: var(--background-color);
-            color: var(--text-color);
-            transition: var(--transition);
-        }
-        
-        .form-group textarea {
-            min-height: 70px;
-            resize: vertical;
-        }
-        
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.15);
-        }
-        
-        .form-hint {
-            font-size: 11px;
-            color: var(--text-light);
-            margin-top: 4px;
-        }
-        
-        /* ===== BONUS TASKS ===== */
-        .bonus-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px;
-            background: var(--background-color);
-            border-radius: 12px;
-            margin-bottom: 10px;
-            border: 1px solid var(--border-color);
-            gap: 12px;
-        }
-        
-        .bonus-item:last-child { margin-bottom: 0; }
-        .bonus-item .details { flex: 1; min-width: 0; }
-        .bonus-item .title { font-weight: 600; font-size: 14px; color: var(--text-color); }
-        .bonus-item .reward { font-size: 13px; font-weight: 700; color: var(--primary-color); }
-        
-        .bonus-item .claim-btn {
-            padding: 8px 18px;
-            font-size: 12px;
-            font-weight: 600;
-            border-radius: 8px;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: var(--transition);
-            white-space: nowrap;
-            font-family: inherit;
-        }
-        
-        .bonus-item .claim-btn:disabled {
-            background: #10b981;
-            cursor: not-allowed;
-        }
-        
-        .bonus-item .claim-btn:hover:not(:disabled) { transform: scale(1.03); }
-        
-        /* ===== HISTORY ===== */
-        .history-item {
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .history-item:last-child { border-bottom: none; }
-        .history-details { flex: 1; min-width: 0; }
-        .history-details .method-number { font-weight: 700; font-size: 14px; }
-        .history-details .date { font-size: 11px; color: var(--text-light); }
-        
-        .history-amount { text-align: right; flex-shrink: 0; }
-        .history-amount .amount-text { font-size: 16px; font-weight: 800; }
-        
-        .history-status {
-            font-size: 11px;
-            font-weight: 700;
-            padding: 2px 10px;
-            border-radius: 12px;
-            display: inline-block;
-            margin-top: 2px;
-        }
-        
-        .history-status.success,
-        .history-status.approved { color: #10b981; background: rgba(16, 185, 129, 0.1); }
-        .history-status.pending { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
-        .history-status.rejected { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
-        
-        .no-history {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-light);
-        }
-        
-        /* ===== DEPOSIT METHODS ===== */
-        .deposit-method {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 14px;
-            background: var(--background-color);
-            border-radius: 12px;
-            border: 2px solid var(--border-color);
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        
-        .deposit-method:hover { border-color: var(--text-light); }
-        .deposit-method.selected {
-            border-color: #10b981;
-            background: rgba(16, 185, 129, 0.06);
-        }
-        
-        .deposit-method .method-icon { font-size: 28px; flex-shrink: 0; }
-        .deposit-method .method-info { flex: 1; }
-        .deposit-method .method-name { font-weight: 600; font-size: 14px; }
-        .deposit-method .method-desc { font-size: 12px; color: var(--text-light); }
-        .deposit-method .method-number { font-weight: 700; font-size: 14px; color: var(--primary-color); }
+        .action-button.success { background: var(--success); }
+        .action-button.danger { background: var(--danger); }
         
         /* ===== NAV BAR ===== */
         .nav-bar {
@@ -815,12 +442,10 @@
             grid-template-columns: repeat(5, 1fr);
             padding: 8px 10px;
             padding-bottom: env(safe-area-inset-bottom, 8px);
-            background: var(--glass-bg);
+            background: rgba(10, 10, 15, 0.95);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-top: 1px solid var(--border-color);
+            border-top: 1px solid var(--border);
             z-index: 100;
-            transition: var(--transition);
         }
         
         .nav-button {
@@ -837,20 +462,13 @@
             border: none;
             background: transparent;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.3s ease;
             font-family: inherit;
         }
         
-        .nav-button i {
-            font-size: 20px;
-            transition: var(--transition);
-        }
-        
+        .nav-button i { font-size: 20px; transition: all 0.3s ease; }
         .nav-button.active,
-        .nav-button:hover {
-            color: var(--primary-color);
-        }
-        
+        .nav-button:hover { color: var(--primary); }
         .nav-button.active i { transform: scale(1.1); }
         
         /* ===== MODALS ===== */
@@ -859,14 +477,14 @@
             position: fixed;
             z-index: 1000;
             inset: 0;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.7);
             align-items: flex-end;
             animation: fadeIn 0.3s ease-out;
             padding: 16px;
         }
         
         .modal-content {
-            background: var(--card-background);
+            background: var(--card);
             padding: 20px;
             border-radius: 20px 20px 0 0;
             width: 100%;
@@ -893,118 +511,10 @@
             background: none;
             border: none;
             font-family: inherit;
-            transition: var(--transition);
+            transition: all 0.3s ease;
         }
         
-        .close-btn:hover { color: var(--text-color); }
-        
-        /* ===== METHOD FIELDS ===== */
-        .method-field {
-            display: none;
-            margin-top: 10px;
-        }
-        
-        .method-field.active {
-            display: block;
-            animation: fadeIn 0.3s ease-out;
-        }
-        
-        .method-field label {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-color);
-            display: block;
-            margin-bottom: 4px;
-        }
-        
-        .method-field .field-hint {
-            font-size: 12px;
-            color: var(--text-light);
-            margin-bottom: 6px;
-        }
-        
-        /* ===== AD LOADER ===== */
-        #ad-loader-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 5000;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 20px;
-            color: white;
-            font-size: 16px;
-            font-weight: 500;
-        }
-        
-        #ad-loader-overlay .loader-spinner {
-            width: 56px;
-            height: 56px;
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-top-color: var(--primary-color);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        
-        #ad-loader-overlay .loader-text {
-            font-size: 16px;
-            font-weight: 500;
-            opacity: 0.9;
-        }
-        
-        #ad-loader-overlay .loader-sub {
-            font-size: 13px;
-            opacity: 0.6;
-            margin-top: -8px;
-        }
-        
-        #ad-loader-overlay .loader-progress {
-            width: 200px;
-            height: 3px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        
-        #ad-loader-overlay .loader-progress-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            border-radius: 4px;
-            transition: width 0.3s ease;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        /* ===== CHART ===== */
-        .chart-container {
-            position: relative;
-            height: 180px;
-            width: 100%;
-        }
-        
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 400px) {
-            body { padding: 12px 8px 80px 8px; }
-            .balance-card .amount { font-size: 36px; }
-            .stats-grid { gap: 8px; }
-            .stat-item { padding: 12px 8px; }
-            .stat-item .value { font-size: 17px; }
-            .role-btn { padding: 10px 8px; }
-            .role-btn .label { font-size: 13px; }
-        }
-        
-        @media (min-width: 481px) {
-            body { padding: 20px 16px 100px 16px; }
-            .modal { align-items: center; padding: 20px; }
-            .modal-content { border-radius: 20px; }
-        }
+        .close-btn:hover { color: var(--text); }
         
         /* ===== TOAST ===== */
         .toast-container {
@@ -1019,7 +529,7 @@
         }
         
         .toast {
-            background: rgba(0,0,0,0.85);
+            background: rgba(0,0,0,0.9);
             color: white;
             padding: 14px 20px;
             border-radius: 12px;
@@ -1035,6 +545,48 @@
         .toast.success { border-color: var(--success); }
         .toast.error { border-color: var(--danger); }
         .toast.warning { border-color: var(--warning); }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 400px) {
+            body { padding: 12px 8px 80px 8px; }
+            .balance-card .amount { font-size: 36px; }
+            .stats-grid { gap: 8px; }
+            .stat-item { padding: 12px 8px; }
+            .stat-item .value { font-size: 17px; }
+        }
+        
+        @media (min-width: 481px) {
+            body { padding: 20px 16px 100px 16px; }
+            .modal { align-items: center; padding: 20px; }
+            .modal-content { border-radius: 20px; }
+        }
+        
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--text-light);
+        }
+        
+        .empty-state i {
+            font-size: 40px;
+            margin-bottom: 12px;
+            opacity: 0.3;
+        }
+        
+        /* ===== BADGE ===== */
+        .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .badge.success { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .badge.warning { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .badge.danger { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        .badge.info { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
     </style>
 </head>
 <body>
@@ -1051,44 +603,34 @@
             <span></span>
         </div>
     </div>
-    <div id="preloader-footer">
-        <a href="https://t.me/nexearn2" target="_blank">@nexearn2</a>
-    </div>
     
-    <!-- ===== AD LOADER ===== -->
-    <div id="ad-loader-overlay">
-        <div class="loader-spinner"></div>
-        <div class="loader-text">Loading Ad...</div>
-        <div class="loader-sub">Please wait while the ad loads</div>
-        <div class="loader-progress">
-            <div class="loader-progress-bar" id="ad-loader-progress"></div>
-        </div>
-    </div>
-    
-    <div class="container">
+    <div class="container" id="appContainer">
         <!-- ===== PROFILE HEADER ===== -->
         <div class="profile-header">
             <div id="profile-pic"><i class="fa-solid fa-user"></i></div>
             <div class="profile-info">
                 <div id="greeting">Welcome!</div>
-                <span id="userRoleBadge" class="role-badge">📖 Publisher</span>
+                <span class="role-badge" id="userRoleBadge">📖 Publisher</span>
+                <span class="admin-badge" id="adminBadge" style="display:none;">👑 Admin</span>
             </div>
-            <button class="switch-role-btn" onclick="switchRole()">
-                <i class="fa-solid fa-arrows-rotate"></i> Switch
-            </button>
         </div>
 
         <!-- ===== ROLE SELECTOR ===== -->
         <div class="role-selector" id="roleSelector">
-            <button class="role-btn active" onclick="selectRole('publisher', this)">
+            <button class="role-btn active" onclick="switchTab('publisher')">
                 <span class="icon">📖</span>
                 <span class="label">Publisher</span>
                 <span class="sub-label">Watch & Earn</span>
             </button>
-            <button class="role-btn" onclick="selectRole('advertiser', this)">
+            <button class="role-btn" onclick="switchTab('advertiser')">
                 <span class="icon">📢</span>
                 <span class="label">Advertiser</span>
                 <span class="sub-label">Create Ads</span>
+            </button>
+            <button class="role-btn" onclick="switchTab('admin')" id="adminTabBtn" style="display:none;">
+                <span class="icon">👑</span>
+                <span class="label">Admin</span>
+                <span class="sub-label">Control Panel</span>
             </button>
         </div>
 
@@ -1098,54 +640,19 @@
             <div class="amount" id="total-earning">$0.000</div>
         </div>
 
-        <!-- ===== WALLET ===== -->
-        <div class="wallet-card">
-            <div>
-                <div class="label" id="walletLabel">💳 Wallet Balance</div>
-                <div class="value" id="wallet-balance">$0.000</div>
-            </div>
-            <button class="deposit-btn" id="depositButton" onclick="showDepositModal()" style="display:none;">
-                + Deposit
-            </button>
-        </div>
-
-        <!-- ===== CONVERT EARNINGS TO WALLET ===== -->
-        <div class="convert-card" id="convertCard">
-            <div class="title">
-                <i class="fa-solid fa-arrows-rotate"></i>
-                Convert Earnings to Wallet
-            </div>
-            <div class="info">
-                <div>
-                    <div style="font-size:12px; color:var(--text-light);">Available to Convert</div>
-                    <div class="balance" id="convert-balance">$0.000</div>
-                </div>
-                <div class="rate">
-                    <div>1:1 Conversion</div>
-                    <div style="font-size:11px; opacity:0.7;">No fees</div>
-                </div>
-            </div>
-            <button class="convert-btn" id="convertBtn" onclick="convertToWallet()">
-                <i class="fa-solid fa-exchange-alt"></i> Convert All to Wallet
-            </button>
-        </div>
-
         <!-- ===== STATS ===== -->
         <div class="stats-grid">
             <div class="stat-item">
-                <i class="fa-solid fa-rectangle-ad bg-icon"></i>
                 <div class="icon"><i class="fa-solid fa-rectangle-ad"></i></div>
                 <div class="value" id="ad-count">0</div>
                 <div class="label">Ads Watched</div>
             </div>
             <div class="stat-item">
-                <i class="fa-solid fa-calendar-day bg-icon"></i>
                 <div class="icon"><i class="fa-solid fa-calendar-day"></i></div>
                 <div class="value" id="ads-today-count">0 / 15</div>
                 <div class="label">Today's Ads</div>
             </div>
             <div class="stat-item">
-                <i class="fa-solid fa-users bg-icon"></i>
                 <div class="icon"><i class="fa-solid fa-users"></i></div>
                 <div class="value" id="referral-count">0</div>
                 <div class="label">Referrals</div>
@@ -1156,11 +663,11 @@
         <div id="publisherView">
             <div class="card">
                 <div class="card-title">📺 Available Ads</div>
-                <div class="ad-filters">
-                    <button class="filter-btn active" onclick="filterAds('all',this)">All</button>
-                    <button class="filter-btn" onclick="filterAds('viewed',this)">👁 Viewed</button>
-                    <button class="filter-btn" onclick="filterAds('pending',this)">⏳ Pending</button>
-                    <button class="filter-btn" onclick="filterAds('verified',this)">✅ Verified</button>
+                <div class="ad-filters" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
+                    <button class="filter-btn active" onclick="filterAds('all',this)" style="padding:6px 14px; border-radius:20px; border:1px solid var(--border); background:transparent; color:var(--text-light); font-size:12px; font-weight:600; cursor:pointer; font-family:inherit;">All</button>
+                    <button class="filter-btn" onclick="filterAds('viewed',this)" style="padding:6px 14px; border-radius:20px; border:1px solid var(--border); background:transparent; color:var(--text-light); font-size:12px; font-weight:600; cursor:pointer; font-family:inherit;">👁 Viewed</button>
+                    <button class="filter-btn" onclick="filterAds('pending',this)" style="padding:6px 14px; border-radius:20px; border:1px solid var(--border); background:transparent; color:var(--text-light); font-size:12px; font-weight:600; cursor:pointer; font-family:inherit;">⏳ Pending</button>
+                    <button class="filter-btn" onclick="filterAds('verified',this)" style="padding:6px 14px; border-radius:20px; border:1px solid var(--border); background:transparent; color:var(--text-light); font-size:12px; font-weight:600; cursor:pointer; font-family:inherit;">✅ Verified</button>
                 </div>
                 <div id="ad-list-container"></div>
             </div>
@@ -1171,7 +678,7 @@
                     <i class="fa-solid fa-play"></i>
                     <span>Watch Ad</span>
                 </button>
-                <button class="action-button secondary" id="join-channel-button">
+                <button class="action-button secondary" id="join-channel-button" style="margin-top:10px;">
                     <i class="fa-brands fa-telegram"></i>
                     <span>Join Channel</span>
                 </button>
@@ -1183,35 +690,35 @@
             <div class="card">
                 <div class="card-title">📢 Create New Ad</div>
                 <form id="create-ad-form">
-                    <div class="form-group">
+                    <div class="setting-group">
                         <label>Ad Title *</label>
                         <input type="text" id="ad-title" placeholder="Enter ad title" required>
                     </div>
-                    <div class="form-group">
+                    <div class="setting-group">
                         <label>Description</label>
                         <textarea id="ad-desc" placeholder="Describe your ad"></textarea>
                     </div>
-                    <div class="form-group">
+                    <div class="setting-group">
                         <label>Link URL *</label>
                         <input type="url" id="ad-link" placeholder="https://example.com" required>
                     </div>
-                    <div class="form-group">
+                    <div class="setting-group">
                         <label>Ad Image (Optional)</label>
                         <input type="file" id="ad-image" accept="image/*">
-                        <div class="form-hint">Upload PNG, JPG or GIF (Max 5MB)</div>
+                        <div style="font-size:11px; color:var(--text-light); margin-top:4px;">Upload PNG, JPG or GIF (Max 5MB)</div>
                     </div>
-                    <div class="form-group">
+                    <div class="setting-group">
                         <label>Reward per View ($)</label>
                         <input type="number" id="ad-reward" step="0.001" value="0.001" min="0.001" required>
                     </div>
-                    <div class="form-group">
+                    <div class="setting-group">
                         <label>Total Budget ($)</label>
                         <input type="number" id="ad-budget" step="0.01" value="1.00" min="0.10" required>
                     </div>
-                    <div id="ad-budget-info" style="font-size:12px; color:var(--text-light); margin-bottom:12px;">
+                    <div style="font-size:12px; color:var(--text-light); margin-bottom:12px;">
                         Total Views: <span id="ad-total-views">1000</span> | Cost per view: $<span id="ad-cost-per-view">0.001</span>
                     </div>
-                    <button type="submit" class="action-button" id="create-ad-btn">
+                    <button type="submit" class="action-button">
                         <i class="fa-solid fa-plus"></i> <span>Create Ad</span>
                     </button>
                 </form>
@@ -1223,16 +730,108 @@
             </div>
 
             <div class="card">
-                <div class="card-title">📋 Ad Verification Requests</div>
-                <div id="verification-requests"></div>
+                <div class="card-title">📋 Deposit History</div>
+                <div id="deposit-history-container"></div>
             </div>
         </div>
 
-        <!-- ===== CHART ===== -->
-        <div class="card">
-            <div class="card-title">📈 Weekly Activity</div>
-            <div class="chart-container">
-                <canvas id="activityChart"></canvas>
+        <!-- ===== ADMIN VIEW ===== -->
+        <div id="adminView" style="display:none;">
+            <!-- Dashboard Stats -->
+            <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr);">
+                <div class="stat-item">
+                    <div class="icon"><i class="fa-solid fa-users"></i></div>
+                    <div class="value" id="admin-total-users">0</div>
+                    <div class="label">Total Users</div>
+                </div>
+                <div class="stat-item">
+                    <div class="icon"><i class="fa-solid fa-dollar-sign"></i></div>
+                    <div class="value" id="admin-total-earnings">$0</div>
+                    <div class="label">Total Earnings</div>
+                </div>
+                <div class="stat-item">
+                    <div class="icon"><i class="fa-solid fa-rectangle-ad"></i></div>
+                    <div class="value" id="admin-total-ads">0</div>
+                    <div class="label">Total Ads</div>
+                </div>
+                <div class="stat-item">
+                    <div class="icon"><i class="fa-solid fa-clock"></i></div>
+                    <div class="value" id="admin-pending-withdrawals">0</div>
+                    <div class="label">Pending Withdrawals</div>
+                </div>
+            </div>
+
+            <!-- Withdrawals -->
+            <div class="card">
+                <div class="card-title">💸 Withdrawal Requests</div>
+                <div id="admin-withdrawals-container"></div>
+            </div>
+
+            <!-- Deposits -->
+            <div class="card">
+                <div class="card-title">💳 Deposit Requests</div>
+                <div id="admin-deposits-container"></div>
+            </div>
+
+            <!-- Settings -->
+            <div class="card">
+                <div class="card-title">⚙️ Settings</div>
+                <form id="admin-settings-form">
+                    <div class="setting-group">
+                        <label>Ad Reward ($)</label>
+                        <input type="number" id="admin-ad-reward" step="0.001" value="0.001">
+                    </div>
+                    <div class="setting-group">
+                        <label>Daily Ad Limit</label>
+                        <input type="number" id="admin-daily-limit" value="15">
+                    </div>
+                    <div class="setting-group">
+                        <label>Minimum Withdrawal ($)</label>
+                        <input type="number" id="admin-min-withdraw" step="0.01" value="0.10">
+                    </div>
+                    <div class="setting-group">
+                        <label>Cooldown (minutes)</label>
+                        <input type="number" id="admin-cooldown" value="30">
+                    </div>
+                    <div class="setting-group">
+                        <label>Referral Reward ($)</label>
+                        <input type="number" id="admin-referral-reward" step="0.001" value="0.01">
+                    </div>
+                    <div class="setting-group">
+                        <label>Welcome Message</label>
+                        <textarea id="admin-welcome-msg" rows="4">Please follow the rules to ensure you receive your payment.</textarea>
+                    </div>
+                    <button type="submit" class="action-button success">
+                        <i class="fa-solid fa-save"></i> <span>Save Settings</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Bonus Tasks -->
+            <div class="card">
+                <div class="card-title">⭐ Bonus Tasks</div>
+                <div id="admin-bonus-tasks-container"></div>
+                <form id="admin-bonus-form" style="margin-top:14px; border-top:1px solid var(--border); padding-top:14px;">
+                    <div class="setting-group">
+                        <label>Task Title</label>
+                        <input type="text" id="admin-bonus-title" placeholder="Enter task title">
+                    </div>
+                    <div class="setting-group">
+                        <label>Task Link</label>
+                        <input type="url" id="admin-bonus-link" placeholder="https://t.me/...">
+                    </div>
+                    <div class="setting-group">
+                        <label>Reward ($)</label>
+                        <input type="number" id="admin-bonus-reward" step="0.001" value="0.01">
+                    </div>
+                    <div class="setting-group">
+                        <label>Duration (seconds)</label>
+                        <input type="number" id="admin-bonus-duration" value="10">
+                    </div>
+                    <button type="submit" class="action-button success" style="margin-top:8px;">
+                        <i class="fa-solid fa-plus"></i> <span>Add Bonus Task</span>
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -1280,103 +879,24 @@
             <h3 class="card-title">💸 Withdraw Funds</h3>
             <p id="min-withdraw-text" style="font-size:13px; color:var(--text-light); margin-bottom:12px;"></p>
             <form id="withdraw-form">
-                <div class="form-group">
+                <div class="setting-group">
                     <label>Payment Method *</label>
                     <select id="method" name="method" required>
                         <option value="" disabled selected>Select Payment Method</option>
                     </select>
                 </div>
-                
                 <div id="method-fields-container"></div>
-                
-                <div class="form-group">
+                <div class="setting-group">
                     <label>Amount (USD) *</label>
                     <input type="number" step="0.001" id="withdraw-amount" placeholder="0.00" min="0.001" required>
                 </div>
-                
                 <button type="submit" class="action-button" id="withdraw-submit-button">
                     <span class="button-text">Submit Request</span>
-                    <div class="loader-spinner" style="display:none; width:20px; height:20px; border-width:3px;"></div>
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- Deposit Modal -->
-    <div id="depositModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('depositModal')">&times;</button>
-            <h3 class="card-title">💳 Deposit Funds</h3>
-            <p style="font-size:13px; color:var(--text-light); margin-bottom:14px;">Select a payment method and enter amount</p>
-            <div id="deposit-methods-list"></div>
-            <div style="margin-top:12px;">
-                <div class="form-group">
-                    <label>Amount (BDT)</label>
-                    <input type="number" id="deposit-amount" step="1" placeholder="Enter amount in BDT" min="10">
-                </div>
-                <button class="action-button" onclick="submitDeposit()">
-                    <i class="fa-solid fa-check"></i> <span>Confirm Deposit</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Convert Modal -->
-    <div id="convertModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('convertModal')">&times;</button>
-            <h3 class="card-title">🔄 Convert to Wallet</h3>
-            <div style="text-align:center; padding:20px 0;">
-                <div style="font-size:48px; margin-bottom:12px;">💰</div>
-                <div style="font-size:14px; color:var(--text-light);">Amount to Convert</div>
-                <div style="font-size:32px; font-weight:800; color:var(--success);" id="convert-amount-display">$0.000</div>
-                <div style="font-size:12px; color:var(--text-light); margin-top:4px;">1:1 conversion rate • No fees</div>
-            </div>
-            <div class="form-group">
-                <label>Enter Amount to Convert</label>
-                <input type="number" step="0.001" id="convert-input" placeholder="Enter amount" min="0.001">
-                <div class="form-hint">Max: <span id="convert-max-display">$0.000</span></div>
-            </div>
-            <button class="action-button success" onclick="confirmConvert()">
-                <i class="fa-solid fa-exchange-alt"></i> <span>Convert Now</span>
-            </button>
-            <button class="action-button secondary" onclick="closeModal('convertModal')" style="margin-top:10px;">
-                Cancel
-            </button>
-        </div>
-    </div>
-
-    <!-- Verify Ad Modal -->
-    <div id="verifyAdModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('verifyAdModal')">&times;</button>
-            <h3 class="card-title">📸 Submit Proof</h3>
-            <p style="font-size:13px; color:var(--text-light); margin-bottom:12px;">Take a screenshot of the ad and upload it here</p>
-            <div id="verify-ad-info"></div>
-            <div class="form-group">
-                <label>Upload Screenshot *</label>
-                <input type="file" id="verify-screenshot" accept="image/*" required>
-                <div class="form-hint">Upload PNG, JPG or GIF (Max 5MB)</div>
-            </div>
-            <button class="action-button" onclick="submitVerification()">
-                <i class="fa-solid fa-upload"></i> <span>Submit for Verification</span>
-            </button>
-        </div>
-    </div>
-    
-    <!-- Support Modal -->
-    <div id="supportModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('supportModal')">&times;</button>
-            <h3 class="card-title">🆘 Support</h3>
-            <p style="line-height:1.6; margin-bottom:16px;">For any help or questions, please contact our support team. We're here to assist you!</p>
-            <button class="action-button" id="admin-contact-button">
-                <i class="fa-brands fa-telegram"></i>
-                <span>Contact Support</span>
-            </button>
-        </div>
-    </div>
-    
     <!-- History Modal -->
     <div id="historyModal" class="modal">
         <div class="modal-content">
@@ -1391,14 +911,27 @@
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal('inviteModal')">&times;</button>
             <h3 class="card-title">👥 Invite Friends</h3>
-            <p style="line-height:1.6; margin-bottom:14px;">Share your referral link with friends and earn together. You get a reward for each successful referral!</p>
+            <p style="line-height:1.6; margin-bottom:14px;">Share your referral link with friends and earn together!</p>
             <button class="action-button" id="copy-link-button">
                 <i class="fa-solid fa-copy"></i>
                 <span>Copy Link</span>
             </button>
-            <button class="action-button secondary" id="share-link-button">
+            <button class="action-button secondary" id="share-link-button" style="margin-top:10px;">
                 <i class="fa-solid fa-share-nodes"></i>
                 <span>Share Link</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Support Modal -->
+    <div id="supportModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('supportModal')">&times;</button>
+            <h3 class="card-title">🆘 Support</h3>
+            <p style="line-height:1.6; margin-bottom:16px;">For any help or questions, please contact our support team.</p>
+            <button class="action-button" id="admin-contact-button">
+                <i class="fa-brands fa-telegram"></i>
+                <span>Contact Support</span>
             </button>
         </div>
     </div>
@@ -1424,12 +957,12 @@
             BOT_USERNAME: 'nexearn2_bot',
             CHANNEL_LINK: 'https://t.me/nexearn2',
             SUPPORT_LINK: 'https://t.me/NexEarn2Support',
-            MONETAG_ZONE_ID: '11573980',
             AD_REWARD: 0.001,
             DAILY_AD_LIMIT: 15,
             MINIMUM_WITHDRAWAL: 0.10,
             COOLDOWN_MINUTES: 30,
             REFERRAL_REWARD: 0.01,
+            ADMIN_IDS: [6624254778],
             withdrawalMethods: ['Binance', 'Bikash', 'Nogad'],
             welcomeNotice: {
                 title: "Welcome to NexEarn! 🎉",
@@ -1457,14 +990,14 @@
         // STATE
         // ============================================================
         const state = {
-            totalEarning: 0,        // Publisher earnings (from ads)
-            walletBalance: 0,       // Advertiser wallet (for creating ads)
+            balance: 0,
             adCount: 0,
             adsWatchedToday: 0,
             lastAdWatchedDate: null,
             cooldownUntil: null,
             weeklyActivity: [0, 0, 0, 0, 0, 0, 0],
             withdrawalHistory: [],
+            depositHistory: [],
             completedBonusTasks: [],
             rewardedReferrals: 0,
             lastUsedIp: null,
@@ -1472,12 +1005,9 @@
             viewedAds: [],
             myAds: [],
             currentUserId: null,
-            currentIp: null,
             currentFilter: 'all',
-            currentVerifyAdId: null,
-            selectedDepositMethod: null,
-            selectedDepositNumber: null,
-            bonusTasks: []
+            bonusTasks: [],
+            isAdmin: false
         };
 
         // ============================================================
@@ -1487,12 +1017,10 @@
 
         function initDOM() {
             DOM.preloader = document.getElementById('preloader');
-            DOM.preloaderFooter = document.getElementById('preloader-footer');
             DOM.loaderBar = document.getElementById('loader-bar');
             DOM.preloaderPercentage = document.getElementById('preloader-percentage');
-            DOM.container = document.querySelector('.container');
+            DOM.container = document.getElementById('appContainer');
             DOM.totalEarning = document.getElementById('total-earning');
-            DOM.walletBalance = document.getElementById('wallet-balance');
             DOM.adCount = document.getElementById('ad-count');
             DOM.adsTodayCount = document.getElementById('ads-today-count');
             DOM.referralCount = document.getElementById('referral-count');
@@ -1506,32 +1034,34 @@
             DOM.minWithdrawText = document.getElementById('min-withdraw-text');
             DOM.welcomeTitle = document.getElementById('welcome-title');
             DOM.welcomeMessage = document.getElementById('welcome-message');
-            DOM.walletLabel = document.getElementById('walletLabel');
-            DOM.depositBtn = document.getElementById('depositButton');
             DOM.userRoleBadge = document.getElementById('userRoleBadge');
+            DOM.adminBadge = document.getElementById('adminBadge');
             DOM.publisherView = document.getElementById('publisherView');
             DOM.advertiserView = document.getElementById('advertiserView');
+            DOM.adminView = document.getElementById('adminView');
+            DOM.adminTabBtn = document.getElementById('adminTabBtn');
             DOM.adListContainer = document.getElementById('ad-list-container');
             DOM.myAdsContainer = document.getElementById('my-ads-container');
-            DOM.verificationContainer = document.getElementById('verification-requests');
             DOM.createAdForm = document.getElementById('create-ad-form');
-            DOM.depositMethodsList = document.getElementById('deposit-methods-list');
             DOM.withdrawForm = document.getElementById('withdraw-form');
             DOM.methodSelect = document.getElementById('method');
             DOM.methodFieldsContainer = document.getElementById('method-fields-container');
             DOM.withdrawAmount = document.getElementById('withdraw-amount');
             DOM.withdrawSubmitBtn = document.getElementById('withdraw-submit-button');
-            DOM.adLoaderOverlay = document.getElementById('ad-loader-overlay');
-            DOM.adLoaderProgress = document.getElementById('ad-loader-progress');
-            DOM.verifyAdInfo = document.getElementById('verify-ad-info');
-            DOM.verifyScreenshot = document.getElementById('verify-screenshot');
             DOM.profilePic = document.getElementById('profile-pic');
             DOM.greeting = document.getElementById('greeting');
-            DOM.convertBalance = document.getElementById('convert-balance');
-            DOM.convertBtn = document.getElementById('convertBtn');
-            DOM.convertInput = document.getElementById('convert-input');
-            DOM.convertAmountDisplay = document.getElementById('convert-amount-display');
-            DOM.convertMaxDisplay = document.getElementById('convert-max-display');
+            
+            // Admin DOM
+            DOM.adminTotalUsers = document.getElementById('admin-total-users');
+            DOM.adminTotalEarnings = document.getElementById('admin-total-earnings');
+            DOM.adminTotalAds = document.getElementById('admin-total-ads');
+            DOM.adminPendingWithdrawals = document.getElementById('admin-pending-withdrawals');
+            DOM.adminWithdrawalsContainer = document.getElementById('admin-withdrawals-container');
+            DOM.adminDepositsContainer = document.getElementById('admin-deposits-container');
+            DOM.adminSettingsForm = document.getElementById('admin-settings-form');
+            DOM.adminBonusTasksContainer = document.getElementById('admin-bonus-tasks-container');
+            DOM.adminBonusForm = document.getElementById('admin-bonus-form');
+            DOM.depositHistoryContainer = document.getElementById('deposit-history-container');
         }
 
         // ============================================================
@@ -1552,7 +1082,7 @@
         function loadConfigFromFirebase() {
             return new Promise((resolve) => {
                 if (!firebaseDb) { resolve(); return; }
-                firebaseDb.ref('adminConfig').once('value').then(snapshot => {
+                firebaseDb.ref('adminConfig').on('value', (snapshot) => {
                     const data = snapshot.val();
                     if (data) {
                         if (data.adReward) CONFIG.AD_REWARD = data.adReward;
@@ -1563,9 +1093,10 @@
                         if (data.withdrawMethods) CONFIG.withdrawalMethods = data.withdrawMethods;
                         if (data.welcomeMessage) CONFIG.welcomeNotice.message = data.welcomeMessage;
                         console.log("✅ Config loaded from Firebase");
+                        updateUI();
                     }
                     resolve();
-                }).catch(() => resolve());
+                });
             });
         }
 
@@ -1578,6 +1109,7 @@
                         state.bonusTasks = data;
                         console.log("✅ Bonus tasks loaded");
                         renderBonusTasks();
+                        if (state.isAdmin) renderAdminBonusTasks();
                     }
                     resolve();
                 });
@@ -1588,18 +1120,17 @@
             if (!firebaseDb || !state.currentUserId) return;
             
             const data = {
-                totalEarning: state.totalEarning,
-                walletBalance: state.walletBalance,
+                balance: state.balance,
                 adCount: state.adCount,
                 adsWatchedToday: state.adsWatchedToday,
                 lastAdWatchedDate: state.lastAdWatchedDate,
                 cooldownUntil: state.cooldownUntil,
                 weeklyActivity: state.weeklyActivity,
                 withdrawalHistory: state.withdrawalHistory,
+                depositHistory: state.depositHistory,
                 completedBonusTasks: state.completedBonusTasks,
                 rewardedReferrals: state.rewardedReferrals,
                 lastUsedIp: state.lastUsedIp,
-                userRole: state.userRole,
                 viewedAds: state.viewedAds,
                 myAds: state.myAds,
                 name: tg?.initDataUnsafe?.user?.first_name || 'User',
@@ -1618,18 +1149,17 @@
                 firebaseDb.ref(`users/${state.currentUserId}`).once('value').then(snapshot => {
                     const data = snapshot.val();
                     if (data) {
-                        state.totalEarning = data.totalEarning || 0;
-                        state.walletBalance = data.walletBalance || 0;
+                        state.balance = data.balance || 0;
                         state.adCount = data.adCount || 0;
                         state.adsWatchedToday = data.adsWatchedToday || 0;
                         state.lastAdWatchedDate = data.lastAdWatchedDate || null;
                         state.cooldownUntil = data.cooldownUntil || null;
                         state.weeklyActivity = data.weeklyActivity || [0,0,0,0,0,0,0];
                         state.withdrawalHistory = data.withdrawalHistory || [];
+                        state.depositHistory = data.depositHistory || [];
                         state.completedBonusTasks = data.completedBonusTasks || [];
                         state.rewardedReferrals = data.rewardedReferrals || 0;
                         state.lastUsedIp = data.lastUsedIp || null;
-                        state.userRole = data.userRole || 'publisher';
                         state.viewedAds = data.viewedAds || [];
                         state.myAds = data.myAds || [];
                         
@@ -1652,21 +1182,8 @@
                 const adList = Object.entries(ads).map(([id, data]) => ({ id, ...data }));
                 renderAdList(adList);
                 renderMyAds(adList);
-                renderVerificationRequests(adList);
-            });
-        }
-
-        function listenDeposits() {
-            if (!firebaseDb || !state.currentUserId) return;
-            firebaseDb.ref('deposits').orderByChild('userId').equalTo(state.currentUserId).on('child_changed', (snapshot) => {
-                const data = snapshot.val();
-                if (data?.status === 'approved') {
-                    if (state.userRole === 'advertiser') {
-                        state.walletBalance += data.amount / 100;
-                        saveUserData();
-                        updateUI();
-                        showToast(`✅ Deposit of ${data.amount} BDT approved!`, 'success');
-                    }
+                if (state.isAdmin) {
+                    document.getElementById('admin-total-ads').textContent = adList.length;
                 }
             });
         }
@@ -1675,6 +1192,63 @@
             if (!firebaseDb || !state.currentUserId) return;
             firebaseDb.ref(`users/${state.currentUserId}/referrals`).on('value', (snapshot) => {
                 DOM.referralCount.textContent = snapshot.val() || 0;
+            });
+        }
+
+        function listenWithdrawals() {
+            if (!firebaseDb) return;
+            firebaseDb.ref('withdrawals').on('value', (snapshot) => {
+                const data = snapshot.val() || {};
+                const list = Object.entries(data).map(([id, item]) => ({ id, ...item }));
+                
+                // Update user's own withdrawals
+                const userWithdrawals = list.filter(w => w.userId === state.currentUserId);
+                // Update history if needed
+                
+                if (state.isAdmin) {
+                    renderAdminWithdrawals(list);
+                    const pending = list.filter(w => w.status === 'Pending' || w.status === 'pending');
+                    document.getElementById('admin-pending-withdrawals').textContent = pending.length;
+                }
+            });
+        }
+
+        function listenDeposits() {
+            if (!firebaseDb) return;
+            
+            // User's own deposits
+            if (state.currentUserId) {
+                firebaseDb.ref('deposits').orderByChild('userId').equalTo(state.currentUserId).on('value', (snapshot) => {
+                    const data = snapshot.val() || {};
+                    const list = Object.entries(data).map(([id, item]) => ({ id, ...item }));
+                    state.depositHistory = list;
+                    renderDepositHistory(list);
+                    saveUserData();
+                });
+            }
+            
+            // Admin deposits
+            if (state.isAdmin) {
+                firebaseDb.ref('deposits').on('value', (snapshot) => {
+                    const data = snapshot.val() || {};
+                    const list = Object.entries(data).map(([id, item]) => ({ id, ...item }));
+                    renderAdminDeposits(list);
+                });
+            }
+        }
+
+        function listenUsers() {
+            if (!firebaseDb || !state.isAdmin) return;
+            firebaseDb.ref('users').on('value', (snapshot) => {
+                const data = snapshot.val() || {};
+                const users = Object.keys(data);
+                document.getElementById('admin-total-users').textContent = users.length;
+                
+                let totalEarnings = 0;
+                Object.values(data).forEach(user => {
+                    totalEarnings += user.balance || 0;
+                });
+                document.getElementById('admin-total-earnings').textContent = `$${totalEarnings.toFixed(3)}`;
             });
         }
 
@@ -1732,6 +1306,11 @@
                 .catch(() => null);
         }
 
+        function isAdmin() {
+            const userId = tg?.initDataUnsafe?.user?.id || 0;
+            return CONFIG.ADMIN_IDS.includes(Number(userId));
+        }
+
         // ============================================================
         // IMAGE UPLOAD
         // ============================================================
@@ -1761,115 +1340,7 @@
         }
 
         // ============================================================
-        // CONVERT EARNINGS TO WALLET
-        // ============================================================
-        function convertToWallet() {
-            if (state.totalEarning <= 0) {
-                showToast('❌ No earnings to convert!', 'error');
-                return;
-            }
-            
-            DOM.convertInput.value = '';
-            DOM.convertAmountDisplay.textContent = `$${state.totalEarning.toFixed(3)}`;
-            DOM.convertMaxDisplay.textContent = `$${state.totalEarning.toFixed(3)}`;
-            DOM.convertInput.max = state.totalEarning;
-            DOM.convertInput.placeholder = `Max $${state.totalEarning.toFixed(3)}`;
-            
-            document.getElementById('convertModal').style.display = 'flex';
-        }
-
-        function confirmConvert() {
-            const amount = parseFloat(DOM.convertInput.value);
-            
-            if (!amount || amount <= 0) {
-                showToast('❌ Please enter a valid amount', 'error');
-                return;
-            }
-            
-            if (amount > state.totalEarning) {
-                showToast(`❌ You only have $${state.totalEarning.toFixed(3)} to convert`, 'error');
-                return;
-            }
-            
-            // Convert: Move from totalEarning to walletBalance (1:1)
-            state.totalEarning -= amount;
-            state.walletBalance += amount;
-            
-            // Save to history
-            const convertRecord = {
-                type: 'convert',
-                amount: amount,
-                date: new Date().toISOString(),
-                status: 'Completed'
-            };
-            
-            state.withdrawalHistory.unshift({
-                method: 'Convert to Wallet',
-                number: 'Earnings → Wallet',
-                amount: amount,
-                date: new Date().toISOString(),
-                status: 'Completed'
-            });
-            
-            saveUserData();
-            updateUI();
-            
-            closeModal('convertModal');
-            showToast(`✅ $${amount.toFixed(3)} converted to wallet successfully!`, 'success');
-        }
-
-        // ============================================================
-        // ROLE MANAGEMENT
-        // ============================================================
-        function selectRole(role, btn) {
-            document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
-            if (btn) btn.classList.add('active');
-
-            state.userRole = role;
-            saveUserData();
-
-            if (role === 'publisher') {
-                DOM.publisherView.style.display = 'block';
-                DOM.advertiserView.style.display = 'none';
-                DOM.userRoleBadge.textContent = '📖 Publisher';
-                DOM.userRoleBadge.className = 'role-badge';
-                DOM.walletLabel.textContent = '💳 Publisher Balance';
-                DOM.depositBtn.style.display = 'none';
-                document.getElementById('convertCard').style.display = 'block';
-                listenAds();
-            } else {
-                DOM.publisherView.style.display = 'none';
-                DOM.advertiserView.style.display = 'block';
-                DOM.userRoleBadge.textContent = '📢 Advertiser';
-                DOM.userRoleBadge.className = 'role-badge advertiser';
-                DOM.walletLabel.textContent = '💳 Advertiser Wallet';
-                DOM.depositBtn.style.display = 'block';
-                document.getElementById('convertCard').style.display = 'none';
-                listenAds();
-            }
-            updateUI();
-        }
-
-        function switchRole() {
-            const newRole = state.userRole === 'publisher' ? 'advertiser' : 'publisher';
-            const btn = document.querySelector(`.role-btn.${newRole}`);
-            if (btn) selectRole(newRole, btn);
-        }
-
-        // ============================================================
-        // AD FILTERS
-        // ============================================================
-        function filterAds(filter, btn) {
-            if (btn) {
-                document.querySelectorAll('.ad-filters .filter-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-            }
-            state.currentFilter = filter;
-            listenAds();
-        }
-
-        // ============================================================
-        // RENDER ADS
+        // RENDER FUNCTIONS
         // ============================================================
         function renderAdList(ads) {
             if (!DOM.adListContainer) return;
@@ -1887,7 +1358,7 @@
             filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
             if (filtered.length === 0) {
-                DOM.adListContainer.innerHTML = `<p style="text-align:center; color:var(--text-light); padding:20px;">No ads available</p>`;
+                DOM.adListContainer.innerHTML = `<div class="empty-state"><i class="fa-solid fa-rectangle-ad"></i><p>No ads available</p></div>`;
                 return;
             }
 
@@ -1900,9 +1371,9 @@
                 const imageUrl = ad.imageUrl || '';
 
                 let statusText = '🟢 Active';
-                let statusClass = 'active';
-                if (isVerified) { statusText = '✅ Verified'; statusClass = 'completed'; }
-                else if (isViewed) { statusText = '⏳ Pending'; statusClass = 'pending'; }
+                let statusClass = 'success';
+                if (isVerified) { statusText = '✅ Verified'; statusClass = 'info'; }
+                else if (isViewed) { statusText = '⏳ Pending'; statusClass = 'warning'; }
 
                 let btnText = '👁 View';
                 let btnAction = `viewAd('${ad.id}')`;
@@ -1912,19 +1383,17 @@
                 else if (isViewed) { btnText = '📸 Verify'; btnAction = `openVerifyModal('${ad.id}')`; }
 
                 return `
-                    <div class="ad-card">
-                        <div class="ad-header">
-                            <span class="ad-title">${escapeHTML(ad.title || 'Untitled')}</span>
-                            <span class="ad-reward">+$${ad.reward?.toFixed(3) || '0.001'}</span>
+                    <div class="ad-card" style="background:var(--bg); border-radius:12px; padding:14px; margin-bottom:12px; border:1px solid var(--border);">
+                        <div class="ad-header" style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
+                            <span class="ad-title" style="font-weight:600; font-size:15px; flex:1;">${escapeHTML(ad.title || 'Untitled')}</span>
+                            <span class="ad-reward" style="font-weight:700; color:var(--primary); font-size:14px; white-space:nowrap;">+$${ad.reward?.toFixed(3) || '0.001'}</span>
                         </div>
-                        ${imageUrl ? `<img src="${imageUrl}" class="ad-image" alt="Ad image" loading="lazy">` : ''}
-                        <div class="ad-desc">${escapeHTML(ad.desc || 'No description')}</div>
-                        <div class="ad-footer">
-                            <span class="ad-views"><i class="fa-solid fa-eye"></i> ${views}/${totalViews}</span>
-                            <span class="ad-status ${statusClass}">${statusText}</span>
-                            <button class="ad-btn view ${isViewed ? 'completed' : ''}"
-                                    onclick="${btnAction}"
-                                    ${btnDisabled ? 'disabled' : ''}>
+                        ${imageUrl ? `<img src="${imageUrl}" class="ad-image" style="width:100%; max-height:120px; object-fit:cover; border-radius:8px; margin:8px 0;" loading="lazy">` : ''}
+                        <div class="ad-desc" style="font-size:13px; color:var(--text-light); margin-bottom:10px; line-height:1.4;">${escapeHTML(ad.desc || 'No description')}</div>
+                        <div class="ad-footer" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                            <span class="ad-views" style="font-size:12px; color:var(--text-light);"><i class="fa-solid fa-eye"></i> ${views}/${totalViews}</span>
+                            <span class="badge ${statusClass}">${statusText}</span>
+                            <button class="action-btn approve" onclick="${btnAction}" ${btnDisabled ? 'disabled' : ''}>
                                 ${btnText}
                             </button>
                         </div>
@@ -1933,9 +1402,319 @@
             }).join('');
         }
 
+        function renderMyAds(ads) {
+            if (!DOM.myAdsContainer) return;
+
+            const myAds = ads.filter(ad => ad.createdBy === state.currentUserId);
+
+            if (myAds.length === 0) {
+                DOM.myAdsContainer.innerHTML = `<div class="empty-state"><i class="fa-solid fa-rectangle-ad"></i><p>You haven't created any ads yet</p></div>`;
+                return;
+            }
+
+            DOM.myAdsContainer.innerHTML = myAds.map(ad => {
+                const views = ad.views || 0;
+                const totalViews = ad.totalViews || 100;
+                const progress = Math.min((views / totalViews) * 100, 100);
+                const imageUrl = ad.imageUrl || '';
+
+                return `
+                    <div class="ad-card" style="background:var(--bg); border-radius:12px; padding:14px; margin-bottom:12px; border:1px solid var(--border);">
+                        <div class="ad-header" style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
+                            <span class="ad-title" style="font-weight:600; font-size:15px; flex:1;">${escapeHTML(ad.title || 'Untitled')}</span>
+                            <span class="badge ${ad.status === 'active' ? 'success' : 'warning'}">${ad.status === 'active' ? '🟢 Active' : '⏳ Paused'}</span>
+                        </div>
+                        ${imageUrl ? `<img src="${imageUrl}" class="ad-image" style="width:100%; max-height:120px; object-fit:cover; border-radius:8px; margin:8px 0;" loading="lazy">` : ''}
+                        <div class="ad-desc" style="font-size:13px; color:var(--text-light); margin-bottom:10px; line-height:1.4;">${escapeHTML(ad.desc || 'No description')}</div>
+                        <div style="margin-top:8px;">
+                            <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-light);">
+                                <span>Views: ${views}/${totalViews}</span>
+                                <span>Reward: $${ad.reward?.toFixed(3) || '0.001'}</span>
+                            </div>
+                            <div style="width:100%; height:4px; background:var(--border); border-radius:4px; margin-top:4px; overflow:hidden;">
+                                <div style="width:${progress}%; height:100%; background:linear-gradient(90deg, var(--success), #3b82f6); border-radius:4px; transition:width 0.3s;"></div>
+                            </div>
+                        </div>
+                        <div class="ad-footer" style="display:flex; gap:8px; margin-top:10px; padding-top:10px; border-top:1px solid var(--border);">
+                            <button class="action-btn reject" onclick="deleteAd('${ad.id}')"><i class="fa-solid fa-trash"></i> Delete</button>
+                            <button class="action-btn approve" onclick="toggleAdStatus('${ad.id}')">${ad.status === 'active' ? '⏸ Pause' : '▶️ Activate'}</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderDepositHistory(deposits) {
+            if (!DOM.depositHistoryContainer) return;
+
+            if (!deposits || deposits.length === 0) {
+                DOM.depositHistoryContainer.innerHTML = `<div class="empty-state"><i class="fa-solid fa-credit-card"></i><p>No deposit history</p></div>`;
+                return;
+            }
+
+            DOM.depositHistoryContainer.innerHTML = `
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Method</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${deposits.map(d => `
+                                <tr>
+                                    <td>${escapeHTML(d.method)}</td>
+                                    <td>${d.amount} BDT</td>
+                                    <td><span class="badge ${d.status === 'approved' ? 'success' : d.status === 'rejected' ? 'danger' : 'warning'}">${d.status}</span></td>
+                                    <td style="font-size:11px; color:var(--text-light);">${new Date(d.createdAt).toLocaleDateString()}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderWithdrawalHistory() {
+            if (!DOM.historyList) return;
+
+            if (!state.withdrawalHistory || state.withdrawalHistory.length === 0) {
+                DOM.historyList.innerHTML = `<div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><p>No withdrawal history</p></div>`;
+                return;
+            }
+
+            DOM.historyList.innerHTML = state.withdrawalHistory.map(item => `
+                <div class="history-item" style="padding:12px 0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; gap:12px;">
+                    <div class="history-details" style="flex:1; min-width:0;">
+                        <div class="method-number" style="font-weight:700; font-size:14px;">${escapeHTML(item.method)} - ${escapeHTML(item.number)}</div>
+                        <div class="date" style="font-size:11px; color:var(--text-light);">${new Date(item.date).toLocaleString()}</div>
+                    </div>
+                    <div class="history-amount" style="text-align:right; flex-shrink:0;">
+                        <div class="amount-text" style="font-size:16px; font-weight:800;">$${item.amount.toFixed(3)}</div>
+                        <span class="badge ${item.status.toLowerCase() === 'pending' ? 'warning' : 'success'}">${item.status}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderBonusTasks() {
+            if (!DOM.bonusTasksList) return;
+
+            if (!state.bonusTasks || state.bonusTasks.length === 0) {
+                DOM.bonusTasksList.innerHTML = `<div class="empty-state"><i class="fa-solid fa-star"></i><p>No bonus tasks available</p></div>`;
+                return;
+            }
+
+            DOM.bonusTasksList.innerHTML = state.bonusTasks.map(task => {
+                const isCompleted = state.completedBonusTasks.includes(task.id);
+                return `
+                    <div class="bonus-item" style="display:flex; align-items:center; justify-content:space-between; padding:14px; background:var(--bg); border-radius:12px; margin-bottom:10px; border:1px solid var(--border); gap:12px;">
+                        <div class="details" style="flex:1; min-width:0;">
+                            <div class="title" style="font-weight:600; font-size:14px; color:var(--text);">${escapeHTML(task.title)}</div>
+                            <div class="reward" style="font-size:13px; font-weight:700; color:var(--primary);"><i class="fa-solid fa-gift"></i> + $${task.reward.toFixed(3)}</div>
+                        </div>
+                        <button class="action-btn approve" ${isCompleted ? 'disabled' : ''} onclick="${isCompleted ? '' : `claimBonus('${task.id}')`}">
+                            ${isCompleted ? '✅ Completed' : 'Claim'}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function claimBonus(taskId) {
+            const task = state.bonusTasks.find(t => t.id === taskId);
+            if (!task || state.completedBonusTasks.includes(taskId)) return;
+
+            safeOpenLink(task.link);
+            
+            setTimeout(() => {
+                if (state.completedBonusTasks.includes(taskId)) return;
+                state.balance += task.reward;
+                state.completedBonusTasks.push(taskId);
+                saveUserData();
+                updateUI();
+                showToast(`🎉 Bonus of $${task.reward.toFixed(3)} added!`, 'success');
+                renderBonusTasks();
+            }, (task.duration || 10) * 1000);
+        }
+
         // ============================================================
-        // VIEW AD - FIXED VERSION
+        // ADMIN FUNCTIONS
         // ============================================================
+        function renderAdminWithdrawals(withdrawals) {
+            if (!DOM.adminWithdrawalsContainer) return;
+
+            const pending = withdrawals.filter(w => w.status === 'Pending' || w.status === 'pending');
+
+            if (pending.length === 0) {
+                DOM.adminWithdrawalsContainer.innerHTML = `<div class="empty-state"><i class="fa-solid fa-check-circle"></i><p>No pending withdrawals</p></div>`;
+                return;
+            }
+
+            DOM.adminWithdrawalsContainer.innerHTML = `
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Method</th>
+                                <th>Amount</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${pending.map(w => `
+                                <tr>
+                                    <td>${escapeHTML(w.userName || 'Unknown')}</td>
+                                    <td>${escapeHTML(w.method)}</td>
+                                    <td>$${w.amount.toFixed(3)}</td>
+                                    <td>
+                                        <button class="action-btn approve" onclick="approveWithdrawal('${w.id}')">Approve</button>
+                                        <button class="action-btn reject" onclick="rejectWithdrawal('${w.id}')">Reject</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderAdminDeposits(deposits) {
+            if (!DOM.adminDepositsContainer) return;
+
+            const pending = deposits.filter(d => d.status === 'pending');
+
+            if (pending.length === 0) {
+                DOM.adminDepositsContainer.innerHTML = `<div class="empty-state"><i class="fa-solid fa-check-circle"></i><p>No pending deposits</p></div>`;
+                return;
+            }
+
+            DOM.adminDepositsContainer.innerHTML = `
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Method</th>
+                                <th>Amount</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${pending.map(d => `
+                                <tr>
+                                    <td>${escapeHTML(d.userName || 'Unknown')}</td>
+                                    <td>${escapeHTML(d.method)}</td>
+                                    <td>${d.amount} BDT</td>
+                                    <td>
+                                        <button class="action-btn approve" onclick="approveDeposit('${d.id}')">Approve</button>
+                                        <button class="action-btn reject" onclick="rejectDeposit('${d.id}')">Reject</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderAdminBonusTasks() {
+            if (!DOM.adminBonusTasksContainer) return;
+
+            if (!state.bonusTasks || state.bonusTasks.length === 0) {
+                DOM.adminBonusTasksContainer.innerHTML = `<div class="empty-state"><i class="fa-solid fa-star"></i><p>No bonus tasks</p></div>`;
+                return;
+            }
+
+            DOM.adminBonusTasksContainer.innerHTML = state.bonusTasks.map((task, index) => `
+                <div class="bonus-item" style="display:flex; align-items:center; justify-content:space-between; padding:12px; background:var(--bg); border-radius:10px; margin-bottom:8px; border:1px solid var(--border);">
+                    <div>
+                        <div style="font-weight:600; font-size:14px;">${escapeHTML(task.title)}</div>
+                        <div style="font-size:12px; color:var(--text-light);">+$${task.reward.toFixed(3)} | ${task.duration}s</div>
+                    </div>
+                    <button class="action-btn reject" onclick="deleteBonusTask(${index})"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        async function approveWithdrawal(id) {
+            if (!confirm('Approve this withdrawal?')) return;
+            try {
+                await firebaseDb.ref(`withdrawals/${id}/status`).set('Approved');
+                showToast('✅ Withdrawal approved!', 'success');
+            } catch (e) {
+                showToast('❌ Failed to approve withdrawal', 'error');
+            }
+        }
+
+        async function rejectWithdrawal(id) {
+            if (!confirm('Reject this withdrawal?')) return;
+            try {
+                await firebaseDb.ref(`withdrawals/${id}/status`).set('Rejected');
+                showToast('❌ Withdrawal rejected', 'error');
+            } catch (e) {
+                showToast('❌ Failed to reject withdrawal', 'error');
+            }
+        }
+
+        async function approveDeposit(id) {
+            if (!confirm('Approve this deposit?')) return;
+            try {
+                const snapshot = await firebaseDb.ref(`deposits/${id}`).once('value');
+                const data = snapshot.val();
+                if (!data) return;
+
+                await firebaseDb.ref(`deposits/${id}/status`).set('approved');
+                
+                // Add balance to user
+                const amount = data.amount / 100;
+                await firebaseDb.ref(`users/${data.userId}/balance`).transaction((current) => (current || 0) + amount);
+                
+                showToast('✅ Deposit approved! Balance updated.', 'success');
+            } catch (e) {
+                showToast('❌ Failed to approve deposit', 'error');
+            }
+        }
+
+        async function rejectDeposit(id) {
+            if (!confirm('Reject this deposit?')) return;
+            try {
+                await firebaseDb.ref(`deposits/${id}/status`).set('rejected');
+                showToast('❌ Deposit rejected', 'error');
+            } catch (e) {
+                showToast('❌ Failed to reject deposit', 'error');
+            }
+        }
+
+        async function deleteBonusTask(index) {
+            if (!confirm('Delete this bonus task?')) return;
+            try {
+                state.bonusTasks.splice(index, 1);
+                await firebaseDb.ref('bonusTasks').set(state.bonusTasks);
+                renderAdminBonusTasks();
+                renderBonusTasks();
+                showToast('✅ Bonus task deleted!', 'success');
+            } catch (e) {
+                showToast('❌ Failed to delete task', 'error');
+            }
+        }
+
+        // ============================================================
+        // AD FUNCTIONS
+        // ============================================================
+        function filterAds(filter, btn) {
+            if (btn) {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+            state.currentFilter = filter;
+            listenAds();
+        }
+
         async function viewAd(adId) {
             if (state.viewedAds.includes(adId)) {
                 openVerifyModal(adId);
@@ -1969,77 +1748,174 @@
             }
         }
 
-        // ============================================================
-        // VERIFICATION
-        // ============================================================
         function openVerifyModal(adId) {
             state.currentVerifyAdId = adId;
-            const modal = document.getElementById('verifyAdModal');
-
-            firebaseDb.ref(`ads/${adId}`).once('value').then(snapshot => {
-                const ad = snapshot.val();
-                if (ad) {
-                    DOM.verifyAdInfo.innerHTML = `
-                        <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:10px; margin-bottom:12px;">
-                            <strong>${escapeHTML(ad.title)}</strong>
-                            <div style="font-size:12px; color:var(--text-light);">Reward: $${ad.reward?.toFixed(3) || '0.001'}</div>
-                            ${ad.imageUrl ? `<img src="${ad.imageUrl}" style="width:100%; max-height:100px; object-fit:cover; border-radius:6px; margin-top:6px;" loading="lazy">` : ''}
-                        </div>
-                    `;
-                }
-            });
-
-            DOM.verifyScreenshot.value = '';
-            modal.style.display = 'flex';
+            // For now, just simulate verification
+            verifyAd(adId);
         }
 
-        async function submitVerification() {
-            const file = DOM.verifyScreenshot.files[0];
-            if (!file) {
-                showToast('❌ Please upload a screenshot!', 'error');
-                return;
-            }
-
-            if (file.size > 5 * 1024 * 1024) {
-                showToast('❌ Image size must be less than 5MB!', 'error');
-                return;
-            }
-
-            if (!state.currentVerifyAdId) {
-                showToast('❌ No ad selected!', 'error');
-                return;
-            }
-
+        async function verifyAd(adId) {
             try {
-                showToast('📤 Uploading screenshot...', '');
-                const downloadUrl = await uploadImage(file);
-
-                const verificationData = {
-                    adId: state.currentVerifyAdId,
-                    userId: state.currentUserId,
-                    userName: tg?.initDataUnsafe?.user?.first_name || 'User',
-                    screenshot: downloadUrl,
-                    status: 'pending',
-                    createdAt: Date.now()
-                };
-
-                await firebaseDb.ref('verifications').push(verificationData);
-
-                if (!state.viewedAds.includes(state.currentVerifyAdId)) {
-                    state.viewedAds.push(state.currentVerifyAdId);
+                await firebaseDb.ref(`ads/${adId}/views`).transaction((current) => (current || 0) + 1);
+                
+                if (!state.viewedAds.includes(adId)) {
+                    state.viewedAds.push(adId);
                 }
 
-                await firebaseDb.ref(`ads/${state.currentVerifyAdId}/views`).transaction((current) => (current || 0) + 1);
+                // Add reward
+                const snapshot = await firebaseDb.ref(`ads/${adId}`).once('value');
+                const ad = snapshot.val();
+                if (ad) {
+                    state.balance += ad.reward || CONFIG.AD_REWARD;
+                }
+
+                state.adCount++;
+                state.adsWatchedToday++;
+                const day = new Date().getDay();
+                state.weeklyActivity[day] = (state.weeklyActivity[day] || 0) + 1;
+
+                if (state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT) {
+                    const cdDate = new Date();
+                    cdDate.setMinutes(cdDate.getMinutes() + CONFIG.COOLDOWN_MINUTES);
+                    state.cooldownUntil = cdDate.toISOString();
+                    state.lastUsedIp = await getIpAddress();
+                    showToast(`✅ Daily limit reached! Take a ${CONFIG.COOLDOWN_MINUTES}-minute break.`, 'warning');
+                }
 
                 saveUserData();
                 updateUI();
-
-                closeModal('verifyAdModal');
-                showToast('✅ Screenshot submitted! Waiting for admin verification.', 'success');
+                showToast(`✅ Ad verified! +$${ad?.reward?.toFixed(3) || CONFIG.AD_REWARD.toFixed(3)} added!`, 'success');
 
             } catch (e) {
-                console.error("Verification error:", e);
-                showToast('❌ Failed to upload screenshot: ' + e.message, 'error');
+                console.error("Verify error:", e);
+                showToast('❌ Failed to verify ad', 'error');
+            }
+        }
+
+        async function deleteAd(adId) {
+            if (!confirm('Delete this ad?')) return;
+            try {
+                await firebaseDb.ref(`ads/${adId}`).remove();
+                showToast('✅ Ad deleted!', 'success');
+                listenAds();
+            } catch (e) {
+                showToast('❌ Failed to delete ad.', 'error');
+            }
+        }
+
+        async function toggleAdStatus(adId) {
+            try {
+                const snapshot = await firebaseDb.ref(`ads/${adId}`).once('value');
+                const ad = snapshot.val();
+                if (!ad) return;
+                const newStatus = ad.status === 'active' ? 'paused' : 'active';
+                await firebaseDb.ref(`ads/${adId}/status`).set(newStatus);
+                showToast(`✅ Ad ${newStatus === 'active' ? 'activated' : 'paused'}!`, 'success');
+                listenAds();
+            } catch (e) {
+                showToast('❌ Failed to update ad status.', 'error');
+            }
+        }
+
+        // ============================================================
+        // WITHDRAWAL FUNCTIONS
+        // ============================================================
+        function populateWithdrawalMethods() {
+            if (!DOM.methodSelect) return;
+
+            DOM.methodSelect.innerHTML = '<option value="" disabled selected>Select Payment Method</option>';
+            DOM.methodFieldsContainer.innerHTML = '';
+
+            CONFIG.withdrawalMethods.forEach((method) => {
+                const option = document.createElement('option');
+                option.value = method;
+                option.textContent = method;
+                DOM.methodSelect.appendChild(option);
+
+                const fieldDiv = document.createElement('div');
+                fieldDiv.id = method.toLowerCase() + '-field';
+                fieldDiv.className = 'method-field';
+                fieldDiv.style.display = 'none';
+                fieldDiv.innerHTML = `
+                    <div class="setting-group">
+                        <label>${method} Account</label>
+                        <input type="text" id="${method.toLowerCase()}-account" placeholder="Enter ${method} Account">
+                    </div>
+                `;
+                DOM.methodFieldsContainer.appendChild(fieldDiv);
+            });
+
+            DOM.methodSelect.addEventListener('change', function() {
+                document.querySelectorAll('.method-field').forEach(el => el.style.display = 'none');
+                if (this.value) {
+                    const field = document.getElementById(this.value.toLowerCase() + '-field');
+                    if (field) field.style.display = 'block';
+                }
+            });
+        }
+
+        async function handleWithdrawal(e) {
+            e.preventDefault();
+
+            const method = DOM.methodSelect.value;
+            const accountInput = document.getElementById(method?.toLowerCase() + '-account');
+            const accountNumber = accountInput?.value.trim() || '';
+            const amount = parseFloat(DOM.withdrawAmount.value);
+
+            if (!method) return showToast('Please select a payment method.', 'error');
+            if (!accountNumber) return showToast(`Please enter your ${method} account number.`, 'error');
+            if (amount > state.balance) return showToast('Insufficient balance.', 'error');
+            if (isNaN(amount) || amount < CONFIG.MINIMUM_WITHDRAWAL) {
+                return showToast(`Minimum withdrawal is $${CONFIG.MINIMUM_WITHDRAWAL}.`, 'error');
+            }
+
+            const btn = DOM.withdrawSubmitBtn;
+            const text = btn.querySelector('.button-text');
+            text.textContent = 'Processing...';
+            btn.disabled = true;
+
+            const user = tg?.initDataUnsafe?.user || { first_name: 'User', last_name: '', username: 'N/A' };
+
+            const withdrawalData = {
+                userId: state.currentUserId,
+                userName: `${user.first_name} ${user.last_name || ''}`,
+                username: user.username || 'N/A',
+                method,
+                accountNumber,
+                amount,
+                date: new Date().toISOString(),
+                status: 'Pending'
+            };
+
+            try {
+                const ref = firebaseDb.ref('withdrawals').push();
+                await ref.set(withdrawalData);
+
+                state.balance -= amount;
+                state.withdrawalHistory.unshift({
+                    method,
+                    number: accountNumber,
+                    amount,
+                    date: new Date().toISOString(),
+                    status: 'Pending'
+                });
+
+                saveUserData();
+                updateUI();
+                closeModal('withdrawModal');
+
+                DOM.withdrawForm.reset();
+                document.querySelectorAll('.method-field').forEach(el => el.style.display = 'none');
+                DOM.methodSelect.selectedIndex = 0;
+
+                showToast('✅ Withdrawal request submitted!', 'success');
+
+            } catch (error) {
+                console.error("Withdrawal error:", error);
+                showToast('❌ Failed to submit request.', 'error');
+            } finally {
+                text.textContent = 'Submit Request';
+                btn.disabled = false;
             }
         }
 
@@ -2067,8 +1943,8 @@
                     return;
                 }
 
-                if (state.walletBalance < budget) {
-                    showToast(`❌ Insufficient balance! You need $${budget.toFixed(2)}. Convert earnings or deposit.`, 'error');
+                if (state.balance < budget) {
+                    showToast(`❌ Insufficient balance! You need $${budget.toFixed(2)}.`, 'error');
                     return;
                 }
 
@@ -2095,7 +1971,7 @@
                     }
                 }
 
-                state.walletBalance -= budget;
+                state.balance -= budget;
 
                 const adData = {
                     title,
@@ -2123,7 +1999,7 @@
                     listenAds();
                 } catch (e) {
                     console.error("Create ad error:", e);
-                    state.walletBalance += budget;
+                    state.balance += budget;
                     saveUserData();
                     showToast('❌ Failed to create ad. Please try again.', 'error');
                 }
@@ -2139,624 +2015,43 @@
         }
 
         // ============================================================
-        // RENDER MY ADS
-        // ============================================================
-        function renderMyAds(ads) {
-            if (!DOM.myAdsContainer) return;
-
-            const myAds = ads.filter(ad => ad.createdBy === state.currentUserId);
-
-            if (myAds.length === 0) {
-                DOM.myAdsContainer.innerHTML = `<p style="text-align:center; color:var(--text-light); padding:20px;">You haven't created any ads yet</p>`;
-                return;
-            }
-
-            DOM.myAdsContainer.innerHTML = myAds.map(ad => {
-                const views = ad.views || 0;
-                const totalViews = ad.totalViews || 100;
-                const progress = Math.min((views / totalViews) * 100, 100);
-                const imageUrl = ad.imageUrl || '';
-
-                return `
-                    <div class="ad-card">
-                        <div class="ad-header">
-                            <span class="ad-title">${escapeHTML(ad.title || 'Untitled')}</span>
-                            <span class="ad-status ${ad.status === 'active' ? 'active' : 'pending'}">
-                                ${ad.status === 'active' ? '🟢 Active' : '⏳ Paused'}
-                            </span>
-                        </div>
-                        ${imageUrl ? `<img src="${imageUrl}" class="ad-image" alt="Ad image" loading="lazy">` : ''}
-                        <div class="ad-desc">${escapeHTML(ad.desc || 'No description')}</div>
-                        <div style="margin-top:8px;">
-                            <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-light);">
-                                <span>Views: ${views}/${totalViews}</span>
-                                <span>Reward: $${ad.reward?.toFixed(3) || '0.001'}</span>
-                            </div>
-                            <div style="width:100%; height:4px; background:var(--border-color); border-radius:4px; margin-top:4px; overflow:hidden;">
-                                <div style="width:${progress}%; height:100%; background:linear-gradient(90deg, #10b981, #3b82f6); border-radius:4px; transition:width 0.3s;"></div>
-                            </div>
-                        </div>
-                        <div class="ad-footer" style="margin-top:8px; padding-top:8px; border-top:1px solid var(--border-color);">
-                            <button class="ad-btn" style="background:#ef4444; color:#fff; padding:4px 14px; border:none; border-radius:6px; font-size:11px; cursor:pointer;" onclick="deleteAd('${ad.id}')">
-                                <i class="fa-solid fa-trash"></i> Delete
-                            </button>
-                            <button class="ad-btn" style="background:#f59e0b; color:#fff; padding:4px 14px; border:none; border-radius:6px; font-size:11px; cursor:pointer;" onclick="toggleAdStatus('${ad.id}')">
-                                ${ad.status === 'active' ? '⏸ Pause' : '▶️ Activate'}
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        async function deleteAd(adId) {
-            if (!confirm('Delete this ad?')) return;
-            try {
-                await firebaseDb.ref(`ads/${adId}`).remove();
-                showToast('✅ Ad deleted!', 'success');
-                listenAds();
-            } catch (e) {
-                console.error("Delete error:", e);
-                showToast('❌ Failed to delete ad.', 'error');
-            }
-        }
-
-        async function toggleAdStatus(adId) {
-            try {
-                const snapshot = await firebaseDb.ref(`ads/${adId}`).once('value');
-                const ad = snapshot.val();
-                if (!ad) return;
-                const newStatus = ad.status === 'active' ? 'paused' : 'active';
-                await firebaseDb.ref(`ads/${adId}/status`).set(newStatus);
-                showToast(`✅ Ad ${newStatus === 'active' ? 'activated' : 'paused'}!`, 'success');
-                listenAds();
-            } catch (e) {
-                console.error("Toggle status error:", e);
-                showToast('❌ Failed to update ad status.', 'error');
-            }
-        }
-
-        // ============================================================
-        // VERIFICATION REQUESTS (Advertiser)
-        // ============================================================
-        function renderVerificationRequests(ads) {
-            if (!DOM.verificationContainer || state.userRole !== 'advertiser') return;
-
-            firebaseDb.ref('verifications').orderByChild('status').equalTo('pending').on('value', (snapshot) => {
-                const verifications = snapshot.val() || {};
-                const items = Object.entries(verifications).map(([id, data]) => ({ id, ...data }));
-
-                const myAdIds = ads.filter(ad => ad.createdBy === state.currentUserId).map(ad => ad.id);
-                const filtered = items.filter(v => myAdIds.includes(v.adId));
-
-                if (filtered.length === 0) {
-                    DOM.verificationContainer.innerHTML = `<p style="text-align:center; color:var(--text-light); padding:20px;">No pending verification requests</p>`;
-                    return;
-                }
-
-                DOM.verificationContainer.innerHTML = filtered.map(v => `
-                    <div class="ad-card">
-                        <div class="ad-header">
-                            <span class="ad-title">Verification from ${escapeHTML(v.userName || 'User')}</span>
-                            <span class="ad-status pending">⏳ Pending</span>
-                        </div>
-                        ${v.screenshot ? `<img src="${v.screenshot}" class="ad-image" alt="Screenshot" style="cursor:pointer;" onclick="window.open('${v.screenshot}','_blank')" loading="lazy">` : ''}
-                        <div class="ad-footer" style="margin-top:8px;">
-                            <button class="ad-btn" style="background:#10b981; color:#fff; padding:4px 14px; border:none; border-radius:6px; font-size:11px; cursor:pointer;" onclick="verifyAdRequest('${v.id}')">
-                                ✅ Approve
-                            </button>
-                            <button class="ad-btn" style="background:#ef4444; color:#fff; padding:4px 14px; border:none; border-radius:6px; font-size:11px; cursor:pointer;" onclick="rejectAdRequest('${v.id}')">
-                                ❌ Reject
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
-            });
-        }
-
-        async function verifyAdRequest(verificationId) {
-            try {
-                const snapshot = await firebaseDb.ref(`verifications/${verificationId}`).once('value');
-                const data = snapshot.val();
-                if (!data) return;
-
-                await firebaseDb.ref(`verifications/${verificationId}/status`).set('approved');
-
-                const adSnapshot = await firebaseDb.ref(`ads/${data.adId}`).once('value');
-                const ad = adSnapshot.val();
-
-                if (ad) {
-                    await firebaseDb.ref(`users/${data.userId}/totalEarning`).transaction((current) => (current || 0) + ad.reward);
-                }
-
-                await firebaseDb.ref(`ads/${data.adId}/verified`).set(true);
-
-                showToast('✅ Verification approved! User got reward.', 'success');
-                listenAds();
-
-            } catch (e) {
-                console.error("Verify error:", e);
-                showToast('❌ Failed to approve verification.', 'error');
-            }
-        }
-
-        async function rejectAdRequest(verificationId) {
-            try {
-                await firebaseDb.ref(`verifications/${verificationId}/status`).set('rejected');
-                showToast('❌ Verification rejected.', 'error');
-                listenAds();
-            } catch (e) {
-                console.error("Reject error:", e);
-                showToast('❌ Failed to reject verification.', 'error');
-            }
-        }
-
-        // ============================================================
-        // DEPOSIT SYSTEM
-        // ============================================================
-        function renderDepositMethods() {
-            if (!DOM.depositMethodsList) return;
-
-            const methods = [
-                { name: 'Bikash', number: '01712345678', icon: '💳' },
-                { name: 'Nogad', number: '01712345678', icon: '📱' },
-                { name: 'Bank', number: '1234567890', icon: '🏦' }
-            ];
-
-            DOM.depositMethodsList.innerHTML = methods.map(m => `
-                <div class="deposit-method" onclick="selectDepositMethod('${m.name}', '${m.number}', this)">
-                    <div class="method-icon">${m.icon}</div>
-                    <div class="method-info">
-                        <div class="method-name">${m.name}</div>
-                        <div class="method-desc">Send money to this number</div>
-                    </div>
-                    <div class="method-number">${m.number}</div>
-                </div>
-            `).join('');
-        }
-
-        function selectDepositMethod(name, number, el) {
-            document.querySelectorAll('.deposit-method').forEach(m => m.classList.remove('selected'));
-            if (el) el.classList.add('selected');
-            state.selectedDepositMethod = name;
-            state.selectedDepositNumber = number;
-            showToast(`✅ Selected: ${name}`, 'success');
-        }
-
-        function showDepositModal() {
-            if (state.userRole !== 'advertiser') {
-                showToast('❌ Deposit is only available for Advertisers.', 'error');
-                return;
-            }
-            document.getElementById('depositModal').style.display = 'flex';
-        }
-
-        async function submitDeposit() {
-            const amount = parseInt(document.getElementById('deposit-amount').value);
-            if (!amount || amount < 10) {
-                showToast('❌ Please enter a valid amount (min 10 BDT)', 'error');
-                return;
-            }
-            if (!state.selectedDepositMethod) {
-                showToast('❌ Please select a payment method first', 'error');
-                return;
-            }
-
-            const user = tg?.initDataUnsafe?.user || { first_name: 'User', id: 'testuser' };
-
-            const depositData = {
-                userId: state.currentUserId,
-                userName: user.first_name || 'User',
-                method: state.selectedDepositMethod,
-                number: state.selectedDepositNumber,
-                amount: amount,
-                status: 'pending',
-                createdAt: Date.now()
-            };
-
-            try {
-                await firebaseDb.ref('deposits').push(depositData);
-
-                // Send admin notification (optional)
-                // ...
-
-                closeModal('depositModal');
-                showToast(`✅ Deposit request sent! Send ${amount} BDT to ${state.selectedDepositMethod}`, 'success');
-                document.getElementById('deposit-amount').value = '';
-
-            } catch (e) {
-                console.error("Deposit error:", e);
-                showToast('❌ Failed to submit deposit. Please try again.', 'error');
-            }
-        }
-
-        // ============================================================
-        // WITHDRAWAL
-        // ============================================================
-        function populateWithdrawalMethods() {
-            if (!DOM.methodSelect) return;
-
-            DOM.methodSelect.innerHTML = '<option value="" disabled selected>Select Payment Method</option>';
-            DOM.methodFieldsContainer.innerHTML = '';
-
-            CONFIG.withdrawalMethods.forEach((method) => {
-                const option = document.createElement('option');
-                option.value = method;
-                option.textContent = method;
-                DOM.methodSelect.appendChild(option);
-
-                const fieldDiv = document.createElement('div');
-                fieldDiv.id = method.toLowerCase() + '-field';
-                fieldDiv.className = 'method-field';
-                fieldDiv.innerHTML = `
-                    <label>${method} Account</label>
-                    <div class="field-hint">Enter your ${method} account details</div>
-                    <input type="text" id="${method.toLowerCase()}-account" placeholder="Enter ${method} Account">
-                `;
-                DOM.methodFieldsContainer.appendChild(fieldDiv);
-            });
-
-            DOM.methodSelect.addEventListener('change', function() {
-                document.querySelectorAll('.method-field').forEach(el => el.classList.remove('active'));
-                if (this.value) {
-                    const field = document.getElementById(this.value.toLowerCase() + '-field');
-                    if (field) field.classList.add('active');
-                }
-            });
-        }
-
-        async function handleWithdrawal(e) {
-            e.preventDefault();
-
-            const method = DOM.methodSelect.value;
-            const accountInput = document.getElementById(method?.toLowerCase() + '-account');
-            const accountNumber = accountInput?.value.trim() || '';
-            const amount = parseFloat(DOM.withdrawAmount.value);
-
-            if (!method) return showToast('Please select a payment method.', 'error');
-            if (!accountNumber) return showToast(`Please enter your ${method} account number.`, 'error');
-            if (amount > state.totalEarning) return showToast('Insufficient balance.', 'error');
-            if (isNaN(amount) || amount < CONFIG.MINIMUM_WITHDRAWAL) {
-                return showToast(`Minimum withdrawal is $${CONFIG.MINIMUM_WITHDRAWAL}.`, 'error');
-            }
-
-            const btn = DOM.withdrawSubmitBtn;
-            const text = btn.querySelector('.button-text');
-            const spinner = btn.querySelector('.loader-spinner');
-            text.style.display = 'none';
-            spinner.style.display = 'block';
-            btn.disabled = true;
-
-            const user = tg?.initDataUnsafe?.user || { first_name: 'User', last_name: '', username: 'N/A' };
-
-            const withdrawalData = {
-                userId: state.currentUserId,
-                userName: `${user.first_name} ${user.last_name || ''}`,
-                username: user.username || 'N/A',
-                method,
-                accountNumber,
-                amount,
-                date: new Date().toISOString(),
-                status: 'Pending'
-            };
-
-            try {
-                const ref = firebaseDb.ref('withdrawals').push();
-                await ref.set(withdrawalData);
-
-                state.totalEarning -= amount;
-                state.withdrawalHistory.unshift({
-                    method,
-                    number: accountNumber,
-                    amount,
-                    date: new Date().toISOString(),
-                    status: 'Pending'
-                });
-
-                saveUserData();
-                updateUI();
-                closeModal('withdrawModal');
-
-                DOM.withdrawForm.reset();
-                document.querySelectorAll('.method-field').forEach(el => el.classList.remove('active'));
-                DOM.methodSelect.selectedIndex = 0;
-
-                showToast('✅ Withdrawal request submitted! It will be processed within 2 hours.', 'success');
-
-            } catch (error) {
-                console.error("Withdrawal error:", error);
-                showToast('❌ Failed to submit request. Please try again.', 'error');
-            } finally {
-                text.style.display = 'inline';
-                spinner.style.display = 'none';
-                btn.disabled = false;
-            }
-        }
-
-        // ============================================================
-        // RENDER FUNCTIONS
-        // ============================================================
-        function renderHistory() {
-            if (!DOM.historyList) return;
-
-            if (!state.withdrawalHistory || state.withdrawalHistory.length === 0) {
-                DOM.historyList.innerHTML = '<p class="no-history">No withdrawal history found.</p>';
-                return;
-            }
-
-            DOM.historyList.innerHTML = state.withdrawalHistory.map(item => `
-                <div class="history-item">
-                    <div class="history-details">
-                        <div class="method-number">${escapeHTML(item.method)} - ${escapeHTML(item.number)}</div>
-                        <div class="date">${new Date(item.date).toLocaleString()}</div>
-                    </div>
-                    <div class="history-amount">
-                        <div class="amount-text">$${item.amount.toFixed(3)}</div>
-                        <div class="history-status ${item.status.toLowerCase()}">${item.status}</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderBonusTasks() {
-            if (!DOM.bonusTasksList) return;
-
-            if (!state.bonusTasks || state.bonusTasks.length === 0) {
-                DOM.bonusTasksList.innerHTML = '<p class="no-history">No bonus tasks available.</p>';
-                return;
-            }
-
-            DOM.bonusTasksList.innerHTML = state.bonusTasks.map(task => {
-                const isCompleted = state.completedBonusTasks.includes(task.id);
-                return `
-                    <div class="bonus-item">
-                        <div class="details">
-                            <div class="title">${escapeHTML(task.title)}</div>
-                            <div class="reward"><i class="fa-solid fa-gift"></i> + $${task.reward.toFixed(3)}</div>
-                        </div>
-                        <button class="claim-btn" ${isCompleted ? 'disabled' : ''}>
-                            ${isCompleted ? '✅ Completed' : 'Claim'}
-                        </button>
-                    </div>
-                `;
-            }).join('');
-
-            DOM.bonusTasksList.querySelectorAll('.claim-btn:not([disabled])').forEach((btn, index) => {
-                btn.addEventListener('click', () => {
-                    const task = state.bonusTasks[index];
-                    handleBonusTask(task, btn);
-                });
-            });
-        }
-
-        function handleBonusTask(task, button) {
-            button.disabled = true;
-            button.textContent = 'Processing...';
-
-            safeOpenLink(task.link);
-
-            setTimeout(() => {
-                if (state.completedBonusTasks.includes(task.id)) return;
-                state.totalEarning += task.reward;
-                state.completedBonusTasks.push(task.id);
-                saveUserData();
-                updateUI();
-                button.textContent = '✅ Completed';
-                showToast(`🎉 Bonus of $${task.reward.toFixed(3)} added!`, 'success');
-            }, (task.duration || 10) * 1000);
-        }
-
-        // ============================================================
-        // REFERRAL SYSTEM
-        // ============================================================
-        async function handleReferral() {
-            if (!firebaseDb || !tg?.initDataUnsafe) return;
-
-            const startParam = tg.initDataUnsafe.start_param;
-            const currentUser = tg.initDataUnsafe.user;
-            if (!startParam || isNaN(parseInt(startParam)) || parseInt(startParam) === currentUser.id) return;
-
-            const referrerId = parseInt(startParam);
-            const ref = firebaseDb.ref(`users/${currentUser.id}/referred_by`);
-            const snapshot = await ref.once('value');
-            if (snapshot.exists()) return;
-
-            await ref.set(referrerId);
-            await firebaseDb.ref(`users/${referrerId}/referrals`).transaction((c) => (c || 0) + 1);
-
-            await processReferralRewards();
-        }
-
-        async function processReferralRewards() {
-            if (!firebaseDb || !state.currentUserId) return;
-
-            const ref = firebaseDb.ref(`users/${state.currentUserId}/referrals`);
-            const snapshot = await ref.once('value');
-            const totalReferrals = snapshot.val() || 0;
-
-            const newReferrals = totalReferrals - (state.rewardedReferrals || 0);
-            if (newReferrals > 0) {
-                const bonus = newReferrals * CONFIG.REFERRAL_REWARD;
-                state.totalEarning += bonus;
-                state.rewardedReferrals = totalReferrals;
-                saveUserData();
-                showToast(`🎉 You received $${bonus.toFixed(3)} for ${newReferrals} new referral(s)!`, 'success');
-            }
-        }
-
-        // ============================================================
-        // WATCH AD - FIXED VERSION
+        // WATCH AD
         // ============================================================
         async function watchAd() {
-            // Check if already watching
-            if (DOM.adLoaderOverlay.style.display === 'flex') {
-                return;
-            }
-
-            // Check IP
-            if (state.lastUsedIp && !state.cooldownUntil) {
-                const newIp = await getIpAddress();
-                if (newIp === state.lastUsedIp) {
-                    showToast('Please change your IP address (turn airplane mode on/off) before continuing.', 'warning');
-                    return;
-                } else {
-                    state.lastUsedIp = null;
-                    saveUserData();
-                }
-            }
-
-            // Check daily limit
             if (state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT) {
                 showToast(`📊 Daily limit reached! (${CONFIG.DAILY_AD_LIMIT})`, 'warning');
                 return;
             }
 
-            // Show loader
-            DOM.adLoaderOverlay.style.display = 'flex';
-            DOM.adLoaderProgress.style.width = '0%';
+            if (state.cooldownUntil && new Date() < new Date(state.cooldownUntil)) {
+                const remaining = new Date(state.cooldownUntil) - new Date();
+                const minutes = Math.floor((remaining / 1000 / 60) % 60);
+                const seconds = Math.floor((remaining / 1000) % 60);
+                showToast(`⏳ Break: ${minutes}m ${seconds}s remaining`, 'warning');
+                return;
+            }
 
-            try {
-                // Show ad with proper handling
-                const adShown = await showMonetagAd();
-
-                if (!adShown) {
-                    throw new Error('Ad not shown');
-                }
-
-                // Update earnings
-                state.totalEarning += CONFIG.AD_REWARD;
+            // Simulate ad watching
+            showToast('📺 Watching ad...', '');
+            
+            setTimeout(() => {
+                state.balance += CONFIG.AD_REWARD;
                 state.adCount++;
                 state.adsWatchedToday++;
                 const day = new Date().getDay();
                 state.weeklyActivity[day] = (state.weeklyActivity[day] || 0) + 1;
 
-                // Check if daily limit reached
-                let alertMsg = `✅ Ad watched! +$${CONFIG.AD_REWARD.toFixed(3)} added!`;
-                alertMsg += ` (${state.adsWatchedToday}/${CONFIG.DAILY_AD_LIMIT})`;
-
                 if (state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT) {
                     const cdDate = new Date();
                     cdDate.setMinutes(cdDate.getMinutes() + CONFIG.COOLDOWN_MINUTES);
                     state.cooldownUntil = cdDate.toISOString();
-                    state.lastUsedIp = await getIpAddress();
-                    alertMsg = `✅ Daily limit reached! Take a ${CONFIG.COOLDOWN_MINUTES}-minute break.`;
+                    showToast(`✅ Daily limit reached! Take a ${CONFIG.COOLDOWN_MINUTES}-minute break.`, 'warning');
                 }
 
-                // Save and update
                 saveUserData();
                 updateUI();
-
-                // Show success message
-                setTimeout(() => {
-                    showToast(alertMsg, 'success');
-                }, 200);
-
-            } catch (e) {
-                console.error("Ad error:", e);
-                showToast('❌ Ad could not be completed. Please try again.', 'error');
-            } finally {
-                // Always hide loader
-                DOM.adLoaderOverlay.style.display = 'none';
-                DOM.adLoaderProgress.style.width = '100%';
-            }
-        }
-
-        // ============================================================
-        // MONETAG AD HELPER
-        // ============================================================
-        function showMonetagAd() {
-            return new Promise((resolve) => {
-                try {
-                    // Check if SDK is loaded
-                    if (typeof show_11573980 !== 'function') {
-                        console.warn('Monetag SDK not loaded, using fallback');
-                        // Simulate progress
-                        let progress = 0;
-                        const interval = setInterval(() => {
-                            progress += 10;
-                            if (DOM.adLoaderProgress) {
-                                DOM.adLoaderProgress.style.width = Math.min(progress, 90) + '%';
-                            }
-                            if (progress >= 90) {
-                                clearInterval(interval);
-                            }
-                        }, 200);
-                        
-                        setTimeout(() => {
-                            if (DOM.adLoaderProgress) {
-                                DOM.adLoaderProgress.style.width = '100%';
-                            }
-                            resolve(true);
-                        }, 3000);
-                        return;
-                    }
-
-                    let resolved = false;
-                    let timeoutId = null;
-                    let progressInterval = null;
-
-                    // Progress animation
-                    let progress = 0;
-                    progressInterval = setInterval(() => {
-                        progress += 5;
-                        if (DOM.adLoaderProgress) {
-                            DOM.adLoaderProgress.style.width = Math.min(progress, 90) + '%';
-                        }
-                        if (progress >= 90) {
-                            clearInterval(progressInterval);
-                        }
-                    }, 300);
-
-                    // Show the ad
-                    show_11573980({
-                        type: 'inApp',
-                        inAppSettings: {
-                            frequency: 2,
-                            capping: 0.1,
-                            interval: 30,
-                            timeout: 5,
-                            everyPage: false
-                        },
-                        onComplete: function() {
-                            if (!resolved) {
-                                resolved = true;
-                                if (timeoutId) clearTimeout(timeoutId);
-                                if (progressInterval) clearInterval(progressInterval);
-                                if (DOM.adLoaderProgress) {
-                                    DOM.adLoaderProgress.style.width = '100%';
-                                }
-                                resolve(true);
-                            }
-                        },
-                        onError: function(err) {
-                            if (!resolved) {
-                                resolved = true;
-                                if (timeoutId) clearTimeout(timeoutId);
-                                if (progressInterval) clearInterval(progressInterval);
-                                console.warn('Ad error:', err);
-                                resolve(true); // Still resolve to not block user
-                            }
-                        }
-                    });
-
-                    // Safety timeout
-                    timeoutId = setTimeout(() => {
-                        if (!resolved) {
-                            resolved = true;
-                            if (progressInterval) clearInterval(progressInterval);
-                            if (DOM.adLoaderProgress) {
-                                DOM.adLoaderProgress.style.width = '100%';
-                            }
-                            console.warn('Ad timeout, continuing...');
-                            resolve(true);
-                        }
-                    }, 15000);
-
-                } catch (e) {
-                    console.error('Monetag error:', e);
-                    setTimeout(() => resolve(true), 2000);
-                }
-            });
+                showToast(`✅ Ad watched! +$${CONFIG.AD_REWARD.toFixed(3)} added!`, 'success');
+            }, 3000);
         }
 
         // ============================================================
@@ -2771,15 +2066,10 @@
                 saveUserData();
             }
 
-            DOM.totalEarning.textContent = `$${state.totalEarning.toFixed(3)}`;
-            DOM.walletBalance.textContent = `$${state.walletBalance.toFixed(3)}`;
+            DOM.totalEarning.textContent = `$${state.balance.toFixed(3)}`;
             DOM.adCount.textContent = state.adCount;
             DOM.adsTodayCount.textContent = `${state.adsWatchedToday} / ${CONFIG.DAILY_AD_LIMIT}`;
             DOM.minWithdrawText.textContent = `Minimum withdrawal is $${CONFIG.MINIMUM_WITHDRAWAL.toFixed(2)}.`;
-
-            // Update convert card
-            DOM.convertBalance.textContent = `$${state.totalEarning.toFixed(3)}`;
-            DOM.convertBtn.disabled = state.totalEarning <= 0;
 
             clearInterval(cooldownInterval);
 
@@ -2793,7 +2083,7 @@
                         state.adsWatchedToday = 0;
                         saveUserData();
                         updateUI();
-                        showToast('✅ Break is over! You can watch ads again.', 'success');
+                        showToast('✅ Break is over!', 'success');
                         return;
                     }
                     const minutes = Math.floor((remaining / 1000 / 60) % 60);
@@ -2804,11 +2094,9 @@
                 updateTimer();
             } else {
                 DOM.watchAdBtn.disabled = state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT;
-                const text = state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT ? '⏳ Take a Break' : '▶️ Watch Ad';
-                DOM.watchAdBtn.querySelector('span').textContent = text;
+                DOM.watchAdBtn.querySelector('span').textContent = state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT ? '⏳ Take a Break' : '▶️ Watch Ad';
             }
 
-            DOM.watchAdBtn.classList.toggle('pulsing', !DOM.watchAdBtn.disabled);
             updateChart();
         }
 
@@ -2818,11 +2106,13 @@
         let chartInstance;
 
         function updateChart() {
-            const ctx = document.getElementById('activityChart').getContext('2d');
-            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            const gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
-            const fontColor = isDark ? '#F5F5F7' : '#1D1D1F';
-
+            const ctx = document.createElement('canvas');
+            const container = document.querySelector('.chart-container');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            container.appendChild(ctx);
+            
             if (chartInstance) chartInstance.destroy();
 
             chartInstance = new Chart(ctx, {
@@ -2832,11 +2122,10 @@
                     datasets: [{
                         label: 'Ads Watched',
                         data: state.weeklyActivity,
-                        backgroundColor: 'rgba(var(--primary-color-rgb), 0.25)',
-                        borderColor: 'rgb(var(--primary-color-rgb))',
+                        backgroundColor: 'rgba(var(--primary-rgb), 0.25)',
+                        borderColor: 'rgb(var(--primary-rgb))',
                         borderWidth: 2,
-                        borderRadius: 6,
-                        hoverBackgroundColor: 'rgba(var(--primary-color-rgb), 0.4)'
+                        borderRadius: 6
                     }]
                 },
                 options: {
@@ -2845,19 +2134,55 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            ticks: { stepSize: 1, color: fontColor },
-                            grid: { color: gridColor }
+                            ticks: { stepSize: 1, color: '#8e8ea0' },
+                            grid: { color: '#2a2a3a' }
                         },
                         x: {
-                            ticks: { color: fontColor },
-                            grid: { color: gridColor }
+                            ticks: { color: '#8e8ea0' },
+                            grid: { color: '#2a2a3a' }
                         }
                     },
-                    plugins: {
-                        legend: { display: false }
-                    }
+                    plugins: { legend: { display: false } }
                 }
             });
+        }
+
+        // ============================================================
+        // TAB SWITCHING
+        // ============================================================
+        function switchTab(tab) {
+            document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+            
+            if (tab === 'publisher') {
+                document.querySelector('.role-btn[onclick*="publisher"]')?.classList.add('active');
+                DOM.publisherView.style.display = 'block';
+                DOM.advertiserView.style.display = 'none';
+                DOM.adminView.style.display = 'none';
+                DOM.userRoleBadge.textContent = '📖 Publisher';
+                listenAds();
+            } else if (tab === 'advertiser') {
+                document.querySelector('.role-btn[onclick*="advertiser"]')?.classList.add('active');
+                DOM.publisherView.style.display = 'none';
+                DOM.advertiserView.style.display = 'block';
+                DOM.adminView.style.display = 'none';
+                DOM.userRoleBadge.textContent = '📢 Advertiser';
+                listenAds();
+            } else if (tab === 'admin' && state.isAdmin) {
+                document.querySelector('.role-btn[onclick*="admin"]')?.classList.add('active');
+                DOM.publisherView.style.display = 'none';
+                DOM.advertiserView.style.display = 'none';
+                DOM.adminView.style.display = 'block';
+                DOM.userRoleBadge.textContent = '👑 Admin';
+                loadAdminData();
+            }
+            updateUI();
+        }
+
+        function loadAdminData() {
+            listenUsers();
+            listenWithdrawals();
+            listenDeposits();
+            renderAdminBonusTasks();
         }
 
         // ============================================================
@@ -2867,7 +2192,7 @@
             document.querySelectorAll('.nav-button.active').forEach(b => b.classList.remove('active'));
             if (btn) btn.classList.add('active');
 
-            if (modalId === 'historyModal') renderHistory();
+            if (modalId === 'historyModal') renderWithdrawalHistory();
             if (modalId === 'bonusTasksModal') renderBonusTasks();
 
             const modal = document.getElementById(modalId);
@@ -2891,8 +2216,115 @@
 
         function shareReferralLink() {
             const link = getReferralLink();
-            const text = `💰 Earn money by watching ads! Join using my referral link:\n\n${link}\n\nJoin @${CONFIG.BOT_USERNAME} and start earning today! 🚀`;
+            const text = `💰 Earn money by watching ads! Join using my referral link:\n\n${link}\n\nJoin and start earning today! 🚀`;
             safeOpenTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`);
+        }
+
+        // ============================================================
+        // REFERRAL SYSTEM
+        // ============================================================
+        async function handleReferral() {
+            if (!firebaseDb || !tg?.initDataUnsafe) return;
+
+            const startParam = tg.initDataUnsafe.start_param;
+            const currentUser = tg.initDataUnsafe.user;
+            if (!startParam || isNaN(parseInt(startParam)) || parseInt(startParam) === currentUser.id) return;
+
+            const referrerId = parseInt(startParam);
+            const ref = firebaseDb.ref(`users/${currentUser.id}/referred_by`);
+            const snapshot = await ref.once('value');
+            if (snapshot.exists()) return;
+
+            await ref.set(referrerId);
+            await firebaseDb.ref(`users/${referrerId}/referrals`).transaction((c) => (c || 0) + 1);
+
+            // Add referral reward
+            const bonus = CONFIG.REFERRAL_REWARD;
+            await firebaseDb.ref(`users/${referrerId}/balance`).transaction((current) => (current || 0) + bonus);
+        }
+
+        // ============================================================
+        // ADMIN SETTINGS
+        // ============================================================
+        function setupAdminSettings() {
+            if (!DOM.adminSettingsForm) return;
+
+            // Load current settings
+            firebaseDb.ref('adminConfig').once('value').then(snapshot => {
+                const data = snapshot.val() || {};
+                document.getElementById('admin-ad-reward').value = data.adReward || CONFIG.AD_REWARD;
+                document.getElementById('admin-daily-limit').value = data.dailyLimit || CONFIG.DAILY_AD_LIMIT;
+                document.getElementById('admin-min-withdraw').value = data.minWithdraw || CONFIG.MINIMUM_WITHDRAWAL;
+                document.getElementById('admin-cooldown').value = data.cooldown || CONFIG.COOLDOWN_MINUTES;
+                document.getElementById('admin-referral-reward').value = data.referralReward || CONFIG.REFERRAL_REWARD;
+                document.getElementById('admin-welcome-msg').value = data.welcomeMessage || CONFIG.welcomeNotice.message;
+            });
+
+            DOM.adminSettingsForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const settings = {
+                    adReward: parseFloat(document.getElementById('admin-ad-reward').value) || 0.001,
+                    dailyLimit: parseInt(document.getElementById('admin-daily-limit').value) || 15,
+                    minWithdraw: parseFloat(document.getElementById('admin-min-withdraw').value) || 0.10,
+                    cooldown: parseInt(document.getElementById('admin-cooldown').value) || 30,
+                    referralReward: parseFloat(document.getElementById('admin-referral-reward').value) || 0.01,
+                    welcomeMessage: document.getElementById('admin-welcome-msg').value || ''
+                };
+
+                try {
+                    await firebaseDb.ref('adminConfig').update(settings);
+                    showToast('✅ Settings saved!', 'success');
+                    
+                    // Update local config
+                    CONFIG.AD_REWARD = settings.adReward;
+                    CONFIG.DAILY_AD_LIMIT = settings.dailyLimit;
+                    CONFIG.MINIMUM_WITHDRAWAL = settings.minWithdraw;
+                    CONFIG.COOLDOWN_MINUTES = settings.cooldown;
+                    CONFIG.REFERRAL_REWARD = settings.referralReward;
+                    CONFIG.welcomeNotice.message = settings.welcomeMessage;
+                    updateUI();
+                } catch (e) {
+                    showToast('❌ Failed to save settings', 'error');
+                }
+            });
+        }
+
+        function setupAdminBonus() {
+            if (!DOM.adminBonusForm) return;
+
+            DOM.adminBonusForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const title = document.getElementById('admin-bonus-title').value.trim();
+                const link = document.getElementById('admin-bonus-link').value.trim();
+                const reward = parseFloat(document.getElementById('admin-bonus-reward').value) || 0.01;
+                const duration = parseInt(document.getElementById('admin-bonus-duration').value) || 10;
+
+                if (!title || !link) {
+                    showToast('❌ Please fill all fields', 'error');
+                    return;
+                }
+
+                const task = {
+                    id: Date.now().toString(),
+                    title,
+                    link,
+                    reward,
+                    duration
+                };
+
+                try {
+                    state.bonusTasks.push(task);
+                    await firebaseDb.ref('bonusTasks').set(state.bonusTasks);
+                    renderAdminBonusTasks();
+                    renderBonusTasks();
+                    DOM.adminBonusForm.reset();
+                    showToast('✅ Bonus task added!', 'success');
+                } catch (e) {
+                    showToast('❌ Failed to add task', 'error');
+                }
+            });
         }
 
         // ============================================================
@@ -2905,16 +2337,13 @@
             const finishLoading = () => {
                 if (ready && loaderDone) {
                     DOM.preloader.style.opacity = '0';
-                    DOM.preloaderFooter.style.opacity = '0';
                     setTimeout(() => {
                         DOM.preloader.style.display = 'none';
-                        DOM.preloaderFooter.style.display = 'none';
                         DOM.container.style.display = 'block';
                     }, 400);
                 }
             };
 
-            // Preloader animation
             let pct = 0;
             const loaderInterval = setInterval(() => {
                 pct += Math.floor(Math.random() * 4) + 1;
@@ -2929,51 +2358,46 @@
             }, 80);
 
             try {
-                // Init DOM
                 initDOM();
 
-                // Firebase
                 if (!initFirebase()) {
                     throw new Error("Firebase initialization failed");
                 }
 
-                // Get user
                 const user = tg?.initDataUnsafe?.user || { first_name: 'User', id: 'testuser_' + Date.now() };
                 state.currentUserId = user.id || 'testuser';
+                state.isAdmin = isAdmin();
 
-                // Load config & data
                 await loadConfigFromFirebase();
                 await loadUserData();
                 await loadBonusTasks();
 
-                // Setup UI
                 populateWithdrawalMethods();
                 setupCreateAdForm();
-                renderDepositMethods();
+                setupAdminSettings();
+                setupAdminBonus();
 
-                // Welcome
                 DOM.welcomeTitle.textContent = CONFIG.welcomeNotice.title;
                 DOM.welcomeMessage.textContent = CONFIG.welcomeNotice.message;
 
-                // Handle referral
                 await handleReferral();
-                await processReferralRewards();
 
-                // Listeners
                 listenReferrals();
-                listenDeposits();
                 listenAds();
+                listenWithdrawals();
+                listenDeposits();
 
-                // User info
                 if (user?.first_name) {
                     DOM.greeting.textContent = `Welcome, ${escapeHTML(user.first_name)}!`;
                     DOM.profilePic.innerHTML = `<span>${escapeHTML(user.first_name.charAt(0))}</span>`;
                 }
 
-                // Get IP
-                state.currentIp = await getIpAddress();
+                if (state.isAdmin) {
+                    DOM.adminBadge.style.display = 'inline-block';
+                    DOM.adminTabBtn.style.display = 'block';
+                    listenUsers();
+                }
 
-                // Event listeners
                 DOM.watchAdBtn.addEventListener('click', watchAd);
                 DOM.joinChannelBtn.addEventListener('click', () => safeOpenTelegramLink(CONFIG.CHANNEL_LINK));
                 DOM.supportBtn.addEventListener('click', () => safeOpenTelegramLink(CONFIG.SUPPORT_LINK));
@@ -2981,46 +2405,34 @@
                 DOM.shareLinkBtn.addEventListener('click', shareReferralLink);
                 DOM.withdrawForm.addEventListener('submit', handleWithdrawal);
 
-                // Close modals on background click
                 window.onclick = (event) => {
                     if (event.target.classList.contains('modal')) {
                         closeModal(event.target.id);
                     }
                 };
 
-                // Set initial role
-                const initialRole = state.userRole || 'publisher';
-                const roleBtn = document.querySelector(`.role-btn.${initialRole}`);
-                if (roleBtn) selectRole(initialRole, roleBtn);
-
-                // Telegram WebApp
                 if (tg) {
                     tg.ready();
                     tg.expand();
-                    tg.onEvent('themeChanged', () => {
-                        document.documentElement.setAttribute('data-theme', tg.colorScheme);
-                        updateChart();
-                    });
                 }
 
-                // Show welcome modal if first visit
                 if (!sessionStorage.getItem('alreadyVisited')) {
                     setTimeout(() => showModal('welcomeModal'), 500);
                     sessionStorage.setItem('alreadyVisited', 'true');
                 }
 
-                // Update UI
+                // Set initial tab
+                switchTab('publisher');
                 updateUI();
 
-                console.log("✅ NexEarn initialized successfully!");
-                console.log("👤 User ID:", state.currentUserId);
-                console.log("💰 Earnings:", state.totalEarning);
-                console.log("💳 Wallet:", state.walletBalance);
-                console.log("🎯 Role:", state.userRole);
+                console.log("✅ NexEarn initialized!");
+                console.log("👤 User:", state.currentUserId);
+                console.log("💰 Balance:", state.balance);
+                console.log("👑 Admin:", state.isAdmin);
 
             } catch (error) {
                 console.error("Init error:", error);
-                showToast('❌ Failed to load app. Please refresh or try again later.', 'error');
+                showToast('❌ Failed to load app. Please refresh.', 'error');
             } finally {
                 ready = true;
                 if (pct < 100) {
@@ -3033,7 +2445,6 @@
             }
         }
 
-        // Start the app
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
