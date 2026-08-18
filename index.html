@@ -1535,7 +1535,7 @@
         </div>
     </div>
 
-    <!-- Deposit Modal -->
+    <!-- Deposit Modal - Updated with Min Amount -->
     <div id="depositModal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal('depositModal')">&times;</button>
@@ -1561,7 +1561,8 @@
             
             <div class="deposit-form-group">
                 <label>Amount (BDT) *</label>
-                <input type="number" id="deposit-amount" step="1" placeholder="Enter amount in BDT" min="10">
+                <input type="number" id="deposit-amount" step="1" placeholder="Enter amount in BDT">
+                <div class="form-hint">Minimum deposit: <span id="deposit-min-amount">10</span> BDT</div>
             </div>
             
             <button class="action-button" onclick="submitDeposit()">
@@ -1750,11 +1751,17 @@
             AD_REWARD: 0.001,
             DAILY_AD_LIMIT: 15,
             MINIMUM_WITHDRAWAL: 0.10,
+            MINIMUM_DEPOSIT: 10, // Minimum deposit in BDT
             COOLDOWN_MINUTES: 30,
             REFERRAL_REWARD: 0.01,
             REFUND_PERCENTAGE: 60,
             COMPANY_FEE_PERCENTAGE: 40,
             withdrawalMethods: ['Binance', 'Bikash', 'Nogad'],
+            depositMethods: [
+                { name: 'Bikash', number: '01712345678', icon: '💳' },
+                { name: 'Nogad', number: '01712345678', icon: '📱' },
+                { name: 'Bank', number: '1234567890', icon: '🏦' }
+            ],
             welcomeNotice: {
                 title: "Welcome to NexEarn! 🎉",
                 message: "Please follow the rules to ensure you receive your payment.\n\n💰 Reward per Ad: $0.001\n💝 After watching 15 ads, there is a 30-minute break.\n✅ 100% Payment Guarantee\n💸 Withdraw via Binance UID or Email\n🔥 Minimum withdrawal is only $0.10"
@@ -1875,6 +1882,7 @@
             DOM.depositSender = document.getElementById('deposit-sender');
             DOM.depositTrxid = document.getElementById('deposit-trxid');
             DOM.depositAmount = document.getElementById('deposit-amount');
+            DOM.depositMinAmount = document.getElementById('deposit-min-amount');
         }
 
         // ============================================================
@@ -1895,20 +1903,28 @@
         function loadConfigFromFirebase() {
             return new Promise((resolve) => {
                 if (!firebaseDb) { resolve(); return; }
-                firebaseDb.ref('adminConfig').once('value').then(snapshot => {
+                firebaseDb.ref('adminConfig').on('value', (snapshot) => {
                     const data = snapshot.val();
                     if (data) {
                         if (data.adReward) CONFIG.AD_REWARD = data.adReward;
                         if (data.dailyLimit) CONFIG.DAILY_AD_LIMIT = data.dailyLimit;
                         if (data.minWithdraw) CONFIG.MINIMUM_WITHDRAWAL = data.minWithdraw;
+                        if (data.minDeposit) {
+                            CONFIG.MINIMUM_DEPOSIT = data.minDeposit;
+                            if (DOM.depositMinAmount) {
+                                DOM.depositMinAmount.textContent = data.minDeposit;
+                            }
+                        }
                         if (data.cooldown) CONFIG.COOLDOWN_MINUTES = data.cooldown;
                         if (data.referralReward) CONFIG.REFERRAL_REWARD = data.referralReward;
                         if (data.withdrawMethods) CONFIG.withdrawalMethods = data.withdrawMethods;
+                        if (data.depositMethods) CONFIG.depositMethods = data.depositMethods;
                         if (data.welcomeMessage) CONFIG.welcomeNotice.message = data.welcomeMessage;
                         console.log("✅ Config loaded from Firebase");
+                        renderDepositMethods();
                     }
                     resolve();
-                }).catch(() => resolve());
+                });
             });
         }
 
@@ -2258,7 +2274,7 @@
         }
 
         // ============================================================
-        // RENDER ADS - Updated with approval system
+        // RENDER ADS
         // ============================================================
         function renderAdList(ads) {
             if (!DOM.adListContainer) return;
@@ -2270,7 +2286,6 @@
                 }
             });
 
-            // Only show approved ads to users
             let filtered = ads.filter(ad => 
                 (ad.status === 'active' || ad.status === 'paused') && 
                 ad.approved === true
@@ -2424,7 +2439,7 @@
         }
 
         // ============================================================
-        // VERIFICATION - Add reward on success
+        // VERIFICATION
         // ============================================================
         function openVerifyModal(adId) {
             const existingVerification = state.verifications.find(v => v.adId === adId);
@@ -2507,7 +2522,6 @@
                     state.viewedAds.push(state.currentVerifyAdId);
                 }
 
-                // Update view count
                 await firebaseDb.ref(`ads/${state.currentVerifyAdId}/views`).transaction((current) => (current || 0) + 1);
 
                 saveUserData();
@@ -2523,7 +2537,7 @@
         }
 
         // ============================================================
-        // ADVERTISER - CREATE AD with Approval Status
+        // ADVERTISER - CREATE AD
         // ============================================================
         function setupCreateAdForm() {
             if (!DOM.createAdForm) return;
@@ -2558,8 +2572,9 @@
                     return;
                 }
 
-                const totalViews = Math.floor(budget / reward);
-                if (totalViews < targetViews) {
+                // Calculate total views based on budget and reward
+                const calculatedViews = Math.floor(budget / reward);
+                if (calculatedViews < targetViews) {
                     showToast(`❌ Budget too low for ${targetViews} views! Need $${(targetViews * reward).toFixed(2)}`, 'error');
                     return;
                 }
@@ -2593,7 +2608,7 @@
                     totalViews: targetViews,
                     views: 0,
                     status: 'active',
-                    approved: false, // Needs admin approval
+                    approved: false,
                     createdBy: state.currentUserId,
                     createdAt: Date.now(),
                     budget,
@@ -2608,7 +2623,7 @@
                     await newRef.set(adData);
                     saveUserData();
                     updateUI();
-                    showToast(`✅ Ad campaign created! Waiting for admin approval.`, 'success');
+                    showToast(`✅ Ad campaign created! ${targetViews} views, ${duration} days. Waiting for admin approval.`, 'success');
                     DOM.createAdForm.reset();
                     document.getElementById('ad-image').value = '';
                     listenAds();
@@ -2626,8 +2641,8 @@
             const budget = parseFloat(document.getElementById('ad-budget').value) || 1.00;
             const duration = parseInt(document.getElementById('ad-duration').value) || 7;
             const targetViews = parseInt(document.getElementById('ad-target-views').value) || 100;
-            const totalViews = Math.floor(budget / reward);
-            document.getElementById('ad-total-views').textContent = targetViews || 0;
+            const calculatedViews = Math.floor(budget / reward);
+            document.getElementById('ad-total-views').textContent = calculatedViews || 0;
             document.getElementById('ad-cost-per-view').textContent = reward.toFixed(4);
             document.getElementById('ad-duration-display').textContent = duration;
         }
@@ -2699,7 +2714,7 @@
         }
 
         // ============================================================
-        // RENDER MY ADS - Updated with approval status
+        // RENDER MY ADS
         // ============================================================
         function renderMyAds(ads) {
             if (!DOM.myAdsContainer) return;
@@ -2794,7 +2809,7 @@
         }
 
         // ============================================================
-        // VERIFICATION REQUESTS (Advertiser) - Updated
+        // VERIFICATION REQUESTS (Advertiser)
         // ============================================================
         function renderVerificationRequests(ads) {
             if (!DOM.verificationContainer || state.userRole !== 'advertiser') return;
@@ -2881,7 +2896,6 @@
                 const ad = adSnapshot.val();
 
                 if (ad) {
-                    // Add reward to user's balance
                     await firebaseDb.ref(`users/${data.userId}/balance`).transaction((current) => (current || 0) + ad.reward);
                 }
 
@@ -2897,12 +2911,12 @@
         }
 
         // ============================================================
-        // DEPOSIT SYSTEM
+        // DEPOSIT SYSTEM - Updated with Min Amount
         // ============================================================
         function renderDepositMethods() {
             if (!DOM.depositMethodsList) return;
 
-            const methods = [
+            const methods = CONFIG.depositMethods || [
                 { name: 'Bikash', number: '01712345678', icon: '💳' },
                 { name: 'Nogad', number: '01712345678', icon: '📱' },
                 { name: 'Bank', number: '1234567890', icon: '🏦' }
@@ -2933,6 +2947,7 @@
                 showToast('❌ Deposit is only available for Advertisers.', 'error');
                 return;
             }
+            DOM.depositMinAmount.textContent = CONFIG.MINIMUM_DEPOSIT;
             document.getElementById('depositModal').style.display = 'flex';
         }
 
@@ -2951,8 +2966,8 @@
                 return;
             }
 
-            if (!amount || amount < 10) {
-                showToast('❌ Please enter a valid amount (min 10 BDT)', 'error');
+            if (!amount || amount < CONFIG.MINIMUM_DEPOSIT) {
+                showToast(`❌ Minimum deposit is ${CONFIG.MINIMUM_DEPOSIT} BDT`, 'error');
                 return;
             }
 
