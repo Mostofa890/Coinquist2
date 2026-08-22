@@ -1983,7 +1983,7 @@
             }
         }
 
-        // Show Rewarded Interstitial Ad - FIXED with proper promise handling
+        // Show Rewarded Interstitial Ad - FIXED - Ad shows, then reward after close
         function showRewardedAd() {
             return new Promise((resolve) => {
                 try {
@@ -2173,7 +2173,8 @@
                 viewedAds: state.viewedAds,
                 myAds: state.myAds,
                 name: tg?.initDataUnsafe?.user?.first_name || 'User',
-                username: tg?.initDataUnsafe?.user?.username || null
+                username: tg?.initDataUnsafe?.user?.username || null,
+                lastAdWatchTime: lastAdWatchTime
             };
             
             firebaseDb.ref(`users/${state.currentUserId}`).update(data).catch(err => {
@@ -2203,6 +2204,9 @@
                         state.userRole = data.userRole || 'publisher';
                         state.viewedAds = data.viewedAds || [];
                         state.myAds = data.myAds || [];
+                        if (data.lastAdWatchTime) {
+                            lastAdWatchTime = data.lastAdWatchTime;
+                        }
                         
                         const today = new Date().toLocaleDateString();
                         if (state.lastAdWatchedDate !== today) {
@@ -3456,13 +3460,13 @@
         }
 
         // ============================================================
-        // WATCH AD - FIXED
+        // WATCH AD - FIXED - Ad shows, then reward after close, timer persists
         // ============================================================
         async function watchAd() {
             if (isAdShowing) return;
             if (DOM.adLoaderOverlay.style.display === 'flex') return;
 
-            // Check 1-minute cooldown
+            // Check 1-minute cooldown (persists across app close)
             const now = Date.now();
             if (now - lastAdWatchTime < CONFIG.AD_COOLDOWN_MINUTES * 60 * 1000) {
                 const remaining = Math.ceil((CONFIG.AD_COOLDOWN_MINUTES * 60 * 1000 - (now - lastAdWatchTime)) / 1000);
@@ -3501,20 +3505,21 @@
                     DOM.adLoaderProgress.style.width = `${progress}%`;
                 }, 300);
 
-                // Show Monetag ad - this will wait for the ad to show
+                // Show Monetag ad - ad shows, then reward after close
                 const adShown = await showRewardedAd();
 
                 clearInterval(progressInterval);
                 DOM.adLoaderProgress.style.width = '100%';
 
                 if (adShown) {
-                    // Add reward only if ad was shown
+                    // Add reward only if ad was shown and closed
                     state.balance += CONFIG.AD_REWARD;
                     state.adCount++;
                     state.adsWatchedToday++;
                     const day = new Date().getDay();
                     state.weeklyActivity[day] = (state.weeklyActivity[day] || 0) + 1;
                     
+                    // Update last watch time (persists in Firebase)
                     lastAdWatchTime = Date.now();
 
                     let alertMsg = `✅ Ad watched! +$${CONFIG.AD_REWARD.toFixed(4)} added!`;
@@ -3816,6 +3821,7 @@
                 console.log("💳 Wallet:", state.walletBalance);
                 console.log("🎯 Role:", state.userRole);
                 console.log(`⏱️ Ad Cooldown: ${CONFIG.AD_COOLDOWN_MINUTES} minute(s)`);
+                console.log(`⏱️ Last Ad Time: ${new Date(lastAdWatchTime).toLocaleTimeString()}`);
 
             } catch (error) {
                 console.error("Init error:", error);
