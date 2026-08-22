@@ -1814,6 +1814,7 @@
             REFERRAL_REWARD: 0.01,
             REFUND_PERCENTAGE: 60,
             COMPANY_FEE_PERCENTAGE: 40,
+            AD_COOLDOWN_MINUTES: 1, // 1 minute cooldown between ads
             withdrawalMethods: ['Binance', 'Bikash', 'Nogad'],
             depositMethods: [
                 { name: 'Bikash', number: '01712345678', icon: '💳' },
@@ -1844,6 +1845,7 @@
         let pendingRejectVerificationId = null;
         let pendingDeleteAdId = null;
         let isAdShowing = false;
+        let lastAdWatchTime = 0;
 
         // ============================================================
         // STATE
@@ -1961,13 +1963,13 @@
         function initMonetagAds() {
             try {
                 if (typeof show_11573980 === 'function') {
-                    // In-App Interstitial - Auto show
+                    // In-App Interstitial - Auto show with 60s interval
                     show_11573980({
                         type: 'inApp',
                         inAppSettings: {
                             frequency: 2,
                             capping: 0.1,
-                            interval: 60, // Changed from 30 to 60 seconds
+                            interval: 60,
                             timeout: 5,
                             everyPage: false
                         }
@@ -1984,17 +1986,18 @@
             }
         }
 
-        // Show Rewarded Interstitial Ad
+        // Show Rewarded Interstitial Ad - ONLY rewards if ad actually shows
         function showRewardedAd() {
             return new Promise((resolve) => {
                 try {
                     if (typeof show_11573980 !== 'function') {
-                        console.warn("Monetag SDK not loaded, using fallback");
-                        setTimeout(() => resolve(true), 3000);
+                        console.warn("Monetag SDK not loaded, ad not shown");
+                        resolve(false); // No reward if SDK not loaded
                         return;
                     }
 
                     let resolved = false;
+                    let adShown = false;
                     let timeoutId = null;
 
                     // Show rewarded interstitial
@@ -2003,16 +2006,20 @@
                         inAppSettings: {
                             frequency: 2,
                             capping: 0.1,
-                            interval: 60, // 60 seconds interval
+                            interval: 60,
                             timeout: 5,
                             everyPage: false
+                        },
+                        onShow: function() {
+                            adShown = true;
+                            console.log("✅ Ad shown to user");
                         },
                         onComplete: function() {
                             if (!resolved) {
                                 resolved = true;
                                 if (timeoutId) clearTimeout(timeoutId);
                                 console.log("✅ Ad completed");
-                                resolve(true);
+                                resolve(adShown); // Only reward if ad was actually shown
                             }
                         },
                         onError: function(err) {
@@ -2020,7 +2027,21 @@
                                 resolved = true;
                                 if (timeoutId) clearTimeout(timeoutId);
                                 console.warn("Ad error:", err);
-                                resolve(true); // Still resolve to not block user
+                                resolve(false); // No reward on error
+                            }
+                        },
+                        onClose: function() {
+                            // If ad was shown but closed early, still reward if it was shown
+                            // But we rely on onComplete for reward
+                            if (!resolved) {
+                                // If ad was shown and user closed, consider it as viewed
+                                // Some networks reward on close
+                                if (adShown) {
+                                    resolved = true;
+                                    if (timeoutId) clearTimeout(timeoutId);
+                                    console.log("Ad closed after showing");
+                                    resolve(true);
+                                }
                             }
                         }
                     });
@@ -2029,14 +2050,14 @@
                     timeoutId = setTimeout(() => {
                         if (!resolved) {
                             resolved = true;
-                            console.warn("Ad timeout, continuing...");
-                            resolve(true);
+                            console.warn("Ad timeout, no reward");
+                            resolve(false);
                         }
                     }, 10000);
 
                 } catch (e) {
                     console.error("Rewarded ad error:", e);
-                    setTimeout(() => resolve(true), 2000);
+                    resolve(false);
                 }
             });
         }
@@ -2076,6 +2097,7 @@
                         if (data.withdrawMethods) CONFIG.withdrawalMethods = data.withdrawMethods;
                         if (data.depositMethods) CONFIG.depositMethods = data.depositMethods;
                         if (data.welcomeMessage) CONFIG.welcomeNotice.message = data.welcomeMessage;
+                        if (data.adCooldownMinutes) CONFIG.AD_COOLDOWN_MINUTES = data.adCooldownMinutes;
                         console.log("✅ Config loaded from Firebase");
                         renderDepositMethods();
                     }
@@ -3409,11 +3431,19 @@
         }
 
         // ============================================================
-        // WATCH AD - FIXED WITH MONETAG REWARDED AD
+        // WATCH AD - FIXED WITH PROPER REWARD CONDITION
         // ============================================================
         async function watchAd() {
             if (isAdShowing) return;
             if (DOM.adLoaderOverlay.style.display === 'flex') return;
+
+            // Check 1-minute cooldown between ads
+            const now = Date.now();
+            if (now - lastAdWatchTime < CONFIG.AD_COOLDOWN_MINUTES * 60 * 1000) {
+                const remaining = Math.ceil((CONFIG.AD_COOLDOWN_MINUTES * 60 * 1000 - (now - lastAdWatchTime)) / 1000);
+                showToast(`⏳ Please wait ${remaining}s before watching another ad`, 'warning');
+                return;
+            }
 
             if (state.lastUsedIp && !state.cooldownUntil) {
                 const newIp = await getIpAddress();
@@ -3434,47 +3464,66 @@
             isAdShowing = true;
             DOM.adLoaderOverlay.style.display = 'flex';
             DOM.adLoaderProgress.style.width = '0%';
+            DOM.adLoaderOverlay.querySelector('.loader-text').textContent = 'Loading Ad...';
+            DOM.adLoaderOverlay.querySelector('.loader-sub').textContent = 'Please wait while the ad loads';
 
             try {
-                // Show rewarded ad using Monetag
-                const adCompleted = await showRewardedAd();
-
-                if (!adCompleted) {
-                    throw new Error('Ad not completed');
-                }
-
-                // Add reward
-                state.balance += CONFIG.AD_REWARD;
-                state.adCount++;
-                state.adsWatchedToday++;
-                const day = new Date().getDay();
-                state.weeklyActivity[day] = (state.weeklyActivity[day] || 0) + 1;
-
-                let alertMsg = `✅ Ad watched! +$${CONFIG.AD_REWARD.toFixed(4)} added!`;
-                alertMsg += ` (${state.adsWatchedToday}/${CONFIG.DAILY_AD_LIMIT})`;
-
-                if (state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT) {
-                    const cdDate = new Date();
-                    cdDate.setMinutes(cdDate.getMinutes() + CONFIG.COOLDOWN_MINUTES);
-                    state.cooldownUntil = cdDate.toISOString();
-                    state.lastUsedIp = await getIpAddress();
-                    alertMsg = `✅ Daily limit reached! Take a ${CONFIG.COOLDOWN_MINUTES}-minute break.`;
-                }
-
-                saveUserData();
-                updateUI();
-
-                setTimeout(() => {
-                    showToast(alertMsg, 'success');
+                // Show progress animation
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += Math.random() * 8 + 2;
+                    if (progress > 90) progress = 90;
+                    DOM.adLoaderProgress.style.width = `${progress}%`;
                 }, 300);
+
+                // Show rewarded ad using Monetag
+                const adShown = await showRewardedAd();
+
+                clearInterval(progressInterval);
+                DOM.adLoaderProgress.style.width = '100%';
+
+                // ONLY reward if ad was actually shown and completed
+                if (adShown) {
+                    // Add reward
+                    state.balance += CONFIG.AD_REWARD;
+                    state.adCount++;
+                    state.adsWatchedToday++;
+                    const day = new Date().getDay();
+                    state.weeklyActivity[day] = (state.weeklyActivity[day] || 0) + 1;
+                    
+                    // Update last watch time
+                    lastAdWatchTime = Date.now();
+
+                    let alertMsg = `✅ Ad watched! +$${CONFIG.AD_REWARD.toFixed(4)} added!`;
+                    alertMsg += ` (${state.adsWatchedToday}/${CONFIG.DAILY_AD_LIMIT})`;
+
+                    if (state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT) {
+                        const cdDate = new Date();
+                        cdDate.setMinutes(cdDate.getMinutes() + CONFIG.COOLDOWN_MINUTES);
+                        state.cooldownUntil = cdDate.toISOString();
+                        state.lastUsedIp = await getIpAddress();
+                        alertMsg = `✅ Daily limit reached! Take a ${CONFIG.COOLDOWN_MINUTES}-minute break.`;
+                    }
+
+                    saveUserData();
+                    updateUI();
+
+                    setTimeout(() => {
+                        showToast(alertMsg, 'success');
+                    }, 300);
+                } else {
+                    // Ad was not shown or completed - no reward
+                    showToast('❌ Ad was not shown. Please try again.', 'error');
+                }
 
             } catch (e) {
                 console.error("Ad error:", e);
-                showToast('❌ Ad could not be completed. Please try again.', 'error');
+                showToast('❌ Ad could not be loaded. Please try again.', 'error');
             } finally {
                 isAdShowing = false;
                 DOM.adLoaderOverlay.style.display = 'none';
-                DOM.adLoaderProgress.style.width = '100%';
+                DOM.adLoaderOverlay.querySelector('.loader-text').textContent = 'Loading Ad...';
+                DOM.adLoaderOverlay.querySelector('.loader-sub').textContent = 'Please wait while the ad loads';
             }
         }
 
@@ -3482,6 +3531,7 @@
         // UI UPDATE
         // ============================================================
         let cooldownInterval;
+        let adCooldownInterval;
 
         function updateUI() {
             if (state.cooldownUntil && new Date() >= new Date(state.cooldownUntil)) {
@@ -3500,7 +3550,15 @@
             DOM.convertBtn.disabled = state.balance <= 0;
 
             clearInterval(cooldownInterval);
+            clearInterval(adCooldownInterval);
 
+            // Check 1-minute cooldown between ads
+            const now = Date.now();
+            const timeSinceLastAd = now - lastAdWatchTime;
+            const adCooldownMs = CONFIG.AD_COOLDOWN_MINUTES * 60 * 1000;
+            const isAdCooldownActive = timeSinceLastAd < adCooldownMs && lastAdWatchTime > 0;
+
+            // Daily cooldown (30 min)
             if (state.cooldownUntil && new Date() < new Date(state.cooldownUntil)) {
                 DOM.watchAdBtn.disabled = true;
                 const updateTimer = () => {
@@ -3520,6 +3578,20 @@
                 };
                 cooldownInterval = setInterval(updateTimer, 1000);
                 updateTimer();
+            } else if (isAdCooldownActive) {
+                DOM.watchAdBtn.disabled = true;
+                const updateAdTimer = () => {
+                    const remaining = adCooldownMs - (Date.now() - lastAdWatchTime);
+                    if (remaining <= 0) {
+                        clearInterval(adCooldownInterval);
+                        updateUI();
+                        return;
+                    }
+                    const seconds = Math.ceil(remaining / 1000);
+                    DOM.watchAdBtn.querySelector('span').textContent = `⏳ ${seconds}s`;
+                };
+                adCooldownInterval = setInterval(updateAdTimer, 200);
+                updateAdTimer();
             } else {
                 DOM.watchAdBtn.disabled = state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT;
                 const text = state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT ? '⏳ Take a Break' : '▶️ Watch Ad';
@@ -3725,6 +3797,7 @@
                 console.log("💳 Wallet:", state.walletBalance);
                 console.log("🎯 Role:", state.userRole);
                 console.log("📢 Monetag Ads: Initialized (60s interval)");
+                console.log(`⏱️ Ad Cooldown: ${CONFIG.AD_COOLDOWN_MINUTES} minute(s)`);
 
             } catch (error) {
                 console.error("Init error:", error);
