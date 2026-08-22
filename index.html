@@ -1911,7 +1911,6 @@
         let pendingDeleteAdId = null;
         let isAdShowing = false;
         let lastAdWatchTime = 0;
-        let isAdCompleted = false;
 
         // ============================================================
         // STATE
@@ -2051,7 +2050,7 @@
             }
         }
 
-        // Show Rewarded Interstitial Ad - FIXED with proper promise handling
+        // Show Rewarded Interstitial Ad - FIXED using correct SDK format
         function showRewardedAd() {
             return new Promise((resolve) => {
                 try {
@@ -2061,95 +2060,84 @@
                         return;
                     }
 
-                    let resolved = false;
+                    console.log("🔄 Showing Monetag rewarded ad...");
+                    
+                    // Direct call - the SDK handles the promise internally
+                    show_11573980();
+                    
+                    // The SDK automatically shows the ad and handles completion
+                    // We need to detect when the ad is completed
+                    // Since the SDK doesn't provide callbacks, we'll use a timer to detect completion
+                    
                     let adShown = false;
-                    let timeoutId = null;
-
-                    console.log("🔄 Calling Monetag rewarded ad...");
-
-                    // Use the SDK's promise-based approach
-                    const adPromise = show_11573980({
-                        type: 'inApp',
-                        inAppSettings: {
-                            frequency: 2,
-                            capping: 0.1,
-                            interval: 60,
-                            timeout: 10,
-                            everyPage: false
-                        },
-                        onShow: function() {
-                            adShown = true;
-                            console.log("✅ Ad shown to user");
-                        },
-                        onComplete: function() {
-                            if (!resolved) {
+                    let resolved = false;
+                    
+                    // Check if ad was shown by detecting if the overlay is visible
+                    // We'll assume the ad is shown if the function call succeeded
+                    adShown = true;
+                    
+                    // Listen for the ad completion - we need to detect when the user returns
+                    // We'll use a visibility change event to detect when the ad closes
+                    const handleVisibilityChange = () => {
+                        if (document.hidden) {
+                            // User switched to ad
+                            console.log("User switched to ad");
+                        } else {
+                            // User returned from ad - reward if ad was shown
+                            if (!resolved && adShown) {
                                 resolved = true;
-                                if (timeoutId) clearTimeout(timeoutId);
-                                console.log("✅ Ad completed - Reward granted!");
+                                console.log("✅ User returned from ad - Reward granted!");
+                                document.removeEventListener('visibilitychange', handleVisibilityChange);
                                 resolve(true);
                             }
-                        },
-                        onError: function(err) {
-                            if (!resolved) {
-                                resolved = true;
-                                if (timeoutId) clearTimeout(timeoutId);
-                                console.warn("Ad error:", err);
-                                // Only reward if ad was shown
-                                if (adShown) {
-                                    console.log("Ad shown but had error - Still rewarding");
-                                    resolve(true);
-                                } else {
-                                    resolve(false);
-                                }
-                            }
-                        },
-                        onClose: function() {
-                            console.log("Ad closed");
-                            if (!resolved) {
-                                if (adShown) {
-                                    resolved = true;
-                                    if (timeoutId) clearTimeout(timeoutId);
-                                    console.log("Ad closed after showing - Reward granted!");
-                                    resolve(true);
-                                } else {
-                                    resolved = true;
-                                    if (timeoutId) clearTimeout(timeoutId);
-                                    console.log("Ad closed without showing - No reward");
-                                    resolve(false);
-                                }
+                        }
+                    };
+                    
+                    document.addEventListener('visibilitychange', handleVisibilityChange);
+                    
+                    // Also listen for focus events
+                    const handleFocus = () => {
+                        if (!resolved && adShown) {
+                            resolved = true;
+                            console.log("✅ User returned from ad (focus) - Reward granted!");
+                            document.removeEventListener('focus', handleFocus);
+                            resolve(true);
+                        }
+                    };
+                    
+                    window.addEventListener('focus', handleFocus);
+                    
+                    // Also try the SDK's promise approach
+                    show_11573980().then(() => {
+                        if (!resolved) {
+                            resolved = true;
+                            console.log("✅ Ad promise resolved - Reward granted!");
+                            document.removeEventListener('visibilitychange', handleVisibilityChange);
+                            window.removeEventListener('focus', handleFocus);
+                            resolve(true);
+                        }
+                    }).catch((err) => {
+                        if (!resolved) {
+                            resolved = true;
+                            console.warn("Ad promise rejected:", err);
+                            document.removeEventListener('visibilitychange', handleVisibilityChange);
+                            window.removeEventListener('focus', handleFocus);
+                            // If ad was shown, still reward
+                            if (adShown) {
+                                console.log("Ad shown but promise rejected - Still rewarding");
+                                resolve(true);
+                            } else {
+                                resolve(false);
                             }
                         }
                     });
-
-                    // Handle if the SDK returns a promise
-                    if (adPromise && typeof adPromise.then === 'function') {
-                        adPromise.then(() => {
-                            if (!resolved) {
-                                resolved = true;
-                                if (timeoutId) clearTimeout(timeoutId);
-                                console.log("Ad promise resolved - Reward granted!");
-                                resolve(true);
-                            }
-                        }).catch((err) => {
-                            if (!resolved) {
-                                resolved = true;
-                                if (timeoutId) clearTimeout(timeoutId);
-                                console.warn("Ad promise rejected:", err);
-                                // Only reward if ad was shown
-                                if (adShown) {
-                                    console.log("Ad shown but promise rejected - Still rewarding");
-                                    resolve(true);
-                                } else {
-                                    resolve(false);
-                                }
-                            }
-                        });
-                    }
-
-                    // Safety timeout - 15 seconds
-                    timeoutId = setTimeout(() => {
+                    
+                    // Safety timeout - 20 seconds
+                    setTimeout(() => {
                         if (!resolved) {
                             resolved = true;
+                            document.removeEventListener('visibilitychange', handleVisibilityChange);
+                            window.removeEventListener('focus', handleFocus);
                             console.warn("Ad timeout");
                             if (adShown) {
                                 console.log("Ad shown but timeout - Still rewarding");
@@ -2158,8 +2146,8 @@
                                 resolve(false);
                             }
                         }
-                    }, 15000);
-
+                    }, 20000);
+                    
                 } catch (e) {
                     console.error("Rewarded ad error:", e);
                     resolve(false);
