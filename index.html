@@ -1983,12 +1983,12 @@
             }
         }
 
-        // Show Rewarded Interstitial Ad - FIXED
+        // Show Rewarded Interstitial Ad - FIXED with proper promise handling
         function showRewardedAd() {
             return new Promise((resolve) => {
                 try {
                     if (typeof show_11573980 !== 'function') {
-                        console.warn("Monetag SDK not loaded, ad not shown");
+                        console.warn("Monetag SDK not loaded");
                         resolve(false);
                         return;
                     }
@@ -1996,12 +1996,11 @@
                     let resolved = false;
                     let adShown = false;
                     let timeoutId = null;
-                    let adCalled = false;
 
                     console.log("🔄 Calling Monetag rewarded ad...");
 
                     // Call the Monetag ad
-                    show_11573980({
+                    const adPromise = show_11573980({
                         type: 'inApp',
                         inAppSettings: {
                             frequency: 2,
@@ -2012,7 +2011,6 @@
                         },
                         onShow: function() {
                             adShown = true;
-                            adCalled = true;
                             console.log("✅ Ad shown to user");
                         },
                         onComplete: function() {
@@ -2028,20 +2026,24 @@
                                 resolved = true;
                                 if (timeoutId) clearTimeout(timeoutId);
                                 console.warn("Ad error:", err);
-                                resolve(false);
+                                // If ad was already shown, still reward
+                                if (adShown) {
+                                    console.log("Ad shown but had error - Still rewarding");
+                                    resolve(true);
+                                } else {
+                                    resolve(false);
+                                }
                             }
                         },
                         onClose: function() {
                             console.log("Ad closed");
                             if (!resolved) {
-                                // If ad was shown and closed, consider it viewed
                                 if (adShown) {
                                     resolved = true;
                                     if (timeoutId) clearTimeout(timeoutId);
                                     console.log("Ad closed after showing - Reward granted!");
                                     resolve(true);
                                 } else {
-                                    // Ad was never shown
                                     resolved = true;
                                     if (timeoutId) clearTimeout(timeoutId);
                                     console.log("Ad closed without showing - No reward");
@@ -2051,32 +2053,37 @@
                         }
                     });
 
-                    // Force show if the SDK supports it
-                    setTimeout(() => {
-                        if (!adCalled) {
-                            console.log("🔄 Retrying ad show...");
-                            try {
-                                // Some SDKs need a second call
-                                show_11573980({
-                                    type: 'inApp',
-                                    inAppSettings: {
-                                        frequency: 2,
-                                        capping: 0.1,
-                                        interval: 60,
-                                        timeout: 10,
-                                        everyPage: false
-                                    }
-                                });
-                            } catch(e) {}
-                        }
-                    }, 1000);
+                    // Handle if the SDK returns a promise
+                    if (adPromise && typeof adPromise.then === 'function') {
+                        adPromise.then(() => {
+                            if (!resolved) {
+                                resolved = true;
+                                if (timeoutId) clearTimeout(timeoutId);
+                                console.log("Ad promise resolved - Reward granted!");
+                                resolve(true);
+                            }
+                        }).catch((err) => {
+                            if (!resolved) {
+                                resolved = true;
+                                if (timeoutId) clearTimeout(timeoutId);
+                                console.warn("Ad promise rejected:", err);
+                                resolve(false);
+                            }
+                        });
+                    }
 
                     // Safety timeout - 15 seconds
                     timeoutId = setTimeout(() => {
                         if (!resolved) {
                             resolved = true;
-                            console.warn("Ad timeout - No reward");
-                            resolve(false);
+                            console.warn("Ad timeout");
+                            // If ad was shown but timeout, still reward
+                            if (adShown) {
+                                console.log("Ad shown but timeout - Still rewarding");
+                                resolve(true);
+                            } else {
+                                resolve(false);
+                            }
                         }
                     }, 15000);
 
@@ -3494,7 +3501,7 @@
                     DOM.adLoaderProgress.style.width = `${progress}%`;
                 }, 300);
 
-                // Show Monetag ad
+                // Show Monetag ad - this will wait for the ad to show
                 const adShown = await showRewardedAd();
 
                 clearInterval(progressInterval);
