@@ -1814,7 +1814,7 @@
             REFERRAL_REWARD: 0.01,
             REFUND_PERCENTAGE: 60,
             COMPANY_FEE_PERCENTAGE: 40,
-            AD_COOLDOWN_MINUTES: 1, // 1 minute cooldown between ads
+            AD_COOLDOWN_MINUTES: 1,
             withdrawalMethods: ['Binance', 'Bikash', 'Nogad'],
             depositMethods: [
                 { name: 'Bikash', number: '01712345678', icon: '💳' },
@@ -1948,7 +1948,6 @@
             DOM.depositAmount = document.getElementById('deposit-amount');
             DOM.depositMinAmount = document.getElementById('deposit-min-amount');
             
-            // Calculator elements
             DOM.calcViews = document.getElementById('calcViews');
             DOM.calcReward = document.getElementById('calcReward');
             DOM.calcDuration = document.getElementById('calcDuration');
@@ -1959,11 +1958,9 @@
         // MONETAG AD FUNCTIONS - FIXED
         // ============================================================
         
-        // Initialize In-App Interstitial
         function initMonetagAds() {
             try {
                 if (typeof show_11573980 === 'function') {
-                    // In-App Interstitial - Auto show with 60s interval
                     show_11573980({
                         type: 'inApp',
                         inAppSettings: {
@@ -1986,40 +1983,44 @@
             }
         }
 
-        // Show Rewarded Interstitial Ad - ONLY rewards if ad actually shows
+        // Show Rewarded Interstitial Ad - FIXED
         function showRewardedAd() {
             return new Promise((resolve) => {
                 try {
                     if (typeof show_11573980 !== 'function') {
                         console.warn("Monetag SDK not loaded, ad not shown");
-                        resolve(false); // No reward if SDK not loaded
+                        resolve(false);
                         return;
                     }
 
                     let resolved = false;
                     let adShown = false;
                     let timeoutId = null;
+                    let adCalled = false;
 
-                    // Show rewarded interstitial
+                    console.log("🔄 Calling Monetag rewarded ad...");
+
+                    // Call the Monetag ad
                     show_11573980({
                         type: 'inApp',
                         inAppSettings: {
                             frequency: 2,
                             capping: 0.1,
                             interval: 60,
-                            timeout: 5,
+                            timeout: 10,
                             everyPage: false
                         },
                         onShow: function() {
                             adShown = true;
+                            adCalled = true;
                             console.log("✅ Ad shown to user");
                         },
                         onComplete: function() {
                             if (!resolved) {
                                 resolved = true;
                                 if (timeoutId) clearTimeout(timeoutId);
-                                console.log("✅ Ad completed");
-                                resolve(adShown); // Only reward if ad was actually shown
+                                console.log("✅ Ad completed - Reward granted!");
+                                resolve(true);
                             }
                         },
                         onError: function(err) {
@@ -2027,33 +2028,57 @@
                                 resolved = true;
                                 if (timeoutId) clearTimeout(timeoutId);
                                 console.warn("Ad error:", err);
-                                resolve(false); // No reward on error
+                                resolve(false);
                             }
                         },
                         onClose: function() {
-                            // If ad was shown but closed early, still reward if it was shown
-                            // But we rely on onComplete for reward
+                            console.log("Ad closed");
                             if (!resolved) {
-                                // If ad was shown and user closed, consider it as viewed
-                                // Some networks reward on close
+                                // If ad was shown and closed, consider it viewed
                                 if (adShown) {
                                     resolved = true;
                                     if (timeoutId) clearTimeout(timeoutId);
-                                    console.log("Ad closed after showing");
+                                    console.log("Ad closed after showing - Reward granted!");
                                     resolve(true);
+                                } else {
+                                    // Ad was never shown
+                                    resolved = true;
+                                    if (timeoutId) clearTimeout(timeoutId);
+                                    console.log("Ad closed without showing - No reward");
+                                    resolve(false);
                                 }
                             }
                         }
                     });
 
-                    // Safety timeout - 10 seconds
+                    // Force show if the SDK supports it
+                    setTimeout(() => {
+                        if (!adCalled) {
+                            console.log("🔄 Retrying ad show...");
+                            try {
+                                // Some SDKs need a second call
+                                show_11573980({
+                                    type: 'inApp',
+                                    inAppSettings: {
+                                        frequency: 2,
+                                        capping: 0.1,
+                                        interval: 60,
+                                        timeout: 10,
+                                        everyPage: false
+                                    }
+                                });
+                            } catch(e) {}
+                        }
+                    }, 1000);
+
+                    // Safety timeout - 15 seconds
                     timeoutId = setTimeout(() => {
                         if (!resolved) {
                             resolved = true;
-                            console.warn("Ad timeout, no reward");
+                            console.warn("Ad timeout - No reward");
                             resolve(false);
                         }
-                    }, 10000);
+                    }, 15000);
 
                 } catch (e) {
                     console.error("Rewarded ad error:", e);
@@ -2452,27 +2477,23 @@
         }
 
         // ============================================================
-        // AUTO CALCULATE AD COST - REWARD CALCULATION
+        // AUTO CALCULATE AD COST
         // ============================================================
         function updateAdCalculation() {
             const budget = parseFloat(DOM.adBudget.value) || 1.00;
             const targetViews = parseInt(DOM.adTargetViews.value) || 100;
             const duration = parseInt(DOM.adDuration.value) || 7;
             
-            // Calculate reward per view (budget / targetViews)
             const rewardPerView = budget / targetViews;
             
-            // Update display
             DOM.adTotalViews.textContent = targetViews || 0;
             DOM.adCostPerView.textContent = rewardPerView.toFixed(4);
             DOM.adDurationDisplay.textContent = duration;
             
-            // Update calculator
             DOM.calcViews.textContent = targetViews || 0;
             DOM.calcReward.textContent = `$${rewardPerView.toFixed(4)}`;
             DOM.calcDuration.textContent = `${duration} days`;
             
-            // Check if reward is valid
             if (rewardPerView < 0.0001) {
                 DOM.calcReward.style.color = 'var(--danger)';
                 DOM.adCostPerView.style.color = 'var(--danger)';
@@ -2492,12 +2513,10 @@
         function setupCreateAdForm() {
             if (!DOM.createAdForm) return;
 
-            // Auto calculate on input change
             DOM.adBudget.addEventListener('input', updateAdCalculation);
             DOM.adTargetViews.addEventListener('input', updateAdCalculation);
             DOM.adDuration.addEventListener('input', updateAdCalculation);
 
-            // Initial calculation
             updateAdCalculation();
 
             DOM.createAdForm.addEventListener('submit', async function(e) {
@@ -2517,14 +2536,13 @@
                 }
 
                 if (state.walletBalance < budget) {
-                    showToast(`❌ Insufficient wallet balance! You need $${budget.toFixed(2)}. Please deposit or convert earnings.`, 'error');
+                    showToast(`❌ Insufficient wallet balance! You need $${budget.toFixed(2)}.`, 'error');
                     return;
                 }
 
-                // Calculate reward per view
                 const reward = budget / targetViews;
                 if (reward < 0.0001) {
-                    showToast(`❌ Reward per view is too low! Minimum is $0.0001. Either increase budget or decrease target views.`, 'error');
+                    showToast(`❌ Reward per view is too low! Minimum is $0.0001.`, 'error');
                     return;
                 }
 
@@ -2572,7 +2590,7 @@
                     await newRef.set(adData);
                     saveUserData();
                     updateUI();
-                    showToast(`✅ Ad campaign created! ${targetViews} views, $${reward.toFixed(4)} per view, ${duration} days. Waiting for admin approval.`, 'success');
+                    showToast(`✅ Ad campaign created! Waiting for admin approval.`, 'success');
                     DOM.createAdForm.reset();
                     document.getElementById('ad-image').value = '';
                     updateAdCalculation();
@@ -2581,7 +2599,7 @@
                     console.error("Create ad error:", e);
                     state.walletBalance += budget;
                     saveUserData();
-                    showToast('❌ Failed to create ad. Please try again.', 'error');
+                    showToast('❌ Failed to create ad.', 'error');
                 }
             });
         }
@@ -2704,7 +2722,7 @@
         async function viewAd(adId) {
             const existingVerification = state.verifications.find(v => v.adId === adId);
             if (existingVerification && existingVerification.status === 'rejected') {
-                showToast(`❌ This verification was rejected. Reason: ${existingVerification.rejectReason || 'No reason provided'}`, 'error');
+                showToast(`❌ This verification was rejected.`, 'error');
                 return;
             }
 
@@ -2722,7 +2740,7 @@
                 const snapshot = await firebaseDb.ref(`ads/${adId}`).once('value');
                 const ad = snapshot.val();
                 if (!ad || ad.status !== 'active' || !ad.approved) {
-                    showToast('❌ Ad not available or pending approval!', 'error');
+                    showToast('❌ Ad not available!', 'error');
                     return;
                 }
 
@@ -2746,7 +2764,7 @@
                 openVerifyModal(adId);
             } catch (e) {
                 console.error("View ad error:", e);
-                showToast('❌ Failed to load ad. Please try again.', 'error');
+                showToast('❌ Failed to load ad.', 'error');
             }
         }
 
@@ -2756,7 +2774,7 @@
         function openVerifyModal(adId) {
             const existingVerification = state.verifications.find(v => v.adId === adId);
             if (existingVerification && existingVerification.status === 'rejected') {
-                showToast(`❌ This verification was rejected. Reason: ${existingVerification.rejectReason || 'No reason provided'}`, 'error');
+                showToast(`❌ This verification was rejected.`, 'error');
                 return;
             }
 
@@ -2905,12 +2923,12 @@
                 closeModal('deleteConfirmModal');
                 pendingDeleteAdId = null;
                 
-                showToast(`✅ Ad deleted! Refund of $${refund.toFixed(2)} added to wallet. ($${fee.toFixed(2)} fee deducted)`, 'success');
+                showToast(`✅ Ad deleted! Refund of $${refund.toFixed(2)} added.`, 'success');
                 listenAds();
 
             } catch (e) {
                 console.error("Delete ad error:", e);
-                showToast('❌ Failed to delete ad. Please try again.', 'error');
+                showToast('❌ Failed to delete ad.', 'error');
             }
         }
 
@@ -3080,7 +3098,7 @@
                 
                 closeModal('rejectReasonModal');
                 pendingRejectVerificationId = null;
-                showToast('❌ Verification rejected with reason', 'error');
+                showToast('❌ Verification rejected', 'error');
                 listenAds();
 
             } catch (e) {
@@ -3106,7 +3124,7 @@
 
                 await firebaseDb.ref(`ads/${data.adId}/verified`).set(true);
 
-                showToast('✅ Verification approved! User got reward.', 'success');
+                showToast('✅ Verification approved!', 'success');
                 listenAds();
 
             } catch (e) {
@@ -3199,7 +3217,7 @@
                 await firebaseDb.ref('deposits').push(depositData);
 
                 closeModal('depositModal');
-                showToast(`✅ Deposit request sent! We'll verify your transaction.`, 'success');
+                showToast(`✅ Deposit request sent!`, 'success');
                 
                 DOM.depositSender.value = '';
                 DOM.depositTrxid.value = '';
@@ -3207,12 +3225,12 @@
 
             } catch (e) {
                 console.error("Deposit error:", e);
-                showToast('❌ Failed to submit deposit. Please try again.', 'error');
+                showToast('❌ Failed to submit deposit.', 'error');
             }
         }
 
         // ============================================================
-        // WITHDRAWAL - Only for Publisher
+        // WITHDRAWAL
         // ============================================================
         function populateWithdrawalMethods() {
             if (!DOM.methodSelect) return;
@@ -3307,11 +3325,11 @@
                 document.querySelectorAll('.method-field').forEach(el => el.classList.remove('active'));
                 DOM.methodSelect.selectedIndex = 0;
 
-                showToast('✅ Withdrawal request submitted! It will be processed within 2 hours.', 'success');
+                showToast('✅ Withdrawal request submitted!', 'success');
 
             } catch (error) {
                 console.error("Withdrawal error:", error);
-                showToast('❌ Failed to submit request. Please try again.', 'error');
+                showToast('❌ Failed to submit request.', 'error');
             } finally {
                 text.style.display = 'inline';
                 spinner.style.display = 'none';
@@ -3431,13 +3449,13 @@
         }
 
         // ============================================================
-        // WATCH AD - FIXED WITH PROPER REWARD CONDITION
+        // WATCH AD - FIXED
         // ============================================================
         async function watchAd() {
             if (isAdShowing) return;
             if (DOM.adLoaderOverlay.style.display === 'flex') return;
 
-            // Check 1-minute cooldown between ads
+            // Check 1-minute cooldown
             const now = Date.now();
             if (now - lastAdWatchTime < CONFIG.AD_COOLDOWN_MINUTES * 60 * 1000) {
                 const remaining = Math.ceil((CONFIG.AD_COOLDOWN_MINUTES * 60 * 1000 - (now - lastAdWatchTime)) / 1000);
@@ -3448,7 +3466,7 @@
             if (state.lastUsedIp && !state.cooldownUntil) {
                 const newIp = await getIpAddress();
                 if (newIp === state.lastUsedIp) {
-                    showToast('Please change your IP address (turn airplane mode on/off) before continuing.', 'warning');
+                    showToast('Please change your IP address before continuing.', 'warning');
                     return;
                 } else {
                     state.lastUsedIp = null;
@@ -3468,7 +3486,7 @@
             DOM.adLoaderOverlay.querySelector('.loader-sub').textContent = 'Please wait while the ad loads';
 
             try {
-                // Show progress animation
+                // Progress animation
                 let progress = 0;
                 const progressInterval = setInterval(() => {
                     progress += Math.random() * 8 + 2;
@@ -3476,22 +3494,20 @@
                     DOM.adLoaderProgress.style.width = `${progress}%`;
                 }, 300);
 
-                // Show rewarded ad using Monetag
+                // Show Monetag ad
                 const adShown = await showRewardedAd();
 
                 clearInterval(progressInterval);
                 DOM.adLoaderProgress.style.width = '100%';
 
-                // ONLY reward if ad was actually shown and completed
                 if (adShown) {
-                    // Add reward
+                    // Add reward only if ad was shown
                     state.balance += CONFIG.AD_REWARD;
                     state.adCount++;
                     state.adsWatchedToday++;
                     const day = new Date().getDay();
                     state.weeklyActivity[day] = (state.weeklyActivity[day] || 0) + 1;
                     
-                    // Update last watch time
                     lastAdWatchTime = Date.now();
 
                     let alertMsg = `✅ Ad watched! +$${CONFIG.AD_REWARD.toFixed(4)} added!`;
@@ -3512,7 +3528,6 @@
                         showToast(alertMsg, 'success');
                     }, 300);
                 } else {
-                    // Ad was not shown or completed - no reward
                     showToast('❌ Ad was not shown. Please try again.', 'error');
                 }
 
@@ -3552,13 +3567,11 @@
             clearInterval(cooldownInterval);
             clearInterval(adCooldownInterval);
 
-            // Check 1-minute cooldown between ads
             const now = Date.now();
             const timeSinceLastAd = now - lastAdWatchTime;
             const adCooldownMs = CONFIG.AD_COOLDOWN_MINUTES * 60 * 1000;
             const isAdCooldownActive = timeSinceLastAd < adCooldownMs && lastAdWatchTime > 0;
 
-            // Daily cooldown (30 min)
             if (state.cooldownUntil && new Date() < new Date(state.cooldownUntil)) {
                 DOM.watchAdBtn.disabled = true;
                 const updateTimer = () => {
@@ -3569,7 +3582,7 @@
                         state.adsWatchedToday = 0;
                         saveUserData();
                         updateUI();
-                        showToast('✅ Break is over! You can watch ads again.', 'success');
+                        showToast('✅ Break is over!', 'success');
                         return;
                     }
                     const minutes = Math.floor((remaining / 1000 / 60) % 60);
@@ -3779,7 +3792,6 @@
                     });
                 }
 
-                // Initialize Monetag Ads
                 setTimeout(() => {
                     initMonetagAds();
                 }, 2000);
@@ -3796,12 +3808,11 @@
                 console.log("💰 Balance:", state.balance);
                 console.log("💳 Wallet:", state.walletBalance);
                 console.log("🎯 Role:", state.userRole);
-                console.log("📢 Monetag Ads: Initialized (60s interval)");
                 console.log(`⏱️ Ad Cooldown: ${CONFIG.AD_COOLDOWN_MINUTES} minute(s)`);
 
             } catch (error) {
                 console.error("Init error:", error);
-                showToast('❌ Failed to load app. Please refresh or try again later.', 'error');
+                showToast('❌ Failed to load app. Please refresh.', 'error');
             } finally {
                 ready = true;
                 if (pct < 100) {
