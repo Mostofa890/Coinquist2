@@ -1843,6 +1843,7 @@
         const tg = window.Telegram ? window.Telegram.WebApp : null;
         let pendingRejectVerificationId = null;
         let pendingDeleteAdId = null;
+        let isAdShowing = false;
 
         // ============================================================
         // STATE
@@ -1950,6 +1951,94 @@
             DOM.calcReward = document.getElementById('calcReward');
             DOM.calcDuration = document.getElementById('calcDuration');
             DOM.calcResult = document.getElementById('calcResult');
+        }
+
+        // ============================================================
+        // MONETAG AD FUNCTIONS - FIXED
+        // ============================================================
+        
+        // Initialize In-App Interstitial
+        function initMonetagAds() {
+            try {
+                if (typeof show_11573980 === 'function') {
+                    // In-App Interstitial - Auto show
+                    show_11573980({
+                        type: 'inApp',
+                        inAppSettings: {
+                            frequency: 2,
+                            capping: 0.1,
+                            interval: 60, // Changed from 30 to 60 seconds
+                            timeout: 5,
+                            everyPage: false
+                        }
+                    });
+                    console.log("✅ Monetag In-App Interstitial initialized");
+                    return true;
+                } else {
+                    console.warn("⚠️ Monetag SDK not loaded yet");
+                    return false;
+                }
+            } catch (e) {
+                console.error("Monetag init error:", e);
+                return false;
+            }
+        }
+
+        // Show Rewarded Interstitial Ad
+        function showRewardedAd() {
+            return new Promise((resolve) => {
+                try {
+                    if (typeof show_11573980 !== 'function') {
+                        console.warn("Monetag SDK not loaded, using fallback");
+                        setTimeout(() => resolve(true), 3000);
+                        return;
+                    }
+
+                    let resolved = false;
+                    let timeoutId = null;
+
+                    // Show rewarded interstitial
+                    show_11573980({
+                        type: 'inApp',
+                        inAppSettings: {
+                            frequency: 2,
+                            capping: 0.1,
+                            interval: 60, // 60 seconds interval
+                            timeout: 5,
+                            everyPage: false
+                        },
+                        onComplete: function() {
+                            if (!resolved) {
+                                resolved = true;
+                                if (timeoutId) clearTimeout(timeoutId);
+                                console.log("✅ Ad completed");
+                                resolve(true);
+                            }
+                        },
+                        onError: function(err) {
+                            if (!resolved) {
+                                resolved = true;
+                                if (timeoutId) clearTimeout(timeoutId);
+                                console.warn("Ad error:", err);
+                                resolve(true); // Still resolve to not block user
+                            }
+                        }
+                    });
+
+                    // Safety timeout - 10 seconds
+                    timeoutId = setTimeout(() => {
+                        if (!resolved) {
+                            resolved = true;
+                            console.warn("Ad timeout, continuing...");
+                            resolve(true);
+                        }
+                    }, 10000);
+
+                } catch (e) {
+                    console.error("Rewarded ad error:", e);
+                    setTimeout(() => resolve(true), 2000);
+                }
+            });
         }
 
         // ============================================================
@@ -3320,9 +3409,10 @@
         }
 
         // ============================================================
-        // WATCH AD
+        // WATCH AD - FIXED WITH MONETAG REWARDED AD
         // ============================================================
         async function watchAd() {
+            if (isAdShowing) return;
             if (DOM.adLoaderOverlay.style.display === 'flex') return;
 
             if (state.lastUsedIp && !state.cooldownUntil) {
@@ -3341,13 +3431,19 @@
                 return;
             }
 
+            isAdShowing = true;
             DOM.adLoaderOverlay.style.display = 'flex';
             DOM.adLoaderProgress.style.width = '0%';
 
             try {
-                const adShown = await showMonetagAd();
-                if (!adShown) throw new Error('Ad not shown');
+                // Show rewarded ad using Monetag
+                const adCompleted = await showRewardedAd();
 
+                if (!adCompleted) {
+                    throw new Error('Ad not completed');
+                }
+
+                // Add reward
                 state.balance += CONFIG.AD_REWARD;
                 state.adCount++;
                 state.adsWatchedToday++;
@@ -3370,97 +3466,16 @@
 
                 setTimeout(() => {
                     showToast(alertMsg, 'success');
-                }, 200);
+                }, 300);
 
             } catch (e) {
                 console.error("Ad error:", e);
                 showToast('❌ Ad could not be completed. Please try again.', 'error');
             } finally {
+                isAdShowing = false;
                 DOM.adLoaderOverlay.style.display = 'none';
                 DOM.adLoaderProgress.style.width = '100%';
             }
-        }
-
-        // ============================================================
-        // MONETAG AD HELPER
-        // ============================================================
-        function showMonetagAd() {
-            return new Promise((resolve) => {
-                try {
-                    if (typeof show_11573980 !== 'function') {
-                        let progress = 0;
-                        const interval = setInterval(() => {
-                            progress += 10;
-                            if (DOM.adLoaderProgress) {
-                                DOM.adLoaderProgress.style.width = Math.min(progress, 90) + '%';
-                            }
-                            if (progress >= 90) clearInterval(interval);
-                        }, 200);
-                        
-                        setTimeout(() => {
-                            if (DOM.adLoaderProgress) DOM.adLoaderProgress.style.width = '100%';
-                            resolve(true);
-                        }, 3000);
-                        return;
-                    }
-
-                    let resolved = false;
-                    let timeoutId = null;
-                    let progressInterval = null;
-
-                    let progress = 0;
-                    progressInterval = setInterval(() => {
-                        progress += 5;
-                        if (DOM.adLoaderProgress) {
-                            DOM.adLoaderProgress.style.width = Math.min(progress, 90) + '%';
-                        }
-                        if (progress >= 90) clearInterval(progressInterval);
-                    }, 300);
-
-                    show_11573980({
-                        type: 'inApp',
-                        inAppSettings: {
-                            frequency: 2,
-                            capping: 0.1,
-                            interval: 30,
-                            timeout: 5,
-                            everyPage: false
-                        },
-                        onComplete: function() {
-                            if (!resolved) {
-                                resolved = true;
-                                if (timeoutId) clearTimeout(timeoutId);
-                                if (progressInterval) clearInterval(progressInterval);
-                                if (DOM.adLoaderProgress) DOM.adLoaderProgress.style.width = '100%';
-                                resolve(true);
-                            }
-                        },
-                        onError: function(err) {
-                            if (!resolved) {
-                                resolved = true;
-                                if (timeoutId) clearTimeout(timeoutId);
-                                if (progressInterval) clearInterval(progressInterval);
-                                console.warn('Ad error:', err);
-                                resolve(true);
-                            }
-                        }
-                    });
-
-                    timeoutId = setTimeout(() => {
-                        if (!resolved) {
-                            resolved = true;
-                            if (progressInterval) clearInterval(progressInterval);
-                            if (DOM.adLoaderProgress) DOM.adLoaderProgress.style.width = '100%';
-                            console.warn('Ad timeout, continuing...');
-                            resolve(true);
-                        }
-                    }, 15000);
-
-                } catch (e) {
-                    console.error('Monetag error:', e);
-                    setTimeout(() => resolve(true), 2000);
-                }
-            });
         }
 
         // ============================================================
@@ -3692,6 +3707,11 @@
                     });
                 }
 
+                // Initialize Monetag Ads
+                setTimeout(() => {
+                    initMonetagAds();
+                }, 2000);
+
                 if (!sessionStorage.getItem('alreadyVisited')) {
                     setTimeout(() => showModal('welcomeModal'), 500);
                     sessionStorage.setItem('alreadyVisited', 'true');
@@ -3704,6 +3724,7 @@
                 console.log("💰 Balance:", state.balance);
                 console.log("💳 Wallet:", state.walletBalance);
                 console.log("🎯 Role:", state.userRole);
+                console.log("📢 Monetag Ads: Initialized (60s interval)");
 
             } catch (error) {
                 console.error("Init error:", error);
