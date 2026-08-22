@@ -19,35 +19,38 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         
         :root { 
-            --primary-color: #FF6B35; 
-            --primary-color-rgb: 255, 107, 53; 
-            --secondary-color: #E85D04; 
-            --background-color: #F0F2F5; 
+            --primary-color: #6C63FF; 
+            --primary-color-rgb: 108, 99, 255; 
+            --secondary-color: #4A42D4; 
+            --background-color: #F8F9FE; 
             --card-background: #FFFFFF; 
-            --text-color: #1D1D1F; 
-            --text-light: #6E6E73; 
-            --border-color: #E5E5EA; 
-            --glass-bg: rgba(240, 242, 245, 0.8); 
-            --shadow: 0 2px 10px rgba(0,0,0,0.08);
+            --text-color: #1A1A2E; 
+            --text-light: #6E6E84; 
+            --border-color: #E8E8F0; 
+            --glass-bg: rgba(248, 249, 254, 0.8); 
+            --shadow: 0 4px 20px rgba(108, 99, 255, 0.10);
+            --shadow-hover: 0 8px 30px rgba(108, 99, 255, 0.18);
             --radius: 16px;
             --transition: all 0.3s ease;
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
             --info: #3b82f6;
+            --gradient: linear-gradient(135deg, #6C63FF, #4A42D4);
         }
         
         [data-theme="dark"] { 
-            --primary-color: #FF8C42; 
-            --primary-color-rgb: 255, 140, 66; 
-            --secondary-color: #E85D04; 
-            --background-color: #000000; 
-            --card-background: #1C1C1E; 
-            --text-color: #F5F5F7; 
-            --text-light: #8E8E93; 
-            --border-color: #3A3A3C; 
-            --glass-bg: rgba(28, 28, 30, 0.8); 
-            --shadow: 0 2px 10px rgba(0,0,0,0.3);
+            --primary-color: #8B83FF; 
+            --primary-color-rgb: 139, 131, 255; 
+            --secondary-color: #6C63FF; 
+            --background-color: #0F0F1A; 
+            --card-background: #1A1A2E; 
+            --text-color: #F0F0F5; 
+            --text-light: #8E8EA3; 
+            --border-color: #2A2A42; 
+            --glass-bg: rgba(26, 26, 46, 0.8); 
+            --shadow: 0 4px 20px rgba(0,0,0,0.3);
+            --shadow-hover: 0 8px 30px rgba(108, 99, 255, 0.15);
         }
         
         * { 
@@ -94,12 +97,16 @@
         #preloader .brand {
             font-size: 42px;
             font-weight: 900;
-            color: var(--primary-color);
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             letter-spacing: -1px;
             animation: pulseText 1.5s ease-in-out infinite;
         }
         
-        #preloader .brand span { color: var(--text-color); }
+        #preloader .brand span { 
+            -webkit-text-fill-color: var(--text-color);
+        }
         
         @keyframes pulseText {
             0%, 100% { transform: scale(1); opacity: 1; }
@@ -117,7 +124,7 @@
         #preloader .loader-bar {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            background: var(--gradient);
             border-radius: 4px;
             transition: width 0.3s ease;
         }
@@ -199,7 +206,7 @@
             width: 48px;
             height: 48px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: var(--gradient);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -207,7 +214,7 @@
             font-weight: 700;
             color: white;
             flex-shrink: 0;
-            box-shadow: 0 2px 8px rgba(var(--primary-color-rgb), 0.3);
+            box-shadow: 0 4px 15px rgba(var(--primary-color-rgb), 0.3);
         }
         
         .profile-info {
@@ -227,7 +234,7 @@
             font-weight: 600;
             padding: 3px 12px;
             border-radius: 20px;
-            background: rgba(var(--primary-color-rgb), 0.15);
+            background: rgba(var(--primary-color-rgb), 0.12);
             color: var(--primary-color);
             margin-top: 2px;
         }
@@ -238,7 +245,7 @@
         }
         
         .switch-role-btn {
-            background: rgba(var(--primary-color-rgb), 0.1);
+            background: rgba(var(--primary-color-rgb), 0.08);
             border: 1px solid var(--border-color);
             color: var(--text-color);
             padding: 4px 12px;
@@ -251,7 +258,7 @@
         }
         
         .switch-role-btn:hover {
-            background: rgba(var(--primary-color-rgb), 0.2);
+            background: rgba(var(--primary-color-rgb), 0.15);
         }
         
         /* ===== ROLE SELECTOR ===== */
@@ -273,6 +280,7 @@
             transition: var(--transition);
             text-align: center;
             font-family: inherit;
+            box-shadow: var(--shadow);
         }
         
         .role-btn .icon { font-size: 24px; display: block; margin-bottom: 4px; }
@@ -281,23 +289,23 @@
         
         .role-btn.active {
             border-color: var(--primary-color);
-            background: rgba(var(--primary-color-rgb), 0.08);
-            box-shadow: 0 0 0 4px rgba(var(--primary-color-rgb), 0.1);
+            background: rgba(var(--primary-color-rgb), 0.06);
+            box-shadow: 0 0 0 4px rgba(var(--primary-color-rgb), 0.08), var(--shadow);
         }
         
-        .role-btn:hover:not(.active) { border-color: var(--text-light); }
+        .role-btn:hover:not(.active) { border-color: var(--text-light); transform: translateY(-2px); }
         
         /* ===== BALANCE CARD ===== */
         .balance-card {
             position: relative;
             overflow: hidden;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: var(--gradient);
             color: white;
-            padding: 24px 20px;
+            padding: 28px 20px;
             border-radius: var(--radius);
             text-align: center;
             margin-bottom: 16px;
-            box-shadow: 0 8px 25px rgba(var(--primary-color-rgb), 0.25);
+            box-shadow: 0 8px 30px rgba(var(--primary-color-rgb), 0.25);
             animation: fadeIn 0.6s ease-out;
         }
         
@@ -309,7 +317,7 @@
             right: -20px;
             bottom: -30px;
             font-size: 100px;
-            opacity: 0.1;
+            opacity: 0.08;
             transform: rotate(-15deg);
             pointer-events: none;
         }
@@ -331,7 +339,7 @@
             z-index: 1;
         }
         
-        /* ===== WALLET CARD - Only for Advertiser ===== */
+        /* ===== WALLET CARD ===== */
         .wallet-card {
             display: flex;
             justify-content: space-between;
@@ -344,6 +352,7 @@
             animation: fadeIn 0.7s ease-out;
             transition: var(--transition);
             display: none;
+            box-shadow: var(--shadow);
         }
         
         .wallet-card .label {
@@ -359,7 +368,7 @@
         }
         
         .wallet-card .deposit-btn {
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: var(--gradient);
             color: white;
             border: none;
             padding: 8px 16px;
@@ -372,12 +381,12 @@
         
         .wallet-card .deposit-btn:hover {
             transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            box-shadow: 0 4px 15px rgba(var(--primary-color-rgb), 0.3);
         }
         
         /* ===== CONVERT CARD ===== */
         .convert-card {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(5, 150, 105, 0.08));
             border: 2px solid var(--success);
             padding: 16px 18px;
             border-radius: var(--radius);
@@ -455,6 +464,12 @@
             border: 1px solid var(--border-color);
             animation: fadeIn 0.8s ease-out;
             transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
         }
         
         .stat-item .bg-icon {
@@ -462,7 +477,7 @@
             right: 2px;
             bottom: 2px;
             font-size: 40px;
-            opacity: 0.06;
+            opacity: 0.04;
             color: var(--text-color);
             pointer-events: none;
         }
@@ -480,6 +495,11 @@
             border: 1px solid var(--border-color);
             animation: fadeIn 0.9s ease-out;
             transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+        
+        .card:hover {
+            box-shadow: var(--shadow-hover);
         }
         
         .card-title {
@@ -531,6 +551,7 @@
         }
         
         .ad-card:last-child { margin-bottom: 0; }
+        .ad-card:hover { box-shadow: var(--shadow-hover); }
         
         .ad-header {
             display: flex;
@@ -597,43 +618,45 @@
             padding: 16px;
             border: none;
             border-radius: var(--radius);
-            background: var(--primary-color);
+            background: var(--gradient);
             color: white;
             font-size: 16px;
             font-weight: 700;
             cursor: pointer;
             transition: var(--transition);
             font-family: inherit;
+            box-shadow: 0 4px 15px rgba(var(--primary-color-rgb), 0.2);
         }
         
         .action-button.pulsing { animation: pulse 2s infinite; }
         
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(var(--primary-color-rgb), 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(var(--primary-color-rgb), 0); }
+            0% { box-shadow: 0 0 0 0 rgba(var(--primary-color-rgb), 0.3); }
+            70% { box-shadow: 0 0 0 12px rgba(var(--primary-color-rgb), 0); }
             100% { box-shadow: 0 0 0 0 rgba(var(--primary-color-rgb), 0); }
         }
         
         .action-button:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(var(--primary-color-rgb), 0.25);
+            box-shadow: 0 6px 25px rgba(var(--primary-color-rgb), 0.3);
         }
         
         .action-button:disabled {
             background: #8E8E93;
             cursor: not-allowed;
             transform: none;
+            box-shadow: none;
         }
         
         .action-button.secondary {
             background: transparent;
             color: var(--primary-color);
             border: 2px solid var(--primary-color);
-            margin-top: 10px;
+            box-shadow: none;
         }
         
         .action-button.secondary:hover {
-            background: rgba(var(--primary-color-rgb), 0.08);
+            background: rgba(var(--primary-color-rgb), 0.06);
             transform: translateY(-2px);
         }
         
@@ -682,7 +705,7 @@
         .form-group select:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.15);
+            box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
         }
         
         .form-hint {
@@ -702,8 +725,10 @@
             margin-bottom: 10px;
             border: 1px solid var(--border-color);
             gap: 12px;
+            transition: var(--transition);
         }
         
+        .bonus-item:hover { box-shadow: var(--shadow-hover); }
         .bonus-item:last-child { margin-bottom: 0; }
         .bonus-item .details { flex: 1; min-width: 0; }
         .bonus-item .title { font-weight: 600; font-size: 14px; color: var(--text-color); }
@@ -714,7 +739,7 @@
             font-size: 12px;
             font-weight: 600;
             border-radius: 8px;
-            background: var(--primary-color);
+            background: var(--gradient);
             color: white;
             border: none;
             cursor: pointer;
@@ -885,7 +910,9 @@
             position: fixed;
             z-index: 1000;
             inset: 0;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             align-items: flex-end;
             animation: fadeIn 0.3s ease-out;
             padding: 16px;
@@ -902,6 +929,7 @@
             overflow-y: auto;
             animation: slideUp 0.3s ease-out;
             position: relative;
+            border: 1px solid var(--border-color);
         }
         
         @keyframes slideUp {
@@ -999,7 +1027,7 @@
         #ad-loader-overlay .loader-progress-bar {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            background: var(--gradient);
             border-radius: 4px;
             transition: width 0.3s ease;
         }
@@ -1097,7 +1125,7 @@
         #rejectReasonModal textarea:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.15);
+            box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
         }
 
         .reject-reason-text {
@@ -1198,7 +1226,7 @@
         .deposit-form-group textarea:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.15);
+            box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
         }
         
         .deposit-form-group textarea {
@@ -1210,17 +1238,6 @@
             font-size: 11px;
             color: var(--text-light);
             margin-top: 4px;
-        }
-
-        /* ===== WITHDRAW DISABLED ===== */
-        .withdraw-disabled {
-            opacity: 0.5;
-            pointer-events: none;
-        }
-        
-        .withdraw-disabled .nav-button {
-            opacity: 0.5;
-            pointer-events: none;
         }
 
         /* ===== AD STATUS BADGE ===== */
@@ -1291,6 +1308,17 @@
             color: var(--success);
             font-size: 18px;
         }
+
+        /* Ad Category Badge */
+        .ad-category-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            background: rgba(var(--primary-color-rgb), 0.1);
+            color: var(--primary-color);
+        }
     </style>
 </head>
 <body>
@@ -1351,14 +1379,14 @@
         <!-- ===== BALANCE ===== -->
         <div class="balance-card">
             <h3>💰 Balance</h3>
-            <div class="amount" id="total-earning">$0.000</div>
+            <div class="amount" id="total-earning">$0.0000</div>
         </div>
 
-        <!-- ===== WALLET CARD - Only for Advertiser ===== -->
+        <!-- ===== WALLET CARD ===== -->
         <div class="wallet-card" id="walletCard">
             <div>
                 <div class="label" id="walletLabel">💳 Wallet Balance</div>
-                <div class="value" id="wallet-balance">$0.000</div>
+                <div class="value" id="wallet-balance">$0.0000</div>
             </div>
             <button class="deposit-btn" id="depositButton" onclick="showDepositModal()">
                 + Deposit
@@ -1374,7 +1402,7 @@
             <div class="info">
                 <div>
                     <div style="font-size:12px; color:var(--text-light);">Available to Convert</div>
-                    <div class="balance" id="convert-balance">$0.000</div>
+                    <div class="balance" id="convert-balance">$0.0000</div>
                 </div>
                 <div class="rate">
                     <div>1:1 Conversion</div>
@@ -1442,6 +1470,22 @@
                     <div class="form-group">
                         <label>Ad Title *</label>
                         <input type="text" id="ad-title" placeholder="Enter ad title" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Ad Category *</label>
+                        <select id="ad-category" required>
+                            <option value="">Select Category</option>
+                            <option value="YouTube Video View">YouTube Video View</option>
+                            <option value="YouTube Like">YouTube Like</option>
+                            <option value="YouTube Comment">YouTube Comment</option>
+                            <option value="YouTube Share">YouTube Share</option>
+                            <option value="App Download">App Download</option>
+                            <option value="Website Visit">Website Visit</option>
+                            <option value="Telegram Join">Telegram Join</option>
+                            <option value="Facebook Like">Facebook Like</option>
+                            <option value="Instagram Follow">Instagram Follow</option>
+                            <option value="Twitter Follow">Twitter Follow</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label>Description</label>
@@ -1582,7 +1626,7 @@
                 
                 <div class="form-group">
                     <label>Amount (USD) *</label>
-                    <input type="number" step="0.001" id="withdraw-amount" placeholder="0.00" min="0.001" required>
+                    <input type="number" step="0.0001" id="withdraw-amount" placeholder="0.00" min="0.0001" required>
                 </div>
                 
                 <button type="submit" class="action-button" id="withdraw-submit-button">
@@ -1593,7 +1637,7 @@
         </div>
     </div>
 
-    <!-- Deposit Modal - Updated with Min Amount -->
+    <!-- Deposit Modal -->
     <div id="depositModal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal('depositModal')">&times;</button>
@@ -1637,13 +1681,13 @@
             <div style="text-align:center; padding:20px 0;">
                 <div style="font-size:48px; margin-bottom:12px;">💰</div>
                 <div style="font-size:14px; color:var(--text-light);">Amount to Convert</div>
-                <div style="font-size:32px; font-weight:800; color:var(--success);" id="convert-amount-display">$0.000</div>
+                <div style="font-size:32px; font-weight:800; color:var(--success);" id="convert-amount-display">$0.0000</div>
                 <div style="font-size:12px; color:var(--text-light); margin-top:4px;">1:1 conversion rate • No fees</div>
             </div>
             <div class="form-group">
                 <label>Enter Amount to Convert</label>
-                <input type="number" step="0.001" id="convert-input" placeholder="Enter amount" min="0.001">
-                <div class="form-hint">Max: <span id="convert-max-display">$0.000</span></div>
+                <input type="number" step="0.0001" id="convert-input" placeholder="Enter amount" min="0.0001">
+                <div class="form-hint">Max: <span id="convert-max-display">$0.0000</span></div>
             </div>
             <button class="action-button success" onclick="confirmConvert()">
                 <i class="fa-solid fa-exchange-alt"></i> <span>Convert Now</span>
@@ -1685,7 +1729,7 @@
         </div>
     </div>
 
-    <!-- Reject Reason Modal (For Advertisers) -->
+    <!-- Reject Reason Modal -->
     <div id="rejectReasonModal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal('rejectReasonModal')">&times;</button>
@@ -1824,7 +1868,12 @@
             welcomeNotice: {
                 title: "Welcome to NexEarn! 🎉",
                 message: "Please follow the rules to ensure you receive your payment.\n\n💰 Reward per Ad: $0.001\n💝 After watching 15 ads, there is a 30-minute break.\n✅ 100% Payment Guarantee\n💸 Withdraw via Binance UID or Email\n🔥 Minimum withdrawal is only $0.10"
-            }
+            },
+            adCategories: [
+                'YouTube Video View', 'YouTube Like', 'YouTube Comment', 'YouTube Share',
+                'App Download', 'Website Visit', 'Telegram Join', 'Facebook Like',
+                'Instagram Follow', 'Twitter Follow'
+            ]
         };
 
         // ============================================================
@@ -1947,6 +1996,7 @@
             DOM.depositTrxid = document.getElementById('deposit-trxid');
             DOM.depositAmount = document.getElementById('deposit-amount');
             DOM.depositMinAmount = document.getElementById('deposit-min-amount');
+            DOM.adCategory = document.getElementById('ad-category');
             
             DOM.calcViews = document.getElementById('calcViews');
             DOM.calcReward = document.getElementById('calcReward');
@@ -1983,7 +2033,7 @@
             }
         }
 
-        // Show Rewarded Interstitial Ad - FIXED - Ad shows, then reward after close
+        // Show Rewarded Interstitial Ad - FIXED
         function showRewardedAd() {
             return new Promise((resolve) => {
                 try {
@@ -1999,7 +2049,6 @@
 
                     console.log("🔄 Calling Monetag rewarded ad...");
 
-                    // Call the Monetag ad
                     const adPromise = show_11573980({
                         type: 'inApp',
                         inAppSettings: {
@@ -2026,7 +2075,6 @@
                                 resolved = true;
                                 if (timeoutId) clearTimeout(timeoutId);
                                 console.warn("Ad error:", err);
-                                // If ad was already shown, still reward
                                 if (adShown) {
                                     console.log("Ad shown but had error - Still rewarding");
                                     resolve(true);
@@ -2053,7 +2101,6 @@
                         }
                     });
 
-                    // Handle if the SDK returns a promise
                     if (adPromise && typeof adPromise.then === 'function') {
                         adPromise.then(() => {
                             if (!resolved) {
@@ -2072,12 +2119,10 @@
                         });
                     }
 
-                    // Safety timeout - 15 seconds
                     timeoutId = setTimeout(() => {
                         if (!resolved) {
                             resolved = true;
                             console.warn("Ad timeout");
-                            // If ad was shown but timeout, still reward
                             if (adShown) {
                                 console.log("Ad shown but timeout - Still rewarding");
                                 resolve(true);
@@ -2362,10 +2407,10 @@
             }
             
             DOM.convertInput.value = '';
-            DOM.convertAmountDisplay.textContent = `$${state.balance.toFixed(3)}`;
-            DOM.convertMaxDisplay.textContent = `$${state.balance.toFixed(3)}`;
+            DOM.convertAmountDisplay.textContent = `$${state.balance.toFixed(4)}`;
+            DOM.convertMaxDisplay.textContent = `$${state.balance.toFixed(4)}`;
             DOM.convertInput.max = state.balance;
-            DOM.convertInput.placeholder = `Max $${state.balance.toFixed(3)}`;
+            DOM.convertInput.placeholder = `Max $${state.balance.toFixed(4)}`;
             
             document.getElementById('convertModal').style.display = 'flex';
         }
@@ -2379,7 +2424,7 @@
             }
             
             if (amount > state.balance) {
-                showToast(`❌ You only have $${state.balance.toFixed(3)} to convert`, 'error');
+                showToast(`❌ You only have $${state.balance.toFixed(4)} to convert`, 'error');
                 return;
             }
             
@@ -2390,7 +2435,7 @@
             updateUI();
             
             closeModal('convertModal');
-            showToast(`✅ $${amount.toFixed(3)} converted to wallet successfully!`, 'success');
+            showToast(`✅ $${amount.toFixed(4)} converted to wallet successfully!`, 'success');
         }
 
         // ============================================================
@@ -2534,6 +2579,7 @@
                 e.preventDefault();
 
                 const title = document.getElementById('ad-title').value.trim();
+                const category = DOM.adCategory.value;
                 const desc = document.getElementById('ad-desc').value.trim();
                 const link = document.getElementById('ad-link').value.trim();
                 const budget = parseFloat(DOM.adBudget.value) || 1.00;
@@ -2541,7 +2587,7 @@
                 const targetViews = parseInt(DOM.adTargetViews.value) || 100;
                 const fileInput = document.getElementById('ad-image');
 
-                if (!title || !link) {
+                if (!title || !category || !link) {
                     showToast('❌ Please fill all required fields!', 'error');
                     return;
                 }
@@ -2580,6 +2626,7 @@
 
                 const adData = {
                     title,
+                    category,
                     desc: desc || 'No description',
                     link,
                     reward: reward,
@@ -2656,6 +2703,7 @@
                 const isVerified = ad.verified || false;
                 const imageUrl = ad.imageUrl || '';
                 const daysLeft = ad.endDate ? Math.ceil((ad.endDate - Date.now()) / (1000 * 60 * 60 * 24)) : 0;
+                const category = ad.category || 'General';
 
                 const userVerification = state.verifications.find(v => v.adId === ad.id);
                 let verificationStatus = '';
@@ -2700,6 +2748,9 @@
                         <div class="ad-header">
                             <span class="ad-title">${escapeHTML(ad.title || 'Untitled')}</span>
                             <span class="ad-reward">+$${ad.reward?.toFixed(4) || '0.001'}</span>
+                        </div>
+                        <div style="display:flex; gap:6px; margin:4px 0;">
+                            <span class="ad-category-badge">📌 ${escapeHTML(category)}</span>
                         </div>
                         ${imageUrl ? `<img src="${imageUrl}" class="ad-image" alt="Ad image" loading="lazy">` : ''}
                         <div class="ad-desc">${escapeHTML(ad.desc || 'No description')}</div>
@@ -2798,6 +2849,7 @@
                     DOM.verifyAdInfo.innerHTML = `
                         <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:10px; margin-bottom:12px;">
                             <strong>${escapeHTML(ad.title)}</strong>
+                            <div style="font-size:12px; color:var(--text-light);">Category: ${escapeHTML(ad.category || 'General')}</div>
                             <div style="font-size:12px; color:var(--text-light);">Reward: $${ad.reward?.toFixed(4) || '0.001'}</div>
                             ${ad.imageUrl ? `<img src="${ad.imageUrl}" style="width:100%; max-height:100px; object-fit:cover; border-radius:6px; margin-top:6px;" loading="lazy">` : ''}
                         </div>
@@ -2965,6 +3017,7 @@
                 const isExpired = ad.endDate && ad.endDate < Date.now();
                 const budget = ad.budget || 0;
                 const isApproved = ad.approved || false;
+                const category = ad.category || 'General';
 
                 let statusText = ad.status === 'active' ? '🟢 Active' : '⏳ Paused';
                 let statusClass = ad.status === 'active' ? 'active' : 'pending';
@@ -2976,6 +3029,9 @@
                         <div class="ad-header">
                             <span class="ad-title">${escapeHTML(ad.title || 'Untitled')}</span>
                             <span class="ad-status ${statusClass}">${statusText}</span>
+                        </div>
+                        <div style="display:flex; gap:6px; margin:4px 0;">
+                            <span class="ad-category-badge">📌 ${escapeHTML(category)}</span>
                         </div>
                         ${imageUrl ? `<img src="${imageUrl}" class="ad-image" alt="Ad image" loading="lazy">` : ''}
                         <div class="ad-desc">${escapeHTML(ad.desc || 'No description')}</div>
@@ -3366,7 +3422,7 @@
                         <div class="date">${new Date(item.date).toLocaleString()}</div>
                     </div>
                     <div class="history-amount">
-                        <div class="amount-text">$${item.amount.toFixed(3)}</div>
+                        <div class="amount-text">$${item.amount.toFixed(4)}</div>
                         <div class="history-status ${item.status.toLowerCase()}">${item.status}</div>
                     </div>
                 </div>
@@ -3387,7 +3443,7 @@
                     <div class="bonus-item">
                         <div class="details">
                             <div class="title">${escapeHTML(task.title)}</div>
-                            <div class="reward"><i class="fa-solid fa-gift"></i> + $${task.reward.toFixed(3)}</div>
+                            <div class="reward"><i class="fa-solid fa-gift"></i> + $${task.reward.toFixed(4)}</div>
                         </div>
                         <button class="claim-btn" ${isCompleted ? 'disabled' : ''}>
                             ${isCompleted ? '✅ Completed' : 'Claim'}
@@ -3417,7 +3473,7 @@
                 saveUserData();
                 updateUI();
                 button.textContent = '✅ Completed';
-                showToast(`🎉 Bonus of $${task.reward.toFixed(3)} added!`, 'success');
+                showToast(`🎉 Bonus of $${task.reward.toFixed(4)} added!`, 'success');
             }, (task.duration || 10) * 1000);
         }
 
@@ -3455,12 +3511,12 @@
                 state.balance += bonus;
                 state.rewardedReferrals = totalReferrals;
                 saveUserData();
-                showToast(`🎉 You received $${bonus.toFixed(3)} for ${newReferrals} new referral(s)!`, 'success');
+                showToast(`🎉 You received $${bonus.toFixed(4)} for ${newReferrals} new referral(s)!`, 'success');
             }
         }
 
         // ============================================================
-        // WATCH AD - FIXED - Ad shows, then reward after close, timer persists
+        // WATCH AD - FIXED
         // ============================================================
         async function watchAd() {
             if (isAdShowing) return;
@@ -3505,14 +3561,14 @@
                     DOM.adLoaderProgress.style.width = `${progress}%`;
                 }, 300);
 
-                // Show Monetag ad - ad shows, then reward after close
+                // Show Monetag ad
                 const adShown = await showRewardedAd();
 
                 clearInterval(progressInterval);
                 DOM.adLoaderProgress.style.width = '100%';
 
                 if (adShown) {
-                    // Add reward only if ad was shown and closed
+                    // Add reward only if ad was shown
                     state.balance += CONFIG.AD_REWARD;
                     state.adCount++;
                     state.adsWatchedToday++;
@@ -3567,13 +3623,13 @@
                 saveUserData();
             }
 
-            DOM.totalEarning.textContent = `$${state.balance.toFixed(3)}`;
-            DOM.walletBalance.textContent = `$${state.walletBalance.toFixed(3)}`;
+            DOM.totalEarning.textContent = `$${state.balance.toFixed(4)}`;
+            DOM.walletBalance.textContent = `$${state.walletBalance.toFixed(4)}`;
             DOM.adCount.textContent = state.adCount;
             DOM.adsTodayCount.textContent = `${state.adsWatchedToday} / ${CONFIG.DAILY_AD_LIMIT}`;
             DOM.minWithdrawText.textContent = `Minimum withdrawal is $${CONFIG.MINIMUM_WITHDRAWAL.toFixed(2)}.`;
 
-            DOM.convertBalance.textContent = `$${state.balance.toFixed(3)}`;
+            DOM.convertBalance.textContent = `$${state.balance.toFixed(4)}`;
             DOM.convertBtn.disabled = state.balance <= 0;
 
             clearInterval(cooldownInterval);
