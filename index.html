@@ -2586,7 +2586,8 @@
             bonusTasks: [],
             verifications: [],
             ratings: {},
-            followers: {}
+            followers: {},
+            userRatings: {}
         };
 
         // ============================================================
@@ -2771,6 +2772,78 @@
         }
 
         // ============================================================
+        // TRANSLATION FUNCTION
+        // ============================================================
+        async function translateText(text, targetLang) {
+            if (!text || targetLang === 'original') return text;
+            try {
+                const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data && data[0]) {
+                    return data[0].map(item => item[0]).join('');
+                }
+                return text;
+            } catch (e) {
+                console.warn("Translation error:", e);
+                return text;
+            }
+        }
+
+        async function translateJobDetails() {
+            const lang = document.getElementById('translateSelect').value;
+            if (lang === 'original') {
+                // Reset to original content
+                const adId = currentJobId;
+                if (adId) {
+                    const snapshot = await firebaseDb.ref(`ads/${adId}`).once('value');
+                    const ad = snapshot.val();
+                    if (ad) {
+                        const descWithLinks = (ad.desc || 'No description').replace(
+                            /(https?:\/\/[^\s]+)/g,
+                            '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
+                        );
+                        document.getElementById('job-description-text').innerHTML = descWithLinks;
+                        document.getElementById('job-instructions-text').textContent = ad.instructions || 'No specific instructions provided.';
+                        document.getElementById('job-requirements-text').textContent = ad.requirements || 'No specific requirements.';
+                    }
+                }
+                return;
+            }
+
+            const descEl = document.getElementById('job-description-text');
+            const instructionsEl = document.getElementById('job-instructions-text');
+            const requirementsEl = document.getElementById('job-requirements-text');
+
+            const originalDesc = descEl.getAttribute('data-original') || descEl.textContent;
+            const originalInstructions = instructionsEl.getAttribute('data-original') || instructionsEl.textContent;
+            const originalRequirements = requirementsEl.getAttribute('data-original') || requirementsEl.textContent;
+
+            if (!descEl.getAttribute('data-original')) {
+                descEl.setAttribute('data-original', originalDesc);
+                instructionsEl.setAttribute('data-original', originalInstructions);
+                requirementsEl.setAttribute('data-original', originalRequirements);
+            }
+
+            showToast(`🌐 Translating to ${lang}...`, '');
+
+            const translatedDesc = await translateText(originalDesc, lang);
+            const translatedInstructions = await translateText(originalInstructions, lang);
+            const translatedRequirements = await translateText(originalRequirements, lang);
+
+            const descWithLinks = translatedDesc.replace(
+                /(https?:\/\/[^\s]+)/g,
+                '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
+            );
+
+            descEl.innerHTML = descWithLinks;
+            instructionsEl.textContent = translatedInstructions;
+            requirementsEl.textContent = translatedRequirements;
+
+            showToast(`✅ Translated to ${lang}`, 'success');
+        }
+
+        // ============================================================
         // FIREBASE FUNCTIONS
         // ============================================================
         function initFirebase() {
@@ -2855,7 +2928,8 @@
                 username: tg?.initDataUnsafe?.user?.username || null,
                 lastAdWatchTime: lastAdWatchTime,
                 ratings: state.ratings,
-                followers: state.followers
+                followers: state.followers,
+                userRatings: state.userRatings
             };
             firebaseDb.ref(`users/${state.currentUserId}`).update(data).catch(err => {
                 console.error("Save error:", err);
@@ -2885,6 +2959,7 @@
                         state.myAds = data.myAds || [];
                         state.ratings = data.ratings || {};
                         state.followers = data.followers || {};
+                        state.userRatings = data.userRatings || {};
                         if (data.lastAdWatchTime) {
                             lastAdWatchTime = data.lastAdWatchTime;
                         }
@@ -3177,7 +3252,7 @@
         }
 
         // ============================================================
-        // ADVERTISER - CREATE AD (with Requirements & Instructions)
+        // ADVERTISER - CREATE AD
         // ============================================================
         function setupCreateAdForm() {
             if (!DOM.createAdForm) return;
@@ -3371,13 +3446,21 @@
         // JOB DETAILS PAGE
         // ============================================================
         function openJobDetails(adId) {
-            currentJobId = adId;
+            // Check if user is the creator of this ad
             firebaseDb.ref(`ads/${adId}`).once('value').then(snapshot => {
                 const ad = snapshot.val();
                 if (!ad) {
                     showToast('❌ Job not found', 'error');
                     return;
                 }
+
+                // If user is the creator, show error and return
+                if (ad.createdBy === state.currentUserId) {
+                    showToast('❌ You cannot view your own ad!', 'error');
+                    return;
+                }
+
+                currentJobId = adId;
 
                 const views = ad.views || 0;
                 const totalViews = ad.totalViews || 100;
@@ -3396,9 +3479,13 @@
                 const imageUrl = ad.imageUrl || '';
                 const creatorId = ad.createdBy || 'unknown';
 
+                // Check if user is following this creator
                 const isFollowing = state.followers && state.followers[creatorId] === true;
-                const userRating = state.ratings && state.ratings[creatorId] || 0;
+                
+                // Get user's rating for this creator
+                const userRating = state.userRatings && state.userRatings[creatorId] || 0;
 
+                // Get verification status
                 const verification = state.verifications.find(v => v.adId === adId);
                 let verificationStatus = '';
                 let rejectionReason = '';
@@ -3510,7 +3597,7 @@
                     <div class="detail-card">
                         <div class="detail-title" style="font-size:15px;">📝 Job Description</div>
                         <div class="job-detail-section">
-                            <div class="section-content" id="job-description-text">${descWithLinks}</div>
+                            <div class="section-content" id="job-description-text" data-original="${escapeHTML(description)}">${descWithLinks}</div>
                         </div>
                     </div>
 
@@ -3518,7 +3605,7 @@
                     <div class="detail-card">
                         <div class="detail-title" style="font-size:15px;">📋 Instructions</div>
                         <div class="job-detail-section">
-                            <div class="section-content" id="job-instructions-text">
+                            <div class="section-content" id="job-instructions-text" data-original="${escapeHTML(instructions)}">
                                 ${escapeHTML(instructions)}
                             </div>
                         </div>
@@ -3528,7 +3615,7 @@
                     <div class="detail-card">
                         <div class="detail-title" style="font-size:15px;">✅ Requirements</div>
                         <div class="job-detail-section">
-                            <div class="section-content" id="job-requirements-text">
+                            <div class="section-content" id="job-requirements-text" data-original="${escapeHTML(requirements)}">
                                 ${escapeHTML(requirements)}
                             </div>
                         </div>
@@ -3570,20 +3657,12 @@
         }
 
         // ============================================================
-        // TRANSLATE JOB DETAILS
-        // ============================================================
-        function translateJobDetails() {
-            const lang = document.getElementById('translateSelect').value;
-            if (lang === 'original') return;
-            showToast(`🌐 Translating to ${lang}... (Demo)`, '');
-        }
-
-        // ============================================================
         // FOLLOW / UNFOLLOW
         // ============================================================
         function toggleFollow(creatorId, btn) {
             if (!state.currentUserId) return;
             const isFollowing = state.followers && state.followers[creatorId] === true;
+            
             if (isFollowing) {
                 delete state.followers[creatorId];
                 btn.classList.remove('following');
@@ -3596,6 +3675,9 @@
                 showToast('✅ Following!', 'success');
             }
             saveUserData();
+            
+            // Update follower count on the creator's ad data
+            firebaseDb.ref(`ads/${currentJobId}/creatorFollowers`).set(Object.keys(state.followers).length);
         }
 
         // ============================================================
@@ -3624,11 +3706,31 @@
                 showToast('❌ Please select a rating', 'error');
                 return;
             }
-            state.ratings[ratingTargetId] = selectedRating;
+            
+            // Check if user already rated this creator
+            if (state.userRatings && state.userRatings[ratingTargetId]) {
+                showToast('❌ You already rated this client!', 'warning');
+                DOM.ratingToast.classList.remove('active');
+                return;
+            }
+            
+            state.userRatings[ratingTargetId] = selectedRating;
+            
+            // Calculate average rating for this creator
+            const creatorRatings = state.userRatings;
+            const ratingsArray = Object.values(creatorRatings).filter(r => r > 0);
+            const avgRating = ratingsArray.reduce((a, b) => a + b, 0) / ratingsArray.length;
+            
+            state.ratings[ratingTargetId] = avgRating;
+            
             saveUserData();
             DOM.ratingToast.classList.remove('active');
             showToast(`✅ Rated ${selectedRating}★`, 'success');
             ratingTargetId = null;
+            
+            // Update the rating on the ad data
+            firebaseDb.ref(`ads/${currentJobId}/creatorRating`).set(avgRating);
+            
             if (currentJobId) {
                 openJobDetails(currentJobId);
             }
