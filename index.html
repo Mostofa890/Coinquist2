@@ -18,16 +18,16 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         
-        :root { 
-            --primary-color: #6C63FF; 
-            --primary-color-rgb: 108, 99, 255; 
-            --secondary-color: #4A42D4; 
-            --background-color: #F8F9FE; 
-            --card-background: #FFFFFF; 
-            --text-color: #1A1A2E; 
-            --text-light: #6E6E84; 
-            --border-color: #E8E8F0; 
-            --glass-bg: rgba(248, 249, 254, 0.8); 
+        :root {
+            --primary-color: #6C63FF;
+            --primary-color-rgb: 108, 99, 255;
+            --secondary-color: #4A42D4;
+            --background-color: #F8F9FE;
+            --card-background: #FFFFFF;
+            --text-color: #1A1A2E;
+            --text-light: #6E6E84;
+            --border-color: #E8E8F0;
+            --glass-bg: rgba(248, 249, 254, 0.8);
             --shadow: 0 4px 20px rgba(108, 99, 255, 0.10);
             --shadow-hover: 0 8px 30px rgba(108, 99, 255, 0.18);
             --radius: 16px;
@@ -39,37 +39,33 @@
             --gradient: linear-gradient(135deg, #6C63FF, #4A42D4);
         }
         
-        [data-theme="dark"] { 
-            --primary-color: #8B83FF; 
-            --primary-color-rgb: 139, 131, 255; 
-            --secondary-color: #6C63FF; 
-            --background-color: #0F0F1A; 
-            --card-background: #1A1A2E; 
-            --text-color: #F0F0F5; 
-            --text-light: #8E8EA3; 
-            --border-color: #2A2A42; 
-            --glass-bg: rgba(26, 26, 46, 0.8); 
+        [data-theme="dark"] {
+            --primary-color: #8B83FF;
+            --primary-color-rgb: 139, 131, 255;
+            --secondary-color: #6C63FF;
+            --background-color: #0F0F1A;
+            --card-background: #1A1A2E;
+            --text-color: #F0F0F5;
+            --text-light: #8E8EA3;
+            --border-color: #2A2A42;
+            --glass-bg: rgba(26, 26, 46, 0.8);
             --shadow: 0 4px 20px rgba(0,0,0,0.3);
             --shadow-hover: 0 8px 30px rgba(108, 99, 255, 0.15);
         }
         
-        * { 
-            box-sizing: border-box; 
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         
-        html, body { 
-            overscroll-behavior-y: contain; 
-            font-family: 'Inter', sans-serif; 
-            background-color: var(--background-color); 
-            color: var(--text-color); 
-            -webkit-font-smoothing: antialiased; 
+        html, body {
+            overscroll-behavior-y: contain;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            -webkit-font-smoothing: antialiased;
             transition: var(--transition);
         }
         
-        body { 
-            padding: 16px 12px 90px 12px; 
+        body {
+            padding: 16px 12px 90px 12px;
             min-height: 100vh;
         }
         
@@ -104,9 +100,7 @@
             animation: pulseText 1.5s ease-in-out infinite;
         }
         
-        #preloader .brand span { 
-            -webkit-text-fill-color: var(--text-color);
-        }
+        #preloader .brand span { -webkit-text-fill-color: var(--text-color); }
         
         @keyframes pulseText {
             0%, 100% { transform: scale(1); opacity: 1; }
@@ -177,15 +171,15 @@
             opacity: 0.5;
         }
         
-        .container { 
-            max-width: 480px; 
-            margin: 0 auto; 
-            display: none; 
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            display: none;
         }
         
-        @keyframes fadeIn { 
-            from { opacity: 0; transform: translateY(12px); } 
-            to { opacity: 1; transform: translateY(0); } 
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         @keyframes slideUp {
@@ -511,109 +505,399 @@
             gap: 8px;
         }
         
-        /* ===== AD FILTERS ===== */
-        .ad-filters {
-            display: flex;
-            gap: 8px;
+        /* ===== ENHANCED AD CARD ===== */
+        .ad-card-enhanced {
+            background: var(--card-background);
+            border-radius: var(--radius);
+            padding: 16px;
             margin-bottom: 14px;
-            flex-wrap: wrap;
-        }
-        
-        .filter-btn {
-            padding: 6px 14px;
-            border-radius: 20px;
             border: 1px solid var(--border-color);
-            background: transparent;
-            color: var(--text-light);
-            font-size: 12px;
-            font-weight: 600;
+            transition: var(--transition);
             cursor: pointer;
-            transition: var(--transition);
-            font-family: inherit;
+            box-shadow: var(--shadow);
         }
         
-        .filter-btn.active {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
+        .ad-card-enhanced:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
         }
         
-        .filter-btn:hover:not(.active) { border-color: var(--text-color); }
-        
-        /* ===== AD CARD ===== */
-        .ad-card {
-            background: var(--background-color);
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 12px;
-            border: 1px solid var(--border-color);
-            transition: var(--transition);
+        .ad-card-enhanced .ad-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--text-color);
         }
         
-        .ad-card:last-child { margin-bottom: 0; }
-        .ad-card:hover { box-shadow: var(--shadow-hover); }
-        
-        .ad-header {
+        .ad-card-enhanced .ad-categories {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 10px;
-        }
-        
-        .ad-title { font-weight: 600; font-size: 15px; flex: 1; }
-        .ad-reward { font-weight: 700; color: var(--primary-color); font-size: 14px; white-space: nowrap; }
-        .ad-image { width: 100%; max-height: 120px; object-fit: cover; border-radius: 8px; margin: 8px 0; }
-        .ad-desc { font-size: 13px; color: var(--text-light); margin-bottom: 10px; line-height: 1.4; }
-        
-        .ad-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            gap: 6px;
             flex-wrap: wrap;
-            gap: 8px;
+            margin-bottom: 10px;
         }
         
-        .ad-views { font-size: 12px; color: var(--text-light); }
-        
-        .ad-status {
+        .ad-card-enhanced .category-badge {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 12px;
             font-size: 11px;
             font-weight: 600;
-            padding: 2px 10px;
+            background: rgba(var(--primary-color-rgb), 0.1);
+            color: var(--primary-color);
+        }
+        
+        .ad-card-enhanced .sub-category-badge {
+            display: inline-block;
+            padding: 2px 12px;
             border-radius: 12px;
-        }
-        
-        .ad-status.active { color: #10b981; background: rgba(16, 185, 129, 0.1); }
-        .ad-status.pending { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
-        .ad-status.completed { color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
-        .ad-status.expired { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
-        .ad-status.approved { color: var(--success); background: rgba(16, 185, 129, 0.1); }
-        
-        .ad-btn {
-            padding: 6px 16px;
-            border-radius: 8px;
-            border: none;
+            font-size: 11px;
             font-weight: 600;
-            font-size: 12px;
-            cursor: pointer;
-            transition: var(--transition);
-            font-family: inherit;
+            background: rgba(var(--text-light), 0.1);
+            color: var(--text-light);
         }
         
-        .ad-btn.view {
-            background: var(--primary-color);
-            color: white;
+        .ad-card-enhanced .creator-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
         }
         
-        .ad-btn.view:hover:not(:disabled) { transform: scale(1.03); }
-        .ad-btn.view:disabled { opacity: 0.5; cursor: not-allowed; }
-        .ad-btn.view.completed { background: #10b981; }
-        
-        /* ===== ACTION BUTTON ===== */
-        .action-button {
+        .ad-card-enhanced .creator-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--gradient);
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+        
+        .ad-card-enhanced .creator-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-color);
+        }
+        
+        .ad-card-enhanced .creator-username {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        .ad-card-enhanced .ad-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .ad-card-enhanced .ad-stats .stat {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            color: var(--text-light);
+        }
+        
+        .ad-card-enhanced .ad-stats .stat strong {
+            color: var(--text-color);
+        }
+        
+        .ad-card-enhanced .ad-stats .reward {
+            font-weight: 800;
+            color: var(--success);
+            font-size: 15px;
+        }
+        
+        .ad-card-enhanced .ad-stats .time-left {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        .ad-card-enhanced .progress-section {
+            margin-top: 10px;
+        }
+        
+        .ad-card-enhanced .progress-section .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .ad-card-enhanced .progress-section .progress-bar .fill {
+            height: 100%;
+            background: var(--gradient);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .ad-card-enhanced .progress-section .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+        
+        .ad-card-enhanced .ad-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .ad-card-enhanced .ad-footer .ad-status {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 12px;
+            border-radius: 12px;
+        }
+        
+        .ad-card-enhanced .ad-footer .ad-status.active {
+            color: var(--success);
+            background: rgba(16, 185, 129, 0.1);
+        }
+        
+        .ad-card-enhanced .ad-footer .ad-status.pending {
+            color: var(--warning);
+            background: rgba(245, 158, 11, 0.1);
+        }
+        
+        .ad-card-enhanced .ad-footer .ad-status.expired {
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+        }
+        
+        .ad-card-enhanced .ad-footer .ad-status.verified {
+            color: var(--info);
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .ad-card-enhanced .ad-footer .view-btn {
+            padding: 6px 18px;
+            border: none;
+            border-radius: 8px;
+            background: var(--gradient);
+            color: white;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+        
+        .ad-card-enhanced .ad-footer .view-btn:hover:not(:disabled) {
+            transform: scale(1.03);
+        }
+        
+        .ad-card-enhanced .ad-footer .view-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .ad-card-enhanced .ad-footer .view-btn.completed {
+            background: var(--success);
+        }
+        
+        /* ===== AD DETAILS PAGE ===== */
+        #adDetailsPage {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 500;
+            background: var(--background-color);
+            overflow-y: auto;
+            padding: 16px 12px 100px 12px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        #adDetailsPage .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 10px;
+            background: var(--card-background);
+            color: var(--text-color);
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        
+        #adDetailsPage .back-btn:hover {
+            transform: translateX(-4px);
+        }
+        
+        #adDetailsPage .ad-detail-title {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+        
+        #adDetailsPage .ad-detail-categories {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        
+        #adDetailsPage .ad-detail-creator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--card-background);
+            border-radius: var(--radius);
+            margin-bottom: 12px;
+            border: 1px solid var(--border-color);
+        }
+        
+        #adDetailsPage .ad-detail-creator .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+        
+        #adDetailsPage .ad-detail-creator .info .name {
+            font-weight: 700;
+            font-size: 15px;
+        }
+        
+        #adDetailsPage .ad-detail-creator .info .username {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+        
+        #adDetailsPage .ad-detail-image {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: var(--radius);
+            margin-bottom: 12px;
+        }
+        
+        #adDetailsPage .ad-detail-desc {
+            font-size: 14px;
+            color: var(--text-light);
+            line-height: 1.6;
+            margin-bottom: 16px;
+            padding: 14px;
+            background: var(--card-background);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+        }
+        
+        #adDetailsPage .ad-detail-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
+            margin-bottom: 16px;
+        }
+        
+        #adDetailsPage .ad-detail-stats .stat-box {
+            padding: 14px;
+            background: var(--card-background);
+            border-radius: var(--radius);
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+        
+        #adDetailsPage .ad-detail-stats .stat-box .label {
+            font-size: 11px;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        #adDetailsPage .ad-detail-stats .stat-box .value {
+            font-size: 20px;
+            font-weight: 800;
+            margin-top: 2px;
+        }
+        
+        #adDetailsPage .ad-detail-stats .stat-box .value.reward {
+            color: var(--success);
+        }
+        
+        #adDetailsPage .ad-detail-stats .stat-box .value.views {
+            color: var(--primary-color);
+        }
+        
+        #adDetailsPage .ad-detail-stats .stat-box .value.time {
+            color: var(--warning);
+        }
+        
+        #adDetailsPage .ad-detail-progress {
+            margin-bottom: 16px;
+        }
+        
+        #adDetailsPage .ad-detail-progress .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        #adDetailsPage .ad-detail-progress .progress-bar .fill {
+            height: 100%;
+            background: var(--gradient);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        #adDetailsPage .ad-detail-progress .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+        
+        #adDetailsPage .ad-detail-link {
+            display: block;
+            padding: 14px;
+            background: rgba(var(--primary-color-rgb), 0.06);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 16px;
+            transition: var(--transition);
+        }
+        
+        #adDetailsPage .ad-detail-link:hover {
+            background: rgba(var(--primary-color-rgb), 0.12);
+        }
+        
+        #adDetailsPage .submit-verification-btn {
             width: 100%;
             padding: 16px;
             border: none;
@@ -628,299 +912,42 @@
             box-shadow: 0 4px 15px rgba(var(--primary-color-rgb), 0.2);
         }
         
-        .action-button.pulsing { animation: pulse 2s infinite; }
-        
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(var(--primary-color-rgb), 0.3); }
-            70% { box-shadow: 0 0 0 12px rgba(var(--primary-color-rgb), 0); }
-            100% { box-shadow: 0 0 0 0 rgba(var(--primary-color-rgb), 0); }
-        }
-        
-        .action-button:hover:not(:disabled) {
+        #adDetailsPage .submit-verification-btn:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 6px 25px rgba(var(--primary-color-rgb), 0.3);
         }
         
-        .action-button:disabled {
+        #adDetailsPage .submit-verification-btn:disabled {
             background: #8E8E93;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
         
-        .action-button.secondary {
-            background: transparent;
-            color: var(--primary-color);
-            border: 2px solid var(--primary-color);
-            box-shadow: none;
-        }
-        
-        .action-button.secondary:hover {
-            background: rgba(var(--primary-color-rgb), 0.06);
-            transform: translateY(-2px);
-        }
-        
-        .action-button.success {
+        #adDetailsPage .submit-verification-btn.completed {
             background: var(--success);
         }
         
-        .action-button.success:hover {
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-        }
-        
-        /* ===== FORM ===== */
-        .form-group {
-            margin-bottom: 14px;
-        }
-        
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-color);
-            margin-bottom: 4px;
-        }
-        
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            font-family: 'Inter', sans-serif;
-            font-size: 15px;
-            background: var(--background-color);
-            color: var(--text-color);
-            transition: var(--transition);
-        }
-        
-        .form-group textarea {
-            min-height: 70px;
-            resize: vertical;
-        }
-        
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
-        }
-        
-        .form-hint {
-            font-size: 11px;
-            color: var(--text-light);
-            margin-top: 4px;
-        }
-        
-        /* ===== BONUS TASKS ===== */
-        .bonus-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px;
-            background: var(--background-color);
-            border-radius: 12px;
-            margin-bottom: 10px;
-            border: 1px solid var(--border-color);
-            gap: 12px;
-            transition: var(--transition);
-        }
-        
-        .bonus-item:hover { box-shadow: var(--shadow-hover); }
-        .bonus-item:last-child { margin-bottom: 0; }
-        .bonus-item .details { flex: 1; min-width: 0; }
-        .bonus-item .title { font-weight: 600; font-size: 14px; color: var(--text-color); }
-        .bonus-item .reward { font-size: 13px; font-weight: 700; color: var(--primary-color); }
-        
-        .bonus-item .claim-btn {
-            padding: 8px 18px;
-            font-size: 12px;
-            font-weight: 600;
-            border-radius: 8px;
-            background: var(--gradient);
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: var(--transition);
-            white-space: nowrap;
-            font-family: inherit;
-        }
-        
-        .bonus-item .claim-btn:disabled {
-            background: #10b981;
-            cursor: not-allowed;
-        }
-        
-        .bonus-item .claim-btn:hover:not(:disabled) { transform: scale(1.03); }
-        
-        /* ===== HISTORY ===== */
-        .history-item {
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .history-item:last-child { border-bottom: none; }
-        .history-details { flex: 1; min-width: 0; }
-        .history-details .method-number { font-weight: 700; font-size: 14px; }
-        .history-details .date { font-size: 11px; color: var(--text-light); }
-        
-        .history-amount { text-align: right; flex-shrink: 0; }
-        .history-amount .amount-text { font-size: 16px; font-weight: 800; }
-        
-        .history-status {
-            font-size: 11px;
-            font-weight: 700;
-            padding: 2px 10px;
-            border-radius: 12px;
-            display: inline-block;
-            margin-top: 2px;
-        }
-        
-        .history-status.success,
-        .history-status.approved { color: #10b981; background: rgba(16, 185, 129, 0.1); }
-        .history-status.pending { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
-        .history-status.rejected { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
-        
-        .no-history {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-light);
-        }
-        
-        /* ===== DEPOSIT METHODS ===== */
-        .deposit-method {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 14px;
-            background: var(--background-color);
-            border-radius: 12px;
-            border: 2px solid var(--border-color);
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        
-        .deposit-method:hover { border-color: var(--text-light); }
-        .deposit-method.selected {
-            border-color: #10b981;
-            background: rgba(16, 185, 129, 0.06);
-        }
-        
-        .deposit-method .method-icon { font-size: 28px; flex-shrink: 0; }
-        .deposit-method .method-info { flex: 1; }
-        .deposit-method .method-name { font-weight: 600; font-size: 14px; }
-        .deposit-method .method-desc { font-size: 12px; color: var(--text-light); }
-        .deposit-method .method-number { font-weight: 700; font-size: 14px; color: var(--primary-color); }
-        
-        /* ===== DEPOSIT HISTORY TABLE ===== */
-        .table-container {
-            overflow-x: auto;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-        
-        th {
-            text-align: left;
-            padding: 10px 8px;
-            color: var(--text-light);
-            font-weight: 600;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        td {
-            padding: 10px 8px;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .status-badge {
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-        
-        .status-badge.pending { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
-        .status-badge.approved { background: rgba(16, 185, 129, 0.2); color: var(--success); }
-        .status-badge.rejected { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
-        
-        /* ===== NAV BAR ===== */
-        .nav-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            max-width: 480px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            padding: 8px 10px;
-            padding-bottom: env(safe-area-inset-bottom, 8px);
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-top: 1px solid var(--border-color);
-            z-index: 100;
-            transition: var(--transition);
-        }
-        
-        .nav-button {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 2px;
-            padding: 6px 4px;
-            border-radius: 12px;
-            color: var(--text-light);
-            font-size: 10px;
-            font-weight: 500;
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            transition: var(--transition);
-            font-family: inherit;
-        }
-        
-        .nav-button i {
-            font-size: 20px;
-            transition: var(--transition);
-        }
-        
-        .nav-button.active,
-        .nav-button:hover {
-            color: var(--primary-color);
-        }
-        
-        .nav-button.active i { transform: scale(1.1); }
-        
-        /* ===== MODALS ===== */
-        .modal {
+        /* ===== VERIFICATION MODAL ===== */
+        .verification-modal {
             display: none;
             position: fixed;
-            z-index: 1000;
+            z-index: 600;
             inset: 0;
             background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
             align-items: flex-end;
-            animation: fadeIn 0.3s ease-out;
             padding: 16px;
         }
         
-        .modal-content {
+        .verification-modal.show {
+            display: flex;
+        }
+        
+        .verification-modal .modal-content {
             background: var(--card-background);
-            padding: 20px;
+            padding: 24px;
             border-radius: 20px 20px 0 0;
             width: 100%;
             max-width: 480px;
@@ -928,136 +955,94 @@
             max-height: 85vh;
             overflow-y: auto;
             animation: slideUp 0.3s ease-out;
-            position: relative;
             border: 1px solid var(--border-color);
         }
         
-        @keyframes slideUp {
-            from { transform: translateY(40px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        .verification-modal .modal-content .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
         }
         
-        .close-btn {
-            position: absolute;
-            top: 14px;
-            right: 18px;
-            font-size: 24px;
-            color: var(--text-light);
-            cursor: pointer;
+        .verification-modal .modal-content .close-modal {
             background: none;
             border: none;
+            color: var(--text-light);
+            font-size: 24px;
+            cursor: pointer;
             font-family: inherit;
+            float: right;
             transition: var(--transition);
         }
         
-        .close-btn:hover { color: var(--text-color); }
-        
-        /* ===== METHOD FIELDS ===== */
-        .method-field {
-            display: none;
-            margin-top: 10px;
+        .verification-modal .modal-content .close-modal:hover {
+            color: var(--text-color);
         }
         
-        .method-field.active {
+        .verification-modal .modal-content .form-group {
+            margin-bottom: 14px;
+        }
+        
+        .verification-modal .modal-content .form-group label {
             display: block;
-            animation: fadeIn 0.3s ease-out;
-        }
-        
-        .method-field label {
             font-size: 13px;
             font-weight: 600;
             color: var(--text-color);
-            display: block;
             margin-bottom: 4px;
         }
         
-        .method-field .field-hint {
-            font-size: 12px;
-            color: var(--text-light);
-            margin-bottom: 6px;
+        .verification-modal .modal-content .form-group input,
+        .verification-modal .modal-content .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            background: var(--background-color);
+            color: var(--text-color);
+            transition: var(--transition);
         }
         
-        /* ===== AD LOADER ===== */
-        #ad-loader-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 5000;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 20px;
+        .verification-modal .modal-content .form-group input:focus,
+        .verification-modal .modal-content .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
+        }
+        
+        .verification-modal .modal-content .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .verification-modal .modal-content .form-group .form-hint {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+        
+        .verification-modal .modal-content .submit-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: var(--radius);
+            background: var(--gradient);
             color: white;
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
         }
         
-        #ad-loader-overlay .loader-spinner {
-            width: 56px;
-            height: 56px;
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-top-color: var(--primary-color);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+        .verification-modal .modal-content .submit-btn:hover:not(:disabled) {
+            transform: scale(1.02);
         }
         
-        #ad-loader-overlay .loader-text {
-            font-size: 16px;
-            font-weight: 500;
-            opacity: 0.9;
-        }
-        
-        #ad-loader-overlay .loader-sub {
-            font-size: 13px;
-            opacity: 0.6;
-            margin-top: -8px;
-        }
-        
-        #ad-loader-overlay .loader-progress {
-            width: 200px;
-            height: 3px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        
-        #ad-loader-overlay .loader-progress-bar {
-            height: 100%;
-            width: 0%;
-            background: var(--gradient);
-            border-radius: 4px;
-            transition: width 0.3s ease;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        /* ===== CHART ===== */
-        .chart-container {
-            position: relative;
-            height: 180px;
-            width: 100%;
-        }
-        
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 400px) {
-            body { padding: 12px 8px 80px 8px; }
-            .balance-card .amount { font-size: 36px; }
-            .stats-grid { gap: 8px; }
-            .stat-item { padding: 12px 8px; }
-            .stat-item .value { font-size: 17px; }
-            .role-btn { padding: 10px 8px; }
-            .role-btn .label { font-size: 13px; }
-        }
-        
-        @media (min-width: 481px) {
-            body { padding: 20px 16px 100px 16px; }
-            .modal { align-items: center; padding: 20px; }
-            .modal-content { border-radius: 20px; }
+        .verification-modal .modal-content .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         
         /* ===== TOAST ===== */
@@ -1090,244 +1075,21 @@
         .toast.error { border-color: var(--danger); }
         .toast.warning { border-color: var(--warning); }
         
-        /* ===== EMPTY STATE ===== */
-        .empty-state {
-            text-align: center;
-            padding: 30px 20px;
-            color: var(--text-light);
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 400px) {
+            body { padding: 12px 8px 80px 8px; }
+            .balance-card .amount { font-size: 36px; }
+            .stats-grid { gap: 8px; }
+            .stat-item { padding: 12px 8px; }
+            .stat-item .value { font-size: 17px; }
+            .role-btn { padding: 10px 8px; }
+            .role-btn .label { font-size: 13px; }
         }
         
-        .empty-state i {
-            font-size: 40px;
-            margin-bottom: 12px;
-            opacity: 0.3;
-        }
-
-        /* ===== REJECT REASON MODAL ===== */
-        #rejectReasonModal .modal-content {
-            max-width: 480px;
-        }
-
-        #rejectReasonModal textarea {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            background: var(--background-color);
-            color: var(--text-color);
-            resize: vertical;
-            min-height: 80px;
-            transition: var(--transition);
-        }
-
-        #rejectReasonModal textarea:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
-        }
-
-        .reject-reason-text {
-            padding: 10px 12px;
-            background: rgba(239, 68, 68, 0.08);
-            border-radius: 8px;
-            border-left: 3px solid var(--danger);
-            margin-top: 8px;
-            font-size: 13px;
-            color: var(--text-light);
-        }
-
-        .reject-reason-text strong {
-            color: var(--danger);
-        }
-
-        /* ===== AD CAMPAIGN INFO ===== */
-        .campaign-info {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin: 8px 0;
-            padding: 8px;
-            background: var(--background-color);
-            border-radius: 8px;
-        }
-        
-        .campaign-info .info-item {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .campaign-info .info-item .label {
-            font-size: 10px;
-            color: var(--text-light);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .campaign-info .info-item .value {
-            font-size: 14px;
-            font-weight: 700;
-        }
-
-        /* ===== DELETE CONFIRMATION MODAL ===== */
-        #deleteConfirmModal .modal-content {
-            max-width: 480px;
-        }
-
-        #deleteConfirmModal .warning-text {
-            color: var(--danger);
-            font-weight: 700;
-        }
-
-        #deleteConfirmModal .refund-info {
-            background: rgba(16, 185, 129, 0.08);
-            padding: 12px;
-            border-radius: 8px;
-            margin: 12px 0;
-            border-left: 3px solid var(--success);
-        }
-
-        #deleteConfirmModal .company-info {
-            background: rgba(239, 68, 68, 0.08);
-            padding: 12px;
-            border-radius: 8px;
-            margin: 12px 0;
-            border-left: 3px solid var(--danger);
-        }
-
-        /* ===== DEPOSIT FORM ===== */
-        .deposit-form-group {
-            margin-bottom: 12px;
-        }
-        
-        .deposit-form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-color);
-            margin-bottom: 4px;
-        }
-        
-        .deposit-form-group input,
-        .deposit-form-group textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            background: var(--background-color);
-            color: var(--text-color);
-            transition: var(--transition);
-        }
-        
-        .deposit-form-group input:focus,
-        .deposit-form-group textarea:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
-        }
-        
-        .deposit-form-group textarea {
-            min-height: 60px;
-            resize: vertical;
-        }
-        
-        .deposit-form-group .form-hint {
-            font-size: 11px;
-            color: var(--text-light);
-            margin-top: 4px;
-        }
-
-        /* ===== AD STATUS BADGE ===== */
-        .ad-status-badge {
-            display: inline-block;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: 600;
-        }
-        
-        .ad-status-badge.pending {
-            background: rgba(245, 158, 11, 0.2);
-            color: var(--warning);
-        }
-        
-        .ad-status-badge.approved {
-            background: rgba(16, 185, 129, 0.2);
-            color: var(--success);
-        }
-        
-        .ad-status-badge.rejected {
-            background: rgba(239, 68, 68, 0.2);
-            color: var(--danger);
-        }
-        
-        .ad-status-badge.active {
-            background: rgba(59, 130, 246, 0.2);
-            color: var(--info);
-        }
-
-        /* ===== AD CALCULATOR ===== */
-        .calc-result {
-            background: rgba(16, 185, 129, 0.06);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            padding: 12px 14px;
-            border-radius: 10px;
-            margin-bottom: 14px;
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 6px;
-        }
-        
-        .calc-result .calc-item {
-            display: flex;
-            flex-direction: column;
-            text-align: center;
-        }
-        
-        .calc-result .calc-item .label {
-            font-size: 9px;
-            color: var(--text-light);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .calc-result .calc-item .value {
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--text-color);
-        }
-        
-        .calc-result .calc-item .value.highlight {
-            color: var(--primary-color);
-        }
-        
-        .calc-result .calc-item .value.reward {
-            color: var(--success);
-            font-size: 18px;
-        }
-
-        /* Ad Category Badge */
-        .ad-category-badge {
-            display: inline-block;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: 600;
-            background: rgba(var(--primary-color-rgb), 0.1);
-            color: var(--primary-color);
-        }
-        
-        .sub-category-badge {
-            display: inline-block;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: 600;
-            background: rgba(var(--primary-color-rgb), 0.05);
-            color: var(--text-light);
+        @media (min-width: 481px) {
+            body { padding: 20px 16px 100px 16px; }
+            .verification-modal { align-items: center; padding: 20px; }
+            .verification-modal .modal-content { border-radius: 20px; }
         }
     </style>
 </head>
@@ -1347,16 +1109,6 @@
     </div>
     <div id="preloader-footer">
         <a href="https://t.me/nexearn2" target="_blank">@nexearn2</a>
-    </div>
-    
-    <!-- ===== AD LOADER ===== -->
-    <div id="ad-loader-overlay">
-        <div class="loader-spinner"></div>
-        <div class="loader-text">Loading Ad...</div>
-        <div class="loader-sub">Please wait while the ad loads</div>
-        <div class="loader-progress">
-            <div class="loader-progress-bar" id="ad-loader-progress"></div>
-        </div>
     </div>
     
     <div class="container">
@@ -1450,12 +1202,6 @@
         <div id="publisherView">
             <div class="card">
                 <div class="card-title">📺 Available Ads</div>
-                <div class="ad-filters">
-                    <button class="filter-btn active" onclick="filterAds('all',this)">All</button>
-                    <button class="filter-btn" onclick="filterAds('viewed',this)">👁 Viewed</button>
-                    <button class="filter-btn" onclick="filterAds('pending',this)">⏳ Pending</button>
-                    <button class="filter-btn" onclick="filterAds('verified',this)">✅ Verified</button>
-                </div>
                 <div id="ad-list-container"></div>
             </div>
 
@@ -1470,6 +1216,14 @@
                     <span>Join Channel</span>
                 </button>
             </div>
+        </div>
+
+        <!-- ===== AD DETAILS PAGE ===== -->
+        <div id="adDetailsPage">
+            <button class="back-btn" onclick="closeAdDetails()">
+                <i class="fa-solid fa-arrow-left"></i> Back
+            </button>
+            <div id="adDetailsContent"></div>
         </div>
 
         <!-- ===== ADVERTISER VIEW ===== -->
@@ -1567,16 +1321,6 @@
                 <div class="card-title">📊 My Ad Campaigns</div>
                 <div id="my-ads-container"></div>
             </div>
-
-            <div class="card">
-                <div class="card-title">📋 Deposit History</div>
-                <div id="deposit-history-container"></div>
-            </div>
-
-            <div class="card">
-                <div class="card-title">📋 Ad Verification Requests</div>
-                <div id="verification-requests"></div>
-            </div>
         </div>
 
         <!-- ===== CHART ===== -->
@@ -1588,138 +1332,12 @@
         </div>
     </div>
 
-    <!-- ===== NAV BAR ===== -->
-    <div class="nav-bar">
-        <button class="nav-button" id="withdrawNavBtn" onclick="showModal('withdrawModal', this)">
-            <i class="fa-solid fa-money-bill-transfer"></i>
-            <span>Withdraw</span>
-        </button>
-        <button class="nav-button" onclick="showModal('historyModal', this)">
-            <i class="fa-solid fa-clock-rotate-left"></i>
-            <span>History</span>
-        </button>
-        <button class="nav-button" onclick="showModal('inviteModal', this)">
-            <i class="fa-solid fa-user-plus"></i>
-            <span>Invite</span>
-        </button>
-        <button class="nav-button" onclick="showModal('supportModal', this)">
-            <i class="fa-solid fa-headset"></i>
-            <span>Support</span>
-        </button>
-        <button class="nav-button" onclick="showModal('bonusTasksModal', this)">
-            <i class="fa-solid fa-star"></i>
-            <span>Bonus</span>
-        </button>
-    </div>
-    
-    <!-- ===== MODALS ===== -->
-    
-    <!-- Welcome Modal -->
-    <div id="welcomeModal" class="modal">
+    <!-- ===== VERIFICATION MODAL ===== -->
+    <div class="verification-modal" id="verificationModal">
         <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('welcomeModal')">&times;</button>
-            <h3 id="welcome-title" class="card-title" style="text-align:center;"></h3>
-            <p id="welcome-message" style="line-height:1.7; font-size:14px; text-align:center; white-space:pre-wrap; margin:12px 0;"></p>
-            <button class="action-button" onclick="closeModal('welcomeModal')">I Understand</button>
-        </div>
-    </div>
-    
-    <!-- Withdraw Modal -->
-    <div id="withdrawModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('withdrawModal')">&times;</button>
-            <h3 class="card-title">💸 Withdraw Funds</h3>
-            <p id="min-withdraw-text" style="font-size:13px; color:var(--text-light); margin-bottom:12px;"></p>
-            <form id="withdraw-form">
-                <div class="form-group">
-                    <label>Payment Method *</label>
-                    <select id="method" name="method" required>
-                        <option value="" disabled selected>Select Payment Method</option>
-                    </select>
-                </div>
-                
-                <div id="method-fields-container"></div>
-                
-                <div class="form-group">
-                    <label>Amount (USD) *</label>
-                    <input type="number" step="0.0001" id="withdraw-amount" placeholder="0.00" min="0.0001" required>
-                </div>
-                
-                <button type="submit" class="action-button" id="withdraw-submit-button">
-                    <span class="button-text">Submit Request</span>
-                    <div class="loader-spinner" style="display:none; width:20px; height:20px; border-width:3px;"></div>
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Deposit Modal -->
-    <div id="depositModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('depositModal')">&times;</button>
-            <h3 class="card-title">💳 Deposit Funds</h3>
-            <p style="font-size:13px; color:var(--text-light); margin-bottom:14px;">Select a payment method and provide transaction details</p>
-            
-            <div class="deposit-form-group">
-                <label>Payment Method *</label>
-                <div id="deposit-methods-list"></div>
-            </div>
-            
-            <div class="deposit-form-group">
-                <label>Sender Number *</label>
-                <input type="text" id="deposit-sender" placeholder="Enter your sending number">
-                <div class="form-hint">The number you sent money from</div>
-            </div>
-            
-            <div class="deposit-form-group">
-                <label>Transaction ID *</label>
-                <input type="text" id="deposit-trxid" placeholder="Enter transaction ID">
-                <div class="form-hint">The transaction ID from your payment</div>
-            </div>
-            
-            <div class="deposit-form-group">
-                <label>Amount (BDT) *</label>
-                <input type="number" id="deposit-amount" step="1" placeholder="Enter amount in BDT">
-                <div class="form-hint">Minimum deposit: <span id="deposit-min-amount">10</span> BDT</div>
-            </div>
-            
-            <button class="action-button" onclick="submitDeposit()">
-                <i class="fa-solid fa-check"></i> <span>Submit Deposit Request</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- Convert Modal -->
-    <div id="convertModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('convertModal')">&times;</button>
-            <h3 class="card-title">🔄 Convert to Wallet</h3>
-            <div style="text-align:center; padding:20px 0;">
-                <div style="font-size:48px; margin-bottom:12px;">💰</div>
-                <div style="font-size:14px; color:var(--text-light);">Amount to Convert</div>
-                <div style="font-size:32px; font-weight:800; color:var(--success);" id="convert-amount-display">$0.0000</div>
-                <div style="font-size:12px; color:var(--text-light); margin-top:4px;">1:1 conversion rate • No fees</div>
-            </div>
-            <div class="form-group">
-                <label>Enter Amount to Convert</label>
-                <input type="number" step="0.0001" id="convert-input" placeholder="Enter amount" min="0.0001">
-                <div class="form-hint">Max: <span id="convert-max-display">$0.0000</span></div>
-            </div>
-            <button class="action-button success" onclick="confirmConvert()">
-                <i class="fa-solid fa-exchange-alt"></i> <span>Convert Now</span>
-            </button>
-            <button class="action-button secondary" onclick="closeModal('convertModal')" style="margin-top:10px;">
-                Cancel
-            </button>
-        </div>
-    </div>
-
-    <!-- Verify Ad Modal -->
-    <div id="verifyAdModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('verifyAdModal')">&times;</button>
-            <h3 class="card-title">📸 Submit Ad Verification</h3>
-            <p style="font-size:13px; color:var(--text-light); margin-bottom:12px;">Please provide details about the ad you watched and upload a screenshot as proof.</p>
+            <button class="close-modal" onclick="closeVerificationModal()">&times;</button>
+            <div class="modal-title">📸 Submit Ad Verification</div>
+            <p style="font-size:13px; color:var(--text-light); margin-bottom:14px;">Please provide details about the ad you watched and upload a screenshot as proof.</p>
             
             <div id="verify-ad-info"></div>
             
@@ -1739,118 +1357,9 @@
                 <div class="form-hint">Upload PNG, JPG or GIF (Max 5MB)</div>
             </div>
             
-            <button class="action-button" onclick="submitVerification()">
-                <i class="fa-solid fa-upload"></i> <span>Submit for Verification</span>
+            <button class="submit-btn" id="verifySubmitBtn" onclick="submitVerification()">
+                <i class="fa-solid fa-upload"></i> Submit Verification
             </button>
-        </div>
-    </div>
-
-    <!-- Reject Reason Modal -->
-    <div id="rejectReasonModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('rejectReasonModal')">&times;</button>
-            <h3 class="card-title">❌ Reject Verification</h3>
-            <p style="font-size:13px; color:var(--text-light); margin-bottom:12px;">Please provide a reason for rejecting this verification request.</p>
-            
-            <div class="form-group">
-                <label>Rejection Reason *</label>
-                <textarea id="reject-reason" placeholder="Explain why this verification is being rejected..." rows="4" required></textarea>
-                <div class="form-hint">The user will see this reason</div>
-            </div>
-            
-            <div style="display:flex; gap:10px; margin-top:12px;">
-                <button class="action-button" onclick="confirmReject()" style="flex:1; background:var(--danger);">
-                    <i class="fa-solid fa-times"></i> Reject
-                </button>
-                <button class="action-button secondary" onclick="closeModal('rejectReasonModal')" style="flex:1; margin-top:0;">
-                    Cancel
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Delete Confirmation Modal -->
-    <div id="deleteConfirmModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('deleteConfirmModal')">&times;</button>
-            <h3 class="card-title">⚠️ Delete Campaign</h3>
-            <p style="font-size:14px; margin-bottom:12px;">Are you sure you want to delete this ad campaign?</p>
-            
-            <div class="refund-info">
-                <strong>💰 Refund Details:</strong><br>
-                <span style="font-size:13px;">You will receive <span class="warning-text">60%</span> of your budget back</span>
-            </div>
-            
-            <div class="company-info">
-                <strong>🏢 Company Fee:</strong><br>
-                <span style="font-size:13px;"><span class="warning-text">40%</span> will be deducted as platform fee</span>
-            </div>
-            
-            <div style="margin-top:12px; padding:10px; background:var(--background-color); border-radius:8px;">
-                <div style="font-size:13px; color:var(--text-light);">
-                    <div>Total Budget: <strong id="delete-budget">$0.00</strong></div>
-                    <div>Refund (60%): <strong style="color:var(--success);" id="delete-refund">$0.00</strong></div>
-                    <div>Fee (40%): <strong style="color:var(--danger);" id="delete-fee">$0.00</strong></div>
-                </div>
-            </div>
-            
-            <div style="display:flex; gap:10px; margin-top:16px;">
-                <button class="action-button" onclick="confirmDeleteAd()" style="flex:1; background:var(--danger);">
-                    <i class="fa-solid fa-trash"></i> Confirm Delete
-                </button>
-                <button class="action-button secondary" onclick="closeModal('deleteConfirmModal')" style="flex:1; margin-top:0;">
-                    Cancel
-                </button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Support Modal -->
-    <div id="supportModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('supportModal')">&times;</button>
-            <h3 class="card-title">🆘 Support</h3>
-            <p style="line-height:1.6; margin-bottom:16px;">For any help or questions, please contact our support team. We're here to assist you!</p>
-            <button class="action-button" id="admin-contact-button">
-                <i class="fa-brands fa-telegram"></i>
-                <span>Contact Support</span>
-            </button>
-        </div>
-    </div>
-    
-    <!-- History Modal -->
-    <div id="historyModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('historyModal')">&times;</button>
-            <h3 class="card-title">📜 Withdrawal History</h3>
-            <div id="history-list"></div>
-        </div>
-    </div>
-    
-    <!-- Invite Modal -->
-    <div id="inviteModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('inviteModal')">&times;</button>
-            <h3 class="card-title">👥 Invite Friends</h3>
-            <p style="line-height:1.6; margin-bottom:14px;">Share your referral link with friends and earn together. You get a reward for each successful referral!</p>
-            <button class="action-button" id="copy-link-button">
-                <i class="fa-solid fa-copy"></i>
-                <span>Copy Link</span>
-            </button>
-            <button class="action-button secondary" id="share-link-button">
-                <i class="fa-solid fa-share-nodes"></i>
-                <span>Share Link</span>
-            </button>
-        </div>
-    </div>
-    
-    <!-- Bonus Tasks Modal -->
-    <div id="bonusTasksModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('bonusTasksModal')">&times;</button>
-            <h3 class="card-title">⭐ Bonus Tasks</h3>
-            <p style="text-align:center; margin-bottom:16px; font-size:14px; color:var(--text-light);">Complete these one-time tasks to earn extra rewards!</p>
-            <div id="bonus-tasks-list"></div>
         </div>
     </div>
 
@@ -1907,8 +1416,6 @@
 
         let firebaseDb = null;
         const tg = window.Telegram ? window.Telegram.WebApp : null;
-        let pendingRejectVerificationId = null;
-        let pendingDeleteAdId = null;
         let isAdShowing = false;
         let lastAdWatchTime = 0;
 
@@ -1938,7 +1445,8 @@
             selectedDepositMethod: null,
             selectedDepositNumber: null,
             bonusTasks: [],
-            verifications: []
+            verifications: [],
+            usersCache: {}
         };
 
         // ============================================================
@@ -1960,173 +1468,36 @@
             DOM.referralCount = document.getElementById('referral-count');
             DOM.watchAdBtn = document.getElementById('watch-ad-button');
             DOM.joinChannelBtn = document.getElementById('join-channel-button');
-            DOM.supportBtn = document.getElementById('admin-contact-button');
-            DOM.copyLinkBtn = document.getElementById('copy-link-button');
-            DOM.shareLinkBtn = document.getElementById('share-link-button');
-            DOM.historyList = document.getElementById('history-list');
-            DOM.bonusTasksList = document.getElementById('bonus-tasks-list');
-            DOM.minWithdrawText = document.getElementById('min-withdraw-text');
-            DOM.welcomeTitle = document.getElementById('welcome-title');
-            DOM.welcomeMessage = document.getElementById('welcome-message');
-            DOM.walletLabel = document.getElementById('walletLabel');
-            DOM.depositBtn = document.getElementById('depositButton');
             DOM.userRoleBadge = document.getElementById('userRoleBadge');
             DOM.publisherView = document.getElementById('publisherView');
             DOM.advertiserView = document.getElementById('advertiserView');
             DOM.adListContainer = document.getElementById('ad-list-container');
             DOM.myAdsContainer = document.getElementById('my-ads-container');
-            DOM.verificationContainer = document.getElementById('verification-requests');
-            DOM.depositHistoryContainer = document.getElementById('deposit-history-container');
             DOM.createAdForm = document.getElementById('create-ad-form');
-            DOM.depositMethodsList = document.getElementById('deposit-methods-list');
-            DOM.withdrawForm = document.getElementById('withdraw-form');
-            DOM.methodSelect = document.getElementById('method');
-            DOM.methodFieldsContainer = document.getElementById('method-fields-container');
-            DOM.withdrawAmount = document.getElementById('withdraw-amount');
-            DOM.withdrawSubmitBtn = document.getElementById('withdraw-submit-button');
-            DOM.withdrawNavBtn = document.getElementById('withdrawNavBtn');
-            DOM.adLoaderOverlay = document.getElementById('ad-loader-overlay');
-            DOM.adLoaderProgress = document.getElementById('ad-loader-progress');
-            DOM.verifyAdInfo = document.getElementById('verify-ad-info');
-            DOM.verifyScreenshot = document.getElementById('verify-screenshot');
-            DOM.verifyAdTitle = document.getElementById('verify-ad-title');
-            DOM.verifyAdDesc = document.getElementById('verify-ad-desc');
             DOM.profilePic = document.getElementById('profile-pic');
             DOM.greeting = document.getElementById('greeting');
             DOM.convertBalance = document.getElementById('convert-balance');
             DOM.convertBtn = document.getElementById('convertBtn');
-            DOM.convertInput = document.getElementById('convert-input');
-            DOM.convertAmountDisplay = document.getElementById('convert-amount-display');
-            DOM.convertMaxDisplay = document.getElementById('convert-max-display');
-            DOM.rejectReason = document.getElementById('reject-reason');
             DOM.adDuration = document.getElementById('ad-duration');
             DOM.adDurationDisplay = document.getElementById('ad-duration-display');
             DOM.adTargetViews = document.getElementById('ad-target-views');
             DOM.adBudget = document.getElementById('ad-budget');
             DOM.adTotalViews = document.getElementById('ad-total-views');
             DOM.adCostPerView = document.getElementById('ad-cost-per-view');
-            DOM.deleteBudget = document.getElementById('delete-budget');
-            DOM.deleteRefund = document.getElementById('delete-refund');
-            DOM.deleteFee = document.getElementById('delete-fee');
-            DOM.depositSender = document.getElementById('deposit-sender');
-            DOM.depositTrxid = document.getElementById('deposit-trxid');
-            DOM.depositAmount = document.getElementById('deposit-amount');
-            DOM.depositMinAmount = document.getElementById('deposit-min-amount');
             DOM.adCategory = document.getElementById('ad-category');
             DOM.adSubCategory = document.getElementById('ad-sub-category');
-            
             DOM.calcViews = document.getElementById('calcViews');
             DOM.calcReward = document.getElementById('calcReward');
             DOM.calcDuration = document.getElementById('calcDuration');
             DOM.calcResult = document.getElementById('calcResult');
-        }
-
-        // ============================================================
-        // MONETAG AD FUNCTIONS - FIXED
-        // ============================================================
-        
-        function initMonetagAds() {
-            try {
-                if (typeof show_11573980 === 'function') {
-                    show_11573980({
-                        type: 'inApp',
-                        inAppSettings: {
-                            frequency: 2,
-                            capping: 0.1,
-                            interval: 60,
-                            timeout: 5,
-                            everyPage: false
-                        }
-                    });
-                    console.log("✅ Monetag In-App Interstitial initialized");
-                    return true;
-                } else {
-                    console.warn("⚠️ Monetag SDK not loaded yet");
-                    return false;
-                }
-            } catch (e) {
-                console.error("Monetag init error:", e);
-                return false;
-            }
-        }
-
-        // Show Rewarded Interstitial Ad - FIXED using correct SDK format
-        function showRewardedAd() {
-            return new Promise((resolve) => {
-                try {
-                    if (typeof show_11573980 !== 'function') {
-                        console.warn("Monetag SDK not loaded");
-                        resolve(false);
-                        return;
-                    }
-
-                    console.log("🔄 Showing Monetag rewarded ad...");
-                    
-                    let adShown = false;
-                    let resolved = false;
-                    
-                    // Call the SDK - it returns a promise
-                    const adPromise = show_11573980();
-                    
-                    // If it returns a promise, handle it
-                    if (adPromise && typeof adPromise.then === 'function') {
-                        adPromise.then(() => {
-                            if (!resolved) {
-                                resolved = true;
-                                console.log("✅ Ad completed - Reward granted!");
-                                resolve(true);
-                            }
-                        }).catch((err) => {
-                            if (!resolved) {
-                                resolved = true;
-                                console.warn("Ad error:", err);
-                                resolve(false);
-                            }
-                        });
-                    } else {
-                        // If no promise, assume ad is shown and use events
-                        adShown = true;
-                        
-                        const handleVisibilityChange = () => {
-                            if (!document.hidden && !resolved) {
-                                resolved = true;
-                                console.log("✅ User returned from ad - Reward granted!");
-                                document.removeEventListener('visibilitychange', handleVisibilityChange);
-                                window.removeEventListener('focus', handleFocus);
-                                resolve(true);
-                            }
-                        };
-                        
-                        const handleFocus = () => {
-                            if (!resolved) {
-                                resolved = true;
-                                console.log("✅ User returned from ad (focus) - Reward granted!");
-                                document.removeEventListener('visibilitychange', handleVisibilityChange);
-                                window.removeEventListener('focus', handleFocus);
-                                resolve(true);
-                            }
-                        };
-                        
-                        document.addEventListener('visibilitychange', handleVisibilityChange);
-                        window.addEventListener('focus', handleFocus);
-                        
-                        // Safety timeout
-                        setTimeout(() => {
-                            if (!resolved) {
-                                resolved = true;
-                                document.removeEventListener('visibilitychange', handleVisibilityChange);
-                                window.removeEventListener('focus', handleFocus);
-                                console.warn("Ad timeout");
-                                resolve(false);
-                            }
-                        }, 15000);
-                    }
-                    
-                } catch (e) {
-                    console.error("Rewarded ad error:", e);
-                    resolve(false);
-                }
-            });
+            DOM.adDetailsPage = document.getElementById('adDetailsPage');
+            DOM.adDetailsContent = document.getElementById('adDetailsContent');
+            DOM.verificationModal = document.getElementById('verificationModal');
+            DOM.verifyAdInfo = document.getElementById('verify-ad-info');
+            DOM.verifyAdTitle = document.getElementById('verify-ad-title');
+            DOM.verifyAdDesc = document.getElementById('verify-ad-desc');
+            DOM.verifyScreenshot = document.getElementById('verify-screenshot');
+            DOM.verifySubmitBtn = document.getElementById('verifySubmitBtn');
         }
 
         // ============================================================
@@ -2153,12 +1524,7 @@
                         if (data.adReward) CONFIG.AD_REWARD = data.adReward;
                         if (data.dailyLimit) CONFIG.DAILY_AD_LIMIT = data.dailyLimit;
                         if (data.minWithdraw) CONFIG.MINIMUM_WITHDRAWAL = data.minWithdraw;
-                        if (data.minDeposit) {
-                            CONFIG.MINIMUM_DEPOSIT = data.minDeposit;
-                            if (DOM.depositMinAmount) {
-                                DOM.depositMinAmount.textContent = data.minDeposit;
-                            }
-                        }
+                        if (data.minDeposit) CONFIG.MINIMUM_DEPOSIT = data.minDeposit;
                         if (data.cooldown) CONFIG.COOLDOWN_MINUTES = data.cooldown;
                         if (data.referralReward) CONFIG.REFERRAL_REWARD = data.referralReward;
                         if (data.withdrawMethods) CONFIG.withdrawalMethods = data.withdrawMethods;
@@ -2166,7 +1532,6 @@
                         if (data.welcomeMessage) CONFIG.welcomeNotice.message = data.welcomeMessage;
                         if (data.adCooldownMinutes) CONFIG.AD_COOLDOWN_MINUTES = data.adCooldownMinutes;
                         console.log("✅ Config loaded from Firebase");
-                        renderDepositMethods();
                     }
                     resolve();
                 });
@@ -2180,8 +1545,6 @@
                     const data = snapshot.val();
                     if (data && Array.isArray(data)) {
                         state.bonusTasks = data;
-                        console.log("✅ Bonus tasks loaded");
-                        renderBonusTasks();
                     }
                     resolve();
                 });
@@ -2266,29 +1629,8 @@
                 const adList = Object.entries(ads).map(([id, data]) => ({ id, ...data }));
                 renderAdList(adList);
                 renderMyAds(adList);
-                renderVerificationRequests(adList);
-            });
-        }
-
-        function listenDeposits() {
-            if (!firebaseDb || !state.currentUserId) return;
-            
-            firebaseDb.ref('deposits').orderByChild('userId').equalTo(state.currentUserId).on('value', (snapshot) => {
-                const data = snapshot.val() || {};
-                const list = Object.entries(data).map(([id, item]) => ({ id, ...item }));
-                state.depositHistory = list;
-                renderDepositHistory(list);
-                saveUserData();
-            });
-            
-            firebaseDb.ref('deposits').orderByChild('userId').equalTo(state.currentUserId).on('child_changed', (snapshot) => {
-                const data = snapshot.val();
-                if (data?.status === 'approved') {
-                    state.walletBalance += data.amount / 100;
-                    saveUserData();
-                    updateUI();
-                    showToast(`✅ Deposit of ${data.amount} BDT approved!`, 'success');
-                }
+                // Also load user data for creator info
+                loadAllUsers();
             });
         }
 
@@ -2301,7 +1643,6 @@
 
         function listenUserVerifications() {
             if (!firebaseDb || !state.currentUserId) return;
-            
             firebaseDb.ref('verifications').orderByChild('userId').equalTo(state.currentUserId).on('value', (snapshot) => {
                 const data = snapshot.val() || {};
                 state.verifications = Object.entries(data).map(([id, item]) => ({ id, ...item }));
@@ -2309,24 +1650,19 @@
             });
         }
 
+        function loadAllUsers() {
+            if (!firebaseDb) return;
+            firebaseDb.ref('users').once('value').then(snapshot => {
+                const data = snapshot.val() || {};
+                state.usersCache = data;
+                // Re-render ads to show creator info
+                listenAds();
+            });
+        }
+
         // ============================================================
-        // HELPER FUNCTIONS
+        // HELPERS
         // ============================================================
-        function safeAlert(msg) {
-            if (tg) tg.showAlert(msg);
-            else alert(msg);
-        }
-
-        function safeOpenLink(url) {
-            if (tg) tg.openLink(url);
-            else window.open(url, '_blank');
-        }
-
-        function safeOpenTelegramLink(url) {
-            if (tg) tg.openTelegramLink(url);
-            else window.open(url, '_blank');
-        }
-
         function escapeHTML(str) {
             if (!str) return '';
             return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -2356,16 +1692,16 @@
             return `https://t.me/${CONFIG.BOT_USERNAME}?startapp=${state.currentUserId}`;
         }
 
-        function getIpAddress() {
-            return fetch('https://api.ipify.org?format=json')
-                .then(res => res.json())
-                .then(data => data.ip)
-                .catch(() => null);
+        function safeOpenLink(url) {
+            if (tg) tg.openLink(url);
+            else window.open(url, '_blank');
         }
 
-        // ============================================================
-        // IMAGE UPLOAD
-        // ============================================================
+        function safeOpenTelegramLink(url) {
+            if (tg) tg.openTelegramLink(url);
+            else window.open(url, '_blank');
+        }
+
         function uploadImage(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -2392,6 +1728,104 @@
         }
 
         // ============================================================
+        // MONETAG AD FUNCTIONS
+        // ============================================================
+        function initMonetagAds() {
+            try {
+                if (typeof show_11573980 === 'function') {
+                    show_11573980({
+                        type: 'inApp',
+                        inAppSettings: {
+                            frequency: 2,
+                            capping: 0.1,
+                            interval: 60,
+                            timeout: 5,
+                            everyPage: false
+                        }
+                    });
+                    console.log("✅ Monetag In-App Interstitial initialized");
+                    return true;
+                } else {
+                    console.warn("⚠️ Monetag SDK not loaded yet");
+                    return false;
+                }
+            } catch (e) {
+                console.error("Monetag init error:", e);
+                return false;
+            }
+        }
+
+        function showRewardedAd() {
+            return new Promise((resolve) => {
+                try {
+                    if (typeof show_11573980 !== 'function') {
+                        console.warn("Monetag SDK not loaded");
+                        resolve(false);
+                        return;
+                    }
+
+                    console.log("🔄 Showing Monetag rewarded ad...");
+                    
+                    let resolved = false;
+                    const adPromise = show_11573980();
+                    
+                    if (adPromise && typeof adPromise.then === 'function') {
+                        adPromise.then(() => {
+                            if (!resolved) {
+                                resolved = true;
+                                console.log("✅ Ad completed - Reward granted!");
+                                resolve(true);
+                            }
+                        }).catch((err) => {
+                            if (!resolved) {
+                                resolved = true;
+                                console.warn("Ad error:", err);
+                                resolve(false);
+                            }
+                        });
+                    } else {
+                        const handleVisibilityChange = () => {
+                            if (!document.hidden && !resolved) {
+                                resolved = true;
+                                console.log("✅ User returned from ad - Reward granted!");
+                                document.removeEventListener('visibilitychange', handleVisibilityChange);
+                                window.removeEventListener('focus', handleFocus);
+                                resolve(true);
+                            }
+                        };
+                        
+                        const handleFocus = () => {
+                            if (!resolved) {
+                                resolved = true;
+                                console.log("✅ User returned from ad (focus) - Reward granted!");
+                                document.removeEventListener('visibilitychange', handleVisibilityChange);
+                                window.removeEventListener('focus', handleFocus);
+                                resolve(true);
+                            }
+                        };
+                        
+                        document.addEventListener('visibilitychange', handleVisibilityChange);
+                        window.addEventListener('focus', handleFocus);
+                        
+                        setTimeout(() => {
+                            if (!resolved) {
+                                resolved = true;
+                                document.removeEventListener('visibilitychange', handleVisibilityChange);
+                                window.removeEventListener('focus', handleFocus);
+                                console.warn("Ad timeout");
+                                resolve(false);
+                            }
+                        }, 15000);
+                    }
+                    
+                } catch (e) {
+                    console.error("Rewarded ad error:", e);
+                    resolve(false);
+                }
+            });
+        }
+
+        // ============================================================
         // CONVERT EARNINGS TO WALLET
         // ============================================================
         function convertToWallet() {
@@ -2400,78 +1834,14 @@
                 return;
             }
             
-            DOM.convertInput.value = '';
-            DOM.convertAmountDisplay.textContent = `$${formatBalance(state.balance)}`;
-            DOM.convertMaxDisplay.textContent = `$${formatBalance(state.balance)}`;
-            DOM.convertInput.max = state.balance;
-            DOM.convertInput.placeholder = `Max $${formatBalance(state.balance)}`;
-            
-            document.getElementById('convertModal').style.display = 'flex';
-        }
-
-        function confirmConvert() {
-            const amount = parseFloat(DOM.convertInput.value);
-            
-            if (!amount || amount <= 0) {
-                showToast('❌ Please enter a valid amount', 'error');
-                return;
-            }
-            
-            if (amount > state.balance) {
-                showToast(`❌ You only have $${formatBalance(state.balance)} to convert`, 'error');
-                return;
-            }
-            
-            state.balance -= amount;
+            const amount = state.balance;
+            state.balance = 0;
             state.walletBalance += amount;
             
             saveUserData();
             updateUI();
             
-            closeModal('convertModal');
             showToast(`✅ $${formatBalance(amount)} converted to wallet successfully!`, 'success');
-        }
-
-        // ============================================================
-        // RENDER DEPOSIT HISTORY
-        // ============================================================
-        function renderDepositHistory(deposits) {
-            if (!DOM.depositHistoryContainer) return;
-
-            if (!deposits || deposits.length === 0) {
-                DOM.depositHistoryContainer.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fa-solid fa-credit-card"></i>
-                        <p>No deposit history</p>
-                    </div>
-                `;
-                return;
-            }
-
-            DOM.depositHistoryContainer.innerHTML = `
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Method</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${deposits.map(d => `
-                                <tr>
-                                    <td>${escapeHTML(d.method)}</td>
-                                    <td><strong>${d.amount} BDT</strong></td>
-                                    <td><span class="status-badge ${d.status || 'pending'}">${d.status || 'Pending'}</span></td>
-                                    <td style="font-size:12px; color:var(--text-light);">${new Date(d.createdAt).toLocaleDateString()}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            `;
         }
 
         // ============================================================
@@ -2491,8 +1861,6 @@
                 DOM.userRoleBadge.className = 'role-badge';
                 DOM.walletCard.style.display = 'none';
                 document.getElementById('convertCard').style.display = 'block';
-                DOM.withdrawNavBtn.style.opacity = '1';
-                DOM.withdrawNavBtn.style.pointerEvents = 'auto';
                 listenAds();
             } else {
                 DOM.publisherView.style.display = 'none';
@@ -2501,8 +1869,6 @@
                 DOM.userRoleBadge.className = 'role-badge advertiser';
                 DOM.walletCard.style.display = 'flex';
                 document.getElementById('convertCard').style.display = 'none';
-                DOM.withdrawNavBtn.style.opacity = '0.5';
-                DOM.withdrawNavBtn.style.pointerEvents = 'none';
                 listenAds();
             }
             updateUI();
@@ -2515,19 +1881,7 @@
         }
 
         // ============================================================
-        // AD FILTERS
-        // ============================================================
-        function filterAds(filter, btn) {
-            if (btn) {
-                document.querySelectorAll('.ad-filters .filter-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-            }
-            state.currentFilter = filter;
-            listenAds();
-        }
-
-        // ============================================================
-        // AUTO CALCULATE AD COST
+        // ADVERTISER - CREATE AD
         // ============================================================
         function updateAdCalculation() {
             const budget = parseFloat(DOM.adBudget.value) || 1.00;
@@ -2557,9 +1911,6 @@
             }
         }
 
-        // ============================================================
-        // ADVERTISER - CREATE AD
-        // ============================================================
         function setupCreateAdForm() {
             if (!DOM.createAdForm) return;
 
@@ -2659,7 +2010,7 @@
         }
 
         // ============================================================
-        // RENDER ADS
+        // RENDER ENHANCED AD LIST
         // ============================================================
         function renderAdList(ads) {
             if (!DOM.adListContainer) return;
@@ -2676,14 +2027,7 @@
                 ad.approved === true
             );
 
-            if (state.currentFilter === 'viewed') {
-                filtered = filtered.filter(ad => state.viewedAds.includes(ad.id));
-            } else if (state.currentFilter === 'pending') {
-                filtered = filtered.filter(ad => !state.viewedAds.includes(ad.id) && ad.status === 'active');
-            } else if (state.currentFilter === 'verified') {
-                filtered = filtered.filter(ad => state.viewedAds.includes(ad.id) && ad.verified);
-            }
-
+            // Sort by newest first
             filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
             if (filtered.length === 0) {
@@ -2696,84 +2040,329 @@
                 const isActive = ad.status === 'active';
                 const views = ad.views || 0;
                 const totalViews = ad.totalViews || 100;
-                const isVerified = ad.verified || false;
+                const progress = Math.min((views / totalViews) * 100, 100);
                 const imageUrl = ad.imageUrl || '';
                 const daysLeft = ad.endDate ? Math.ceil((ad.endDate - Date.now()) / (1000 * 60 * 60 * 24)) : 0;
                 const category = ad.category || 'General';
                 const subCategory = ad.subCategory || '';
 
+                // Get creator info
+                const creator = state.usersCache[ad.createdBy] || {};
+                const creatorName = creator.name || 'Unknown';
+                const creatorUsername = creator.username || '';
+                const creatorInitial = creatorName.charAt(0).toUpperCase() || 'U';
+
+                // Check verification status
                 const userVerification = state.verifications.find(v => v.adId === ad.id);
                 let verificationStatus = '';
                 let rejectionReason = '';
 
                 if (userVerification) {
                     if (userVerification.status === 'approved') {
-                        verificationStatus = '✅ Verified';
+                        verificationStatus = 'verified';
                     } else if (userVerification.status === 'rejected') {
-                        verificationStatus = '❌ Rejected';
+                        verificationStatus = 'rejected';
                         rejectionReason = userVerification.rejectReason || 'No reason provided';
                     } else {
-                        verificationStatus = '⏳ Pending';
+                        verificationStatus = 'pending';
                     }
                 }
 
                 let statusText = '🟢 Active';
                 let statusClass = 'active';
                 if (ad.status === 'expired') { statusText = '⏰ Expired'; statusClass = 'expired'; }
-                else if (isVerified) { statusText = '✅ Verified'; statusClass = 'completed'; }
-                else if (isViewed && verificationStatus === 'rejected') { statusText = '❌ Rejected'; statusClass = 'pending'; }
-                else if (isViewed) { statusText = '⏳ Pending'; statusClass = 'pending'; }
+                else if (verificationStatus === 'verified') { statusText = '✅ Verified'; statusClass = 'verified'; }
+                else if (verificationStatus === 'rejected') { statusText = '❌ Rejected'; statusClass = 'expired'; }
+                else if (isViewed && verificationStatus === 'pending') { statusText = '⏳ Pending'; statusClass = 'pending'; }
 
-                let btnText = '👁 View';
-                let btnAction = `viewAd('${ad.id}')`;
-                let btnDisabled = !isActive || ad.status === 'expired';
+                let btnText = 'View Ad';
+                let btnDisabled = !isActive || ad.status === 'expired' || verificationStatus === 'rejected';
 
-                if (ad.status === 'expired') { btnText = '⏰ Expired'; btnDisabled = true; }
-                else if (isVerified) { btnText = '✓ Verified'; btnDisabled = true; }
-                else if (isViewed) { 
-                    if (verificationStatus === 'rejected') {
-                        btnText = '❌ Rejected';
-                        btnDisabled = true;
-                    } else {
-                        btnText = '📸 Verify'; 
-                        btnAction = `openVerifyModal('${ad.id}')`;
-                    }
+                if (ad.status === 'expired') { btnText = 'Expired'; btnDisabled = true; }
+                else if (verificationStatus === 'verified') { btnText = '✓ Verified'; btnDisabled = true; }
+                else if (verificationStatus === 'rejected') { 
+                    btnText = 'Rejected'; 
+                    btnDisabled = true; 
+                }
+                else if (isViewed && verificationStatus === 'pending') { 
+                    btnText = 'Pending'; 
+                    btnDisabled = true; 
                 }
 
                 return `
-                    <div class="ad-card">
-                        <div class="ad-header">
-                            <span class="ad-title">${escapeHTML(ad.title || 'Untitled')}</span>
-                            <span class="ad-reward">+$${ad.reward?.toFixed(4) || '0.0010'}</span>
-                        </div>
-                        <div style="display:flex; gap:6px; margin:4px 0; flex-wrap:wrap;">
-                            <span class="ad-category-badge">📌 ${escapeHTML(category)}</span>
+                    <div class="ad-card-enhanced" onclick="openAdDetails('${ad.id}')">
+                        <div class="ad-title">${escapeHTML(ad.title || 'Untitled')}</div>
+                        <div class="ad-categories">
+                            <span class="category-badge">📌 ${escapeHTML(category)}</span>
                             ${subCategory ? `<span class="sub-category-badge">🏷️ ${escapeHTML(subCategory)}</span>` : ''}
                         </div>
-                        ${imageUrl ? `<img src="${imageUrl}" class="ad-image" alt="Ad image" loading="lazy">` : ''}
-                        <div class="ad-desc">${escapeHTML(ad.desc || 'No description')}</div>
-                        ${rejectionReason ? `<div class="reject-reason-text"><strong>❌ Rejected:</strong> ${escapeHTML(rejectionReason)}</div>` : ''}
-                        <div class="campaign-info">
-                            <div class="info-item">
-                                <span class="label">Views</span>
-                                <span class="value">${views}/${totalViews}</span>
+                        <div class="creator-info">
+                            <div class="creator-avatar">${escapeHTML(creatorInitial)}</div>
+                            <div>
+                                <div class="creator-name">${escapeHTML(creatorName)}</div>
+                                <div class="creator-username">${creatorUsername ? '@' + escapeHTML(creatorUsername) : ''}</div>
                             </div>
-                            <div class="info-item">
-                                <span class="label">Days Left</span>
-                                <span class="value">${daysLeft > 0 ? daysLeft : 'Expired'}</span>
+                            <div style="margin-left:auto; text-align:right;">
+                                <div style="font-weight:700; color:var(--success); font-size:14px;">+$${ad.reward?.toFixed(4) || '0.0010'}</div>
+                                <div style="font-size:11px; color:var(--text-light);">per view</div>
+                            </div>
+                        </div>
+                        ${imageUrl ? `<img src="${imageUrl}" class="ad-image" alt="Ad image" loading="lazy" style="width:100%; max-height:120px; object-fit:cover; border-radius:8px; margin:8px 0;">` : ''}
+                        <div class="ad-stats">
+                            <span class="stat"><i class="fa-regular fa-eye"></i> <strong>${views}</strong> / ${totalViews}</span>
+                            <span class="stat"><i class="fa-regular fa-clock"></i> ${daysLeft > 0 ? daysLeft + ' days left' : 'Expired'}</span>
+                            <span class="reward">+$${ad.reward?.toFixed(4) || '0.0010'}</span>
+                        </div>
+                        <div class="progress-section">
+                            <div class="progress-bar">
+                                <div class="fill" style="width:${progress}%;"></div>
+                            </div>
+                            <div class="progress-info">
+                                <span>${Math.round(progress)}% completed</span>
+                                <span>${daysLeft > 0 ? daysLeft + 'd remaining' : 'Ended'}</span>
                             </div>
                         </div>
                         <div class="ad-footer">
                             <span class="ad-status ${statusClass}">${statusText}</span>
-                            <button class="ad-btn view ${isViewed ? 'completed' : ''}"
-                                    onclick="${btnAction}"
+                            <button class="view-btn ${isViewed ? 'completed' : ''}" 
+                                    onclick="event.stopPropagation(); viewAd('${ad.id}')"
                                     ${btnDisabled ? 'disabled' : ''}>
                                 ${btnText}
                             </button>
                         </div>
+                        ${rejectionReason ? `<div style="margin-top:8px; padding:8px; background:rgba(239,68,68,0.08); border-radius:8px; font-size:12px; color:var(--danger);"><strong>Rejected:</strong> ${escapeHTML(rejectionReason)}</div>` : ''}
                     </div>
                 `;
             }).join('');
+        }
+
+        // ============================================================
+        // AD DETAILS PAGE
+        // ============================================================
+        function openAdDetails(adId) {
+            firebaseDb.ref(`ads/${adId}`).once('value').then(snapshot => {
+                const ad = snapshot.val();
+                if (!ad) {
+                    showToast('❌ Ad not found!', 'error');
+                    return;
+                }
+
+                const creator = state.usersCache[ad.createdBy] || {};
+                const creatorName = creator.name || 'Unknown';
+                const creatorUsername = creator.username || '';
+                const creatorInitial = creatorName.charAt(0).toUpperCase() || 'U';
+                const views = ad.views || 0;
+                const totalViews = ad.totalViews || 100;
+                const progress = Math.min((views / totalViews) * 100, 100);
+                const daysLeft = ad.endDate ? Math.ceil((ad.endDate - Date.now()) / (1000 * 60 * 60 * 24)) : 0;
+                const imageUrl = ad.imageUrl || '';
+                const category = ad.category || 'General';
+                const subCategory = ad.subCategory || '';
+
+                // Check verification status
+                const userVerification = state.verifications.find(v => v.adId === adId);
+                let verificationStatus = 'none';
+                let rejectionReason = '';
+
+                if (userVerification) {
+                    if (userVerification.status === 'approved') {
+                        verificationStatus = 'verified';
+                    } else if (userVerification.status === 'rejected') {
+                        verificationStatus = 'rejected';
+                        rejectionReason = userVerification.rejectReason || 'No reason provided';
+                    } else {
+                        verificationStatus = 'pending';
+                    }
+                }
+
+                const isViewed = state.viewedAds.includes(adId);
+                let btnText = 'Submit Verification';
+                let btnDisabled = false;
+
+                if (verificationStatus === 'verified') {
+                    btnText = '✅ Already Verified';
+                    btnDisabled = true;
+                } else if (verificationStatus === 'rejected') {
+                    btnText = '❌ Rejected';
+                    btnDisabled = true;
+                } else if (verificationStatus === 'pending') {
+                    btnText = '⏳ Pending Review';
+                    btnDisabled = true;
+                } else if (!isViewed) {
+                    btnText = '👁 View Ad First';
+                    btnDisabled = true;
+                }
+
+                DOM.adDetailsContent.innerHTML = `
+                    <div class="ad-detail-title">${escapeHTML(ad.title || 'Untitled')}</div>
+                    <div class="ad-detail-categories">
+                        <span class="category-badge">📌 ${escapeHTML(category)}</span>
+                        ${subCategory ? `<span class="sub-category-badge">🏷️ ${escapeHTML(subCategory)}</span>` : ''}
+                    </div>
+                    <div class="ad-detail-creator">
+                        <div class="avatar">${escapeHTML(creatorInitial)}</div>
+                        <div class="info">
+                            <div class="name">${escapeHTML(creatorName)}</div>
+                            <div class="username">${creatorUsername ? '@' + escapeHTML(creatorUsername) : 'Anonymous'}</div>
+                        </div>
+                        <div style="margin-left:auto; text-align:right;">
+                            <div style="font-weight:700; color:var(--success); font-size:18px;">+$${ad.reward?.toFixed(4) || '0.0010'}</div>
+                            <div style="font-size:12px; color:var(--text-light);">per view</div>
+                        </div>
+                    </div>
+                    ${imageUrl ? `<img src="${imageUrl}" class="ad-detail-image" alt="Ad image" loading="lazy">` : ''}
+                    <div class="ad-detail-desc">${escapeHTML(ad.desc || 'No description provided.')}</div>
+                    <div class="ad-detail-stats">
+                        <div class="stat-box">
+                            <div class="label">💰 Reward</div>
+                            <div class="value reward">+$${ad.reward?.toFixed(4) || '0.0010'}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="label">👁 Views</div>
+                            <div class="value views">${views} / ${totalViews}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="label">⏳ Time Left</div>
+                            <div class="value time">${daysLeft > 0 ? daysLeft + ' days' : 'Expired'}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="label">📊 Progress</div>
+                            <div class="value">${Math.round(progress)}%</div>
+                        </div>
+                    </div>
+                    <div class="ad-detail-progress">
+                        <div class="progress-bar">
+                            <div class="fill" style="width:${progress}%;"></div>
+                        </div>
+                        <div class="progress-info">
+                            <span>${Math.round(progress)}% completed</span>
+                            <span>${totalViews - views} views remaining</span>
+                        </div>
+                    </div>
+                    <a href="${ad.link}" target="_blank" class="ad-detail-link" onclick="event.stopPropagation();">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Ad Link
+                    </a>
+                    ${rejectionReason ? `<div style="padding:12px; background:rgba(239,68,68,0.08); border-radius:8px; margin-bottom:16px; font-size:13px; color:var(--danger);"><strong>❌ Rejected:</strong> ${escapeHTML(rejectionReason)}</div>` : ''}
+                    <button class="submit-verification-btn ${verificationStatus === 'verified' ? 'completed' : ''}" 
+                            onclick="openVerificationModal('${adId}')" 
+                            ${btnDisabled ? 'disabled' : ''}>
+                        ${btnText}
+                    </button>
+                `;
+
+                DOM.adDetailsPage.style.display = 'block';
+                document.querySelector('.container').style.display = 'none';
+            });
+        }
+
+        function closeAdDetails() {
+            DOM.adDetailsPage.style.display = 'none';
+            document.querySelector('.container').style.display = 'block';
+        }
+
+        // ============================================================
+        // VERIFICATION MODAL
+        // ============================================================
+        function openVerificationModal(adId) {
+            state.currentVerifyAdId = adId;
+            
+            firebaseDb.ref(`ads/${adId}`).once('value').then(snapshot => {
+                const ad = snapshot.val();
+                if (ad) {
+                    DOM.verifyAdInfo.innerHTML = `
+                        <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:10px; margin-bottom:12px;">
+                            <strong>${escapeHTML(ad.title)}</strong>
+                            <div style="font-size:12px; color:var(--text-light);">Category: ${escapeHTML(ad.category || 'General')}</div>
+                            ${ad.subCategory ? `<div style="font-size:12px; color:var(--text-light);">Sub Category: ${escapeHTML(ad.subCategory)}</div>` : ''}
+                            <div style="font-size:12px; color:var(--text-light);">Reward: $${ad.reward?.toFixed(4) || '0.0010'}</div>
+                        </div>
+                    `;
+                }
+            });
+
+            DOM.verifyAdTitle.value = '';
+            DOM.verifyAdDesc.value = '';
+            DOM.verifyScreenshot.value = '';
+            DOM.verifySubmitBtn.disabled = false;
+            DOM.verifySubmitBtn.innerHTML = '<i class="fa-solid fa-upload"></i> Submit Verification';
+            DOM.verificationModal.classList.add('show');
+        }
+
+        function closeVerificationModal() {
+            DOM.verificationModal.classList.remove('show');
+            state.currentVerifyAdId = null;
+        }
+
+        async function submitVerification() {
+            const title = DOM.verifyAdTitle.value.trim();
+            const desc = DOM.verifyAdDesc.value.trim();
+            const file = DOM.verifyScreenshot.files[0];
+
+            if (!title || title.length < 3) {
+                showToast('❌ Please enter a valid ad title (min 3 characters)', 'error');
+                return;
+            }
+
+            if (!desc || desc.length < 5) {
+                showToast('❌ Please enter a valid description (min 5 characters)', 'error');
+                return;
+            }
+
+            if (!file) {
+                showToast('❌ Please upload a screenshot!', 'error');
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('❌ Image size must be less than 5MB!', 'error');
+                return;
+            }
+
+            if (!state.currentVerifyAdId) {
+                showToast('❌ No ad selected!', 'error');
+                return;
+            }
+
+            DOM.verifySubmitBtn.disabled = true;
+            DOM.verifySubmitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Uploading...';
+
+            try {
+                const downloadUrl = await uploadImage(file);
+
+                const verificationData = {
+                    adId: state.currentVerifyAdId,
+                    userId: state.currentUserId,
+                    userName: tg?.initDataUnsafe?.user?.first_name || 'User',
+                    adTitle: title,
+                    adDescription: desc,
+                    screenshot: downloadUrl,
+                    status: 'pending',
+                    rejectReason: '',
+                    createdAt: Date.now()
+                };
+
+                await firebaseDb.ref('verifications').push(verificationData);
+
+                if (!state.viewedAds.includes(state.currentVerifyAdId)) {
+                    state.viewedAds.push(state.currentVerifyAdId);
+                }
+
+                await firebaseDb.ref(`ads/${state.currentVerifyAdId}/views`).transaction((current) => (current || 0) + 1);
+
+                saveUserData();
+                updateUI();
+
+                closeVerificationModal();
+                closeAdDetails();
+                showToast('✅ Verification submitted! Waiting for admin approval.', 'success');
+
+            } catch (e) {
+                console.error("Verification error:", e);
+                showToast('❌ Failed to submit verification: ' + e.message, 'error');
+            } finally {
+                DOM.verifySubmitBtn.disabled = false;
+                DOM.verifySubmitBtn.innerHTML = '<i class="fa-solid fa-upload"></i> Submit Verification';
+            }
         }
 
         // ============================================================
@@ -2787,7 +2376,7 @@
             }
 
             if (state.viewedAds.includes(adId)) {
-                openVerifyModal(adId);
+                openAdDetails(adId);
                 return;
             }
 
@@ -2821,176 +2410,10 @@
 
                 safeOpenLink(ad.link);
                 state.currentVerifyAdId = adId;
-                openVerifyModal(adId);
+                openVerificationModal(adId);
             } catch (e) {
                 console.error("View ad error:", e);
                 showToast('❌ Failed to load ad.', 'error');
-            }
-        }
-
-        // ============================================================
-        // VERIFICATION
-        // ============================================================
-        function openVerifyModal(adId) {
-            const existingVerification = state.verifications.find(v => v.adId === adId);
-            if (existingVerification && existingVerification.status === 'rejected') {
-                showToast(`❌ This verification was rejected.`, 'error');
-                return;
-            }
-
-            state.currentVerifyAdId = adId;
-            const modal = document.getElementById('verifyAdModal');
-
-            firebaseDb.ref(`ads/${adId}`).once('value').then(snapshot => {
-                const ad = snapshot.val();
-                if (ad) {
-                    DOM.verifyAdInfo.innerHTML = `
-                        <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:10px; margin-bottom:12px;">
-                            <strong>${escapeHTML(ad.title)}</strong>
-                            <div style="font-size:12px; color:var(--text-light);">Category: ${escapeHTML(ad.category || 'General')}</div>
-                            ${ad.subCategory ? `<div style="font-size:12px; color:var(--text-light);">Sub Category: ${escapeHTML(ad.subCategory)}</div>` : ''}
-                            <div style="font-size:12px; color:var(--text-light);">Reward: $${ad.reward?.toFixed(4) || '0.0010'}</div>
-                            ${ad.imageUrl ? `<img src="${ad.imageUrl}" style="width:100%; max-height:100px; object-fit:cover; border-radius:6px; margin-top:6px;" loading="lazy">` : ''}
-                        </div>
-                    `;
-                }
-            });
-
-            DOM.verifyScreenshot.value = '';
-            DOM.verifyAdTitle.value = '';
-            DOM.verifyAdDesc.value = '';
-            modal.style.display = 'flex';
-        }
-
-        async function submitVerification() {
-            const title = DOM.verifyAdTitle.value.trim();
-            const desc = DOM.verifyAdDesc.value.trim();
-            const file = DOM.verifyScreenshot.files[0];
-
-            if (!title || title.length < 3) {
-                showToast('❌ Please enter a valid ad title (min 3 characters)', 'error');
-                return;
-            }
-
-            if (!desc || desc.length < 5) {
-                showToast('❌ Please enter a valid description (min 5 characters)', 'error');
-                return;
-            }
-
-            if (!file) {
-                showToast('❌ Please upload a screenshot!', 'error');
-                return;
-            }
-
-            if (file.size > 5 * 1024 * 1024) {
-                showToast('❌ Image size must be less than 5MB!', 'error');
-                return;
-            }
-
-            if (!state.currentVerifyAdId) {
-                showToast('❌ No ad selected!', 'error');
-                return;
-            }
-
-            try {
-                showToast('📤 Uploading screenshot...', '');
-                const downloadUrl = await uploadImage(file);
-
-                const verificationData = {
-                    adId: state.currentVerifyAdId,
-                    userId: state.currentUserId,
-                    userName: tg?.initDataUnsafe?.user?.first_name || 'User',
-                    adTitle: title,
-                    adDescription: desc,
-                    screenshot: downloadUrl,
-                    status: 'pending',
-                    rejectReason: '',
-                    createdAt: Date.now()
-                };
-
-                await firebaseDb.ref('verifications').push(verificationData);
-
-                if (!state.viewedAds.includes(state.currentVerifyAdId)) {
-                    state.viewedAds.push(state.currentVerifyAdId);
-                }
-
-                await firebaseDb.ref(`ads/${state.currentVerifyAdId}/views`).transaction((current) => (current || 0) + 1);
-
-                saveUserData();
-                updateUI();
-
-                closeModal('verifyAdModal');
-                showToast('✅ Verification submitted! Waiting for admin approval.', 'success');
-
-            } catch (e) {
-                console.error("Verification error:", e);
-                showToast('❌ Failed to submit verification: ' + e.message, 'error');
-            }
-        }
-
-        // ============================================================
-        // DELETE AD WITH REFUND
-        // ============================================================
-        function openDeleteConfirm(adId) {
-            pendingDeleteAdId = adId;
-            
-            firebaseDb.ref(`ads/${adId}`).once('value').then(snapshot => {
-                const ad = snapshot.val();
-                if (!ad) return;
-                
-                const budget = ad.budget || 0;
-                const refund = budget * (CONFIG.REFUND_PERCENTAGE / 100);
-                const fee = budget * (CONFIG.COMPANY_FEE_PERCENTAGE / 100);
-                
-                DOM.deleteBudget.textContent = `$${budget.toFixed(2)}`;
-                DOM.deleteRefund.textContent = `$${refund.toFixed(2)}`;
-                DOM.deleteFee.textContent = `$${fee.toFixed(2)}`;
-                
-                document.getElementById('deleteConfirmModal').style.display = 'flex';
-            });
-        }
-
-        async function confirmDeleteAd() {
-            if (!pendingDeleteAdId) {
-                showToast('❌ No ad selected', 'error');
-                return;
-            }
-
-            try {
-                const snapshot = await firebaseDb.ref(`ads/${pendingDeleteAdId}`).once('value');
-                const ad = snapshot.val();
-                if (!ad) {
-                    showToast('❌ Ad not found', 'error');
-                    return;
-                }
-
-                const budget = ad.budget || 0;
-                const refund = budget * (CONFIG.REFUND_PERCENTAGE / 100);
-                const fee = budget * (CONFIG.COMPANY_FEE_PERCENTAGE / 100);
-
-                state.walletBalance += refund;
-                await firebaseDb.ref(`ads/${pendingDeleteAdId}`).remove();
-
-                state.withdrawalHistory.unshift({
-                    method: 'Ad Deleted (Refund)',
-                    number: `${ad.title || 'Untitled'}`,
-                    amount: refund,
-                    date: new Date().toISOString(),
-                    status: 'Refunded'
-                });
-
-                saveUserData();
-                updateUI();
-                
-                closeModal('deleteConfirmModal');
-                pendingDeleteAdId = null;
-                
-                showToast(`✅ Ad deleted! Refund of $${refund.toFixed(2)} added.`, 'success');
-                listenAds();
-
-            } catch (e) {
-                console.error("Delete ad error:", e);
-                showToast('❌ Failed to delete ad.', 'error');
             }
         }
 
@@ -3025,55 +2448,54 @@
                 if (!isApproved) { statusText = '⏳ Pending Approval'; statusClass = 'pending'; }
 
                 return `
-                    <div class="ad-card">
-                        <div class="ad-header">
-                            <span class="ad-title">${escapeHTML(ad.title || 'Untitled')}</span>
-                            <span class="ad-status ${statusClass}">${statusText}</span>
-                        </div>
-                        <div style="display:flex; gap:6px; margin:4px 0; flex-wrap:wrap;">
-                            <span class="ad-category-badge">📌 ${escapeHTML(category)}</span>
+                    <div class="ad-card-enhanced" style="cursor:default;">
+                        <div class="ad-title">${escapeHTML(ad.title || 'Untitled')}</div>
+                        <div class="ad-categories">
+                            <span class="category-badge">📌 ${escapeHTML(category)}</span>
                             ${subCategory ? `<span class="sub-category-badge">🏷️ ${escapeHTML(subCategory)}</span>` : ''}
                         </div>
-                        ${imageUrl ? `<img src="${imageUrl}" class="ad-image" alt="Ad image" loading="lazy">` : ''}
-                        <div class="ad-desc">${escapeHTML(ad.desc || 'No description')}</div>
-                        <div class="campaign-info">
-                            <div class="info-item">
-                                <span class="label">Views</span>
-                                <span class="value">${views}/${totalViews}</span>
+                        ${imageUrl ? `<img src="${imageUrl}" class="ad-image" alt="Ad image" loading="lazy" style="width:100%; max-height:120px; object-fit:cover; border-radius:8px; margin:8px 0;">` : ''}
+                        <div class="ad-stats">
+                            <span class="stat"><i class="fa-regular fa-eye"></i> <strong>${views}</strong> / ${totalViews}</span>
+                            <span class="stat"><i class="fa-regular fa-clock"></i> ${daysLeft > 0 ? daysLeft + ' days left' : 'Expired'}</span>
+                            <span class="reward">+$${ad.reward?.toFixed(4) || '0.0010'}</span>
+                        </div>
+                        <div class="progress-section">
+                            <div class="progress-bar">
+                                <div class="fill" style="width:${progress}%;"></div>
                             </div>
-                            <div class="info-item">
-                                <span class="label">Budget</span>
-                                <span class="value">$${budget.toFixed(2)}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="label">Reward/View</span>
-                                <span class="value">$${ad.reward?.toFixed(4) || '0.0010'}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="label">Days Left</span>
-                                <span class="value">${daysLeft > 0 ? daysLeft : 'Expired'}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="label">Status</span>
-                                <span class="value"><span class="ad-status-badge ${isApproved ? 'approved' : 'pending'}">${isApproved ? '✅ Approved' : '⏳ Pending'}</span></span>
+                            <div class="progress-info">
+                                <span>${Math.round(progress)}% completed</span>
+                                <span>Budget: $${budget.toFixed(2)}</span>
                             </div>
                         </div>
-                        <div style="width:100%; height:4px; background:var(--border-color); border-radius:4px; margin-top:8px; overflow:hidden;">
-                            <div style="width:${progress}%; height:100%; background:linear-gradient(90deg, #10b981, #3b82f6); border-radius:4px; transition:width 0.3s;"></div>
-                        </div>
-                        <div class="ad-footer" style="margin-top:8px; padding-top:8px; border-top:1px solid var(--border-color);">
-                            <button class="ad-btn" style="background:#ef4444; color:#fff; padding:4px 14px; border:none; border-radius:6px; font-size:11px; cursor:pointer;" onclick="openDeleteConfirm('${ad.id}')">
-                                <i class="fa-solid fa-trash"></i> Delete
-                            </button>
-                            ${!isExpired && isApproved ? `
-                                <button class="ad-btn" style="background:#f59e0b; color:#fff; padding:4px 14px; border:none; border-radius:6px; font-size:11px; cursor:pointer;" onclick="toggleAdStatus('${ad.id}')">
-                                    ${ad.status === 'active' ? '⏸ Pause' : '▶️ Activate'}
+                        <div class="ad-footer">
+                            <span class="ad-status ${statusClass}">${statusText}</span>
+                            <div>
+                                <button class="action-btn delete" onclick="deleteMyAd('${ad.id}')" style="padding:4px 12px; border:none; border-radius:6px; background:var(--danger); color:white; cursor:pointer; font-size:11px;">
+                                    <i class="fa-solid fa-trash"></i>
                                 </button>
-                            ` : ''}
+                                ${!isExpired && isApproved ? `
+                                    <button class="action-btn view" onclick="toggleAdStatus('${ad.id}')" style="padding:4px 12px; border:none; border-radius:6px; background:var(--primary); color:white; cursor:pointer; font-size:11px;">
+                                        ${ad.status === 'active' ? '⏸' : '▶️'}
+                                    </button>
+                                ` : ''}
+                            </div>
                         </div>
                     </div>
                 `;
             }).join('');
+        }
+
+        async function deleteMyAd(adId) {
+            if (!confirm('Delete this ad?')) return;
+            try {
+                await firebaseDb.ref(`ads/${adId}`).remove();
+                showToast('✅ Ad deleted!', 'success');
+                listenAds();
+            } catch (e) {
+                showToast('❌ Failed to delete ad.', 'error');
+            }
         }
 
         async function toggleAdStatus(adId) {
@@ -3100,446 +2522,16 @@
         }
 
         // ============================================================
-        // VERIFICATION REQUESTS (Advertiser)
-        // ============================================================
-        function renderVerificationRequests(ads) {
-            if (!DOM.verificationContainer || state.userRole !== 'advertiser') return;
-
-            firebaseDb.ref('verifications').orderByChild('status').equalTo('pending').on('value', (snapshot) => {
-                const verifications = snapshot.val() || {};
-                const items = Object.entries(verifications).map(([id, data]) => ({ id, ...data }));
-
-                const myAdIds = ads.filter(ad => ad.createdBy === state.currentUserId).map(ad => ad.id);
-                const filtered = items.filter(v => myAdIds.includes(v.adId));
-
-                if (filtered.length === 0) {
-                    DOM.verificationContainer.innerHTML = `<div class="empty-state"><i class="fa-solid fa-check-double"></i><p>No pending verification requests</p></div>`;
-                    return;
-                }
-
-                DOM.verificationContainer.innerHTML = filtered.map(v => `
-                    <div class="ad-card">
-                        <div class="ad-header">
-                            <span class="ad-title">Verification from ${escapeHTML(v.userName || 'User')}</span>
-                            <span class="ad-status pending">⏳ Pending</span>
-                        </div>
-                        <div style="font-size:13px; color:var(--text-light); margin:6px 0;">
-                            <strong>Title:</strong> ${escapeHTML(v.adTitle || 'N/A')}<br>
-                            <strong>Description:</strong> ${escapeHTML(v.adDescription || 'N/A')}
-                        </div>
-                        ${v.screenshot ? `<img src="${v.screenshot}" class="ad-image" alt="Screenshot" style="cursor:pointer; max-height:80px;" onclick="window.open('${v.screenshot}','_blank')" loading="lazy">` : ''}
-                        <div class="ad-footer" style="margin-top:8px;">
-                            <button class="ad-btn" style="background:#10b981; color:#fff; padding:4px 14px; border:none; border-radius:6px; font-size:11px; cursor:pointer;" onclick="verifyAdRequest('${v.id}')">
-                                ✅ Approve
-                            </button>
-                            <button class="ad-btn" style="background:#ef4444; color:#fff; padding:4px 14px; border:none; border-radius:6px; font-size:11px; cursor:pointer;" onclick="openRejectModal('${v.id}')">
-                                ❌ Reject
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
-            });
-        }
-
-        function openRejectModal(verificationId) {
-            pendingRejectVerificationId = verificationId;
-            DOM.rejectReason.value = '';
-            document.getElementById('rejectReasonModal').style.display = 'flex';
-        }
-
-        async function confirmReject() {
-            const reason = DOM.rejectReason.value.trim();
-            
-            if (!reason || reason.length < 3) {
-                showToast('❌ Please provide a valid rejection reason (min 3 characters)', 'error');
-                return;
-            }
-
-            if (!pendingRejectVerificationId) {
-                showToast('❌ No verification selected', 'error');
-                return;
-            }
-
-            try {
-                await firebaseDb.ref(`verifications/${pendingRejectVerificationId}/status`).set('rejected');
-                await firebaseDb.ref(`verifications/${pendingRejectVerificationId}/rejectReason`).set(reason);
-                
-                closeModal('rejectReasonModal');
-                pendingRejectVerificationId = null;
-                showToast('❌ Verification rejected', 'error');
-                listenAds();
-
-            } catch (e) {
-                console.error("Reject error:", e);
-                showToast('❌ Failed to reject verification.', 'error');
-            }
-        }
-
-        async function verifyAdRequest(verificationId) {
-            try {
-                const snapshot = await firebaseDb.ref(`verifications/${verificationId}`).once('value');
-                const data = snapshot.val();
-                if (!data) return;
-
-                await firebaseDb.ref(`verifications/${verificationId}/status`).set('approved');
-
-                const adSnapshot = await firebaseDb.ref(`ads/${data.adId}`).once('value');
-                const ad = adSnapshot.val();
-
-                if (ad) {
-                    await firebaseDb.ref(`users/${data.userId}/balance`).transaction((current) => (current || 0) + ad.reward);
-                }
-
-                await firebaseDb.ref(`ads/${data.adId}/verified`).set(true);
-
-                showToast('✅ Verification approved!', 'success');
-                listenAds();
-
-            } catch (e) {
-                console.error("Verify error:", e);
-                showToast('❌ Failed to approve verification.', 'error');
-            }
-        }
-
-        // ============================================================
-        // DEPOSIT SYSTEM
-        // ============================================================
-        function renderDepositMethods() {
-            if (!DOM.depositMethodsList) return;
-
-            const methods = CONFIG.depositMethods || [
-                { name: 'Bikash', number: '01712345678', icon: '💳' },
-                { name: 'Nogad', number: '01712345678', icon: '📱' },
-                { name: 'Bank', number: '1234567890', icon: '🏦' }
-            ];
-
-            DOM.depositMethodsList.innerHTML = methods.map(m => `
-                <div class="deposit-method" onclick="selectDepositMethod('${m.name}', '${m.number}', this)">
-                    <div class="method-icon">${m.icon}</div>
-                    <div class="method-info">
-                        <div class="method-name">${m.name}</div>
-                        <div class="method-desc">Send money to this number</div>
-                    </div>
-                    <div class="method-number">${m.number}</div>
-                </div>
-            `).join('');
-        }
-
-        function selectDepositMethod(name, number, el) {
-            document.querySelectorAll('.deposit-method').forEach(m => m.classList.remove('selected'));
-            if (el) el.classList.add('selected');
-            state.selectedDepositMethod = name;
-            state.selectedDepositNumber = number;
-            showToast(`✅ Selected: ${name}`, 'success');
-        }
-
-        function showDepositModal() {
-            if (state.userRole !== 'advertiser') {
-                showToast('❌ Deposit is only available for Advertisers.', 'error');
-                return;
-            }
-            DOM.depositMinAmount.textContent = CONFIG.MINIMUM_DEPOSIT;
-            document.getElementById('depositModal').style.display = 'flex';
-        }
-
-        async function submitDeposit() {
-            const sender = DOM.depositSender.value.trim();
-            const trxid = DOM.depositTrxid.value.trim();
-            const amount = parseInt(DOM.depositAmount.value);
-
-            if (!sender) {
-                showToast('❌ Please enter your sender number', 'error');
-                return;
-            }
-
-            if (!trxid) {
-                showToast('❌ Please enter the transaction ID', 'error');
-                return;
-            }
-
-            if (!amount || amount < CONFIG.MINIMUM_DEPOSIT) {
-                showToast(`❌ Minimum deposit is ${CONFIG.MINIMUM_DEPOSIT} BDT`, 'error');
-                return;
-            }
-
-            if (!state.selectedDepositMethod) {
-                showToast('❌ Please select a payment method first', 'error');
-                return;
-            }
-
-            const user = tg?.initDataUnsafe?.user || { first_name: 'User', id: 'testuser' };
-
-            const depositData = {
-                userId: state.currentUserId,
-                userName: user.first_name || 'User',
-                method: state.selectedDepositMethod,
-                number: state.selectedDepositNumber,
-                senderNumber: sender,
-                transactionId: trxid,
-                amount: amount,
-                status: 'pending',
-                createdAt: Date.now()
-            };
-
-            try {
-                await firebaseDb.ref('deposits').push(depositData);
-
-                closeModal('depositModal');
-                showToast(`✅ Deposit request sent!`, 'success');
-                
-                DOM.depositSender.value = '';
-                DOM.depositTrxid.value = '';
-                DOM.depositAmount.value = '';
-
-            } catch (e) {
-                console.error("Deposit error:", e);
-                showToast('❌ Failed to submit deposit.', 'error');
-            }
-        }
-
-        // ============================================================
-        // WITHDRAWAL
-        // ============================================================
-        function populateWithdrawalMethods() {
-            if (!DOM.methodSelect) return;
-
-            DOM.methodSelect.innerHTML = '<option value="" disabled selected>Select Payment Method</option>';
-            DOM.methodFieldsContainer.innerHTML = '';
-
-            CONFIG.withdrawalMethods.forEach((method) => {
-                const option = document.createElement('option');
-                option.value = method;
-                option.textContent = method;
-                DOM.methodSelect.appendChild(option);
-
-                const fieldDiv = document.createElement('div');
-                fieldDiv.id = method.toLowerCase() + '-field';
-                fieldDiv.className = 'method-field';
-                fieldDiv.innerHTML = `
-                    <label>${method} Account</label>
-                    <div class="field-hint">Enter your ${method} account details</div>
-                    <input type="text" id="${method.toLowerCase()}-account" placeholder="Enter ${method} Account">
-                `;
-                DOM.methodFieldsContainer.appendChild(fieldDiv);
-            });
-
-            DOM.methodSelect.addEventListener('change', function() {
-                document.querySelectorAll('.method-field').forEach(el => el.classList.remove('active'));
-                if (this.value) {
-                    const field = document.getElementById(this.value.toLowerCase() + '-field');
-                    if (field) field.classList.add('active');
-                }
-            });
-        }
-
-        async function handleWithdrawal(e) {
-            e.preventDefault();
-
-            if (state.userRole !== 'publisher') {
-                showToast('❌ Only Publishers can withdraw!', 'error');
-                return;
-            }
-
-            const method = DOM.methodSelect.value;
-            const accountInput = document.getElementById(method?.toLowerCase() + '-account');
-            const accountNumber = accountInput?.value.trim() || '';
-            const amount = parseFloat(DOM.withdrawAmount.value);
-
-            if (!method) return showToast('Please select a payment method.', 'error');
-            if (!accountNumber) return showToast(`Please enter your ${method} account number.`, 'error');
-            if (amount > state.balance) return showToast('Insufficient balance.', 'error');
-            if (isNaN(amount) || amount < CONFIG.MINIMUM_WITHDRAWAL) {
-                return showToast(`Minimum withdrawal is $${CONFIG.MINIMUM_WITHDRAWAL.toFixed(2)}.`, 'error');
-            }
-
-            const btn = DOM.withdrawSubmitBtn;
-            const text = btn.querySelector('.button-text');
-            const spinner = btn.querySelector('.loader-spinner');
-            text.style.display = 'none';
-            spinner.style.display = 'block';
-            btn.disabled = true;
-
-            const user = tg?.initDataUnsafe?.user || { first_name: 'User', last_name: '', username: 'N/A' };
-
-            const withdrawalData = {
-                userId: state.currentUserId,
-                userName: `${user.first_name} ${user.last_name || ''}`,
-                username: user.username || 'N/A',
-                method,
-                accountNumber,
-                amount,
-                date: new Date().toISOString(),
-                status: 'Pending'
-            };
-
-            try {
-                const ref = firebaseDb.ref('withdrawals').push();
-                await ref.set(withdrawalData);
-
-                state.balance -= amount;
-                state.withdrawalHistory.unshift({
-                    method,
-                    number: accountNumber,
-                    amount,
-                    date: new Date().toISOString(),
-                    status: 'Pending'
-                });
-
-                saveUserData();
-                updateUI();
-                closeModal('withdrawModal');
-
-                DOM.withdrawForm.reset();
-                document.querySelectorAll('.method-field').forEach(el => el.classList.remove('active'));
-                DOM.methodSelect.selectedIndex = 0;
-
-                showToast('✅ Withdrawal request submitted!', 'success');
-
-            } catch (error) {
-                console.error("Withdrawal error:", error);
-                showToast('❌ Failed to submit request.', 'error');
-            } finally {
-                text.style.display = 'inline';
-                spinner.style.display = 'none';
-                btn.disabled = false;
-            }
-        }
-
-        // ============================================================
-        // RENDER FUNCTIONS
-        // ============================================================
-        function renderHistory() {
-            if (!DOM.historyList) return;
-
-            if (!state.withdrawalHistory || state.withdrawalHistory.length === 0) {
-                DOM.historyList.innerHTML = `<div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><p>No withdrawal history</p></div>`;
-                return;
-            }
-
-            DOM.historyList.innerHTML = state.withdrawalHistory.map(item => `
-                <div class="history-item">
-                    <div class="history-details">
-                        <div class="method-number">${escapeHTML(item.method)} - ${escapeHTML(item.number)}</div>
-                        <div class="date">${new Date(item.date).toLocaleString()}</div>
-                    </div>
-                    <div class="history-amount">
-                        <div class="amount-text">$${item.amount.toFixed(4)}</div>
-                        <div class="history-status ${item.status.toLowerCase()}">${item.status}</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderBonusTasks() {
-            if (!DOM.bonusTasksList) return;
-
-            if (!state.bonusTasks || state.bonusTasks.length === 0) {
-                DOM.bonusTasksList.innerHTML = `<div class="empty-state"><i class="fa-solid fa-star"></i><p>No bonus tasks available</p></div>`;
-                return;
-            }
-
-            DOM.bonusTasksList.innerHTML = state.bonusTasks.map(task => {
-                const isCompleted = state.completedBonusTasks.includes(task.id);
-                return `
-                    <div class="bonus-item">
-                        <div class="details">
-                            <div class="title">${escapeHTML(task.title)}</div>
-                            <div class="reward"><i class="fa-solid fa-gift"></i> + $${task.reward.toFixed(4)}</div>
-                        </div>
-                        <button class="claim-btn" ${isCompleted ? 'disabled' : ''}>
-                            ${isCompleted ? '✅ Completed' : 'Claim'}
-                        </button>
-                    </div>
-                `;
-            }).join('');
-
-            DOM.bonusTasksList.querySelectorAll('.claim-btn:not([disabled])').forEach((btn, index) => {
-                btn.addEventListener('click', () => {
-                    const task = state.bonusTasks[index];
-                    handleBonusTask(task, btn);
-                });
-            });
-        }
-
-        function handleBonusTask(task, button) {
-            button.disabled = true;
-            button.textContent = 'Processing...';
-
-            safeOpenLink(task.link);
-
-            setTimeout(() => {
-                if (state.completedBonusTasks.includes(task.id)) return;
-                state.balance += task.reward;
-                state.completedBonusTasks.push(task.id);
-                saveUserData();
-                updateUI();
-                button.textContent = '✅ Completed';
-                showToast(`🎉 Bonus of $${task.reward.toFixed(4)} added!`, 'success');
-            }, (task.duration || 10) * 1000);
-        }
-
-        // ============================================================
-        // REFERRAL SYSTEM
-        // ============================================================
-        async function handleReferral() {
-            if (!firebaseDb || !tg?.initDataUnsafe) return;
-
-            const startParam = tg.initDataUnsafe.start_param;
-            const currentUser = tg.initDataUnsafe.user;
-            if (!startParam || isNaN(parseInt(startParam)) || parseInt(startParam) === currentUser.id) return;
-
-            const referrerId = parseInt(startParam);
-            const ref = firebaseDb.ref(`users/${currentUser.id}/referred_by`);
-            const snapshot = await ref.once('value');
-            if (snapshot.exists()) return;
-
-            await ref.set(referrerId);
-            await firebaseDb.ref(`users/${referrerId}/referrals`).transaction((c) => (c || 0) + 1);
-
-            await processReferralRewards();
-        }
-
-        async function processReferralRewards() {
-            if (!firebaseDb || !state.currentUserId) return;
-
-            const ref = firebaseDb.ref(`users/${state.currentUserId}/referrals`);
-            const snapshot = await ref.once('value');
-            const totalReferrals = snapshot.val() || 0;
-
-            const newReferrals = totalReferrals - (state.rewardedReferrals || 0);
-            if (newReferrals > 0) {
-                const bonus = newReferrals * CONFIG.REFERRAL_REWARD;
-                state.balance += bonus;
-                state.rewardedReferrals = totalReferrals;
-                saveUserData();
-                showToast(`🎉 You received $${bonus.toFixed(4)} for ${newReferrals} new referral(s)!`, 'success');
-            }
-        }
-
-        // ============================================================
-        // WATCH AD - FIXED - ONLY REWARD WHEN AD IS SHOWN AND COMPLETED
+        // WATCH AD
         // ============================================================
         async function watchAd() {
             if (isAdShowing) return;
-            if (DOM.adLoaderOverlay.style.display === 'flex') return;
 
-            // Check 1-minute cooldown (persists across app close)
             const now = Date.now();
             if (now - lastAdWatchTime < CONFIG.AD_COOLDOWN_MINUTES * 60 * 1000) {
                 const remaining = Math.ceil((CONFIG.AD_COOLDOWN_MINUTES * 60 * 1000 - (now - lastAdWatchTime)) / 1000);
                 showToast(`⏳ Please wait ${remaining}s before watching another ad`, 'warning');
                 return;
-            }
-
-            if (state.lastUsedIp && !state.cooldownUntil) {
-                const newIp = await getIpAddress();
-                if (newIp === state.lastUsedIp) {
-                    showToast('Please change your IP address before continuing.', 'warning');
-                    return;
-                } else {
-                    state.lastUsedIp = null;
-                    saveUserData();
-                }
             }
 
             if (state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT) {
@@ -3548,36 +2540,19 @@
             }
 
             isAdShowing = true;
-            DOM.adLoaderOverlay.style.display = 'flex';
-            DOM.adLoaderProgress.style.width = '0%';
-            DOM.adLoaderOverlay.querySelector('.loader-text').textContent = 'Loading Ad...';
-            DOM.adLoaderOverlay.querySelector('.loader-sub').textContent = 'Please wait while the ad loads';
+            DOM.watchAdBtn.disabled = true;
+            DOM.watchAdBtn.querySelector('span').textContent = 'Loading...';
 
             try {
-                // Progress animation
-                let progress = 0;
-                const progressInterval = setInterval(() => {
-                    progress += Math.random() * 8 + 2;
-                    if (progress > 90) progress = 90;
-                    DOM.adLoaderProgress.style.width = `${progress}%`;
-                }, 300);
-
-                // Show Monetag ad - ONLY reward when ad is shown and completed
                 const adShown = await showRewardedAd();
 
-                clearInterval(progressInterval);
-                DOM.adLoaderProgress.style.width = '100%';
-
-                // ONLY add reward if ad was actually shown and completed
                 if (adShown) {
-                    // Add reward
                     state.balance += CONFIG.AD_REWARD;
                     state.adCount++;
                     state.adsWatchedToday++;
                     const day = new Date().getDay();
                     state.weeklyActivity[day] = (state.weeklyActivity[day] || 0) + 1;
                     
-                    // Update last watch time (persists in Firebase)
                     lastAdWatchTime = Date.now();
 
                     let alertMsg = `✅ Ad watched! +$${CONFIG.AD_REWARD.toFixed(4)} added!`;
@@ -3587,18 +2562,13 @@
                         const cdDate = new Date();
                         cdDate.setMinutes(cdDate.getMinutes() + CONFIG.COOLDOWN_MINUTES);
                         state.cooldownUntil = cdDate.toISOString();
-                        state.lastUsedIp = await getIpAddress();
                         alertMsg = `✅ Daily limit reached! Take a ${CONFIG.COOLDOWN_MINUTES}-minute break.`;
                     }
 
                     saveUserData();
                     updateUI();
-
-                    setTimeout(() => {
-                        showToast(alertMsg, 'success');
-                    }, 300);
+                    showToast(alertMsg, 'success');
                 } else {
-                    // NO reward - ad was not shown
                     showToast('❌ Ad was not shown. Please try again.', 'error');
                 }
 
@@ -3607,9 +2577,8 @@
                 showToast('❌ Ad could not be loaded. Please try again.', 'error');
             } finally {
                 isAdShowing = false;
-                DOM.adLoaderOverlay.style.display = 'none';
-                DOM.adLoaderOverlay.querySelector('.loader-text').textContent = 'Loading Ad...';
-                DOM.adLoaderOverlay.querySelector('.loader-sub').textContent = 'Please wait while the ad loads';
+                DOM.watchAdBtn.disabled = false;
+                DOM.watchAdBtn.querySelector('span').textContent = '▶️ Watch Ad';
             }
         }
 
@@ -3630,7 +2599,6 @@
             DOM.walletBalance.textContent = `$${formatBalance(state.walletBalance)}`;
             DOM.adCount.textContent = state.adCount;
             DOM.adsTodayCount.textContent = `${state.adsWatchedToday} / ${CONFIG.DAILY_AD_LIMIT}`;
-            DOM.minWithdrawText.textContent = `Minimum withdrawal is $${CONFIG.MINIMUM_WITHDRAWAL.toFixed(2)}.`;
 
             DOM.convertBalance.textContent = `$${formatBalance(state.balance)}`;
             DOM.convertBtn.disabled = state.balance <= 0;
@@ -3735,38 +2703,14 @@
         }
 
         // ============================================================
-        // MODALS
+        // DEPOSIT MODAL (Simplified)
         // ============================================================
-        function showModal(modalId, btn) {
-            document.querySelectorAll('.nav-button.active').forEach(b => b.classList.remove('active'));
-            if (btn) btn.classList.add('active');
-
-            if (modalId === 'historyModal') renderHistory();
-            if (modalId === 'bonusTasksModal') renderBonusTasks();
-
-            const modal = document.getElementById(modalId);
-            if (modal) modal.style.display = 'flex';
-        }
-
-        function closeModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (modal) modal.style.display = 'none';
-        }
-
-        // ============================================================
-        // COPY / SHARE
-        // ============================================================
-        function copyReferralLink() {
-            const link = getReferralLink();
-            navigator.clipboard.writeText(link)
-                .then(() => showToast('✅ Referral link copied!', 'success'))
-                .catch(() => showToast('Could not copy link.', 'error'));
-        }
-
-        function shareReferralLink() {
-            const link = getReferralLink();
-            const text = `💰 Earn money by watching ads! Join using my referral link:\n\n${link}\n\nJoin @${CONFIG.BOT_USERNAME} and start earning today! 🚀`;
-            safeOpenTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`);
+        function showDepositModal() {
+            if (state.userRole !== 'advertiser') {
+                showToast('❌ Deposit is only available for Advertisers.', 'error');
+                return;
+            }
+            showToast('💳 Deposit feature: Contact admin for manual deposit.', 'info');
         }
 
         // ============================================================
@@ -3815,40 +2759,21 @@
                 await loadUserData();
                 await loadBonusTasks();
 
-                populateWithdrawalMethods();
                 setupCreateAdForm();
-                renderDepositMethods();
 
-                DOM.welcomeTitle.textContent = CONFIG.welcomeNotice.title;
-                DOM.welcomeMessage.textContent = CONFIG.welcomeNotice.message;
+                await loadAllUsers();
 
-                await handleReferral();
-                await processReferralRewards();
-
-                listenReferrals();
-                listenDeposits();
-                listenAds();
-                listenUserVerifications();
+                DOM.watchAdBtn.addEventListener('click', watchAd);
+                DOM.joinChannelBtn.addEventListener('click', () => safeOpenTelegramLink(CONFIG.CHANNEL_LINK));
 
                 if (user?.first_name) {
                     DOM.greeting.textContent = `Welcome, ${escapeHTML(user.first_name)}!`;
                     DOM.profilePic.innerHTML = `<span>${escapeHTML(user.first_name.charAt(0))}</span>`;
                 }
 
-                state.currentIp = await getIpAddress();
-
-                DOM.watchAdBtn.addEventListener('click', watchAd);
-                DOM.joinChannelBtn.addEventListener('click', () => safeOpenTelegramLink(CONFIG.CHANNEL_LINK));
-                DOM.supportBtn.addEventListener('click', () => safeOpenTelegramLink(CONFIG.SUPPORT_LINK));
-                DOM.copyLinkBtn.addEventListener('click', copyReferralLink);
-                DOM.shareLinkBtn.addEventListener('click', shareReferralLink);
-                DOM.withdrawForm.addEventListener('submit', handleWithdrawal);
-
-                window.onclick = (event) => {
-                    if (event.target.classList.contains('modal')) {
-                        closeModal(event.target.id);
-                    }
-                };
+                listenReferrals();
+                listenAds();
+                listenUserVerifications();
 
                 const initialRole = state.userRole || 'publisher';
                 const roleBtn = document.querySelector(`.role-btn.${initialRole}`);
@@ -3868,7 +2793,9 @@
                 }, 2000);
 
                 if (!sessionStorage.getItem('alreadyVisited')) {
-                    setTimeout(() => showModal('welcomeModal'), 500);
+                    setTimeout(() => {
+                        showToast('🎉 Welcome to NexEarn! Watch ads and earn money!', 'success');
+                    }, 500);
                     sessionStorage.setItem('alreadyVisited', 'true');
                 }
 
@@ -3879,8 +2806,6 @@
                 console.log("💰 Balance:", state.balance);
                 console.log("💳 Wallet:", state.walletBalance);
                 console.log("🎯 Role:", state.userRole);
-                console.log(`⏱️ Ad Cooldown: ${CONFIG.AD_COOLDOWN_MINUTES} minute(s)`);
-                console.log(`⏱️ Last Ad Time: ${new Date(lastAdWatchTime).toLocaleTimeString()}`);
 
             } catch (error) {
                 console.error("Init error:", error);
@@ -3898,6 +2823,13 @@
         }
 
         document.addEventListener('DOMContentLoaded', initApp);
+
+        // Close verification modal on outside click
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('verification-modal')) {
+                closeVerificationModal();
+            }
+        });
     </script>
 </body>
 </html>
