@@ -541,7 +541,7 @@
         
         .filter-btn:hover:not(.active) { border-color: var(--text-color); }
         
-        /* ===== JOB CARD STYLES (UPDATED) ===== */
+        /* ===== JOB CARD STYLES ===== */
         .job-card {
             background: var(--card-background);
             border-radius: var(--radius);
@@ -2091,6 +2091,21 @@
                         <textarea id="ad-desc" placeholder="Describe your ad. You can include links here." required></textarea>
                         <div class="form-hint">You can add links in the description. Users can click them.</div>
                     </div>
+                    
+                    <!-- NEW: Requirements Field -->
+                    <div class="form-group">
+                        <label>Requirements *</label>
+                        <textarea id="ad-requirements" placeholder="What requirements must users meet to complete this job?" rows="3" required></textarea>
+                        <div class="form-hint">Example: Must have a YouTube account, must like the video, etc.</div>
+                    </div>
+                    
+                    <!-- NEW: Instructions Field -->
+                    <div class="form-group">
+                        <label>Instructions *</label>
+                        <textarea id="ad-instructions" placeholder="Step by step instructions for users to follow" rows="4" required></textarea>
+                        <div class="form-hint">Example: 1. Click the link below 2. Watch the video 3. Take a screenshot</div>
+                    </div>
+                    
                     <!-- LINK FIELD REMOVED - Links can be placed in description -->
                     <div class="form-group">
                         <label>Ad Image (Optional)</label>
@@ -2647,6 +2662,8 @@
             DOM.depositMinAmount = document.getElementById('deposit-min-amount');
             DOM.adCategory = document.getElementById('ad-category');
             DOM.adSubCategory = document.getElementById('ad-sub-category');
+            DOM.adRequirements = document.getElementById('ad-requirements');
+            DOM.adInstructions = document.getElementById('ad-instructions');
             DOM.calcViews = document.getElementById('calcViews');
             DOM.calcReward = document.getElementById('calcReward');
             DOM.calcDuration = document.getElementById('calcDuration');
@@ -2660,7 +2677,6 @@
             DOM.verifyJobScreenshot = document.getElementById('verify-job-screenshot');
             DOM.ratingToast = document.getElementById('ratingToast');
             DOM.ratingStars = document.getElementById('ratingStars');
-            DOM.adLink = document.getElementById('ad-link');
         }
 
         // ============================================================
@@ -3161,7 +3177,7 @@
         }
 
         // ============================================================
-        // ADVERTISER - CREATE AD (LINK REMOVED)
+        // ADVERTISER - CREATE AD (with Requirements & Instructions)
         // ============================================================
         function setupCreateAdForm() {
             if (!DOM.createAdForm) return;
@@ -3178,12 +3194,14 @@
                 const category = DOM.adCategory.value;
                 const subCategory = DOM.adSubCategory.value.trim();
                 const desc = document.getElementById('ad-desc').value.trim();
+                const requirements = DOM.adRequirements.value.trim();
+                const instructions = DOM.adInstructions.value.trim();
                 const budget = parseFloat(DOM.adBudget.value) || 1.00;
                 const duration = parseInt(DOM.adDuration.value) || 7;
                 const targetViews = parseInt(DOM.adTargetViews.value) || 100;
                 const fileInput = document.getElementById('ad-image');
 
-                if (!title || !category || !desc) {
+                if (!title || !category || !desc || !requirements || !instructions) {
                     showToast('❌ Please fill all required fields!', 'error');
                     return;
                 }
@@ -3225,6 +3243,8 @@
                     category,
                     subCategory: subCategory || '',
                     desc: desc || 'No description',
+                    requirements: requirements,
+                    instructions: instructions,
                     reward: reward,
                     totalViews: targetViews,
                     views: 0,
@@ -3239,9 +3259,7 @@
                     imageUrl,
                     verified: false,
                     duration: duration,
-                    endDate: endDate,
-                    instructions: 'Follow the link provided in the description and complete the required action.',
-                    requirements: 'Must provide valid screenshot as proof.'
+                    endDate: endDate
                 };
 
                 try {
@@ -3264,7 +3282,7 @@
         }
 
         // ============================================================
-        // RENDER JOB LIST (NEW - with all required features)
+        // RENDER JOB LIST
         // ============================================================
         function renderJobList(ads) {
             if (!DOM.jobListContainer) return;
@@ -3373,14 +3391,14 @@
                 const category = ad.category || 'General';
                 const subCategory = ad.subCategory || '';
                 const description = ad.desc || 'No description';
+                const requirements = ad.requirements || 'No specific requirements.';
+                const instructions = ad.instructions || 'No specific instructions provided.';
                 const imageUrl = ad.imageUrl || '';
                 const creatorId = ad.createdBy || 'unknown';
 
-                // Check if user is following this creator
                 const isFollowing = state.followers && state.followers[creatorId] === true;
                 const userRating = state.ratings && state.ratings[creatorId] || 0;
 
-                // Get verification status
                 const verification = state.verifications.find(v => v.adId === adId);
                 let verificationStatus = '';
                 let rejectionReason = '';
@@ -3397,7 +3415,6 @@
 
                 const creatorInitial = creatorName.charAt(0).toUpperCase();
 
-                // Convert description links to clickable
                 const descWithLinks = description.replace(
                     /(https?:\/\/[^\s]+)/g,
                     '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
@@ -3502,7 +3519,7 @@
                         <div class="detail-title" style="font-size:15px;">📋 Instructions</div>
                         <div class="job-detail-section">
                             <div class="section-content" id="job-instructions-text">
-                                ${ad.instructions ? escapeHTML(ad.instructions) : 'No specific instructions provided.'}
+                                ${escapeHTML(instructions)}
                             </div>
                         </div>
                     </div>
@@ -3512,7 +3529,7 @@
                         <div class="detail-title" style="font-size:15px;">✅ Requirements</div>
                         <div class="job-detail-section">
                             <div class="section-content" id="job-requirements-text">
-                                ${ad.requirements ? escapeHTML(ad.requirements) : 'No specific requirements.'}
+                                ${escapeHTML(requirements)}
                             </div>
                         </div>
                     </div>
@@ -3558,8 +3575,6 @@
         function translateJobDetails() {
             const lang = document.getElementById('translateSelect').value;
             if (lang === 'original') return;
-            // In production, use translation API
-            // For demo, just show a note
             showToast(`🌐 Translating to ${lang}... (Demo)`, '');
         }
 
@@ -3732,7 +3747,6 @@
                 const isApproved = ad.approved || false;
                 const category = ad.category || 'General';
                 const subCategory = ad.subCategory || '';
-                // Convert description links
                 const descWithLinks = (ad.desc || '').replace(
                     /(https?:\/\/[^\s]+)/g,
                     '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
@@ -4497,7 +4511,6 @@
                 DOM.shareLinkBtn.addEventListener('click', shareReferralLink);
                 DOM.withdrawForm.addEventListener('submit', handleWithdrawal);
 
-                // Rating toast close on outside click
                 document.addEventListener('click', (e) => {
                     if (DOM.ratingToast.classList.contains('active') && !DOM.ratingToast.contains(e.target) && !e.target.closest('.action-btn.rate')) {
                         DOM.ratingToast.classList.remove('active');
