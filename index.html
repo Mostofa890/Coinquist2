@@ -796,6 +796,13 @@
         .ad-btn.view:hover:not(:disabled) { transform: scale(1.03); }
         .ad-btn.view:disabled { opacity: 0.5; cursor: not-allowed; }
         .ad-btn.view.completed { background: #10b981; }
+
+        .ad-btn.edit {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .ad-btn.edit:hover:not(:disabled) { transform: scale(1.03); }
         
         /* ===== ACTION BUTTON ===== */
         .action-button {
@@ -2251,6 +2258,42 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
+
+        /* ===== EDIT AD MODAL ===== */
+        .edit-ad-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 3000;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            align-items: flex-end;
+            padding: 16px;
+        }
+
+        .edit-ad-modal.active {
+            display: flex;
+        }
+
+        .edit-ad-modal .modal-content {
+            background: var(--card-background);
+            padding: 20px;
+            border-radius: 20px 20px 0 0;
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease-out;
+            border: 1px solid var(--border-color);
+        }
+
+        .edit-ad-modal .modal-content .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
     </style>
 </head>
 <body>
@@ -2443,7 +2486,6 @@
                         <div class="form-hint">Example: 1. Click the link below 2. Watch the video 3. Take a screenshot</div>
                     </div>
                     
-                    <!-- LINK FIELD REMOVED - Links can be placed in description -->
                     <div class="form-group">
                         <label>Ad Image (Optional)</label>
                         <input type="file" id="ad-image" accept="image/*">
@@ -2568,6 +2610,56 @@
             <button class="action-button" onclick="submitJobVerification()">
                 <i class="fa-solid fa-upload"></i> <span>Submit for Verification</span>
             </button>
+        </div>
+    </div>
+
+    <!-- ===== EDIT AD MODAL ===== -->
+    <div class="edit-ad-modal" id="editAdModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeEditAdModal()">&times;</button>
+            <div class="modal-title">✏️ Edit Ad Campaign</div>
+            <form id="edit-ad-form">
+                <div class="form-group">
+                    <label>Ad Title *</label>
+                    <input type="text" id="edit-ad-title" placeholder="Enter ad title" required>
+                </div>
+                <div class="form-group">
+                    <label>Ad Category *</label>
+                    <select id="edit-ad-category" required>
+                        <option value="">Select Category</option>
+                        <option value="YouTube Video View">YouTube Video View</option>
+                        <option value="YouTube Like">YouTube Like</option>
+                        <option value="YouTube Comment">YouTube Comment</option>
+                        <option value="YouTube Share">YouTube Share</option>
+                        <option value="App Download">App Download</option>
+                        <option value="Website Visit">Website Visit</option>
+                        <option value="Telegram Join">Telegram Join</option>
+                        <option value="Facebook Like">Facebook Like</option>
+                        <option value="Instagram Follow">Instagram Follow</option>
+                        <option value="Twitter Follow">Twitter Follow</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Sub Category (Optional)</label>
+                    <input type="text" id="edit-ad-sub-category" placeholder="Enter sub-category (e.g., Gaming, Tech, etc.)">
+                </div>
+                <div class="form-group">
+                    <label>Description *</label>
+                    <textarea id="edit-ad-desc" placeholder="Describe your ad. You can include links here." rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Requirements *</label>
+                    <textarea id="edit-ad-requirements" placeholder="What requirements must users meet to complete this job?" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Instructions *</label>
+                    <textarea id="edit-ad-instructions" placeholder="Step by step instructions for users to follow" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="action-button" id="edit-ad-btn">
+                    <i class="fa-solid fa-save"></i> <span>Save Changes</span>
+                </button>
+            </form>
         </div>
     </div>
 
@@ -2886,6 +2978,7 @@
         let currentJobId = null;
         let selectedRating = 0;
         let ratingTargetId = null;
+        let editingAdId = null;
 
         // ============================================================
         // STATE
@@ -3020,6 +3113,15 @@
             DOM.allJobsPage = document.getElementById('allJobsPage');
             DOM.allJobsContainer = document.getElementById('all-jobs-container');
             DOM.jobsCountBadge = document.getElementById('jobs-count-badge');
+            DOM.editAdModal = document.getElementById('editAdModal');
+            DOM.editAdForm = document.getElementById('edit-ad-form');
+            DOM.editAdTitle = document.getElementById('edit-ad-title');
+            DOM.editAdCategory = document.getElementById('edit-ad-category');
+            DOM.editAdSubCategory = document.getElementById('edit-ad-sub-category');
+            DOM.editAdDesc = document.getElementById('edit-ad-desc');
+            DOM.editAdRequirements = document.getElementById('edit-ad-requirements');
+            DOM.editAdInstructions = document.getElementById('edit-ad-instructions');
+            DOM.editAdBtn = document.getElementById('edit-ad-btn');
         }
 
         // ============================================================
@@ -3342,7 +3444,6 @@
                 renderVerificationRequests(adList);
                 updateProfileData(adList);
                 
-                // Update all jobs page if open
                 if (DOM.allJobsPage.classList.contains('active')) {
                     renderAllJobs(adList);
                 }
@@ -3387,6 +3488,81 @@
         }
 
         // ============================================================
+        // EDIT AD FUNCTIONS
+        // ============================================================
+        function openEditAd(adId) {
+            editingAdId = adId;
+            firebaseDb.ref(`ads/${adId}`).once('value').then(snapshot => {
+                const ad = snapshot.val();
+                if (!ad) {
+                    showToast('❌ Ad not found', 'error');
+                    return;
+                }
+                
+                DOM.editAdTitle.value = ad.title || '';
+                DOM.editAdCategory.value = ad.category || '';
+                DOM.editAdSubCategory.value = ad.subCategory || '';
+                DOM.editAdDesc.value = ad.desc || '';
+                DOM.editAdRequirements.value = ad.requirements || '';
+                DOM.editAdInstructions.value = ad.instructions || '';
+                
+                DOM.editAdModal.classList.add('active');
+            }).catch(err => {
+                console.error("Error loading ad for edit:", err);
+                showToast('❌ Failed to load ad data', 'error');
+            });
+        }
+
+        function closeEditAdModal() {
+            DOM.editAdModal.classList.remove('active');
+            editingAdId = null;
+        }
+
+        function setupEditAdForm() {
+            if (!DOM.editAdForm) return;
+            
+            DOM.editAdForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                if (!editingAdId) {
+                    showToast('❌ No ad selected for editing', 'error');
+                    return;
+                }
+                
+                const title = DOM.editAdTitle.value.trim();
+                const category = DOM.editAdCategory.value;
+                const subCategory = DOM.editAdSubCategory.value.trim();
+                const desc = DOM.editAdDesc.value.trim();
+                const requirements = DOM.editAdRequirements.value.trim();
+                const instructions = DOM.editAdInstructions.value.trim();
+                
+                if (!title || !category || !desc || !requirements || !instructions) {
+                    showToast('❌ Please fill all required fields!', 'error');
+                    return;
+                }
+                
+                try {
+                    await firebaseDb.ref(`ads/${editingAdId}`).update({
+                        title: title,
+                        category: category,
+                        subCategory: subCategory || '',
+                        desc: desc,
+                        requirements: requirements,
+                        instructions: instructions,
+                        updatedAt: Date.now()
+                    });
+                    
+                    closeEditAdModal();
+                    showToast('✅ Ad updated successfully!', 'success');
+                    listenAds();
+                } catch (e) {
+                    console.error("Edit ad error:", e);
+                    showToast('❌ Failed to update ad', 'error');
+                }
+            });
+        }
+
+        // ============================================================
         // PROFILE PAGE FUNCTIONS
         // ============================================================
         function openProfilePage() {
@@ -3407,20 +3583,14 @@
             const initial = user.first_name?.charAt(0) || 'U';
             const role = state.userRole === 'publisher' ? '📖 Publisher' : '📢 Advertiser';
             
-            // Get following count (users this user is following)
             const followingCount = Object.keys(state.followers).filter(id => id !== state.currentUserId).length || 0;
-            
-            // Get followers count (users following this user)
             const followersCount = Object.keys(state.followers).length || 0;
-            
-            // Get average rating from others
             const ratingsArray = Object.values(state.ratings).filter(r => r > 0);
             const avgRating = ratingsArray.length > 0 ? ratingsArray.reduce((a, b) => a + b, 0) / ratingsArray.length : 0;
             
             let content = '';
             
             if (state.userRole === 'advertiser') {
-                // Advertiser Profile
                 const activeAds = state.myAds.filter(a => a.status === 'active' && a.approved).length;
                 const pendingReviews = state.verifications.filter(v => v.status === 'pending').length;
                 const expiredAds = state.myAds.filter(a => a.status === 'expired' || (a.endDate && a.endDate < Date.now())).length;
@@ -3501,7 +3671,6 @@
                     </div>
                 `;
             } else {
-                // Publisher Profile
                 const availableJobs = state.jobCount || 0;
                 
                 content = `
@@ -3535,8 +3704,6 @@
                             <div class="value">$${formatBalance(state.totalEarnings)}</div>
                         </div>
                     </div>
-                    
-                    <!-- REMOVED: Browse Jobs and My Submissions buttons -->
                     
                     <div class="card">
                         <div class="profile-section-title">📋 My Submissions</div>
@@ -3594,14 +3761,11 @@
         }
 
         function updateProfileData(ads) {
-            // Update available jobs count for publisher
             if (ads) {
                 state.jobCount = ads.filter(a => a.status === 'active' && a.approved && a.createdBy !== state.currentUserId).length;
-                // Update profile page if open
                 if (DOM.profilePage.classList.contains('active')) {
                     renderProfilePage();
                 }
-                // Update badge on homepage
                 if (DOM.jobsCountBadge) {
                     DOM.jobsCountBadge.textContent = state.jobCount;
                 }
@@ -3644,7 +3808,7 @@
                 let filtered = adList.filter(ad => 
                     (ad.status === 'active' || ad.status === 'paused') && 
                     ad.approved === true &&
-                    ad.createdBy !== state.currentUserId // Hide own ads
+                    ad.createdBy !== state.currentUserId
                 );
 
                 filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
@@ -3716,9 +3880,7 @@
         }
 
         function openJobDetailsFromAll(adId) {
-            // Close all jobs page
             DOM.allJobsPage.classList.remove('active');
-            // Open job details
             openJobDetails(adId);
         }
 
@@ -3925,20 +4087,26 @@
         }
 
         // ============================================================
-        // AUTO CALCULATE AD COST
+        // AUTO CALCULATE AD COST - UPDATED
         // ============================================================
         function updateAdCalculation() {
             const budget = parseFloat(DOM.adBudget.value) || 1.00;
             const targetViews = parseInt(DOM.adTargetViews.value) || 100;
             const duration = parseInt(DOM.adDuration.value) || 7;
-            const rewardPerView = budget / targetViews;
+            
+            // Calculate cost per view
+            const costPerView = budget / targetViews;
+            
             DOM.adTotalViews.textContent = targetViews || 0;
-            DOM.adCostPerView.textContent = rewardPerView.toFixed(4);
+            DOM.adCostPerView.textContent = costPerView.toFixed(4);
             DOM.adDurationDisplay.textContent = duration;
+            
             DOM.calcViews.textContent = targetViews || 0;
-            DOM.calcReward.textContent = `$${rewardPerView.toFixed(4)}`;
+            DOM.calcReward.textContent = `$${costPerView.toFixed(4)}`;
             DOM.calcDuration.textContent = `${duration} days`;
-            if (rewardPerView < 0.0001) {
+            
+            // Color coding based on cost per view
+            if (costPerView < 0.0001) {
                 DOM.calcReward.style.color = 'var(--danger)';
                 DOM.adCostPerView.style.color = 'var(--danger)';
                 DOM.calcResult.style.borderColor = 'var(--danger)';
@@ -3986,9 +4154,9 @@
                     return;
                 }
 
-                const reward = budget / targetViews;
-                if (reward < 0.0001) {
-                    showToast(`❌ Reward per view is too low! Minimum is $0.0001.`, 'error');
+                const costPerView = budget / targetViews;
+                if (costPerView < 0.0001) {
+                    showToast(`❌ Cost per view is too low! Minimum is $0.0001. Please increase budget or reduce target views.`, 'error');
                     return;
                 }
 
@@ -4021,7 +4189,7 @@
                     desc: desc || 'No description',
                     requirements: requirements,
                     instructions: instructions,
-                    reward: reward,
+                    reward: costPerView,
                     totalViews: targetViews,
                     views: 0,
                     status: 'active',
@@ -4035,7 +4203,8 @@
                     imageUrl,
                     verified: false,
                     duration: duration,
-                    endDate: endDate
+                    endDate: endDate,
+                    costPerView: costPerView
                 };
 
                 try {
@@ -4071,11 +4240,10 @@
                 }
             });
 
-            // Filter: Only show top 3 jobs on homepage
             let filtered = ads.filter(ad => 
                 (ad.status === 'active' || ad.status === 'paused') && 
                 ad.approved === true &&
-                ad.createdBy !== state.currentUserId // Hide own ads
+                ad.createdBy !== state.currentUserId
             );
 
             if (state.currentFilter === 'completed') {
@@ -4084,7 +4252,6 @@
 
             filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
             
-            // Show only top 3 on homepage
             const topJobs = filtered.slice(0, 3);
 
             if (topJobs.length === 0) {
@@ -4150,7 +4317,7 @@
         }
 
         // ============================================================
-        // JOB DETAILS PAGE - VERIFY BUTTON ALWAYS ACTIVE
+        // JOB DETAILS PAGE
         // ============================================================
         function openJobDetails(adId) {
             firebaseDb.ref(`ads/${adId}`).once('value').then(snapshot => {
@@ -4206,9 +4373,6 @@
                     /(https?:\/\/[^\s]+)/g,
                     '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
                 );
-
-                // VERIFY BUTTON - Always active (removed completion check)
-                const verifyButtonActive = true;
 
                 DOM.jobDetailsContent.innerHTML = `
                     <div class="detail-card">
@@ -4368,17 +4532,14 @@
                 showToast('✅ Following!', 'success');
             }
             
-            // Update counts
             state.followingCount = Object.keys(state.followers).filter(id => id !== state.currentUserId).length;
             state.followersCount = Object.keys(state.followers).length;
             state.profileFollowers = state.followersCount;
             
             saveUserData();
             
-            // Update creator's followers count in ad data
             firebaseDb.ref(`ads/${currentJobId}/creatorFollowers`).set(state.followersCount);
             
-            // Update profile page if open
             if (DOM.profilePage.classList.contains('active')) {
                 renderProfilePage();
             }
@@ -4430,7 +4591,6 @@
             
             state.userRatings[ratingTargetId] = selectedRating;
             
-            // Calculate average rating for this creator
             const creatorRatings = state.userRatings;
             const ratingsArray = Object.values(creatorRatings).filter(r => r > 0);
             const avgRating = ratingsArray.length > 0 ? ratingsArray.reduce((a, b) => a + b, 0) / ratingsArray.length : 0;
@@ -4445,7 +4605,6 @@
             
             firebaseDb.ref(`ads/${currentJobId}/creatorRating`).set(avgRating);
             
-            // Update profile page if open
             if (DOM.profilePage.classList.contains('active')) {
                 renderProfilePage();
             }
@@ -4464,7 +4623,6 @@
                 return;
             }
             
-            // Check if already submitted pending or approved
             const existingVerification = state.verifications.find(v => v.adId === adId);
             if (existingVerification && existingVerification.status === 'pending') {
                 showToast('⏳ Verification already submitted and pending review', 'warning');
@@ -4491,7 +4649,6 @@
                 }
             });
             
-            // Pre-fill with ad details if it's a resubmission
             if (existingVerification && existingVerification.status === 'rejected') {
                 DOM.verifyJobTitle.value = existingVerification.adTitle || '';
                 DOM.verifyJobDesc.value = existingVerification.adDescription || '';
@@ -4538,12 +4695,10 @@
                 showToast('📤 Uploading screenshot...', '');
                 const downloadUrl = await uploadImage(file);
                 
-                // Get ad data for reward
                 const adSnapshot = await firebaseDb.ref(`ads/${state.currentVerifyAdId}`).once('value');
                 const ad = adSnapshot.val();
                 const reward = ad?.reward || 0;
                 
-                // Check if there's an existing rejected verification
                 const existingVerification = state.verifications.find(v => v.adId === state.currentVerifyAdId);
                 
                 let verificationData = {
@@ -4559,7 +4714,6 @@
                 };
                 
                 if (existingVerification && existingVerification.status === 'rejected') {
-                    // Update existing rejected verification
                     await firebaseDb.ref(`verifications/${existingVerification.id}`).update({
                         adTitle: title,
                         adDescription: desc,
@@ -4569,7 +4723,6 @@
                         updatedAt: Date.now()
                     });
                 } else {
-                    // Create new verification
                     await firebaseDb.ref('verifications').push(verificationData);
                 }
                 
@@ -4590,7 +4743,7 @@
         }
 
         // ============================================================
-        // RENDER MY ADS
+        // RENDER MY ADS - WITH EDIT BUTTON
         // ============================================================
         function renderMyAds(ads) {
             if (!DOM.myAdsContainer) return;
@@ -4641,6 +4794,9 @@
                             <div style="width:${progress}%; height:100%; background:linear-gradient(90deg, #10b981, #3b82f6); border-radius:4px; transition:width 0.3s;"></div>
                         </div>
                         <div class="ad-footer" style="margin-top:8px; padding-top:8px; border-top:1px solid var(--border-color);">
+                            <button class="ad-btn edit" onclick="openEditAd('${ad.id}')" ${!isApproved ? 'disabled' : ''}>
+                                <i class="fa-solid fa-pen"></i> Edit
+                            </button>
                             <button class="ad-btn" style="background:#ef4444; color:#fff; padding:4px 14px; border:none; border-radius:6px; font-size:11px; cursor:pointer;" onclick="openDeleteConfirm('${ad.id}')">
                                 <i class="fa-solid fa-trash"></i> Delete
                             </button>
@@ -4739,7 +4895,6 @@
                 await firebaseDb.ref(`verifications/${pendingRejectVerificationId}/status`).set('rejected');
                 await firebaseDb.ref(`verifications/${pendingRejectVerificationId}/rejectReason`).set(reason);
                 
-                // Update ad rejects count
                 state.adRejects += 1;
                 saveUserData();
                 
@@ -4763,8 +4918,6 @@
                 const ad = adSnapshot.val();
                 if (ad) {
                     await firebaseDb.ref(`users/${data.userId}/balance`).transaction((current) => (current || 0) + ad.reward);
-                    
-                    // Update earnings for publisher
                     firebaseDb.ref(`users/${data.userId}/totalEarnings`).transaction((current) => (current || 0) + ad.reward);
                     firebaseDb.ref(`users/${data.userId}/pendingEarnings`).transaction((current) => Math.max(0, (current || 0) - ad.reward));
                 }
@@ -5357,6 +5510,7 @@
 
                 populateWithdrawalMethods();
                 setupCreateAdForm();
+                setupEditAdForm();
                 renderDepositMethods();
 
                 DOM.welcomeTitle.textContent = CONFIG.welcomeNotice.title;
