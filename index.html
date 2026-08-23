@@ -216,6 +216,13 @@
             color: white;
             flex-shrink: 0;
             box-shadow: 0 4px 15px rgba(var(--primary-color-rgb), 0.3);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        #profile-pic:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 25px rgba(var(--primary-color-rgb), 0.4);
         }
         
         .profile-info {
@@ -1913,6 +1920,258 @@
         .rating-toast .rating-stars .star {
             font-size: 28px;
         }
+
+        /* ===== PROFILE PAGE STYLES ===== */
+        .profile-page {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1500;
+            background: var(--background-color);
+            overflow-y: auto;
+            padding: 16px 12px 100px 12px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .profile-page.active {
+            display: block;
+        }
+
+        .profile-page .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 16px;
+            font-family: inherit;
+        }
+
+        .profile-page .back-btn:hover {
+            background: var(--border-color);
+        }
+
+        .profile-page .profile-card {
+            background: var(--card-background);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            padding: 20px 16px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .profile-page .profile-card .big-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+            margin: 0 auto 12px;
+            box-shadow: 0 4px 20px rgba(var(--primary-color-rgb), 0.3);
+        }
+
+        .profile-page .profile-card .profile-name {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-color);
+        }
+
+        .profile-page .profile-card .profile-role {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        .profile-page .profile-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .profile-page .profile-tab {
+            padding: 12px;
+            border-radius: var(--radius);
+            border: 2px solid var(--border-color);
+            background: var(--card-background);
+            color: var(--text-color);
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            font-weight: 600;
+            font-family: inherit;
+            box-shadow: var(--shadow);
+        }
+
+        .profile-page .profile-tab.active {
+            border-color: var(--primary-color);
+            background: rgba(var(--primary-color-rgb), 0.06);
+            color: var(--primary-color);
+        }
+
+        .profile-page .profile-tab:hover:not(.active) {
+            border-color: var(--text-light);
+        }
+
+        .profile-page .profile-stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .profile-page .profile-stat-box {
+            background: var(--card-background);
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+        }
+
+        .profile-page .profile-stat-box .label {
+            font-size: 10px;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .profile-page .profile-stat-box .value {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-color);
+        }
+
+        .profile-page .profile-stat-box .value.reward {
+            color: var(--success);
+        }
+
+        .profile-page .profile-stat-box .value.highlight {
+            color: var(--primary-color);
+        }
+
+        .profile-page .profile-stat-box .value.danger {
+            color: var(--danger);
+        }
+
+        .profile-page .profile-section-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .profile-page .profile-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .profile-page .profile-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .profile-page .profile-list-item .left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-page .profile-list-item .left .icon {
+            font-size: 18px;
+            color: var(--primary-color);
+        }
+
+        .profile-page .profile-list-item .left .info .title {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-color);
+        }
+
+        .profile-page .profile-list-item .left .info .sub {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .profile-page .profile-list-item .right .status {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 12px;
+        }
+
+        .profile-page .profile-list-item .right .status.pending {
+            color: var(--warning);
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .profile-page .profile-list-item .right .status.approved {
+            color: var(--success);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .profile-page .profile-list-item .right .status.rejected {
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .profile-page .profile-list-item .right .status.active {
+            color: var(--info);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .profile-page .profile-list-item .right .status.expired {
+            color: var(--text-light);
+            background: rgba(110, 110, 132, 0.1);
+        }
+
+        .profile-page .profile-list-item .right .count {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .profile-page .browse-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 10px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+            margin-top: 8px;
+        }
+
+        .profile-page .browse-btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 15px rgba(var(--primary-color-rgb), 0.3);
+        }
     </style>
 </head>
 <body>
@@ -1946,7 +2205,7 @@
     <div class="container">
         <!-- ===== PROFILE HEADER ===== -->
         <div class="profile-header">
-            <div id="profile-pic"><i class="fa-solid fa-user"></i></div>
+            <div id="profile-pic" onclick="openProfilePage()"><i class="fa-solid fa-user"></i></div>
             <div class="profile-info">
                 <div id="greeting">Welcome!</div>
                 <span id="userRoleBadge" class="role-badge">📖 Publisher</span>
@@ -2184,6 +2443,14 @@
         </div>
     </div>
 
+    <!-- ===== PROFILE PAGE ===== -->
+    <div class="profile-page" id="profilePage">
+        <button class="back-btn" onclick="closeProfilePage()">
+            <i class="fa-solid fa-arrow-left"></i> Back
+        </button>
+        <div id="profile-content"></div>
+    </div>
+
     <!-- ===== JOB DETAILS PAGE ===== -->
     <div class="job-details-page" id="jobDetailsPage">
         <button class="back-btn" onclick="closeJobDetails()">
@@ -2242,8 +2509,7 @@
         </button>
     </div>
     
-    <!-- ===== MODALS ===== -->
-    
+    <!-- ===== MODALS (same as before) ===== -->
     <!-- Welcome Modal -->
     <div id="welcomeModal" class="modal">
         <div class="modal-content">
@@ -2267,14 +2533,11 @@
                         <option value="" disabled selected>Select Payment Method</option>
                     </select>
                 </div>
-                
                 <div id="method-fields-container"></div>
-                
                 <div class="form-group">
                     <label>Amount (USD) *</label>
                     <input type="number" step="0.0001" id="withdraw-amount" placeholder="0.00" min="0.0001" required>
                 </div>
-                
                 <button type="submit" class="action-button" id="withdraw-submit-button">
                     <span class="button-text">Submit Request</span>
                     <div class="loader-spinner" style="display:none; width:20px; height:20px; border-width:3px;"></div>
@@ -2289,30 +2552,23 @@
             <button class="close-btn" onclick="closeModal('depositModal')">&times;</button>
             <h3 class="card-title">💳 Deposit Funds</h3>
             <p style="font-size:13px; color:var(--text-light); margin-bottom:14px;">Select a payment method and provide transaction details</p>
-            
             <div class="deposit-form-group">
                 <label>Payment Method *</label>
                 <div id="deposit-methods-list"></div>
             </div>
-            
             <div class="deposit-form-group">
                 <label>Sender Number *</label>
                 <input type="text" id="deposit-sender" placeholder="Enter your sending number">
-                <div class="form-hint">The number you sent money from</div>
             </div>
-            
             <div class="deposit-form-group">
                 <label>Transaction ID *</label>
                 <input type="text" id="deposit-trxid" placeholder="Enter transaction ID">
-                <div class="form-hint">The transaction ID from your payment</div>
             </div>
-            
             <div class="deposit-form-group">
                 <label>Amount (BDT) *</label>
                 <input type="number" id="deposit-amount" step="1" placeholder="Enter amount in BDT">
                 <div class="form-hint">Minimum deposit: <span id="deposit-min-amount">10</span> BDT</div>
             </div>
-            
             <button class="action-button" onclick="submitDeposit()">
                 <i class="fa-solid fa-check"></i> <span>Submit Deposit Request</span>
             </button>
@@ -2350,25 +2606,19 @@
             <button class="close-btn" onclick="closeModal('verifyAdModal')">&times;</button>
             <h3 class="card-title">📸 Submit Ad Verification</h3>
             <p style="font-size:13px; color:var(--text-light); margin-bottom:12px;">Please provide details about the ad you watched and upload a screenshot as proof.</p>
-            
             <div id="verify-ad-info"></div>
-            
             <div class="form-group">
                 <label>Ad Title *</label>
                 <input type="text" id="verify-ad-title" placeholder="Enter the ad title" required>
             </div>
-            
             <div class="form-group">
                 <label>Ad Description *</label>
                 <textarea id="verify-ad-desc" placeholder="Describe the ad you watched" rows="3" required></textarea>
             </div>
-            
             <div class="form-group">
                 <label>Upload Screenshot *</label>
                 <input type="file" id="verify-screenshot" accept="image/*" required>
-                <div class="form-hint">Upload PNG, JPG or GIF (Max 5MB)</div>
             </div>
-            
             <button class="action-button" onclick="submitVerification()">
                 <i class="fa-solid fa-upload"></i> <span>Submit for Verification</span>
             </button>
@@ -2381,13 +2631,10 @@
             <button class="close-btn" onclick="closeModal('rejectReasonModal')">&times;</button>
             <h3 class="card-title">❌ Reject Verification</h3>
             <p style="font-size:13px; color:var(--text-light); margin-bottom:12px;">Please provide a reason for rejecting this verification request.</p>
-            
             <div class="form-group">
                 <label>Rejection Reason *</label>
                 <textarea id="reject-reason" placeholder="Explain why this verification is being rejected..." rows="4" required></textarea>
-                <div class="form-hint">The user will see this reason</div>
             </div>
-            
             <div style="display:flex; gap:10px; margin-top:12px;">
                 <button class="action-button" onclick="confirmReject()" style="flex:1; background:var(--danger);">
                     <i class="fa-solid fa-times"></i> Reject
@@ -2405,17 +2652,14 @@
             <button class="close-btn" onclick="closeModal('deleteConfirmModal')">&times;</button>
             <h3 class="card-title">⚠️ Delete Campaign</h3>
             <p style="font-size:14px; margin-bottom:12px;">Are you sure you want to delete this ad campaign?</p>
-            
             <div class="refund-info">
                 <strong>💰 Refund Details:</strong><br>
                 <span style="font-size:13px;">You will receive <span class="warning-text">60%</span> of your budget back</span>
             </div>
-            
             <div class="company-info">
                 <strong>🏢 Company Fee:</strong><br>
                 <span style="font-size:13px;"><span class="warning-text">40%</span> will be deducted as platform fee</span>
             </div>
-            
             <div style="margin-top:12px; padding:10px; background:var(--background-color); border-radius:8px;">
                 <div style="font-size:13px; color:var(--text-light);">
                     <div>Total Budget: <strong id="delete-budget">$0.00</strong></div>
@@ -2423,7 +2667,6 @@
                     <div>Fee (40%): <strong style="color:var(--danger);" id="delete-fee">$0.00</strong></div>
                 </div>
             </div>
-            
             <div style="display:flex; gap:10px; margin-top:16px;">
                 <button class="action-button" onclick="confirmDeleteAd()" style="flex:1; background:var(--danger);">
                     <i class="fa-solid fa-trash"></i> Confirm Delete
@@ -2587,7 +2830,11 @@
             verifications: [],
             ratings: {},
             followers: {},
-            userRatings: {}
+            userRatings: {},
+            totalSpent: 0,
+            pendingEarnings: 0,
+            totalEarnings: 0,
+            adRejects: 0
         };
 
         // ============================================================
@@ -2678,6 +2925,8 @@
             DOM.verifyJobScreenshot = document.getElementById('verify-job-screenshot');
             DOM.ratingToast = document.getElementById('ratingToast');
             DOM.ratingStars = document.getElementById('ratingStars');
+            DOM.profilePage = document.getElementById('profilePage');
+            DOM.profileContent = document.getElementById('profile-content');
         }
 
         // ============================================================
@@ -2793,7 +3042,6 @@
         async function translateJobDetails() {
             const lang = document.getElementById('translateSelect').value;
             if (lang === 'original') {
-                // Reset to original content
                 const adId = currentJobId;
                 if (adId) {
                     const snapshot = await firebaseDb.ref(`ads/${adId}`).once('value');
@@ -2929,7 +3177,11 @@
                 lastAdWatchTime: lastAdWatchTime,
                 ratings: state.ratings,
                 followers: state.followers,
-                userRatings: state.userRatings
+                userRatings: state.userRatings,
+                totalSpent: state.totalSpent,
+                pendingEarnings: state.pendingEarnings,
+                totalEarnings: state.totalEarnings,
+                adRejects: state.adRejects
             };
             firebaseDb.ref(`users/${state.currentUserId}`).update(data).catch(err => {
                 console.error("Save error:", err);
@@ -2960,6 +3212,10 @@
                         state.ratings = data.ratings || {};
                         state.followers = data.followers || {};
                         state.userRatings = data.userRatings || {};
+                        state.totalSpent = data.totalSpent || 0;
+                        state.pendingEarnings = data.pendingEarnings || 0;
+                        state.totalEarnings = data.totalEarnings || 0;
+                        state.adRejects = data.adRejects || 0;
                         if (data.lastAdWatchTime) {
                             lastAdWatchTime = data.lastAdWatchTime;
                         }
@@ -2983,6 +3239,7 @@
                 renderJobList(adList);
                 renderMyAds(adList);
                 renderVerificationRequests(adList);
+                updateProfileData(adList);
             });
         }
 
@@ -3019,7 +3276,213 @@
                 const data = snapshot.val() || {};
                 state.verifications = Object.entries(data).map(([id, item]) => ({ id, ...item }));
                 listenAds();
+                updateProfileData();
             });
+        }
+
+        // ============================================================
+        // PROFILE PAGE FUNCTIONS
+        // ============================================================
+        function openProfilePage() {
+            DOM.profilePage.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            document.querySelector('.container').style.display = 'none';
+            renderProfilePage();
+        }
+
+        function closeProfilePage() {
+            DOM.profilePage.classList.remove('active');
+            document.body.style.overflow = '';
+            document.querySelector('.container').style.display = 'block';
+        }
+
+        function renderProfilePage() {
+            const user = tg?.initDataUnsafe?.user || { first_name: 'User' };
+            const initial = user.first_name?.charAt(0) || 'U';
+            const role = state.userRole === 'publisher' ? '📖 Publisher' : '📢 Advertiser';
+            
+            let content = '';
+            
+            if (state.userRole === 'advertiser') {
+                // Advertiser Profile
+                const activeAds = state.myAds.filter(a => a.status === 'active' && a.approved).length;
+                const pendingReviews = state.verifications.filter(v => v.status === 'pending').length;
+                const expiredAds = state.myAds.filter(a => a.status === 'expired' || (a.endDate && a.endDate < Date.now())).length;
+                
+                content = `
+                    <div class="profile-card">
+                        <div class="big-avatar">${initial}</div>
+                        <div class="profile-name">${escapeHTML(user.first_name || 'User')}</div>
+                        <div class="profile-role">${role}</div>
+                    </div>
+                    
+                    <div class="profile-tabs">
+                        <button class="profile-tab active" onclick="switchProfileTab('advertiser', this)">📢 Advertiser</button>
+                        <button class="profile-tab" onclick="switchProfileTab('publisher', this)">📖 Publisher</button>
+                    </div>
+                    
+                    <div class="profile-stats-grid">
+                        <div class="profile-stat-box">
+                            <div class="label">💰 Available Balance</div>
+                            <div class="value reward">$${formatBalance(state.walletBalance)}</div>
+                        </div>
+                        <div class="profile-stat-box">
+                            <div class="label">📊 Total Spent</div>
+                            <div class="value highlight">$${formatBalance(state.totalSpent)}</div>
+                        </div>
+                        <div class="profile-stat-box">
+                            <div class="label">❌ Ad Rejects</div>
+                            <div class="value danger">${state.adRejects}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display:flex; gap:10px; margin-bottom:16px;">
+                        <button class="action-button" style="flex:1; padding:12px;" onclick="closeProfilePage(); document.querySelector('.role-btn.advertiser').click();">
+                            <i class="fa-solid fa-eye"></i> View Ads
+                        </button>
+                        <button class="action-button secondary" style="flex:1; padding:12px;" onclick="closeProfilePage(); document.querySelector('.role-btn.advertiser').click();">
+                            <i class="fa-solid fa-plus"></i> Create Ad
+                        </button>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="profile-section-title">📊 Ad Statistics</div>
+                        <div class="profile-list-item">
+                            <div class="left"><span class="icon"><i class="fa-solid fa-play-circle"></i></span><div class="info"><div class="title">Active Ads</div></div></div>
+                            <div class="right"><span class="count">${activeAds}</span></div>
+                        </div>
+                        <div class="profile-list-item">
+                            <div class="left"><span class="icon"><i class="fa-solid fa-clock"></i></span><div class="info"><div class="title">Pending Review</div></div></div>
+                            <div class="right"><span class="count">${pendingReviews}</span></div>
+                        </div>
+                        <div class="profile-list-item">
+                            <div class="left"><span class="icon"><i class="fa-solid fa-calendar-times"></i></span><div class="info"><div class="title">Expired Ads</div></div></div>
+                            <div class="right"><span class="count">${expiredAds}</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="profile-section-title">📋 Recent Activity</div>
+                        ${state.depositHistory.slice(0, 5).map(d => `
+                            <div class="profile-list-item">
+                                <div class="left">
+                                    <span class="icon"><i class="fa-solid fa-arrow-down"></i></span>
+                                    <div class="info">
+                                        <div class="title">Deposit via ${escapeHTML(d.method)}</div>
+                                        <div class="sub">${new Date(d.createdAt).toLocaleDateString()}</div>
+                                    </div>
+                                </div>
+                                <div class="right">
+                                    <span class="status ${d.status || 'pending'}">${d.status || 'Pending'}</span>
+                                </div>
+                            </div>
+                        `).join('') || '<div class="empty-state"><i class="fa-solid fa-inbox"></i><p>No recent activity</p></div>'}
+                    </div>
+                `;
+            } else {
+                // Publisher Profile
+                const availableJobs = 0; // Will be updated from Firebase
+                
+                content = `
+                    <div class="profile-card">
+                        <div class="big-avatar">${initial}</div>
+                        <div class="profile-name">${escapeHTML(user.first_name || 'User')}</div>
+                        <div class="profile-role">${role}</div>
+                    </div>
+                    
+                    <div class="profile-tabs">
+                        <button class="profile-tab" onclick="switchProfileTab('advertiser', this)">📢 Advertiser</button>
+                        <button class="profile-tab active" onclick="switchProfileTab('publisher', this)">📖 Publisher</button>
+                    </div>
+                    
+                    <div class="profile-stats-grid">
+                        <div class="profile-stat-box">
+                            <div class="label">💰 Available Balance</div>
+                            <div class="value reward">$${formatBalance(state.balance)}</div>
+                        </div>
+                        <div class="profile-stat-box">
+                            <div class="label">⏳ Pending Earnings</div>
+                            <div class="value highlight">$${formatBalance(state.pendingEarnings)}</div>
+                        </div>
+                        <div class="profile-stat-box">
+                            <div class="label">📈 Total Earnings</div>
+                            <div class="value">$${formatBalance(state.totalEarnings)}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display:flex; gap:10px; margin-bottom:16px;">
+                        <button class="action-button" style="flex:1; padding:12px;" onclick="closeProfilePage(); document.querySelector('.role-btn.publisher').click();">
+                            <i class="fa-solid fa-briefcase"></i> Browse Jobs
+                        </button>
+                        <button class="action-button secondary" style="flex:1; padding:12px;" onclick="closeProfilePage();">
+                            <i class="fa-solid fa-arrow-right"></i> My Submissions
+                        </button>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="profile-section-title">📋 My Submissions</div>
+                        ${state.verifications.length > 0 ? state.verifications.slice(0, 5).map(v => `
+                            <div class="profile-list-item">
+                                <div class="left">
+                                    <span class="icon"><i class="fa-solid fa-file-alt"></i></span>
+                                    <div class="info">
+                                        <div class="title">${escapeHTML(v.adTitle || 'Job')}</div>
+                                        <div class="sub">${new Date(v.createdAt).toLocaleDateString()}</div>
+                                    </div>
+                                </div>
+                                <div class="right">
+                                    <span class="status ${v.status || 'pending'}">${v.status || 'Pending'}</span>
+                                </div>
+                            </div>
+                        `).join('') : '<div class="empty-state"><i class="fa-solid fa-inbox"></i><p>No submissions yet</p></div>'}
+                    </div>
+                    
+                    <div class="card">
+                        <div class="profile-section-title">📋 Recent Activity</div>
+                        ${state.withdrawalHistory.slice(0, 5).map(w => `
+                            <div class="profile-list-item">
+                                <div class="left">
+                                    <span class="icon"><i class="fa-solid fa-arrow-up"></i></span>
+                                    <div class="info">
+                                        <div class="title">Withdrawal via ${escapeHTML(w.method)}</div>
+                                        <div class="sub">${new Date(w.date).toLocaleDateString()}</div>
+                                    </div>
+                                </div>
+                                <div class="right">
+                                    <span class="status ${w.status.toLowerCase()}">${w.status}</span>
+                                </div>
+                            </div>
+                        `).join('') || '<div class="empty-state"><i class="fa-solid fa-inbox"></i><p>No recent activity</p></div>'}
+                    </div>
+                `;
+            }
+            
+            DOM.profileContent.innerHTML = content;
+        }
+
+        function switchProfileTab(tab, btn) {
+            document.querySelectorAll('.profile-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            if (tab === 'advertiser') {
+                state.userRole = 'advertiser';
+                selectRole('advertiser', document.querySelector('.role-btn.advertiser'));
+            } else {
+                state.userRole = 'publisher';
+                selectRole('publisher', document.querySelector('.role-btn.publisher'));
+            }
+            renderProfilePage();
+        }
+
+        function updateProfileData(ads) {
+            // Update available jobs count for publisher
+            if (ads) {
+                const available = ads.filter(a => a.status === 'active' && a.approved).length;
+                // Update profile page if open
+                if (DOM.profilePage.classList.contains('active')) {
+                    renderProfilePage();
+                }
+            }
         }
 
         // ============================================================
@@ -3310,6 +3773,7 @@
                 }
 
                 state.walletBalance -= budget;
+                state.totalSpent += budget;
                 const endDate = Date.now() + (duration * 24 * 60 * 60 * 1000);
                 const user = tg?.initDataUnsafe?.user || { first_name: 'User' };
 
@@ -3350,6 +3814,7 @@
                 } catch (e) {
                     console.error("Create ad error:", e);
                     state.walletBalance += budget;
+                    state.totalSpent -= budget;
                     saveUserData();
                     showToast('❌ Failed to create ad.', 'error');
                 }
@@ -3446,7 +3911,6 @@
         // JOB DETAILS PAGE
         // ============================================================
         function openJobDetails(adId) {
-            // Check if user is the creator of this ad
             firebaseDb.ref(`ads/${adId}`).once('value').then(snapshot => {
                 const ad = snapshot.val();
                 if (!ad) {
@@ -3454,7 +3918,6 @@
                     return;
                 }
 
-                // If user is the creator, show error and return
                 if (ad.createdBy === state.currentUserId) {
                     showToast('❌ You cannot view your own ad!', 'error');
                     return;
@@ -3479,13 +3942,9 @@
                 const imageUrl = ad.imageUrl || '';
                 const creatorId = ad.createdBy || 'unknown';
 
-                // Check if user is following this creator
                 const isFollowing = state.followers && state.followers[creatorId] === true;
-                
-                // Get user's rating for this creator
                 const userRating = state.userRatings && state.userRatings[creatorId] || 0;
 
-                // Get verification status
                 const verification = state.verifications.find(v => v.adId === adId);
                 let verificationStatus = '';
                 let rejectionReason = '';
@@ -3501,14 +3960,12 @@
                 }
 
                 const creatorInitial = creatorName.charAt(0).toUpperCase();
-
                 const descWithLinks = description.replace(
                     /(https?:\/\/[^\s]+)/g,
                     '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
                 );
 
                 DOM.jobDetailsContent.innerHTML = `
-                    <!-- Translation Section -->
                     <div class="detail-card">
                         <div class="translation-section">
                             <span class="translate-label">🌐 Translate this job</span>
@@ -3520,8 +3977,6 @@
                                 <option value="ar">العربية</option>
                             </select>
                         </div>
-
-                        <!-- Category & Sub Category -->
                         <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
                             <span class="category-badge" style="background:rgba(var(--primary-color-rgb),0.1); color:var(--primary-color); padding:4px 14px; border-radius:12px; font-weight:600; font-size:13px;">
                                 📌 ${escapeHTML(category)}
@@ -3530,8 +3985,6 @@
                                 🏷️ ${escapeHTML(subCategory)}
                             </span>` : ''}
                         </div>
-
-                        <!-- Stats Grid -->
                         <div class="detail-stats-grid">
                             <div class="stat-box">
                                 <div class="label">💰 Payment</div>
@@ -3550,8 +4003,6 @@
                                 <div class="value">${ad.duration || 7} days</div>
                             </div>
                         </div>
-
-                        <!-- Progress -->
                         <div class="detail-progress">
                             <div class="progress-bar">
                                 <div class="fill" style="width:${progress}%"></div>
@@ -3563,7 +4014,6 @@
                         </div>
                     </div>
 
-                    <!-- Client Information -->
                     <div class="detail-card">
                         <div class="detail-title" style="font-size:15px;">👤 Client Information</div>
                         <div class="client-info">
@@ -3593,7 +4043,6 @@
                         </div>
                     </div>
 
-                    <!-- Job Description -->
                     <div class="detail-card">
                         <div class="detail-title" style="font-size:15px;">📝 Job Description</div>
                         <div class="job-detail-section">
@@ -3601,7 +4050,6 @@
                         </div>
                     </div>
 
-                    <!-- Instructions -->
                     <div class="detail-card">
                         <div class="detail-title" style="font-size:15px;">📋 Instructions</div>
                         <div class="job-detail-section">
@@ -3611,7 +4059,6 @@
                         </div>
                     </div>
 
-                    <!-- Requirements -->
                     <div class="detail-card">
                         <div class="detail-title" style="font-size:15px;">✅ Requirements</div>
                         <div class="job-detail-section">
@@ -3621,7 +4068,6 @@
                         </div>
                     </div>
 
-                    <!-- Verification -->
                     <div class="detail-card">
                         <div class="detail-title" style="font-size:15px;">🔍 Job Verification</div>
                         ${verificationStatus ? `
@@ -3675,8 +4121,6 @@
                 showToast('✅ Following!', 'success');
             }
             saveUserData();
-            
-            // Update follower count on the creator's ad data
             firebaseDb.ref(`ads/${currentJobId}/creatorFollowers`).set(Object.keys(state.followers).length);
         }
 
@@ -3707,7 +4151,6 @@
                 return;
             }
             
-            // Check if user already rated this creator
             if (state.userRatings && state.userRatings[ratingTargetId]) {
                 showToast('❌ You already rated this client!', 'warning');
                 DOM.ratingToast.classList.remove('active');
@@ -3715,8 +4158,6 @@
             }
             
             state.userRatings[ratingTargetId] = selectedRating;
-            
-            // Calculate average rating for this creator
             const creatorRatings = state.userRatings;
             const ratingsArray = Object.values(creatorRatings).filter(r => r > 0);
             const avgRating = ratingsArray.reduce((a, b) => a + b, 0) / ratingsArray.length;
@@ -3728,7 +4169,6 @@
             showToast(`✅ Rated ${selectedRating}★`, 'success');
             ratingTargetId = null;
             
-            // Update the rating on the ad data
             firebaseDb.ref(`ads/${currentJobId}/creatorRating`).set(avgRating);
             
             if (currentJobId) {
@@ -3819,6 +4259,7 @@
                     state.viewedAds.push(state.currentVerifyAdId);
                 }
                 await firebaseDb.ref(`ads/${state.currentVerifyAdId}/views`).transaction((current) => (current || 0) + 1);
+                state.pendingEarnings += ad.reward || 0;
                 saveUserData();
                 updateUI();
                 closeVerifyModal();
@@ -3979,6 +4420,11 @@
             try {
                 await firebaseDb.ref(`verifications/${pendingRejectVerificationId}/status`).set('rejected');
                 await firebaseDb.ref(`verifications/${pendingRejectVerificationId}/rejectReason`).set(reason);
+                
+                // Update ad rejects count
+                state.adRejects += 1;
+                saveUserData();
+                
                 closeModal('rejectReasonModal');
                 pendingRejectVerificationId = null;
                 showToast('❌ Verification rejected', 'error');
@@ -3999,6 +4445,10 @@
                 const ad = adSnapshot.val();
                 if (ad) {
                     await firebaseDb.ref(`users/${data.userId}/balance`).transaction((current) => (current || 0) + ad.reward);
+                    
+                    // Update earnings for publisher
+                    firebaseDb.ref(`users/${data.userId}/totalEarnings`).transaction((current) => (current || 0) + ad.reward);
+                    firebaseDb.ref(`users/${data.userId}/pendingEarnings`).transaction((current) => Math.max(0, (current || 0) - ad.reward));
                 }
                 await firebaseDb.ref(`ads/${data.adId}/verified`).set(true);
                 showToast('✅ Verification approved!', 'success');
@@ -4042,6 +4492,7 @@
                 const budget = ad.budget || 0;
                 const refund = budget * (CONFIG.REFUND_PERCENTAGE / 100);
                 state.walletBalance += refund;
+                state.totalSpent -= refund;
                 await firebaseDb.ref(`ads/${pendingDeleteAdId}`).remove();
                 state.withdrawalHistory.unshift({
                     method: 'Ad Deleted (Refund)',
@@ -4372,6 +4823,7 @@
 
                 if (adShown) {
                     state.balance += CONFIG.AD_REWARD;
+                    state.totalEarnings += CONFIG.AD_REWARD;
                     state.adCount++;
                     state.adsWatchedToday++;
                     const day = new Date().getDay();
