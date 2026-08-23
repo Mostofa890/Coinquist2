@@ -3536,14 +3536,7 @@
                         </div>
                     </div>
                     
-                    <div style="display:flex; gap:10px; margin-bottom:16px;">
-                        <button class="action-button" style="flex:1; padding:12px;" onclick="openAllJobs()">
-                            <i class="fa-solid fa-briefcase"></i> Browse Jobs (${availableJobs})
-                        </button>
-                        <button class="action-button secondary" style="flex:1; padding:12px;" onclick="closeProfilePage();">
-                            <i class="fa-solid fa-arrow-right"></i> My Submissions
-                        </button>
-                    </div>
+                    <!-- REMOVED: Browse Jobs and My Submissions buttons -->
                     
                     <div class="card">
                         <div class="profile-section-title">📋 My Submissions</div>
@@ -4157,7 +4150,7 @@
         }
 
         // ============================================================
-        // JOB DETAILS PAGE
+        // JOB DETAILS PAGE - VERIFY BUTTON ALWAYS ACTIVE
         // ============================================================
         function openJobDetails(adId) {
             firebaseDb.ref(`ads/${adId}`).once('value').then(snapshot => {
@@ -4214,8 +4207,8 @@
                     '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
                 );
 
-                // VERIFY BUTTON - Always active if job is completed
-                const verifyButtonActive = isCompleted;
+                // VERIFY BUTTON - Always active (removed completion check)
+                const verifyButtonActive = true;
 
                 DOM.jobDetailsContent.innerHTML = `
                     <div class="detail-card">
@@ -4328,9 +4321,9 @@
                                 ${rejectionReason ? `<div style="margin-top:6px; font-size:13px; color:var(--text-light);"><strong>Reason:</strong> ${escapeHTML(rejectionReason)}</div>` : ''}
                             </div>
                         ` : ''}
-                        <button class="verify-job-btn ${verifyButtonActive ? 'active' : ''}" onclick="${verifyButtonActive ? `openVerifyJob('${adId}')` : ''}" ${verifyButtonActive ? '' : 'disabled'}>
+                        <button class="verify-job-btn active" onclick="openVerifyJob('${adId}')">
                             <i class="fa-solid fa-check-circle"></i>
-                            ${verifyButtonActive ? 'Verify Job' : 'Complete the job first to verify'}
+                            ${verificationStatus ? 'Resubmit Verification' : 'Verify Job'}
                         </button>
                     </div>
                 `;
@@ -4463,18 +4456,25 @@
         }
 
         // ============================================================
-        // VERIFY JOB
+        // VERIFY JOB - ALWAYS ENABLED
         // ============================================================
         function openVerifyJob(adId) {
             if (!adId) {
                 showToast('❌ No job selected', 'error');
                 return;
             }
+            
+            // Check if already submitted pending or approved
             const existingVerification = state.verifications.find(v => v.adId === adId);
-            if (existingVerification && (existingVerification.status === 'approved' || existingVerification.status === 'pending')) {
-                showToast('❌ Verification already submitted', 'error');
+            if (existingVerification && existingVerification.status === 'pending') {
+                showToast('⏳ Verification already submitted and pending review', 'warning');
                 return;
             }
+            if (existingVerification && existingVerification.status === 'approved') {
+                showToast('✅ This job is already verified!', 'success');
+                return;
+            }
+            
             state.currentVerifyAdId = adId;
             firebaseDb.ref(`ads/${adId}`).once('value').then(snapshot => {
                 const ad = snapshot.val();
@@ -4490,8 +4490,16 @@
                     `;
                 }
             });
-            DOM.verifyJobTitle.value = '';
-            DOM.verifyJobDesc.value = '';
+            
+            // Pre-fill with ad details if it's a resubmission
+            if (existingVerification && existingVerification.status === 'rejected') {
+                DOM.verifyJobTitle.value = existingVerification.adTitle || '';
+                DOM.verifyJobDesc.value = existingVerification.adDescription || '';
+            } else {
+                DOM.verifyJobTitle.value = '';
+                DOM.verifyJobDesc.value = '';
+            }
+            
             DOM.verifyJobScreenshot.value = '';
             DOM.verifyJobModal.classList.add('active');
         }
@@ -4535,7 +4543,10 @@
                 const ad = adSnapshot.val();
                 const reward = ad?.reward || 0;
                 
-                const verificationData = {
+                // Check if there's an existing rejected verification
+                const existingVerification = state.verifications.find(v => v.adId === state.currentVerifyAdId);
+                
+                let verificationData = {
                     adId: state.currentVerifyAdId,
                     userId: state.currentUserId,
                     userName: tg?.initDataUnsafe?.user?.first_name || 'User',
@@ -4546,7 +4557,22 @@
                     rejectReason: '',
                     createdAt: Date.now()
                 };
-                await firebaseDb.ref('verifications').push(verificationData);
+                
+                if (existingVerification && existingVerification.status === 'rejected') {
+                    // Update existing rejected verification
+                    await firebaseDb.ref(`verifications/${existingVerification.id}`).update({
+                        adTitle: title,
+                        adDescription: desc,
+                        screenshot: downloadUrl,
+                        status: 'pending',
+                        rejectReason: '',
+                        updatedAt: Date.now()
+                    });
+                } else {
+                    // Create new verification
+                    await firebaseDb.ref('verifications').push(verificationData);
+                }
+                
                 if (!state.viewedAds.includes(state.currentVerifyAdId)) {
                     state.viewedAds.push(state.currentVerifyAdId);
                 }
