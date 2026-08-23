@@ -4,17 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>NexEarn</title>
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
-    <!-- Monetag SDK -->
     <script src='//libtl.com/sdk.js' data-zone='11573980' data-sdk='show_11573980'></script>
-
     <style>
         /* ===== ALL EXISTING STYLES REMAIN SAME ===== */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
@@ -2511,7 +2506,7 @@
                     <div class="form-group">
                         <label>Total Budget ($)</label>
                         <input type="number" id="ad-budget" step="0.01" value="1.00" min="0.10" required>
-                        <div class="form-hint">Total amount you want to spend</div>
+                        <div class="form-hint">Total amount you want to spend (Minimum $1.00)</div>
                     </div>
                     <div class="form-group">
                         <label>Target Views</label>
@@ -2532,6 +2527,8 @@
                             <span>Daily Budget: <strong>$<span id="ad-daily-budget">0.00</span></strong></span>
                         </div>
                     </div>
+                    
+                    <div id="ad-validation-message" style="font-size:13px; font-weight:600; margin-bottom:10px; padding:8px 12px; border-radius:8px; display:none;"></div>
                     
                     <button type="submit" class="action-button" id="create-ad-btn">
                         <i class="fa-solid fa-plus"></i> <span>Create Ad Campaign</span>
@@ -2941,6 +2938,7 @@
             COMPANY_FEE_PERCENTAGE: 40,
             AD_COOLDOWN_MINUTES: 1,
             MINIMUM_DURATION_DAYS: 7,
+            MINIMUM_BUDGET: 1.00,
             withdrawalMethods: ['Binance', 'Bikash', 'Nogad'],
             depositMethods: [
                 { name: 'Bikash', number: '01712345678', icon: '💳' },
@@ -3019,7 +3017,8 @@
             profileFollowers: 0,
             profileRating: 0,
             followingCount: 0,
-            followersCount: 0
+            followersCount: 0,
+            jobCount: 0
         };
 
         // ============================================================
@@ -3125,6 +3124,7 @@
             DOM.editAdRequirements = document.getElementById('edit-ad-requirements');
             DOM.editAdInstructions = document.getElementById('edit-ad-instructions');
             DOM.editAdBtn = document.getElementById('edit-ad-btn');
+            DOM.adValidationMessage = document.getElementById('ad-validation-message');
         }
 
         // ============================================================
@@ -3326,6 +3326,7 @@
                         if (data.welcomeMessage) CONFIG.welcomeNotice.message = data.welcomeMessage;
                         if (data.adCooldownMinutes) CONFIG.AD_COOLDOWN_MINUTES = data.adCooldownMinutes;
                         if (data.minDurationDays) CONFIG.MINIMUM_DURATION_DAYS = data.minDurationDays;
+                        if (data.minBudget) CONFIG.MINIMUM_BUDGET = data.minBudget;
                         console.log("✅ Config loaded from Firebase");
                         renderDepositMethods();
                     }
@@ -4091,7 +4092,7 @@
         }
 
         // ============================================================
-        // AUTO CALCULATE AD COST - UPDATED WITH DURATION
+        // AUTO CALCULATE AD COST - UPDATED WITH VALIDATION
         // ============================================================
         function updateAdCalculation() {
             const budget = parseFloat(DOM.adBudget.value) || 1.00;
@@ -4100,8 +4101,6 @@
             
             // Calculate cost per view based on duration
             // Formula: costPerView = (budget / targetViews) * (duration / 7)
-            // If duration increases, cost per view increases
-            // If duration decreases, cost per view decreases
             const baseCostPerView = budget / targetViews;
             const durationFactor = duration / 7; // 7 is the minimum duration
             const costPerView = baseCostPerView * durationFactor;
@@ -4118,18 +4117,63 @@
             DOM.calcReward.textContent = `$${costPerView.toFixed(4)}`;
             DOM.calcDuration.textContent = `${duration} days`;
             
-            // Color coding based on cost per view
-            if (costPerView < 0.0001) {
+            // Validation
+            const minBudget = CONFIG.MINIMUM_BUDGET || 1.00;
+            const validationMsg = document.getElementById('ad-validation-message');
+            
+            // Check minimum budget
+            if (budget < minBudget) {
+                validationMsg.style.display = 'block';
+                validationMsg.style.background = 'rgba(239, 68, 68, 0.1)';
+                validationMsg.style.color = 'var(--danger)';
+                validationMsg.style.border = '1px solid var(--danger)';
+                validationMsg.innerHTML = `⚠️ Minimum budget is $${minBudget.toFixed(2)}. Please increase your budget.`;
                 DOM.calcReward.style.color = 'var(--danger)';
-                DOM.adCostPerView.style.color = 'var(--danger)';
                 DOM.calcResult.style.borderColor = 'var(--danger)';
                 DOM.calcResult.style.background = 'rgba(239, 68, 68, 0.06)';
-            } else {
-                DOM.calcReward.style.color = 'var(--success)';
-                DOM.adCostPerView.style.color = 'var(--text-color)';
-                DOM.calcResult.style.borderColor = 'rgba(16, 185, 129, 0.2)';
-                DOM.calcResult.style.background = 'rgba(16, 185, 129, 0.06)';
+                return;
             }
+            
+            // Check if cost per view is too low
+            if (costPerView < 0.0001) {
+                validationMsg.style.display = 'block';
+                validationMsg.style.background = 'rgba(239, 68, 68, 0.1)';
+                validationMsg.style.color = 'var(--danger)';
+                validationMsg.style.border = '1px solid var(--danger)';
+                validationMsg.innerHTML = `⚠️ Cost per view is too low! Minimum is $0.0001. 
+                    <br><strong>Suggestions:</strong> 
+                    <br>• Increase budget to $${(targetViews * 0.0001 / (duration/7)).toFixed(2)} 
+                    <br>• Reduce target views to ${Math.floor(budget / (0.0001 * (duration/7)))} 
+                    <br>• Increase duration to ${Math.ceil(7 * (0.0001 * targetViews / budget))} days`;
+                DOM.calcReward.style.color = 'var(--danger)';
+                DOM.calcResult.style.borderColor = 'var(--danger)';
+                DOM.calcResult.style.background = 'rgba(239, 68, 68, 0.06)';
+                return;
+            }
+            
+            // Check if budget is enough for target views at current cost
+            const requiredBudget = targetViews * costPerView;
+            if (Math.abs(budget - requiredBudget) > 0.01) {
+                validationMsg.style.display = 'block';
+                validationMsg.style.background = 'rgba(245, 158, 11, 0.1)';
+                validationMsg.style.color = 'var(--warning)';
+                validationMsg.style.border = '1px solid var(--warning)';
+                validationMsg.innerHTML = `⚠️ Budget and target views don't match exactly. 
+                    <br>• Current cost per view: $${costPerView.toFixed(4)} 
+                    <br>• Required budget for ${targetViews} views: $${(targetViews * costPerView).toFixed(2)} 
+                    <br>• Your budget: $${budget.toFixed(2)} 
+                    <br><strong>Suggestion:</strong> Set budget to $${(targetViews * costPerView).toFixed(2)} or adjust views to ${Math.floor(budget / costPerView)}`;
+                DOM.calcReward.style.color = 'var(--warning)';
+                DOM.calcResult.style.borderColor = 'var(--warning)';
+                DOM.calcResult.style.background = 'rgba(245, 158, 11, 0.06)';
+                return;
+            }
+            
+            // All validations passed
+            validationMsg.style.display = 'none';
+            DOM.calcReward.style.color = 'var(--success)';
+            DOM.calcResult.style.borderColor = 'rgba(16, 185, 129, 0.2)';
+            DOM.calcResult.style.background = 'rgba(16, 185, 129, 0.06)';
         }
 
         // ============================================================
@@ -4167,6 +4211,11 @@
                     return;
                 }
 
+                if (budget < CONFIG.MINIMUM_BUDGET) {
+                    showToast(`❌ Minimum budget is $${CONFIG.MINIMUM_BUDGET.toFixed(2)}!`, 'error');
+                    return;
+                }
+
                 if (state.walletBalance < budget) {
                     showToast(`❌ Insufficient wallet balance! You need $${budget.toFixed(2)}.`, 'error');
                     return;
@@ -4177,8 +4226,21 @@
                 const durationFactor = duration / 7;
                 const costPerView = baseCostPerView * durationFactor;
 
+                // Validate cost per view
                 if (costPerView < 0.0001) {
-                    showToast(`❌ Cost per view is too low! Minimum is $0.0001. Please increase budget, reduce target views, or adjust duration.`, 'error');
+                    showToast(`❌ Cost per view is too low! Minimum is $0.0001. 
+                        Please increase budget (to $${(targetViews * 0.0001 * (duration/7)).toFixed(2)}), 
+                        reduce target views (to ${Math.floor(budget / (0.0001 * (duration/7)))}), 
+                        or increase duration.`, 'error');
+                    return;
+                }
+
+                // Validate budget matches target views
+                const requiredBudget = targetViews * costPerView;
+                if (Math.abs(budget - requiredBudget) > 0.01) {
+                    showToast(`❌ Budget and target views don't match. 
+                        Required budget: $${requiredBudget.toFixed(2)}. 
+                        Please adjust budget or target views.`, 'error');
                     return;
                 }
 
@@ -4771,6 +4833,7 @@
         function renderMyAds(ads) {
             if (!DOM.myAdsContainer) return;
             const myAds = ads.filter(ad => ad.createdBy === state.currentUserId);
+            state.myAds = myAds;
             if (myAds.length === 0) {
                 DOM.myAdsContainer.innerHTML = `<div class="empty-state"><i class="fa-solid fa-rectangle-ad"></i><p>You haven't created any ad campaigns yet</p></div>`;
                 return;
