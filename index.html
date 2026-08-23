@@ -247,6 +247,11 @@
             color: #10b981;
         }
         
+        .role-badge.banned {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+        }
+        
         .switch-role-btn {
             background: rgba(var(--primary-color-rgb), 0.08);
             border: 1px solid var(--border-color);
@@ -771,6 +776,7 @@
         .ad-status.completed { color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
         .ad-status.expired { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
         .ad-status.approved { color: var(--success); background: rgba(16, 185, 129, 0.1); }
+        .ad-status.banned { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
         
         .ad-btn {
             padding: 6px 16px;
@@ -857,6 +863,14 @@
         
         .action-button.success:hover {
             box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+        
+        .action-button.danger {
+            background: var(--danger);
+        }
+        
+        .action-button.danger:hover {
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
         }
         
         /* ===== FORM ===== */
@@ -2289,6 +2303,261 @@
             font-weight: 700;
             margin-bottom: 12px;
         }
+
+        /* ===== FAB (Floating Action Button) FOR ADMIN CHAT ===== */
+        .fab {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            z-index: 500;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 20px rgba(var(--primary-color-rgb), 0.4);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(var(--primary-color-rgb), 0.5);
+        }
+
+        .fab:active {
+            transform: scale(0.95);
+        }
+
+        .fab .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            min-width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--card-background);
+        }
+
+        /* ===== ADMIN CHAT MODAL ===== */
+        .chat-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 6000;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            align-items: flex-end;
+            padding: 16px;
+        }
+
+        .chat-modal.active {
+            display: flex;
+        }
+
+        .chat-modal .modal-content {
+            background: var(--card-background);
+            padding: 20px;
+            border-radius: 20px 20px 0 0;
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease-out;
+            border: 1px solid var(--border-color);
+        }
+
+        .chat-modal .modal-content .chat-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-modal .modal-content .chat-title .online-status {
+            font-size: 12px;
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        .chat-modal .modal-content .chat-messages {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 12px;
+            padding: 8px;
+            background: var(--background-color);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .chat-modal .modal-content .chat-message {
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            border-radius: 10px;
+            max-width: 85%;
+            word-wrap: break-word;
+        }
+
+        .chat-modal .modal-content .chat-message.user {
+            background: var(--gradient);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-modal .modal-content .chat-message.admin {
+            background: var(--border-color);
+            color: var(--text-color);
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-modal .modal-content .chat-message .time {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-top: 2px;
+        }
+
+        .chat-modal .modal-content .chat-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-modal .modal-content .chat-input-group input {
+            flex: 1;
+            padding: 12px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            background: var(--background-color);
+            color: var(--text-color);
+            transition: var(--transition);
+        }
+
+        .chat-modal .modal-content .chat-input-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
+        }
+
+        .chat-modal .modal-content .chat-input-group button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            background: var(--gradient);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .chat-modal .modal-content .chat-input-group button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(var(--primary-color-rgb), 0.3);
+        }
+
+        .chat-modal .modal-content .chat-input-group button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .chat-modal .modal-content .chat-status {
+            font-size: 12px;
+            color: var(--text-light);
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        /* Banned overlay */
+        .banned-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 8000;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .banned-overlay.active {
+            display: flex;
+        }
+
+        .banned-overlay .banned-icon {
+            font-size: 80px;
+            color: var(--danger);
+            margin-bottom: 20px;
+        }
+
+        .banned-overlay .banned-title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .banned-overlay .banned-reason {
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+            max-width: 400px;
+            margin-bottom: 20px;
+        }
+
+        .banned-overlay .banned-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 12px;
+            background: var(--primary-color);
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .banned-overlay .banned-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(var(--primary-color-rgb), 0.4);
+        }
+
+        /* Anti-hack warning */
+        .security-badge {
+            position: fixed;
+            bottom: 75px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 50;
+            font-size: 10px;
+            color: var(--text-light);
+            opacity: 0.3;
+            text-align: center;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -2318,7 +2587,48 @@
             <div class="loader-progress-bar" id="ad-loader-progress"></div>
         </div>
     </div>
-    
+
+    <!-- ===== BANNED OVERLAY ===== -->
+    <div class="banned-overlay" id="bannedOverlay">
+        <div class="banned-icon"><i class="fa-solid fa-ban"></i></div>
+        <div class="banned-title">🚫 Account Banned</div>
+        <div class="banned-reason" id="banReason">Your account has been suspended due to violation of our terms of service.</div>
+        <button class="banned-btn" onclick="openChatFromBanned()">
+            <i class="fa-solid fa-comment"></i> Contact Admin
+        </button>
+    </div>
+
+    <!-- ===== FAB BUTTON ===== -->
+    <button class="fab" id="fabButton" onclick="openChatModal()">
+        <i class="fa-solid fa-comment-dots"></i>
+        <span class="badge" id="chatBadge" style="display:none;">0</span>
+    </button>
+
+    <!-- ===== CHAT MODAL ===== -->
+    <div class="chat-modal" id="chatModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeChatModal()">&times;</button>
+            <div class="chat-title">
+                <i class="fa-solid fa-headset" style="color:var(--primary-color);"></i>
+                Admin Support
+                <span class="online-status">● Online</span>
+            </div>
+            <div class="chat-status" id="chatStatus">💬 Chat with admin for support</div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="chat-message admin">
+                    👋 Welcome! How can I help you today?
+                    <div class="time">Just now</div>
+                </div>
+            </div>
+            <div class="chat-input-group">
+                <input type="text" id="chatInput" placeholder="Type your message..." onkeydown="if(event.key==='Enter') sendMessage()">
+                <button onclick="sendMessage()" id="sendChatBtn">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <!-- ===== PROFILE HEADER ===== -->
         <div class="profile-header">
@@ -2334,12 +2644,12 @@
 
         <!-- ===== ROLE SELECTOR ===== -->
         <div class="role-selector" id="roleSelector">
-            <button class="role-btn active" onclick="selectRole('publisher', this)">
+            <button class="role-btn publisher active" onclick="selectRole('publisher', this)">
                 <span class="icon">📖</span>
                 <span class="label">Publisher</span>
                 <span class="sub-label">Watch & Earn</span>
             </button>
-            <button class="role-btn" onclick="selectRole('advertiser', this)">
+            <button class="role-btn advertiser" onclick="selectRole('advertiser', this)">
                 <span class="icon">📢</span>
                 <span class="label">Advertiser</span>
                 <span class="sub-label">Create Ads</span>
@@ -2939,6 +3249,7 @@
             AD_COOLDOWN_MINUTES: 1,
             MINIMUM_DURATION_DAYS: 7,
             MINIMUM_BUDGET: 1.00,
+            ADMIN_CHAT_ID: 'YOUR_ADMIN_CHAT_ID', // Replace with actual admin chat ID
             withdrawalMethods: ['Binance', 'Bikash', 'Nogad'],
             depositMethods: [
                 { name: 'Bikash', number: '01712345678', icon: '💳' },
@@ -2979,6 +3290,10 @@
         let selectedRating = 0;
         let ratingTargetId = null;
         let editingAdId = null;
+        let isBanned = false;
+        let banReason = '';
+        let chatMessages = [];
+        let unreadCount = 0;
 
         // ============================================================
         // STATE
@@ -3018,7 +3333,9 @@
             profileRating: 0,
             followingCount: 0,
             followersCount: 0,
-            jobCount: 0
+            jobCount: 0,
+            isBanned: false,
+            banReason: ''
         };
 
         // ============================================================
@@ -3125,6 +3442,255 @@
             DOM.editAdInstructions = document.getElementById('edit-ad-instructions');
             DOM.editAdBtn = document.getElementById('edit-ad-btn');
             DOM.adValidationMessage = document.getElementById('ad-validation-message');
+            DOM.fabButton = document.getElementById('fabButton');
+            DOM.chatModal = document.getElementById('chatModal');
+            DOM.chatMessages = document.getElementById('chatMessages');
+            DOM.chatInput = document.getElementById('chatInput');
+            DOM.chatStatus = document.getElementById('chatStatus');
+            DOM.sendChatBtn = document.getElementById('sendChatBtn');
+            DOM.chatBadge = document.getElementById('chatBadge');
+            DOM.bannedOverlay = document.getElementById('bannedOverlay');
+            DOM.banReason = document.getElementById('banReason');
+        }
+
+        // ============================================================
+        // ANTI-HACK BALANCE PROTECTION
+        // ============================================================
+        let lastKnownBalance = 0;
+        let balanceCheckInterval = null;
+
+        function setupBalanceProtection() {
+            // Store initial balance
+            lastKnownBalance = state.balance;
+
+            // Check for balance tampering every 5 seconds
+            balanceCheckInterval = setInterval(() => {
+                const currentBalance = state.balance;
+                
+                // Check if balance was manually changed (increased)
+                if (currentBalance > lastKnownBalance + 0.001) {
+                    // Check if the increase is suspicious (not from ad reward or conversion)
+                    // We'll use a flag to track legitimate balance changes
+                    if (!window._legitimateBalanceChange) {
+                        console.warn('⚠️ Suspicious balance change detected!');
+                        banUser('Suspicious balance manipulation detected. Account banned for security reasons.');
+                        return;
+                    }
+                    window._legitimateBalanceChange = false;
+                }
+                
+                // Check if balance decreased in a suspicious way (not from withdrawal)
+                if (currentBalance < lastKnownBalance - 0.001) {
+                    // Withdrawals are legitimate
+                    if (!window._legitimateWithdrawal) {
+                        console.warn('⚠️ Suspicious balance decrease detected!');
+                        banUser('Suspicious balance manipulation detected. Account banned for security reasons.');
+                        return;
+                    }
+                    window._legitimateWithdrawal = false;
+                }
+                
+                lastKnownBalance = currentBalance;
+            }, 5000);
+        }
+
+        // Override the balance update functions to mark legitimate changes
+        const originalSaveUserData = saveUserData;
+        saveUserData = function() {
+            // Mark this as a legitimate balance change
+            window._legitimateBalanceChange = true;
+            originalSaveUserData.call(this);
+        };
+
+        // Override watchAd to mark legitimate balance increase
+        const originalWatchAd = watchAd;
+        watchAd = async function() {
+            window._legitimateBalanceChange = true;
+            await originalWatchAd.call(this);
+        };
+
+        // Override convertToWallet to mark legitimate balance change
+        const originalConfirmConvert = confirmConvert;
+        confirmConvert = function() {
+            window._legitimateBalanceChange = true;
+            originalConfirmConvert.call(this);
+        };
+
+        // Override withdrawal to mark legitimate balance decrease
+        const originalHandleWithdrawal = handleWithdrawal;
+        handleWithdrawal = async function(e) {
+            window._legitimateWithdrawal = true;
+            await originalHandleWithdrawal.call(this, e);
+        };
+
+        // ============================================================
+        // BAN SYSTEM
+        // ============================================================
+        function banUser(reason = 'Violation of terms of service') {
+            if (isBanned) return;
+            
+            isBanned = true;
+            state.isBanned = true;
+            state.banReason = reason;
+            
+            // Save ban status to Firebase
+            if (firebaseDb && state.currentUserId) {
+                firebaseDb.ref(`users/${state.currentUserId}/isBanned`).set(true);
+                firebaseDb.ref(`users/${state.currentUserId}/banReason`).set(reason);
+                firebaseDb.ref(`users/${state.currentUserId}/bannedAt`).set(Date.now());
+            }
+            
+            // Show banned overlay
+            DOM.banReason.textContent = reason;
+            DOM.bannedOverlay.classList.add('active');
+            
+            // Disable all interactions
+            document.querySelectorAll('button, input, textarea, select').forEach(el => {
+                el.disabled = true;
+            });
+            
+            // Hide container
+            DOM.container.style.display = 'none';
+            document.querySelectorAll('.modal, .job-details-page, .profile-page, .all-jobs-page').forEach(el => {
+                el.classList.remove('active');
+                el.style.display = 'none';
+            });
+            
+            // Show toast
+            showToast('🚫 Account Banned! Contact admin for more info.', 'error');
+            
+            // Send ban notification to admin
+            sendAdminNotification(`🚫 User Banned\nUser: ${tg?.initDataUnsafe?.user?.first_name || 'Unknown'}\nID: ${state.currentUserId}\nReason: ${reason}`);
+        }
+
+        function checkBanStatus() {
+            if (!firebaseDb || !state.currentUserId) return;
+            
+            firebaseDb.ref(`users/${state.currentUserId}/isBanned`).on('value', (snapshot) => {
+                const banned = snapshot.val();
+                if (banned === true) {
+                    firebaseDb.ref(`users/${state.currentUserId}/banReason`).once('value', (reasonSnap) => {
+                        const reason = reasonSnap.val() || 'Violation of terms of service';
+                        banUser(reason);
+                    });
+                }
+            });
+        }
+
+        // ============================================================
+        // ADMIN CHAT SYSTEM
+        // ============================================================
+        function openChatModal() {
+            if (isBanned) {
+                // Banned users can still chat with admin
+                DOM.bannedOverlay.classList.remove('active');
+            }
+            DOM.chatModal.classList.add('active');
+            // Reset unread count
+            unreadCount = 0;
+            DOM.chatBadge.style.display = 'none';
+            // Scroll to bottom
+            DOM.chatMessages.scrollTop = DOM.chatMessages.scrollHeight;
+        }
+
+        function closeChatModal() {
+            DOM.chatModal.classList.remove('active');
+            if (isBanned) {
+                DOM.bannedOverlay.classList.add('active');
+            }
+        }
+
+        function openChatFromBanned() {
+            DOM.bannedOverlay.classList.remove('active');
+            openChatModal();
+        }
+
+        function sendMessage() {
+            const input = DOM.chatInput;
+            const message = input.value.trim();
+            if (!message) return;
+
+            const user = tg?.initDataUnsafe?.user || { first_name: 'User', id: 'unknown' };
+            const msgData = {
+                userId: state.currentUserId,
+                userName: user.first_name || 'User',
+                message: message,
+                timestamp: Date.now(),
+                isFromUser: true
+            };
+
+            // Add to local chat
+            addChatMessage(message, 'user');
+            input.value = '';
+            DOM.sendChatBtn.disabled = true;
+
+            // Send to Firebase
+            const chatRef = firebaseDb.ref(`chats/${state.currentUserId}`);
+            chatRef.push(msgData).then(() => {
+                DOM.sendChatBtn.disabled = false;
+                // Notify admin via Telegram
+                sendAdminNotification(`💬 New message from ${user.first_name}\nID: ${state.currentUserId}\nMessage: ${message}`);
+            }).catch(err => {
+                console.error("Chat send error:", err);
+                DOM.sendChatBtn.disabled = false;
+                showToast('❌ Failed to send message', 'error');
+            });
+        }
+
+        function addChatMessage(message, type = 'user', time = Date.now()) {
+            const div = document.createElement('div');
+            div.className = `chat-message ${type}`;
+            const timeStr = new Date(time).toLocaleTimeString();
+            div.innerHTML = `
+                ${escapeHTML(message)}
+                <div class="time">${timeStr}</div>
+            `;
+            DOM.chatMessages.appendChild(div);
+            DOM.chatMessages.scrollTop = DOM.chatMessages.scrollHeight;
+        }
+
+        function listenChatMessages() {
+            if (!firebaseDb || !state.currentUserId) return;
+
+            const chatRef = firebaseDb.ref(`chats/${state.currentUserId}`);
+            chatRef.orderByChild('timestamp').startAt(Date.now() - 86400000).on('child_added', (snapshot) => {
+                const data = snapshot.val();
+                if (!data) return;
+                
+                // Check if this is a new message not from this user
+                if (!data.isFromUser) {
+                    addChatMessage(data.message, 'admin', data.timestamp);
+                    
+                    // Only increment unread count if chat is not open
+                    if (!DOM.chatModal.classList.contains('active')) {
+                        unreadCount++;
+                        DOM.chatBadge.textContent = unreadCount;
+                        DOM.chatBadge.style.display = 'flex';
+                    }
+                }
+            });
+        }
+
+        function sendAdminNotification(message) {
+            // Send to Firebase for admin to read
+            if (firebaseDb) {
+                firebaseDb.ref('adminNotifications').push({
+                    message: message,
+                    userId: state.currentUserId,
+                    timestamp: Date.now(),
+                    read: false
+                });
+            }
+            
+            // Also try to send via Telegram bot if available
+            try {
+                if (tg) {
+                    // Telegram WebApp doesn't support direct bot messages
+                    // We'll use the Firebase notification system
+                }
+            } catch (e) {
+                console.warn("Admin notification error:", e);
+            }
         }
 
         // ============================================================
@@ -3385,7 +3951,9 @@
                 profileFollowers: state.profileFollowers,
                 profileRating: state.profileRating,
                 followingCount: state.followingCount,
-                followersCount: state.followersCount
+                followersCount: state.followersCount,
+                isBanned: state.isBanned,
+                banReason: state.banReason
             };
             firebaseDb.ref(`users/${state.currentUserId}`).update(data).catch(err => {
                 console.error("Save error:", err);
@@ -3424,6 +3992,8 @@
                         state.profileRating = data.profileRating || 0;
                         state.followingCount = data.followingCount || 0;
                         state.followersCount = data.followersCount || 0;
+                        state.isBanned = data.isBanned || false;
+                        state.banReason = data.banReason || '';
                         if (data.lastAdWatchTime) {
                             lastAdWatchTime = data.lastAdWatchTime;
                         }
@@ -3947,6 +4517,10 @@
         }
 
         function showModal(modalId, btn) {
+            if (isBanned) {
+                showToast('🚫 You are banned. Contact admin for support.', 'error');
+                return;
+            }
             document.querySelectorAll('.nav-button.active').forEach(b => b.classList.remove('active'));
             if (btn) btn.classList.add('active');
             if (modalId === 'historyModal') renderHistory();
@@ -4005,6 +4579,7 @@
                 showToast(`❌ You only have $${formatBalance(state.balance)} to convert`, 'error');
                 return;
             }
+            window._legitimateBalanceChange = true;
             state.balance -= amount;
             state.walletBalance += amount;
             saveUserData();
@@ -4045,6 +4620,10 @@
         // ROLE MANAGEMENT
         // ============================================================
         function selectRole(role, btn) {
+            if (isBanned) {
+                showToast('🚫 You are banned. Contact admin for support.', 'error');
+                return;
+            }
             document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
             if (btn) btn.classList.add('active');
             state.userRole = role;
@@ -5206,6 +5785,7 @@
             try {
                 const ref = firebaseDb.ref('withdrawals').push();
                 await ref.set(withdrawalData);
+                window._legitimateWithdrawal = true;
                 state.balance -= amount;
                 state.withdrawalHistory.unshift({
                     method,
@@ -5333,6 +5913,10 @@
         // WATCH AD
         // ============================================================
         async function watchAd() {
+            if (isBanned) {
+                showToast('🚫 You are banned. Contact admin for support.', 'error');
+                return;
+            }
             if (isAdShowing) return;
             if (DOM.adLoaderOverlay.style.display === 'flex') return;
 
@@ -5379,6 +5963,7 @@
                 DOM.adLoaderProgress.style.width = '100%';
 
                 if (adShown) {
+                    window._legitimateBalanceChange = true;
                     state.balance += CONFIG.AD_REWARD;
                     state.totalEarnings += CONFIG.AD_REWARD;
                     state.adCount++;
@@ -5490,6 +6075,19 @@
 
             DOM.watchAdBtn.classList.toggle('pulsing', !DOM.watchAdBtn.disabled);
             updateChart();
+            
+            // Update security badge
+            updateSecurityBadge();
+        }
+
+        function updateSecurityBadge() {
+            let badge = document.querySelector('.security-badge');
+            if (!badge) {
+                badge = document.createElement('div');
+                badge.className = 'security-badge';
+                document.body.appendChild(badge);
+            }
+            badge.textContent = '🔒 Secured • Anti-Hack Protection Active';
         }
 
         // ============================================================
@@ -5623,6 +6221,7 @@
                 DOM.copyLinkBtn.addEventListener('click', copyReferralLink);
                 DOM.shareLinkBtn.addEventListener('click', shareReferralLink);
                 DOM.withdrawForm.addEventListener('submit', handleWithdrawal);
+                DOM.sendChatBtn.addEventListener('click', sendMessage);
 
                 document.addEventListener('click', (e) => {
                     if (DOM.ratingToast.classList.contains('active') && !DOM.ratingToast.contains(e.target) && !e.target.closest('.action-btn.rate')) {
@@ -5658,6 +6257,13 @@
                     sessionStorage.setItem('alreadyVisited', 'true');
                 }
 
+                // Setup security
+                setupBalanceProtection();
+                checkBanStatus();
+                
+                // Setup chat listener
+                listenChatMessages();
+
                 updateUI();
 
                 console.log("✅ NexEarn initialized successfully!");
@@ -5665,6 +6271,7 @@
                 console.log("💰 Balance:", state.balance);
                 console.log("💳 Wallet:", state.walletBalance);
                 console.log("🎯 Role:", state.userRole);
+                console.log("🔒 Security: Active");
 
             } catch (error) {
                 console.error("Init error:", error);
