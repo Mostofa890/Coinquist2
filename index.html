@@ -2172,6 +2172,46 @@
             transform: scale(1.03);
             box-shadow: 0 4px 15px rgba(var(--primary-color-rgb), 0.3);
         }
+
+        /* ===== ALL JOBS PAGE ===== */
+        .all-jobs-page {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1600;
+            background: var(--background-color);
+            overflow-y: auto;
+            padding: 16px 12px 100px 12px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .all-jobs-page.active {
+            display: block;
+        }
+
+        .all-jobs-page .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 16px;
+            font-family: inherit;
+        }
+
+        .all-jobs-page .back-btn:hover {
+            background: var(--border-color);
+        }
     </style>
 </head>
 <body>
@@ -2449,6 +2489,14 @@
             <i class="fa-solid fa-arrow-left"></i> Back
         </button>
         <div id="profile-content"></div>
+    </div>
+
+    <!-- ===== ALL JOBS PAGE ===== -->
+    <div class="all-jobs-page" id="allJobsPage">
+        <button class="back-btn" onclick="closeAllJobs()">
+            <i class="fa-solid fa-arrow-left"></i> Back to Profile
+        </button>
+        <div id="all-jobs-container"></div>
     </div>
 
     <!-- ===== JOB DETAILS PAGE ===== -->
@@ -2834,7 +2882,9 @@
             totalSpent: 0,
             pendingEarnings: 0,
             totalEarnings: 0,
-            adRejects: 0
+            adRejects: 0,
+            profileFollowers: 0,
+            profileRating: 0
         };
 
         // ============================================================
@@ -2927,6 +2977,8 @@
             DOM.ratingStars = document.getElementById('ratingStars');
             DOM.profilePage = document.getElementById('profilePage');
             DOM.profileContent = document.getElementById('profile-content');
+            DOM.allJobsPage = document.getElementById('allJobsPage');
+            DOM.allJobsContainer = document.getElementById('all-jobs-container');
         }
 
         // ============================================================
@@ -3181,7 +3233,9 @@
                 totalSpent: state.totalSpent,
                 pendingEarnings: state.pendingEarnings,
                 totalEarnings: state.totalEarnings,
-                adRejects: state.adRejects
+                adRejects: state.adRejects,
+                profileFollowers: state.profileFollowers,
+                profileRating: state.profileRating
             };
             firebaseDb.ref(`users/${state.currentUserId}`).update(data).catch(err => {
                 console.error("Save error:", err);
@@ -3216,6 +3270,8 @@
                         state.pendingEarnings = data.pendingEarnings || 0;
                         state.totalEarnings = data.totalEarnings || 0;
                         state.adRejects = data.adRejects || 0;
+                        state.profileFollowers = data.profileFollowers || 0;
+                        state.profileRating = data.profileRating || 0;
                         if (data.lastAdWatchTime) {
                             lastAdWatchTime = data.lastAdWatchTime;
                         }
@@ -3240,6 +3296,11 @@
                 renderMyAds(adList);
                 renderVerificationRequests(adList);
                 updateProfileData(adList);
+                
+                // Update all jobs page if open
+                if (DOM.allJobsPage.classList.contains('active')) {
+                    renderAllJobs(adList);
+                }
             });
         }
 
@@ -3301,6 +3362,13 @@
             const initial = user.first_name?.charAt(0) || 'U';
             const role = state.userRole === 'publisher' ? '📖 Publisher' : '📢 Advertiser';
             
+            // Get total followers count
+            const totalFollowers = Object.keys(state.followers).length || 0;
+            
+            // Get average rating
+            const ratingsArray = Object.values(state.ratings).filter(r => r > 0);
+            const avgRating = ratingsArray.length > 0 ? ratingsArray.reduce((a, b) => a + b, 0) / ratingsArray.length : 0;
+            
             let content = '';
             
             if (state.userRole === 'advertiser') {
@@ -3314,6 +3382,10 @@
                         <div class="big-avatar">${initial}</div>
                         <div class="profile-name">${escapeHTML(user.first_name || 'User')}</div>
                         <div class="profile-role">${role}</div>
+                        <div style="display:flex; justify-content:center; gap:20px; margin-top:8px;">
+                            <div><span style="font-weight:700; color:var(--primary-color);">${totalFollowers}</span> Followers</div>
+                            <div><span style="font-weight:700; color:#f59e0b;">${avgRating.toFixed(1)}</span> ★ Rating</div>
+                        </div>
                     </div>
                     
                     <div class="profile-tabs">
@@ -3388,6 +3460,10 @@
                         <div class="big-avatar">${initial}</div>
                         <div class="profile-name">${escapeHTML(user.first_name || 'User')}</div>
                         <div class="profile-role">${role}</div>
+                        <div style="display:flex; justify-content:center; gap:20px; margin-top:8px;">
+                            <div><span style="font-weight:700; color:var(--primary-color);">${totalFollowers}</span> Followers</div>
+                            <div><span style="font-weight:700; color:#f59e0b;">${avgRating.toFixed(1)}</span> ★ Rating</div>
+                        </div>
                     </div>
                     
                     <div class="profile-tabs">
@@ -3411,8 +3487,8 @@
                     </div>
                     
                     <div style="display:flex; gap:10px; margin-bottom:16px;">
-                        <button class="action-button" style="flex:1; padding:12px;" onclick="closeProfilePage(); document.querySelector('.role-btn.publisher').click();">
-                            <i class="fa-solid fa-briefcase"></i> Browse Jobs
+                        <button class="action-button" style="flex:1; padding:12px;" onclick="openAllJobs()">
+                            <i class="fa-solid fa-briefcase"></i> Browse Jobs (${state.jobCount || 0})
                         </button>
                         <button class="action-button secondary" style="flex:1; padding:12px;" onclick="closeProfilePage();">
                             <i class="fa-solid fa-arrow-right"></i> My Submissions
@@ -3477,12 +3553,124 @@
         function updateProfileData(ads) {
             // Update available jobs count for publisher
             if (ads) {
-                const available = ads.filter(a => a.status === 'active' && a.approved).length;
+                state.jobCount = ads.filter(a => a.status === 'active' && a.approved).length;
                 // Update profile page if open
                 if (DOM.profilePage.classList.contains('active')) {
                     renderProfilePage();
                 }
             }
+        }
+
+        // ============================================================
+        // ALL JOBS PAGE FUNCTIONS
+        // ============================================================
+        function openAllJobs() {
+            DOM.allJobsPage.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            DOM.profilePage.classList.remove('active');
+            renderAllJobs();
+        }
+
+        function closeAllJobs() {
+            DOM.allJobsPage.classList.remove('active');
+            document.body.style.overflow = '';
+            DOM.profilePage.classList.add('active');
+            renderProfilePage();
+        }
+
+        function renderAllJobs(ads) {
+            if (!DOM.allJobsContainer) return;
+            
+            firebaseDb.ref('ads').once('value').then(snapshot => {
+                const allAds = snapshot.val() || {};
+                const adList = Object.entries(allAds).map(([id, data]) => ({ id, ...data }));
+                
+                const now = Date.now();
+                adList.forEach(ad => {
+                    if (ad.endDate && ad.endDate < now && ad.status === 'active') {
+                        firebaseDb.ref(`ads/${ad.id}/status`).set('expired');
+                    }
+                });
+
+                let filtered = adList.filter(ad => 
+                    (ad.status === 'active' || ad.status === 'paused') && 
+                    ad.approved === true &&
+                    ad.createdBy !== state.currentUserId // Hide own ads
+                );
+
+                filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+                if (filtered.length === 0) {
+                    DOM.allJobsContainer.innerHTML = `<div class="empty-state"><i class="fa-solid fa-rectangle-ad"></i><p>No jobs available</p></div>`;
+                    return;
+                }
+
+                DOM.allJobsContainer.innerHTML = filtered.map(ad => {
+                    const views = ad.views || 0;
+                    const totalViews = ad.totalViews || 100;
+                    const progress = Math.min((views / totalViews) * 100, 100);
+                    const daysLeft = ad.endDate ? Math.ceil((ad.endDate - Date.now()) / (1000 * 60 * 60 * 24)) : 0;
+                    const category = ad.category || 'General';
+                    const subCategory = ad.subCategory || '';
+                    const creatorName = ad.creatorName || 'Anonymous';
+                    const creatorRating = ad.creatorRating || 0;
+                    const reward = ad.reward || 0.001;
+                    const isCompleted = views >= totalViews;
+                    const creatorInitial = creatorName.charAt(0).toUpperCase();
+
+                    return `
+                        <div class="job-card" onclick="openJobDetailsFromAll('${ad.id}')">
+                            <div class="job-title">${escapeHTML(ad.title || 'Untitled')}</div>
+                            <div class="job-meta">
+                                <span class="category-badge">📌 ${escapeHTML(category)}</span>
+                                ${subCategory ? `<span class="sub-category-badge">🏷️ ${escapeHTML(subCategory)}</span>` : ''}
+                            </div>
+                            <div class="job-creator">
+                                <div class="creator-avatar">${creatorInitial}</div>
+                                <div class="creator-info">
+                                    <div class="creator-name">${escapeHTML(creatorName)}</div>
+                                    <div class="creator-rating">
+                                        <span class="stars">${'★'.repeat(Math.floor(creatorRating))}${creatorRating % 1 >= 0.5 ? '★' : ''}${'☆'.repeat(5 - Math.ceil(creatorRating))}</span>
+                                        <span>(${creatorRating.toFixed(1)})</span>
+                                    </div>
+                                </div>
+                                <div class="reward-amount">+$${reward.toFixed(4)}</div>
+                            </div>
+                            <div class="job-stats">
+                                <div class="stat-item">
+                                    <i class="fa-solid fa-eye"></i>
+                                    <span class="value">${views}</span>
+                                    <span>/ ${totalViews}</span>
+                                </div>
+                                <div class="progress-container">
+                                    <div class="progress-bar">
+                                        <div class="fill" style="width:${progress}%"></div>
+                                    </div>
+                                    <div class="progress-label">
+                                        <span>${progress.toFixed(0)}%</span>
+                                        <span>${isCompleted ? '✅ Completed' : 'In Progress'}</span>
+                                    </div>
+                                </div>
+                                <div class="days-left">
+                                    <i class="fa-regular fa-clock"></i>
+                                    <span class="days">${daysLeft > 0 ? daysLeft : 'Expired'}</span>
+                                    <span>days</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }).catch(err => {
+                console.error("Error loading all jobs:", err);
+                DOM.allJobsContainer.innerHTML = `<div class="empty-state"><i class="fa-solid fa-exclamation-circle"></i><p>Failed to load jobs</p></div>`;
+            });
+        }
+
+        function openJobDetailsFromAll(adId) {
+            // Close all jobs page
+            DOM.allJobsPage.classList.remove('active');
+            // Open job details
+            openJobDetails(adId);
         }
 
         // ============================================================
@@ -3822,7 +4010,7 @@
         }
 
         // ============================================================
-        // RENDER JOB LIST
+        // RENDER JOB LIST (Homepage)
         // ============================================================
         function renderJobList(ads) {
             if (!DOM.jobListContainer) return;
@@ -3836,7 +4024,8 @@
 
             let filtered = ads.filter(ad => 
                 (ad.status === 'active' || ad.status === 'paused') && 
-                ad.approved === true
+                ad.approved === true &&
+                ad.createdBy !== state.currentUserId // Hide own ads
             );
 
             if (state.currentFilter === 'completed') {
@@ -4120,8 +4309,14 @@
                 btn.innerHTML = '<i class="fa-solid fa-user-check"></i> Following';
                 showToast('✅ Following!', 'success');
             }
+            state.profileFollowers = Object.keys(state.followers).length;
             saveUserData();
-            firebaseDb.ref(`ads/${currentJobId}/creatorFollowers`).set(Object.keys(state.followers).length);
+            firebaseDb.ref(`ads/${currentJobId}/creatorFollowers`).set(state.profileFollowers);
+            
+            // Update profile page if open
+            if (DOM.profilePage.classList.contains('active')) {
+                renderProfilePage();
+            }
         }
 
         // ============================================================
@@ -4160,9 +4355,10 @@
             state.userRatings[ratingTargetId] = selectedRating;
             const creatorRatings = state.userRatings;
             const ratingsArray = Object.values(creatorRatings).filter(r => r > 0);
-            const avgRating = ratingsArray.reduce((a, b) => a + b, 0) / ratingsArray.length;
+            const avgRating = ratingsArray.length > 0 ? ratingsArray.reduce((a, b) => a + b, 0) / ratingsArray.length : 0;
             
             state.ratings[ratingTargetId] = avgRating;
+            state.profileRating = avgRating;
             
             saveUserData();
             DOM.ratingToast.classList.remove('active');
@@ -4170,6 +4366,11 @@
             ratingTargetId = null;
             
             firebaseDb.ref(`ads/${currentJobId}/creatorRating`).set(avgRating);
+            
+            // Update profile page if open
+            if (DOM.profilePage.classList.contains('active')) {
+                renderProfilePage();
+            }
             
             if (currentJobId) {
                 openJobDetails(currentJobId);
@@ -5031,6 +5232,7 @@
 
                 const user = tg?.initDataUnsafe?.user || { first_name: 'User', id: 'testuser_' + Date.now() };
                 state.currentUserId = user.id || 'testuser';
+                state.jobCount = 0;
 
                 await loadConfigFromFirebase();
                 await loadUserData();
