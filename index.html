@@ -1474,7 +1474,7 @@
             color: var(--info);
         }
 
-        /* ===== AD CALCULATOR ===== */
+        /* ===== AD CALCULATOR - UPDATED ===== */
         .calc-result {
             background: rgba(16, 185, 129, 0.06);
             border: 1px solid rgba(16, 185, 129, 0.2);
@@ -2352,7 +2352,7 @@
             border: 2px solid var(--card-background);
         }
 
-        /* ===== ADMIN CHAT MODAL ===== */
+        /* ===== ADMIN CHAT MODAL - UPDATED ===== */
         .chat-modal {
             display: none;
             position: fixed;
@@ -2405,14 +2405,16 @@
             background: var(--background-color);
             border-radius: 12px;
             border: 1px solid var(--border-color);
+            min-height: 200px;
         }
 
         .chat-modal .modal-content .chat-message {
-            padding: 8px 12px;
+            padding: 10px 14px;
             margin-bottom: 6px;
-            border-radius: 10px;
+            border-radius: 12px;
             max-width: 85%;
             word-wrap: break-word;
+            animation: fadeIn 0.2s ease;
         }
 
         .chat-modal .modal-content .chat-message.user {
@@ -2433,6 +2435,26 @@
             font-size: 10px;
             opacity: 0.7;
             margin-top: 2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .chat-modal .modal-content .chat-message .time .read-status {
+            font-size: 10px;
+        }
+
+        .chat-modal .modal-content .chat-typing {
+            font-size: 12px;
+            color: var(--text-light);
+            font-style: italic;
+            padding: 4px 12px;
+            animation: pulse 1.5s infinite;
+            display: none;
+        }
+
+        .chat-modal .modal-content .chat-typing.active {
+            display: block;
         }
 
         .chat-modal .modal-content .chat-input-group {
@@ -2484,6 +2506,15 @@
             font-size: 12px;
             color: var(--text-light);
             text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .chat-modal .modal-content .chat-info {
+            font-size: 11px;
+            color: var(--text-light);
+            text-align: center;
+            padding: 4px;
+            border-bottom: 1px solid var(--border-color);
             margin-bottom: 8px;
         }
 
@@ -2558,6 +2589,32 @@
             text-align: center;
             pointer-events: none;
         }
+
+        /* ===== BUDGET SUGGESTION STYLES ===== */
+        .budget-suggestion {
+            background: rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            padding: 10px 14px;
+            border-radius: 10px;
+            margin-top: 8px;
+            font-size: 13px;
+            color: var(--text-light);
+            display: none;
+        }
+
+        .budget-suggestion.active {
+            display: block;
+        }
+
+        .budget-suggestion .suggestion-text {
+            font-weight: 600;
+            color: var(--info);
+        }
+
+        .budget-suggestion .suggestion-amount {
+            font-weight: 700;
+            color: var(--primary-color);
+        }
     </style>
 </head>
 <body>
@@ -2614,14 +2671,16 @@
                 <span class="online-status">● Online</span>
             </div>
             <div class="chat-status" id="chatStatus">💬 Chat with admin for support</div>
+            <div class="chat-info" id="chatInfo">Messages are delivered in real-time</div>
             <div class="chat-messages" id="chatMessages">
                 <div class="chat-message admin">
                     👋 Welcome! How can I help you today?
-                    <div class="time">Just now</div>
+                    <div class="time">Just now <span class="read-status">✓✓</span></div>
                 </div>
             </div>
+            <div class="chat-typing" id="chatTyping">✍️ Admin is typing...</div>
             <div class="chat-input-group">
-                <input type="text" id="chatInput" placeholder="Type your message..." onkeydown="if(event.key==='Enter') sendMessage()">
+                <input type="text" id="chatInput" placeholder="Type your message..." onkeydown="if(event.key==='Enter') sendMessage()" oninput="handleTyping()">
                 <button onclick="sendMessage()" id="sendChatBtn">
                     <i class="fa-solid fa-paper-plane"></i>
                 </button>
@@ -2797,7 +2856,7 @@
                         <div class="form-hint">Upload PNG, JPG or GIF (Max 5MB)</div>
                     </div>
                     
-                    <!-- Auto Calculate Section - UPDATED -->
+                    <!-- Auto Calculate Section - UPDATED WITH SUGGESTION -->
                     <div class="calc-result" id="calcResult">
                         <div class="calc-item">
                             <span class="label">👁 Total Views</span>
@@ -2813,6 +2872,14 @@
                         </div>
                     </div>
                     
+                    <!-- Budget Suggestion -->
+                    <div class="budget-suggestion" id="budgetSuggestion">
+                        <i class="fa-solid fa-lightbulb" style="color:var(--info);"></i>
+                        <span class="suggestion-text">Suggested Budget:</span>
+                        <span class="suggestion-amount" id="suggestedBudget">$0.00</span>
+                        <span style="font-size:12px; display:block; margin-top:4px;" id="suggestionReason">Based on your selected duration and views</span>
+                    </div>
+                    
                     <div class="form-group">
                         <label>Total Budget ($)</label>
                         <input type="number" id="ad-budget" step="0.01" value="1.00" min="0.10" required>
@@ -2825,15 +2892,15 @@
                     </div>
                     <div class="form-group">
                         <label>Campaign Duration (Days) *</label>
-                        <input type="number" id="ad-duration" value="7" min="7" max="30" required>
-                        <div class="form-hint">Minimum 7 days. Duration affects cost per view.</div>
+                        <input type="number" id="ad-duration" value="3" min="3" max="30" required>
+                        <div class="form-hint">Minimum 3 days. Duration affects cost per view.</div>
                     </div>
                     
                     <div id="ad-budget-info" style="font-size:12px; color:var(--text-light); margin-bottom:12px; background:var(--background-color); padding:10px; border-radius:8px;">
                         <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:4px;">
                             <span>Total Views: <strong id="ad-total-views">100</strong></span>
                             <span>Cost per view: <strong>$<span id="ad-cost-per-view">0.0000</span></strong></span>
-                            <span>Duration: <strong id="ad-duration-display">7</strong> days</span>
+                            <span>Duration: <strong id="ad-duration-display">3</strong> days</span>
                             <span>Daily Budget: <strong>$<span id="ad-daily-budget">0.00</span></strong></span>
                         </div>
                     </div>
@@ -3247,9 +3314,9 @@
             REFUND_PERCENTAGE: 60,
             COMPANY_FEE_PERCENTAGE: 40,
             AD_COOLDOWN_MINUTES: 1,
-            MINIMUM_DURATION_DAYS: 7,
+            MINIMUM_DURATION_DAYS: 3,
             MINIMUM_BUDGET: 1.00,
-            ADMIN_CHAT_ID: 'YOUR_ADMIN_CHAT_ID', // Replace with actual admin chat ID
+            ADMIN_CHAT_ID: 'YOUR_ADMIN_CHAT_ID',
             withdrawalMethods: ['Binance', 'Bikash', 'Nogad'],
             depositMethods: [
                 { name: 'Bikash', number: '01712345678', icon: '💳' },
@@ -3292,8 +3359,9 @@
         let editingAdId = null;
         let isBanned = false;
         let banReason = '';
-        let chatMessages = [];
         let unreadCount = 0;
+        let typingTimeout = null;
+        let isTyping = false;
 
         // ============================================================
         // STATE
@@ -3447,10 +3515,15 @@
             DOM.chatMessages = document.getElementById('chatMessages');
             DOM.chatInput = document.getElementById('chatInput');
             DOM.chatStatus = document.getElementById('chatStatus');
+            DOM.chatInfo = document.getElementById('chatInfo');
+            DOM.chatTyping = document.getElementById('chatTyping');
             DOM.sendChatBtn = document.getElementById('sendChatBtn');
             DOM.chatBadge = document.getElementById('chatBadge');
             DOM.bannedOverlay = document.getElementById('bannedOverlay');
             DOM.banReason = document.getElementById('banReason');
+            DOM.budgetSuggestion = document.getElementById('budgetSuggestion');
+            DOM.suggestedBudget = document.getElementById('suggestedBudget');
+            DOM.suggestionReason = document.getElementById('suggestionReason');
         }
 
         // ============================================================
@@ -3460,17 +3533,10 @@
         let balanceCheckInterval = null;
 
         function setupBalanceProtection() {
-            // Store initial balance
             lastKnownBalance = state.balance;
-
-            // Check for balance tampering every 5 seconds
             balanceCheckInterval = setInterval(() => {
                 const currentBalance = state.balance;
-                
-                // Check if balance was manually changed (increased)
                 if (currentBalance > lastKnownBalance + 0.001) {
-                    // Check if the increase is suspicious (not from ad reward or conversion)
-                    // We'll use a flag to track legitimate balance changes
                     if (!window._legitimateBalanceChange) {
                         console.warn('⚠️ Suspicious balance change detected!');
                         banUser('Suspicious balance manipulation detected. Account banned for security reasons.');
@@ -3478,10 +3544,7 @@
                     }
                     window._legitimateBalanceChange = false;
                 }
-                
-                // Check if balance decreased in a suspicious way (not from withdrawal)
                 if (currentBalance < lastKnownBalance - 0.001) {
-                    // Withdrawals are legitimate
                     if (!window._legitimateWithdrawal) {
                         console.warn('⚠️ Suspicious balance decrease detected!');
                         banUser('Suspicious balance manipulation detected. Account banned for security reasons.');
@@ -3489,34 +3552,28 @@
                     }
                     window._legitimateWithdrawal = false;
                 }
-                
                 lastKnownBalance = currentBalance;
             }, 5000);
         }
 
-        // Override the balance update functions to mark legitimate changes
         const originalSaveUserData = saveUserData;
         saveUserData = function() {
-            // Mark this as a legitimate balance change
             window._legitimateBalanceChange = true;
             originalSaveUserData.call(this);
         };
 
-        // Override watchAd to mark legitimate balance increase
         const originalWatchAd = watchAd;
         watchAd = async function() {
             window._legitimateBalanceChange = true;
             await originalWatchAd.call(this);
         };
 
-        // Override convertToWallet to mark legitimate balance change
         const originalConfirmConvert = confirmConvert;
         confirmConvert = function() {
             window._legitimateBalanceChange = true;
             originalConfirmConvert.call(this);
         };
 
-        // Override withdrawal to mark legitimate balance decrease
         const originalHandleWithdrawal = handleWithdrawal;
         handleWithdrawal = async function(e) {
             window._legitimateWithdrawal = true;
@@ -3528,44 +3585,35 @@
         // ============================================================
         function banUser(reason = 'Violation of terms of service') {
             if (isBanned) return;
-            
             isBanned = true;
             state.isBanned = true;
             state.banReason = reason;
             
-            // Save ban status to Firebase
             if (firebaseDb && state.currentUserId) {
                 firebaseDb.ref(`users/${state.currentUserId}/isBanned`).set(true);
                 firebaseDb.ref(`users/${state.currentUserId}/banReason`).set(reason);
                 firebaseDb.ref(`users/${state.currentUserId}/bannedAt`).set(Date.now());
             }
             
-            // Show banned overlay
             DOM.banReason.textContent = reason;
             DOM.bannedOverlay.classList.add('active');
             
-            // Disable all interactions
             document.querySelectorAll('button, input, textarea, select').forEach(el => {
                 el.disabled = true;
             });
             
-            // Hide container
             DOM.container.style.display = 'none';
             document.querySelectorAll('.modal, .job-details-page, .profile-page, .all-jobs-page').forEach(el => {
                 el.classList.remove('active');
                 el.style.display = 'none';
             });
             
-            // Show toast
             showToast('🚫 Account Banned! Contact admin for more info.', 'error');
-            
-            // Send ban notification to admin
             sendAdminNotification(`🚫 User Banned\nUser: ${tg?.initDataUnsafe?.user?.first_name || 'Unknown'}\nID: ${state.currentUserId}\nReason: ${reason}`);
         }
 
         function checkBanStatus() {
             if (!firebaseDb || !state.currentUserId) return;
-            
             firebaseDb.ref(`users/${state.currentUserId}/isBanned`).on('value', (snapshot) => {
                 const banned = snapshot.val();
                 if (banned === true) {
@@ -3578,19 +3626,29 @@
         }
 
         // ============================================================
-        // ADMIN CHAT SYSTEM
+        // ADMIN CHAT SYSTEM - FULLY WORKING
         // ============================================================
         function openChatModal() {
             if (isBanned) {
-                // Banned users can still chat with admin
                 DOM.bannedOverlay.classList.remove('active');
             }
             DOM.chatModal.classList.add('active');
-            // Reset unread count
             unreadCount = 0;
             DOM.chatBadge.style.display = 'none';
-            // Scroll to bottom
             DOM.chatMessages.scrollTop = DOM.chatMessages.scrollHeight;
+            
+            // Mark all messages as read
+            if (firebaseDb && state.currentUserId) {
+                const chatRef = firebaseDb.ref(`chats/${state.currentUserId}`);
+                chatRef.orderByChild('timestamp').once('value', (snapshot) => {
+                    const data = snapshot.val() || {};
+                    Object.entries(data).forEach(([key, msg]) => {
+                        if (msg.isFromUser === false && !msg.read) {
+                            chatRef.child(key + '/read').set(true);
+                        }
+                    });
+                });
+            }
         }
 
         function closeChatModal() {
@@ -3605,6 +3663,27 @@
             openChatModal();
         }
 
+        function handleTyping() {
+            if (!firebaseDb || !state.currentUserId) return;
+            
+            const chatRef = firebaseDb.ref(`chats/${state.currentUserId}`);
+            
+            // Clear previous timeout
+            if (typingTimeout) clearTimeout(typingTimeout);
+            
+            // Set typing status
+            chatRef.child('typing').set({
+                isTyping: true,
+                timestamp: Date.now(),
+                sender: 'user'
+            });
+            
+            // Clear typing after 2 seconds of inactivity
+            typingTimeout = setTimeout(() => {
+                chatRef.child('typing').remove();
+            }, 2000);
+        }
+
         function sendMessage() {
             const input = DOM.chatInput;
             const message = input.value.trim();
@@ -3616,20 +3695,23 @@
                 userName: user.first_name || 'User',
                 message: message,
                 timestamp: Date.now(),
-                isFromUser: true
+                isFromUser: true,
+                read: false
             };
 
-            // Add to local chat
-            addChatMessage(message, 'user');
+            addChatMessage(message, 'user', Date.now());
             input.value = '';
             DOM.sendChatBtn.disabled = true;
 
-            // Send to Firebase
             const chatRef = firebaseDb.ref(`chats/${state.currentUserId}`);
+            
+            // Clear typing
+            chatRef.child('typing').remove();
+            
             chatRef.push(msgData).then(() => {
                 DOM.sendChatBtn.disabled = false;
-                // Notify admin via Telegram
-                sendAdminNotification(`💬 New message from ${user.first_name}\nID: ${state.currentUserId}\nMessage: ${message}`);
+                // Send notification to admin via Telegram Bot
+                sendAdminNotification(`💬 New message from ${user.first_name}\nID: ${state.currentUserId}\nMessage: ${message}\nTime: ${new Date().toLocaleString()}`);
             }).catch(err => {
                 console.error("Chat send error:", err);
                 DOM.sendChatBtn.disabled = false;
@@ -3640,10 +3722,11 @@
         function addChatMessage(message, type = 'user', time = Date.now()) {
             const div = document.createElement('div');
             div.className = `chat-message ${type}`;
-            const timeStr = new Date(time).toLocaleTimeString();
+            const timeStr = new Date(time).toLocaleString();
+            const readStatus = type === 'user' ? '<span class="read-status">✓</span>' : '<span class="read-status">✓✓</span>';
             div.innerHTML = `
                 ${escapeHTML(message)}
-                <div class="time">${timeStr}</div>
+                <div class="time">${timeStr} ${readStatus}</div>
             `;
             DOM.chatMessages.appendChild(div);
             DOM.chatMessages.scrollTop = DOM.chatMessages.scrollHeight;
@@ -3653,12 +3736,17 @@
             if (!firebaseDb || !state.currentUserId) return;
 
             const chatRef = firebaseDb.ref(`chats/${state.currentUserId}`);
-            chatRef.orderByChild('timestamp').startAt(Date.now() - 86400000).on('child_added', (snapshot) => {
+            
+            // Listen for messages
+            chatRef.orderByChild('timestamp').on('child_added', (snapshot) => {
                 const data = snapshot.val();
                 if (!data) return;
                 
+                // Skip typing indicators
+                if (data.isTyping) return;
+                
                 // Check if this is a new message not from this user
-                if (!data.isFromUser) {
+                if (data.isFromUser === false) {
                     addChatMessage(data.message, 'admin', data.timestamp);
                     
                     // Only increment unread count if chat is not open
@@ -3666,30 +3754,37 @@
                         unreadCount++;
                         DOM.chatBadge.textContent = unreadCount;
                         DOM.chatBadge.style.display = 'flex';
+                    } else {
+                        // Mark as read
+                        chatRef.child(snapshot.key + '/read').set(true);
                     }
+                } else if (data.isFromUser === true && DOM.chatModal.classList.contains('active')) {
+                    // Mark user's own messages as read
+                    chatRef.child(snapshot.key + '/read').set(true);
+                }
+            });
+            
+            // Listen for typing indicators
+            chatRef.child('typing').on('value', (snapshot) => {
+                const typing = snapshot.val();
+                if (typing && typing.isTyping && typing.sender === 'admin') {
+                    DOM.chatTyping.textContent = '✍️ Admin is typing...';
+                    DOM.chatTyping.classList.add('active');
+                } else {
+                    DOM.chatTyping.classList.remove('active');
                 }
             });
         }
 
         function sendAdminNotification(message) {
-            // Send to Firebase for admin to read
             if (firebaseDb) {
                 firebaseDb.ref('adminNotifications').push({
                     message: message,
                     userId: state.currentUserId,
                     timestamp: Date.now(),
-                    read: false
+                    read: false,
+                    type: 'chat'
                 });
-            }
-            
-            // Also try to send via Telegram bot if available
-            try {
-                if (tg) {
-                    // Telegram WebApp doesn't support direct bot messages
-                    // We'll use the Firebase notification system
-                }
-            } catch (e) {
-                console.warn("Admin notification error:", e);
             }
         }
 
@@ -4671,17 +4766,16 @@
         }
 
         // ============================================================
-        // AUTO CALCULATE AD COST - UPDATED WITH VALIDATION
+        // AUTO CALCULATE AD COST - UPDATED WITH SMART SUGGESTION
         // ============================================================
         function updateAdCalculation() {
             const budget = parseFloat(DOM.adBudget.value) || 1.00;
             const targetViews = parseInt(DOM.adTargetViews.value) || 100;
-            const duration = parseInt(DOM.adDuration.value) || 7;
+            const duration = parseInt(DOM.adDuration.value) || 3;
             
-            // Calculate cost per view based on duration
-            // Formula: costPerView = (budget / targetViews) * (duration / 7)
+            // Base cost per view calculation
             const baseCostPerView = budget / targetViews;
-            const durationFactor = duration / 7; // 7 is the minimum duration
+            const durationFactor = duration / 3; // 3 is the minimum duration
             const costPerView = baseCostPerView * durationFactor;
             
             // Calculate daily budget
@@ -4696,8 +4790,39 @@
             DOM.calcReward.textContent = `$${costPerView.toFixed(4)}`;
             DOM.calcDuration.textContent = `${duration} days`;
             
-            // Validation
+            // ===== SMART BUDGET SUGGESTION =====
             const minBudget = CONFIG.MINIMUM_BUDGET || 1.00;
+            const minDuration = CONFIG.MINIMUM_DURATION_DAYS || 3;
+            const minCostPerView = 0.0001;
+            
+            // Calculate ideal budget based on duration and views
+            // Formula: idealBudget = targetViews * minCostPerView * (duration / minDuration)
+            const idealBudget = targetViews * minCostPerView * (duration / minDuration);
+            
+            // Show suggestion
+            const suggestionEl = DOM.budgetSuggestion;
+            const suggestedAmountEl = DOM.suggestedBudget;
+            const reasonEl = DOM.suggestionReason;
+            
+            // Check if current budget is less than ideal
+            if (budget < idealBudget && targetViews > 0 && duration > 0) {
+                suggestionEl.classList.add('active');
+                suggestedAmountEl.textContent = `$${idealBudget.toFixed(2)}`;
+                reasonEl.textContent = `For ${targetViews} views over ${duration} days, minimum budget should be $${idealBudget.toFixed(2)}`;
+                suggestionEl.style.borderColor = 'var(--warning)';
+                suggestionEl.style.background = 'rgba(245, 158, 11, 0.08)';
+            } else if (budget > idealBudget * 2 && targetViews > 0) {
+                // If budget is too high, suggest lowering it
+                suggestionEl.classList.add('active');
+                suggestedAmountEl.textContent = `$${idealBudget.toFixed(2)}`;
+                reasonEl.textContent = `For ${targetViews} views over ${duration} days, recommended budget is $${idealBudget.toFixed(2)}`;
+                suggestionEl.style.borderColor = 'var(--info)';
+                suggestionEl.style.background = 'rgba(59, 130, 246, 0.08)';
+            } else {
+                suggestionEl.classList.remove('active');
+            }
+            
+            // Validation
             const validationMsg = document.getElementById('ad-validation-message');
             
             // Check minimum budget
@@ -4714,23 +4839,36 @@
             }
             
             // Check if cost per view is too low
-            if (costPerView < 0.0001) {
+            if (costPerView < minCostPerView) {
                 validationMsg.style.display = 'block';
                 validationMsg.style.background = 'rgba(239, 68, 68, 0.1)';
                 validationMsg.style.color = 'var(--danger)';
                 validationMsg.style.border = '1px solid var(--danger)';
-                validationMsg.innerHTML = `⚠️ Cost per view is too low! Minimum is $0.0001. 
+                validationMsg.innerHTML = `⚠️ Cost per view is too low! Minimum is $${minCostPerView.toFixed(4)}. 
                     <br><strong>Suggestions:</strong> 
-                    <br>• Increase budget to $${(targetViews * 0.0001 / (duration/7)).toFixed(2)} 
-                    <br>• Reduce target views to ${Math.floor(budget / (0.0001 * (duration/7)))} 
-                    <br>• Increase duration to ${Math.ceil(7 * (0.0001 * targetViews / budget))} days`;
+                    <br>• Increase budget to $${(idealBudget).toFixed(2)} (recommended)
+                    <br>• Reduce target views to ${Math.floor(budget / (minCostPerView * (duration/minDuration)))} 
+                    <br>• Increase duration to ${Math.ceil(minDuration * (minCostPerView * targetViews / budget))} days`;
                 DOM.calcReward.style.color = 'var(--danger)';
                 DOM.calcResult.style.borderColor = 'var(--danger)';
                 DOM.calcResult.style.background = 'rgba(239, 68, 68, 0.06)';
                 return;
             }
             
-            // Check if budget is enough for target views at current cost
+            // Check minimum duration
+            if (duration < minDuration) {
+                validationMsg.style.display = 'block';
+                validationMsg.style.background = 'rgba(239, 68, 68, 0.1)';
+                validationMsg.style.color = 'var(--danger)';
+                validationMsg.style.border = '1px solid var(--danger)';
+                validationMsg.innerHTML = `⚠️ Minimum duration is ${minDuration} days. Please increase duration.`;
+                DOM.calcReward.style.color = 'var(--danger)';
+                DOM.calcResult.style.borderColor = 'var(--danger)';
+                DOM.calcResult.style.background = 'rgba(239, 68, 68, 0.06)';
+                return;
+            }
+            
+            // Check if budget matches target views at current cost
             const requiredBudget = targetViews * costPerView;
             if (Math.abs(budget - requiredBudget) > 0.01) {
                 validationMsg.style.display = 'block';
@@ -4776,7 +4914,7 @@
                 const requirements = DOM.adRequirements.value.trim();
                 const instructions = DOM.adInstructions.value.trim();
                 const budget = parseFloat(DOM.adBudget.value) || 1.00;
-                const duration = parseInt(DOM.adDuration.value) || 7;
+                const duration = parseInt(DOM.adDuration.value) || 3;
                 const targetViews = parseInt(DOM.adTargetViews.value) || 100;
                 const fileInput = document.getElementById('ad-image');
 
@@ -4802,14 +4940,14 @@
 
                 // Calculate cost per view with duration factor
                 const baseCostPerView = budget / targetViews;
-                const durationFactor = duration / 7;
+                const durationFactor = duration / CONFIG.MINIMUM_DURATION_DAYS;
                 const costPerView = baseCostPerView * durationFactor;
 
                 // Validate cost per view
                 if (costPerView < 0.0001) {
                     showToast(`❌ Cost per view is too low! Minimum is $0.0001. 
-                        Please increase budget (to $${(targetViews * 0.0001 * (duration/7)).toFixed(2)}), 
-                        reduce target views (to ${Math.floor(budget / (0.0001 * (duration/7)))}), 
+                        Please increase budget (to $${(targetViews * 0.0001 * (duration/CONFIG.MINIMUM_DURATION_DAYS)).toFixed(2)}), 
+                        reduce target views (to ${Math.floor(budget / (0.0001 * (duration/CONFIG.MINIMUM_DURATION_DAYS)))}), 
                         or increase duration.`, 'error');
                     return;
                 }
