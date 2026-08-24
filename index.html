@@ -173,6 +173,53 @@
             opacity: 0.5;
         }
         
+        /* ===== MAINTENANCE OVERLAY ===== */
+        #maintenance-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background: rgba(0,0,0,0.92);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+        
+        #maintenance-overlay.active {
+            display: flex;
+        }
+        
+        #maintenance-overlay .maintenance-icon {
+            font-size: 80px;
+            color: var(--warning);
+            margin-bottom: 20px;
+            animation: spin 3s linear infinite;
+        }
+        
+        #maintenance-overlay .maintenance-title {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        
+        #maintenance-overlay .maintenance-message {
+            font-size: 16px;
+            color: rgba(255,255,255,0.7);
+            max-width: 400px;
+            margin-bottom: 20px;
+        }
+        
+        #maintenance-overlay .maintenance-time {
+            font-size: 14px;
+            color: var(--warning);
+            font-weight: 600;
+        }
+        
         .container { 
             max-width: 480px; 
             margin: 0 auto; 
@@ -2624,6 +2671,14 @@
     </style>
 </head>
 <body>
+    <!-- ===== MAINTENANCE OVERLAY ===== -->
+    <div id="maintenance-overlay">
+        <div class="maintenance-icon"><i class="fa-solid fa-tools"></i></div>
+        <div class="maintenance-title">🔧 Under Maintenance</div>
+        <div class="maintenance-message" id="maintenanceMessage">We're currently updating our system. Please check back later.</div>
+        <div class="maintenance-time" id="maintenanceTime">⏳ Estimated time: 30 minutes</div>
+    </div>
+
     <!-- ===== PRELOADER ===== -->
     <div id="preloader">
         <div class="brand">Nex<span>Earn</span></div>
@@ -3533,6 +3588,34 @@
             DOM.budgetSuggestion = document.getElementById('budgetSuggestion');
             DOM.suggestedBudget = document.getElementById('suggestedBudget');
             DOM.suggestionReason = document.getElementById('suggestionReason');
+            DOM.maintenanceOverlay = document.getElementById('maintenance-overlay');
+            DOM.maintenanceMessage = document.getElementById('maintenanceMessage');
+            DOM.maintenanceTime = document.getElementById('maintenanceTime');
+        }
+
+        // ============================================================
+        // MAINTENANCE MODE
+        // ============================================================
+        function checkMaintenanceMode() {
+            if (!firebaseDb) return;
+            firebaseDb.ref('adminConfig/maintenance').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data && data.active) {
+                    DOM.maintenanceOverlay.classList.add('active');
+                    if (data.message) {
+                        DOM.maintenanceMessage.textContent = data.message;
+                    }
+                    if (data.estimatedTime) {
+                        DOM.maintenanceTime.textContent = `⏳ Estimated time: ${data.estimatedTime}`;
+                    }
+                    DOM.container.style.display = 'none';
+                } else {
+                    DOM.maintenanceOverlay.classList.remove('active');
+                    if (DOM.container.style.display !== 'block') {
+                        // Only show container if not already showing
+                    }
+                }
+            });
         }
 
         // ============================================================
@@ -3717,13 +3800,11 @@
             chatRef.push(msgData).then((ref) => {
                 DOM.sendChatBtn.disabled = false;
                 
-                // Update message with delivered status
                 chatRef.child(ref.key + '/delivered').set(true);
                 
-                // Send notification to admin via Telegram Bot
+                // Send notification to admin via Firebase and Telegram
                 sendAdminNotification(`💬 New message from ${user.first_name}\nID: ${state.currentUserId}\nMessage: ${message}\nTime: ${new Date().toLocaleString()}`);
                 
-                // Update the message status in UI
                 const lastMsg = DOM.chatMessages.lastElementChild;
                 if (lastMsg) {
                     const statusEl = lastMsg.querySelector('.read-status');
@@ -3765,7 +3846,6 @@
                 if (data.isTyping) return;
                 
                 if (data.isFromUser === false) {
-                    // Admin message - mark as seen
                     const status = data.read ? 'seen' : 'delivered';
                     addChatMessage(data.message, 'admin', data.timestamp, status);
                     
@@ -3774,9 +3854,7 @@
                         DOM.chatBadge.textContent = unreadCount;
                         DOM.chatBadge.style.display = 'flex';
                     } else {
-                        // Mark as read (seen) if chat is open
                         chatRef.child(snapshot.key + '/read').set(true);
-                        // Update status to seen
                         const lastMsg = DOM.chatMessages.lastElementChild;
                         if (lastMsg) {
                             const statusEl = lastMsg.querySelector('.read-status');
@@ -3787,7 +3865,6 @@
                         }
                     }
                 } else if (data.isFromUser === true && DOM.chatModal.classList.contains('active')) {
-                    // User's own message - mark as read if chat is open
                     chatRef.child(snapshot.key + '/read').set(true);
                 }
             });
@@ -3814,13 +3891,14 @@
                 });
             }
             
-            // Send to Telegram Bot using WebApp
+            // Telegram notification via WebApp
             if (tg && CONFIG.ADMIN_CHAT_ID) {
                 try {
                     tg.sendData(JSON.stringify({
                         type: 'admin_notification',
                         message: message,
-                        userId: state.currentUserId
+                        userId: state.currentUserId,
+                        userName: tg?.initDataUnsafe?.user?.first_name || 'User'
                     }));
                 } catch (e) {
                     console.warn("Telegram notification error:", e);
@@ -6433,6 +6511,9 @@
                 
                 // Setup chat listener
                 listenChatMessages();
+
+                // Check maintenance mode
+                checkMaintenanceMode();
 
                 updateUI();
 
