@@ -2352,7 +2352,7 @@
             border: 2px solid var(--card-background);
         }
 
-        /* ===== ADMIN CHAT MODAL - UPDATED ===== */
+        /* ===== ADMIN CHAT MODAL - UPDATED WITH READ RECEIPTS ===== */
         .chat-modal {
             display: none;
             position: fixed;
@@ -2442,6 +2442,12 @@
 
         .chat-modal .modal-content .chat-message .time .read-status {
             font-size: 10px;
+        }
+        .chat-modal .modal-content .chat-message .time .read-status.delivered {
+            color: var(--text-light);
+        }
+        .chat-modal .modal-content .chat-message .time .read-status.seen {
+            color: var(--success);
         }
 
         .chat-modal .modal-content .chat-typing {
@@ -2675,7 +2681,7 @@
             <div class="chat-messages" id="chatMessages">
                 <div class="chat-message admin">
                     👋 Welcome! How can I help you today?
-                    <div class="time">Just now <span class="read-status">✓✓</span></div>
+                    <div class="time">Just now <span class="read-status seen">✓✓</span></div>
                 </div>
             </div>
             <div class="chat-typing" id="chatTyping">✍️ Admin is typing...</div>
@@ -3316,7 +3322,10 @@
             AD_COOLDOWN_MINUTES: 1,
             MINIMUM_DURATION_DAYS: 3,
             MINIMUM_BUDGET: 1.00,
-            ADMIN_CHAT_ID: 'YOUR_ADMIN_CHAT_ID',
+            BASE_VIEWS: 10,
+            BASE_DAYS: 3,
+            BASE_BUDGET: 1.00,
+            ADMIN_CHAT_ID: 'YOUR_ADMIN_CHAT_ID', // Replace with actual admin chat ID
             withdrawalMethods: ['Binance', 'Bikash', 'Nogad'],
             depositMethods: [
                 { name: 'Bikash', number: '01712345678', icon: '💳' },
@@ -3626,7 +3635,7 @@
         }
 
         // ============================================================
-        // ADMIN CHAT SYSTEM - FULLY WORKING
+        // ADMIN CHAT SYSTEM - FULLY WORKING WITH READ RECEIPTS
         // ============================================================
         function openChatModal() {
             if (isBanned) {
@@ -3637,7 +3646,7 @@
             DOM.chatBadge.style.display = 'none';
             DOM.chatMessages.scrollTop = DOM.chatMessages.scrollHeight;
             
-            // Mark all messages as read
+            // Mark all messages as read (Seen)
             if (firebaseDb && state.currentUserId) {
                 const chatRef = firebaseDb.ref(`chats/${state.currentUserId}`);
                 chatRef.orderByChild('timestamp').once('value', (snapshot) => {
@@ -3668,17 +3677,14 @@
             
             const chatRef = firebaseDb.ref(`chats/${state.currentUserId}`);
             
-            // Clear previous timeout
             if (typingTimeout) clearTimeout(typingTimeout);
             
-            // Set typing status
             chatRef.child('typing').set({
                 isTyping: true,
                 timestamp: Date.now(),
                 sender: 'user'
             });
             
-            // Clear typing after 2 seconds of inactivity
             typingTimeout = setTimeout(() => {
                 chatRef.child('typing').remove();
             }, 2000);
@@ -3696,22 +3702,36 @@
                 message: message,
                 timestamp: Date.now(),
                 isFromUser: true,
-                read: false
+                read: false,
+                delivered: false
             };
 
-            addChatMessage(message, 'user', Date.now());
+            addChatMessage(message, 'user', Date.now(), 'delivered');
             input.value = '';
             DOM.sendChatBtn.disabled = true;
 
             const chatRef = firebaseDb.ref(`chats/${state.currentUserId}`);
             
-            // Clear typing
             chatRef.child('typing').remove();
             
-            chatRef.push(msgData).then(() => {
+            chatRef.push(msgData).then((ref) => {
                 DOM.sendChatBtn.disabled = false;
+                
+                // Update message with delivered status
+                chatRef.child(ref.key + '/delivered').set(true);
+                
                 // Send notification to admin via Telegram Bot
                 sendAdminNotification(`💬 New message from ${user.first_name}\nID: ${state.currentUserId}\nMessage: ${message}\nTime: ${new Date().toLocaleString()}`);
+                
+                // Update the message status in UI
+                const lastMsg = DOM.chatMessages.lastElementChild;
+                if (lastMsg) {
+                    const statusEl = lastMsg.querySelector('.read-status');
+                    if (statusEl) {
+                        statusEl.textContent = '✓';
+                        statusEl.className = 'read-status delivered';
+                    }
+                }
             }).catch(err => {
                 console.error("Chat send error:", err);
                 DOM.sendChatBtn.disabled = false;
@@ -3719,14 +3739,15 @@
             });
         }
 
-        function addChatMessage(message, type = 'user', time = Date.now()) {
+        function addChatMessage(message, type = 'user', time = Date.now(), status = 'delivered') {
             const div = document.createElement('div');
             div.className = `chat-message ${type}`;
             const timeStr = new Date(time).toLocaleString();
-            const readStatus = type === 'user' ? '<span class="read-status">✓</span>' : '<span class="read-status">✓✓</span>';
+            const statusClass = status === 'seen' ? 'seen' : 'delivered';
+            const statusText = status === 'seen' ? '✓✓' : '✓';
             div.innerHTML = `
                 ${escapeHTML(message)}
-                <div class="time">${timeStr} ${readStatus}</div>
+                <div class="time">${timeStr} <span class="read-status ${statusClass}">${statusText}</span></div>
             `;
             DOM.chatMessages.appendChild(div);
             DOM.chatMessages.scrollTop = DOM.chatMessages.scrollHeight;
@@ -3737,34 +3758,40 @@
 
             const chatRef = firebaseDb.ref(`chats/${state.currentUserId}`);
             
-            // Listen for messages
             chatRef.orderByChild('timestamp').on('child_added', (snapshot) => {
                 const data = snapshot.val();
                 if (!data) return;
                 
-                // Skip typing indicators
                 if (data.isTyping) return;
                 
-                // Check if this is a new message not from this user
                 if (data.isFromUser === false) {
-                    addChatMessage(data.message, 'admin', data.timestamp);
+                    // Admin message - mark as seen
+                    const status = data.read ? 'seen' : 'delivered';
+                    addChatMessage(data.message, 'admin', data.timestamp, status);
                     
-                    // Only increment unread count if chat is not open
                     if (!DOM.chatModal.classList.contains('active')) {
                         unreadCount++;
                         DOM.chatBadge.textContent = unreadCount;
                         DOM.chatBadge.style.display = 'flex';
                     } else {
-                        // Mark as read
+                        // Mark as read (seen) if chat is open
                         chatRef.child(snapshot.key + '/read').set(true);
+                        // Update status to seen
+                        const lastMsg = DOM.chatMessages.lastElementChild;
+                        if (lastMsg) {
+                            const statusEl = lastMsg.querySelector('.read-status');
+                            if (statusEl) {
+                                statusEl.textContent = '✓✓';
+                                statusEl.className = 'read-status seen';
+                            }
+                        }
                     }
                 } else if (data.isFromUser === true && DOM.chatModal.classList.contains('active')) {
-                    // Mark user's own messages as read
+                    // User's own message - mark as read if chat is open
                     chatRef.child(snapshot.key + '/read').set(true);
                 }
             });
             
-            // Listen for typing indicators
             chatRef.child('typing').on('value', (snapshot) => {
                 const typing = snapshot.val();
                 if (typing && typing.isTyping && typing.sender === 'admin') {
@@ -3785,6 +3812,19 @@
                     read: false,
                     type: 'chat'
                 });
+            }
+            
+            // Send to Telegram Bot using WebApp
+            if (tg && CONFIG.ADMIN_CHAT_ID) {
+                try {
+                    tg.sendData(JSON.stringify({
+                        type: 'admin_notification',
+                        message: message,
+                        userId: state.currentUserId
+                    }));
+                } catch (e) {
+                    console.warn("Telegram notification error:", e);
+                }
             }
         }
 
@@ -3988,6 +4028,7 @@
                         if (data.adCooldownMinutes) CONFIG.AD_COOLDOWN_MINUTES = data.adCooldownMinutes;
                         if (data.minDurationDays) CONFIG.MINIMUM_DURATION_DAYS = data.minDurationDays;
                         if (data.minBudget) CONFIG.MINIMUM_BUDGET = data.minBudget;
+                        if (data.adminChatId) CONFIG.ADMIN_CHAT_ID = data.adminChatId;
                         console.log("✅ Config loaded from Firebase");
                         renderDepositMethods();
                     }
@@ -4770,16 +4811,23 @@
         // ============================================================
         function updateAdCalculation() {
             const budget = parseFloat(DOM.adBudget.value) || 1.00;
-            const targetViews = parseInt(DOM.adTargetViews.value) || 100;
+            const targetViews = parseInt(DOM.adTargetViews.value) || 10;
             const duration = parseInt(DOM.adDuration.value) || 3;
             
-            // Base cost per view calculation
-            const baseCostPerView = budget / targetViews;
-            const durationFactor = duration / 3; // 3 is the minimum duration
-            const costPerView = baseCostPerView * durationFactor;
+            // BASE RATE: 10 views in 3 days = $1.00
+            const BASE_VIEWS = 10;
+            const BASE_DAYS = 3;
+            const BASE_BUDGET = 1.00;
+            const BASE_COST_PER_VIEW_PER_DAY = BASE_BUDGET / (BASE_VIEWS * BASE_DAYS);
+            
+            // Calculate cost per view based on duration
+            const costPerView = BASE_COST_PER_VIEW_PER_DAY * duration;
+            
+            // Calculate total budget needed
+            const requiredBudget = targetViews * costPerView;
             
             // Calculate daily budget
-            const dailyBudget = budget / duration;
+            const dailyBudget = requiredBudget / duration;
             
             DOM.adTotalViews.textContent = targetViews || 0;
             DOM.adCostPerView.textContent = costPerView.toFixed(4);
@@ -4795,24 +4843,19 @@
             const minDuration = CONFIG.MINIMUM_DURATION_DAYS || 3;
             const minCostPerView = 0.0001;
             
-            // Calculate ideal budget based on duration and views
-            // Formula: idealBudget = targetViews * minCostPerView * (duration / minDuration)
-            const idealBudget = targetViews * minCostPerView * (duration / minDuration);
+            const idealBudget = requiredBudget;
             
-            // Show suggestion
             const suggestionEl = DOM.budgetSuggestion;
             const suggestedAmountEl = DOM.suggestedBudget;
             const reasonEl = DOM.suggestionReason;
             
-            // Check if current budget is less than ideal
             if (budget < idealBudget && targetViews > 0 && duration > 0) {
                 suggestionEl.classList.add('active');
                 suggestedAmountEl.textContent = `$${idealBudget.toFixed(2)}`;
-                reasonEl.textContent = `For ${targetViews} views over ${duration} days, minimum budget should be $${idealBudget.toFixed(2)}`;
+                reasonEl.textContent = `For ${targetViews} views over ${duration} days, required budget is $${idealBudget.toFixed(2)} (Based on: 10 views / 3 days = $1.00)`;
                 suggestionEl.style.borderColor = 'var(--warning)';
                 suggestionEl.style.background = 'rgba(245, 158, 11, 0.08)';
             } else if (budget > idealBudget * 2 && targetViews > 0) {
-                // If budget is too high, suggest lowering it
                 suggestionEl.classList.add('active');
                 suggestedAmountEl.textContent = `$${idealBudget.toFixed(2)}`;
                 reasonEl.textContent = `For ${targetViews} views over ${duration} days, recommended budget is $${idealBudget.toFixed(2)}`;
@@ -4822,10 +4865,8 @@
                 suggestionEl.classList.remove('active');
             }
             
-            // Validation
             const validationMsg = document.getElementById('ad-validation-message');
             
-            // Check minimum budget
             if (budget < minBudget) {
                 validationMsg.style.display = 'block';
                 validationMsg.style.background = 'rgba(239, 68, 68, 0.1)';
@@ -4838,7 +4879,6 @@
                 return;
             }
             
-            // Check if cost per view is too low
             if (costPerView < minCostPerView) {
                 validationMsg.style.display = 'block';
                 validationMsg.style.background = 'rgba(239, 68, 68, 0.1)';
@@ -4847,15 +4887,14 @@
                 validationMsg.innerHTML = `⚠️ Cost per view is too low! Minimum is $${minCostPerView.toFixed(4)}. 
                     <br><strong>Suggestions:</strong> 
                     <br>• Increase budget to $${(idealBudget).toFixed(2)} (recommended)
-                    <br>• Reduce target views to ${Math.floor(budget / (minCostPerView * (duration/minDuration)))} 
-                    <br>• Increase duration to ${Math.ceil(minDuration * (minCostPerView * targetViews / budget))} days`;
+                    <br>• Reduce target views to ${Math.floor(budget / (minCostPerView * (duration/3)))} 
+                    <br>• Increase duration to ${Math.ceil(3 * (minCostPerView * targetViews / budget))} days`;
                 DOM.calcReward.style.color = 'var(--danger)';
                 DOM.calcResult.style.borderColor = 'var(--danger)';
                 DOM.calcResult.style.background = 'rgba(239, 68, 68, 0.06)';
                 return;
             }
             
-            // Check minimum duration
             if (duration < minDuration) {
                 validationMsg.style.display = 'block';
                 validationMsg.style.background = 'rgba(239, 68, 68, 0.1)';
@@ -4868,8 +4907,6 @@
                 return;
             }
             
-            // Check if budget matches target views at current cost
-            const requiredBudget = targetViews * costPerView;
             if (Math.abs(budget - requiredBudget) > 0.01) {
                 validationMsg.style.display = 'block';
                 validationMsg.style.background = 'rgba(245, 158, 11, 0.1)';
@@ -4877,16 +4914,15 @@
                 validationMsg.style.border = '1px solid var(--warning)';
                 validationMsg.innerHTML = `⚠️ Budget and target views don't match exactly. 
                     <br>• Current cost per view: $${costPerView.toFixed(4)} 
-                    <br>• Required budget for ${targetViews} views: $${(targetViews * costPerView).toFixed(2)} 
+                    <br>• Required budget for ${targetViews} views: $${requiredBudget.toFixed(2)} 
                     <br>• Your budget: $${budget.toFixed(2)} 
-                    <br><strong>Suggestion:</strong> Set budget to $${(targetViews * costPerView).toFixed(2)} or adjust views to ${Math.floor(budget / costPerView)}`;
+                    <br><strong>Suggestion:</strong> Set budget to $${requiredBudget.toFixed(2)} or adjust views to ${Math.floor(budget / costPerView)}`;
                 DOM.calcReward.style.color = 'var(--warning)';
                 DOM.calcResult.style.borderColor = 'var(--warning)';
                 DOM.calcResult.style.background = 'rgba(245, 158, 11, 0.06)';
                 return;
             }
             
-            // All validations passed
             validationMsg.style.display = 'none';
             DOM.calcReward.style.color = 'var(--success)';
             DOM.calcResult.style.borderColor = 'rgba(16, 185, 129, 0.2)';
@@ -4915,7 +4951,7 @@
                 const instructions = DOM.adInstructions.value.trim();
                 const budget = parseFloat(DOM.adBudget.value) || 1.00;
                 const duration = parseInt(DOM.adDuration.value) || 3;
-                const targetViews = parseInt(DOM.adTargetViews.value) || 100;
+                const targetViews = parseInt(DOM.adTargetViews.value) || 10;
                 const fileInput = document.getElementById('ad-image');
 
                 if (!title || !category || !desc || !requirements || !instructions) {
@@ -4938,12 +4974,10 @@
                     return;
                 }
 
-                // Calculate cost per view with duration factor
-                const baseCostPerView = budget / targetViews;
-                const durationFactor = duration / CONFIG.MINIMUM_DURATION_DAYS;
-                const costPerView = baseCostPerView * durationFactor;
+                const BASE_COST_PER_VIEW_PER_DAY = CONFIG.BASE_BUDGET / (CONFIG.BASE_VIEWS * CONFIG.BASE_DAYS);
+                const costPerView = BASE_COST_PER_VIEW_PER_DAY * duration;
+                const requiredBudget = targetViews * costPerView;
 
-                // Validate cost per view
                 if (costPerView < 0.0001) {
                     showToast(`❌ Cost per view is too low! Minimum is $0.0001. 
                         Please increase budget (to $${(targetViews * 0.0001 * (duration/CONFIG.MINIMUM_DURATION_DAYS)).toFixed(2)}), 
@@ -4952,8 +4986,6 @@
                     return;
                 }
 
-                // Validate budget matches target views
-                const requiredBudget = targetViews * costPerView;
                 if (Math.abs(budget - requiredBudget) > 0.01) {
                     showToast(`❌ Budget and target views don't match. 
                         Required budget: $${requiredBudget.toFixed(2)}. 
