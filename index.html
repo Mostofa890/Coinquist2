@@ -15,9 +15,7 @@
     </script>
     <script src='//libtl.com/sdk.js' data-zone='11573980' data-sdk='show_11573980'>
     </script>
-    <!-- باقی স্টাইল একই থাকবে -->
     <style>
-        /* সব স্টাইল একই রাখুন - আপনার দেওয়া কোডের স্টাইল */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
         :root {
@@ -192,6 +190,119 @@
             color: var(--text-light);
             text-decoration: none;
             opacity: 0.5;
+        }
+
+        /* ===== JOIN CHANNEL MODAL ===== */
+        #joinChannelModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9998;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 20px;
+            animation: fadeIn 0.5s ease-out;
+        }
+        #joinChannelModal .modal-box {
+            background: var(--card-background);
+            max-width: 400px;
+            width: 100%;
+            padding: 32px 24px;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+        }
+        #joinChannelModal .modal-box .icon {
+            font-size: 64px;
+            color: var(--primary-color);
+            margin-bottom: 16px;
+        }
+        #joinChannelModal .modal-box h2 {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-color);
+            margin-bottom: 8px;
+        }
+        #joinChannelModal .modal-box p {
+            font-size: 14px;
+            color: var(--text-light);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        #joinChannelModal .modal-box .join-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: var(--gradient);
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+            box-shadow: 0 4px 15px rgba(var(--primary-color-rgb), 0.3);
+            margin-bottom: 12px;
+        }
+        #joinChannelModal .modal-box .join-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(var(--primary-color-rgb), 0.4);
+        }
+        #joinChannelModal .modal-box .verify-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 14px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background: transparent;
+            color: var(--text-light);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+        #joinChannelModal .modal-box .verify-btn.active {
+            border-color: var(--success);
+            color: var(--success);
+            background: rgba(16, 185, 129, 0.05);
+        }
+        #joinChannelModal .modal-box .verify-btn.active:hover {
+            background: rgba(16, 185, 129, 0.1);
+            transform: scale(1.02);
+        }
+        #joinChannelModal .modal-box .verify-btn:not(.active) {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        #joinChannelModal .modal-box .verify-status {
+            margin-top: 12px;
+            font-size: 13px;
+            color: var(--text-light);
+        }
+        #joinChannelModal .modal-box .verify-status.success {
+            color: var(--success);
+        }
+        #joinChannelModal .modal-box .verify-status.error {
+            color: var(--danger);
+        }
+        #joinChannelModal.hidden {
+            display: none;
         }
 
         /* ===== MAINTENANCE OVERLAY ===== */
@@ -2155,6 +2266,22 @@
         <a href="https://t.me/nexearn2" target="_blank">@nexearn2</a>
     </div>
 
+    <!-- ===== JOIN CHANNEL MODAL ===== -->
+    <div id="joinChannelModal" class="hidden">
+        <div class="modal-box">
+            <div class="icon">📢</div>
+            <h2>Join Our Channel</h2>
+            <p>Please join our official Telegram channel to access the app. This is a one-time verification.</p>
+            <button class="join-btn" id="joinChannelBtn">
+                <i class="fa-brands fa-telegram"></i> Join Channel
+            </button>
+            <button class="verify-btn" id="verifyChannelBtn">
+                <i class="fa-solid fa-check-circle"></i> I've Joined - Verify
+            </button>
+            <div class="verify-status" id="verifyStatus"></div>
+        </div>
+    </div>
+
     <!-- ===== AD LOADER ===== -->
     <div id="ad-loader-overlay">
         <div class="loader-spinner"></div>
@@ -2232,10 +2359,6 @@
                 <button class="action-button pulsing" id="watch-ad-button" onclick="openWatchEarn()">
                     <i class="fa-solid fa-play"></i>
                     <span>Watch Ad</span>
-                </button>
-                <button class="action-button secondary" id="join-channel-button">
-                    <i class="fa-brands fa-telegram"></i>
-                    <span>Join Channel</span>
                 </button>
             </div>
         </div>
@@ -2434,14 +2557,12 @@
         <div id="tiers-container"></div>
 
         <!-- ===== ADMIN TIER MANAGEMENT ===== -->
-        <!-- Only visible to admin users -->
         <div class="admin-tier-section" id="adminTierSection" style="display:none;">
             <div class="section-title">
                 <i class="fa-solid fa-gear"></i> Manage Ad Tiers
                 <span style="font-size:11px; font-weight:400; color:var(--text-light); margin-left:auto;">Admin Only</span>
             </div>
 
-            <!-- Add Tier Form -->
             <div class="admin-tier-form" id="adminTierForm">
                 <div class="form-row">
                     <div class="form-group-sm">
@@ -2477,18 +2598,16 @@
                 <input type="hidden" id="edit-tier-id" value="">
             </div>
 
-            <!-- Add Tier Button -->
             <button class="add-tier-btn" onclick="openTierForm()">
                 <i class="fa-solid fa-plus"></i> Add New Tier
             </button>
 
-            <!-- Tier List (Admin) -->
             <div id="admin-tier-list"></div>
         </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- JAVASCRIPT (সমাধানকৃত) -->
+    <!-- JAVASCRIPT -->
     <!-- ============================================================ -->
     <script>
         // ============================================================
@@ -2510,12 +2629,7 @@
             welcomeNotice: {
                 title: "Welcome to NexEarn! 🎉",
                 message: "Please follow the rules to ensure you receive your payment.\n\n💰 Reward per Ad: $0.0010\n💝 After watching 15 ads, there is a 30-minute break.\n✅ 100% Payment Guarantee\n💸 Withdraw via Binance UID or Email\n🔥 Minimum withdrawal is only $0.10"
-            },
-            adCategories: [
-                'YouTube Video View', 'YouTube Like', 'YouTube Comment', 'YouTube Share',
-                'App Download', 'Website Visit', 'Telegram Join', 'Facebook Like',
-                'Instagram Follow', 'Twitter Follow', 'Other'
-            ]
+            }
         };
 
         // ============================================================
@@ -2540,6 +2654,7 @@
         let ratingTargetId = null;
         let isBanned = false;
         let banReason = '';
+        let isChannelVerified = false;
 
         // ============================================================
         // STATE
@@ -2574,7 +2689,8 @@
             banReason: '',
             tierProgress: {},
             tiers: [],
-            isAdmin: false
+            isAdmin: false,
+            channelVerified: false
         };
 
         // ============================================================
@@ -2593,7 +2709,6 @@
             DOM.adsTodayCount = document.getElementById('ads-today-count');
             DOM.referralCount = document.getElementById('referral-count');
             DOM.watchAdBtn = document.getElementById('watch-ad-button');
-            DOM.joinChannelBtn = document.getElementById('join-channel-button');
             DOM.supportBtn = document.getElementById('admin-contact-button');
             DOM.copyLinkBtn = document.getElementById('copy-link-button');
             DOM.shareLinkBtn = document.getElementById('share-link-button');
@@ -2632,6 +2747,11 @@
             DOM.maintenanceOverlay = document.getElementById('maintenance-overlay');
             DOM.maintenanceMessage = document.getElementById('maintenanceMessage');
             DOM.maintenanceTime = document.getElementById('maintenanceTime');
+            // Join Channel Modal
+            DOM.joinChannelModal = document.getElementById('joinChannelModal');
+            DOM.joinChannelBtn = document.getElementById('joinChannelBtn');
+            DOM.verifyChannelBtn = document.getElementById('verifyChannelBtn');
+            DOM.verifyStatus = document.getElementById('verifyStatus');
             // Watch & Earn
             DOM.watchEarnPage = document.getElementById('watchEarnPage');
             DOM.tiersContainer = document.getElementById('tiers-container');
@@ -2657,6 +2777,47 @@
             } else {
                 window.open(supportLink, '_blank');
             }
+        }
+
+        // ============================================================
+        // JOIN CHANNEL FUNCTIONS
+        // ============================================================
+        function showJoinChannelModal() {
+            if (state.channelVerified) {
+                showApp();
+                return;
+            }
+            DOM.joinChannelModal.classList.remove('hidden');
+            DOM.joinChannelBtn.onclick = function() {
+                safeOpenTelegramLink(CONFIG.CHANNEL_LINK);
+                DOM.verifyChannelBtn.classList.add('active');
+                DOM.verifyStatus.textContent = '✅ You have joined! Click "Verify" to continue.';
+                DOM.verifyStatus.className = 'verify-status success';
+            };
+            DOM.verifyChannelBtn.onclick = function() {
+                if (!this.classList.contains('active')) {
+                    DOM.verifyStatus.textContent = '❌ Please join the channel first!';
+                    DOM.verifyStatus.className = 'verify-status error';
+                    return;
+                }
+                // Verify successful
+                state.channelVerified = true;
+                isChannelVerified = true;
+                DOM.joinChannelModal.classList.add('hidden');
+                showToast('✅ Channel verified! Welcome to NexEarn!', 'success');
+                saveUserData();
+                showApp();
+                // Show welcome modal after verification
+                setTimeout(() => showModal('welcomeModal'), 500);
+            };
+        }
+
+        function showApp() {
+            DOM.container.style.display = 'block';
+            DOM.preloader.style.display = 'none';
+            DOM.preloaderFooter.style.display = 'none';
+            // Update UI
+            updateUI();
         }
 
         // ============================================================
@@ -2999,7 +3160,8 @@
                 isBanned: state.isBanned,
                 banReason: state.banReason,
                 tierProgress: state.tierProgress,
-                isAdmin: state.isAdmin
+                isAdmin: state.isAdmin,
+                channelVerified: state.channelVerified
             };
             firebaseDb.ref(`users/${state.currentUserId}`).update(data).catch(err => {
                 console.error("Save error:", err);
@@ -3036,6 +3198,7 @@
                         state.banReason = data.banReason || '';
                         state.tierProgress = data.tierProgress || {};
                         state.isAdmin = data.isAdmin || false;
+                        state.channelVerified = data.channelVerified || false;
                         if (data.lastAdWatchTime) {
                             lastAdWatchTime = data.lastAdWatchTime;
                         }
@@ -3914,7 +4077,6 @@
             document.body.style.overflow = 'hidden';
             document.querySelector('.container').style.display = 'none';
             loadTiers();
-            // Show admin tier management if user is admin
             if (state.isAdmin) {
                 DOM.adminTierSection.style.display = 'block';
                 loadAdminTiers();
@@ -4029,13 +4191,11 @@
             if (isAdShowing) return;
             if (DOM.adLoaderOverlay.style.display === 'flex') return;
 
-            // Check daily limit
             if (state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT) {
                 showToast(`📊 Daily limit reached! (${CONFIG.DAILY_AD_LIMIT})`, 'warning');
                 return;
             }
 
-            // Check cooldown
             const now = Date.now();
             if (now - lastAdWatchTime < CONFIG.AD_COOLDOWN_MINUTES * 60 * 1000) {
                 const remaining = Math.ceil((CONFIG.AD_COOLDOWN_MINUTES * 60 * 1000 - (now - lastAdWatchTime)) / 1000);
@@ -4043,7 +4203,6 @@
                 return;
             }
 
-            // Check if already completed
             const progress = state.tierProgress[tierId] || { watched: 0, claimed: false };
             const tier = state.tiers.find(t => t.id === tierId);
             if (!tier) {
@@ -4079,7 +4238,6 @@
                     const day = new Date().getDay();
                     state.weeklyActivity[day] = (state.weeklyActivity[day] || 0) + 1;
 
-                    // Update tier progress
                     if (!state.tierProgress[tierId]) {
                         state.tierProgress[tierId] = { watched: 0, claimed: false };
                     }
@@ -4097,7 +4255,6 @@
                         showToast(`✅ Ad watched! ${newWatched}/${required} completed for ${tier.name}.`, 'success');
                     }
 
-                    // Update the watch button text
                     const watchBtn = document.querySelector(`.tier-card .tier-btn.watch[onclick*="${tierId}"]`);
                     if (watchBtn) {
                         if (newWatched >= required) {
@@ -4148,7 +4305,6 @@
                 return;
             }
 
-            // Claim the reward
             const prize = tier.prize || 0;
             window._legitimateBalanceChange = true;
             state.balance += prize;
@@ -4161,7 +4317,6 @@
 
             showToast(`🎉 You claimed $${prize.toFixed(2)} from ${tier.name}!`, 'success');
 
-            // Update UI
             const claimBtn = document.querySelector(`.tier-card .tier-btn.claim[onclick*="${tierId}"]`);
             if (claimBtn) {
                 claimBtn.disabled = true;
@@ -4181,7 +4336,6 @@
         function openTierForm(tierId = null) {
             DOM.adminTierForm.classList.add('active');
             if (tierId) {
-                // Edit mode
                 const tier = state.tiers.find(t => t.id === tierId);
                 if (tier) {
                     DOM.tierName.value = tier.name || '';
@@ -4193,7 +4347,6 @@
                     DOM.saveTierBtn.innerHTML = '<i class="fa-solid fa-save"></i> Update Tier';
                 }
             } else {
-                // Add mode
                 DOM.tierName.value = `Section ${state.tiers.length + 1}`;
                 DOM.tierPrize.value = '1.00';
                 DOM.tierRequired.value = '6';
@@ -4233,11 +4386,9 @@
 
             try {
                 if (editId) {
-                    // Update existing
                     await firebaseDb.ref(`adTiers/${editId}`).update(tierData);
                     showToast('✅ Tier updated successfully!', 'success');
                 } else {
-                    // Create new
                     tierData.createdAt = Date.now();
                     tierData.order = state.tiers.length;
                     await firebaseDb.ref('adTiers').push(tierData);
@@ -4290,7 +4441,6 @@
         }
 
         function loadAdminTiers() {
-            // This is called from openWatchEarn if user is admin
             loadTiers();
         }
 
@@ -4511,14 +4661,13 @@
         }
 
         // ============================================================
-        // INITIALIZATION (সমাধানকৃত)
+        // INITIALIZATION
         // ============================================================
         async function initApp() {
             let isAppReady = false;
             let isLoaderComplete = false;
             let preloaderClosed = false;
 
-            // ফোর্স ক্লোজ - ৮ সেকেন্ড পর যদি না খোলে
             const forceTimeout = setTimeout(() => {
                 if (!preloaderClosed) {
                     console.warn("⚠️ Force closing preloader due to timeout");
@@ -4534,7 +4683,12 @@
                 setTimeout(() => {
                     DOM.preloader.style.display = 'none';
                     DOM.preloaderFooter.style.display = 'none';
-                    DOM.container.style.display = 'block';
+                    if (state.channelVerified) {
+                        DOM.container.style.display = 'block';
+                        updateUI();
+                    } else {
+                        showJoinChannelModal();
+                    }
                 }, 400);
                 clearTimeout(forceTimeout);
             };
@@ -4548,13 +4702,17 @@
                     setTimeout(() => {
                         DOM.preloader.style.display = 'none';
                         DOM.preloaderFooter.style.display = 'none';
-                        DOM.container.style.display = 'block';
+                        if (state.channelVerified) {
+                            DOM.container.style.display = 'block';
+                            updateUI();
+                        } else {
+                            showJoinChannelModal();
+                        }
                     }, 400);
                     clearTimeout(forceTimeout);
                 }
             };
 
-            // লোডার অ্যানিমেশন
             let pct = 0;
             const loaderInterval = setInterval(() => {
                 pct += Math.floor(Math.random() * 5) + 2;
@@ -4569,20 +4727,16 @@
             }, 80);
 
             try {
-                // DOM ইনিশিয়ালাইজ
                 initDOM();
 
-                // Firebase কানেক্ট
                 if (!initFirebase()) {
                     throw new Error("Firebase initialization failed");
                 }
 
-                // ইউজার আইডি সেট
                 const user = tg?.initDataUnsafe?.user || { first_name: 'User', id: 'testuser_' + Date.now() };
                 state.currentUserId = user.id || 'testuser';
                 state.jobCount = 0;
 
-                // সব অ্যাসিঙ্ক অপারেশন সমান্তরালে
                 await Promise.all([
                     loadConfigFromFirebase(),
                     loadUserData(),
@@ -4596,7 +4750,6 @@
                 await handleReferral();
                 await processReferralRewards();
 
-                // ইভেন্ট লিসেনার
                 listenReferrals();
                 listenAds();
                 listenUserVerifications();
@@ -4610,9 +4763,7 @@
 
                 state.currentIp = await getIpAddress();
 
-                // ইভেন্ট অ্যাটাচ
                 DOM.watchAdBtn.addEventListener('click', openWatchEarn);
-                DOM.joinChannelBtn.addEventListener('click', () => safeOpenTelegramLink(CONFIG.CHANNEL_LINK));
                 DOM.supportBtn.addEventListener('click', () => safeOpenTelegramLink(CONFIG.SUPPORT_LINK));
                 DOM.copyLinkBtn.addEventListener('click', copyReferralLink);
                 DOM.shareLinkBtn.addEventListener('click', shareReferralLink);
@@ -4631,7 +4782,6 @@
                     }
                 };
 
-                // Telegram Theme
                 if (tg) {
                     tg.ready();
                     tg.expand();
@@ -4645,7 +4795,8 @@
                     initMonetagAds();
                 }, 2000);
 
-                if (!sessionStorage.getItem('alreadyVisited')) {
+                // Welcome modal after channel verification
+                if (state.channelVerified && !sessionStorage.getItem('alreadyVisited')) {
                     setTimeout(() => showModal('welcomeModal'), 500);
                     sessionStorage.setItem('alreadyVisited', 'true');
                 }
@@ -4658,6 +4809,7 @@
                 console.log("✅ NexEarn initialized successfully!");
                 console.log("👤 User ID:", state.currentUserId);
                 console.log("💰 Balance:", state.balance);
+                console.log("📢 Channel Verified:", state.channelVerified);
 
                 isAppReady = true;
                 finishLoading();
@@ -4669,7 +4821,6 @@
                 finishLoading();
             } finally {
                 clearInterval(loaderInterval);
-                // নিশ্চিত করা যে লোডার বন্ধ হবে
                 if (!isLoaderComplete) {
                     isLoaderComplete = true;
                     finishLoading();
@@ -4678,7 +4829,6 @@
                     isAppReady = true;
                     finishLoading();
                 }
-                // ফোর্স ক্লোজ যদি ২ সেকেন্ড পরেও না খোলে
                 setTimeout(() => {
                     if (!preloaderClosed) {
                         forceClosePreloader();
