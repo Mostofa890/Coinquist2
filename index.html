@@ -1841,7 +1841,7 @@
             background: var(--card-background);
             border-radius: var(--radius);
             border: 1px solid var(--border-color);
-            padding: 18px 16px;
+            padding: 20px 16px;
             margin-bottom: 16px;
             box-shadow: var(--shadow);
             transition: var(--transition);
@@ -1870,6 +1870,14 @@
             padding: 2px 14px;
             border-radius: 20px;
             white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .tier-card .tier-prize .currency {
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0.7;
         }
         .tier-card .tier-progress {
             margin: 10px 0 12px 0;
@@ -2052,6 +2060,103 @@
             text-align: center;
             pointer-events: none;
         }
+
+        /* ===== WITHDRAW FULL PAGE ===== */
+        #withdrawPage {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 2000;
+            background: var(--background-color);
+            overflow-y: auto;
+            padding: 16px 12px 100px 12px;
+            animation: fadeIn 0.3s ease-out;
+        }
+        #withdrawPage.active {
+            display: block;
+        }
+        #withdrawPage .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 16px;
+            font-family: inherit;
+        }
+        #withdrawPage .back-btn:hover {
+            background: var(--border-color);
+        }
+        #withdrawPage .withdraw-card {
+            background: var(--card-background);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            padding: 20px 16px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+        }
+        #withdrawPage .withdraw-card .withdraw-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        #withdrawPage .withdraw-info-box {
+            background: var(--background-color);
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 12px;
+        }
+        #withdrawPage .withdraw-info-box .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 14px;
+        }
+        #withdrawPage .withdraw-info-box .info-row .label {
+            color: var(--text-light);
+        }
+        #withdrawPage .withdraw-info-box .info-row .value {
+            font-weight: 700;
+            color: var(--text-color);
+        }
+        #withdrawPage .withdraw-info-box .info-row .value.success {
+            color: var(--success);
+        }
+        #withdrawPage .withdraw-info-box .info-row .value.danger {
+            color: var(--danger);
+        }
+        #withdrawPage .withdraw-info-box .info-row .value.warning {
+            color: var(--warning);
+        }
+        #withdrawPage .withdraw-rule-box {
+            background: rgba(245, 158, 11, 0.08);
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            margin-bottom: 14px;
+        }
+        #withdrawPage .withdraw-rule-box .rule-title {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--warning);
+            margin-bottom: 4px;
+        }
+        #withdrawPage .withdraw-rule-box .rule-text {
+            font-size: 13px;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body>
@@ -2129,10 +2234,10 @@
             </div>
         </div>
 
-        <!-- ===== BALANCE ===== -->
+        <!-- ===== BALANCE CARD ===== -->
         <div class="balance-card">
             <h3>💰 Balance</h3>
-            <div class="amount" id="total-earning">$0.0000</div>
+            <div class="amount" id="total-earning">₹0.00</div>
         </div>
 
         <!-- ===== STATS ===== -->
@@ -2236,9 +2341,20 @@
         </div>
     </div>
 
+    <!-- ===== WITHDRAW FULL PAGE ===== -->
+    <div id="withdrawPage">
+        <button class="back-btn" onclick="closeWithdrawPage()">
+            <i class="fa-solid fa-arrow-left"></i> Back
+        </button>
+        <div class="withdraw-card">
+            <div class="withdraw-title">💸 Withdraw Funds</div>
+            <div id="withdraw-content"></div>
+        </div>
+    </div>
+
     <!-- ===== NAV BAR ===== -->
     <div class="nav-bar">
-        <button class="nav-button" id="withdrawNavBtn" onclick="showModal('withdrawModal', this)">
+        <button class="nav-button" id="withdrawNavBtn" onclick="openWithdrawPage()">
             <i class="fa-solid fa-money-bill-transfer"></i>
             <span>Withdraw</span>
         </button>
@@ -2271,31 +2387,8 @@
         </div>
     </div>
 
-    <!-- Withdraw Modal -->
-    <div id="withdrawModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('withdrawModal')">&times;</button>
-            <h3 class="card-title">💸 Withdraw Funds</h3>
-            <p id="min-withdraw-text" style="font-size:13px; color:var(--text-light); margin-bottom:12px;"></p>
-            <form id="withdraw-form">
-                <div class="form-group">
-                    <label>Payment Method *</label>
-                    <select id="method" name="method" required>
-                        <option value="" disabled selected>Select Payment Method</option>
-                    </select>
-                </div>
-                <div id="method-fields-container"></div>
-                <div class="form-group">
-                    <label>Amount (USD) *</label>
-                    <input type="number" step="0.0001" id="withdraw-amount" placeholder="0.00" min="0.0001" required>
-                </div>
-                <button type="submit" class="action-button" id="withdraw-submit-button">
-                    <span class="button-text">Submit Request</span>
-                    <div class="loader-spinner" style="display:none; width:20px; height:20px; border-width:3px;"></div>
-                </button>
-            </form>
-        </div>
-    </div>
+    <!-- Withdraw Modal (Old - replaced by full page) -->
+    <div id="withdrawModal" class="modal" style="display:none;"></div>
 
     <!-- Support Modal -->
     <div id="supportModal" class="modal">
@@ -2391,8 +2484,12 @@
             withdrawalMethods: ['Binance', 'Bikash', 'Nogad'],
             welcomeNotice: {
                 title: "Welcome to NexEarn! 🎉",
-                message: "Please follow the rules to ensure you receive your payment.\n\n💰 Reward per Ad: $0.0010\n💝 After watching 15 ads, there is a 30-minute break.\n✅ 100% Payment Guarantee\n💸 Withdraw via Binance UID or Email\n🔥 Minimum withdrawal is only $0.10"
-            }
+                message: "Please follow the rules to ensure you receive your payment.\n\n💰 Reward per Ad: ₹0.08\n💝 After watching 15 ads, there is a 30-minute break.\n✅ 100% Payment Guarantee\n💸 Withdraw via Binance UID or Email\n🔥 Minimum withdrawal is ₹8.00"
+            },
+            REQUIRED_REFERRALS_FIRST_WITHDRAW: 5,
+            AD_WATCH_DURATION: 15, // 15 seconds per ad
+            DAILY_RESET_HOURS: 24,
+            CURRENCY_SYMBOL: '₹'
         };
 
         // ============================================================
@@ -2424,6 +2521,10 @@
         let isBanned = false;
         let banReason = '';
         let isChannelVerified = false;
+        let adCountdownInterval = null;
+        let dailyResetInterval = null;
+        let watchAdCountdown = 0;
+        let isAdCountdownActive = false;
 
         // ============================================================
         // STATE
@@ -2459,7 +2560,11 @@
             tierProgress: {},
             tiers: [],
             isAdmin: false,
-            channelVerified: false
+            channelVerified: false,
+            hasWithdrawnBefore: false,
+            dailyResetTime: null,
+            adsWatchedSinceReset: 0,
+            referralCount: 0
         };
 
         // ============================================================
@@ -2522,6 +2627,8 @@
             DOM.verifyStatus = document.getElementById('verifyStatus');
             DOM.watchEarnPage = document.getElementById('watchEarnPage');
             DOM.tiersContainer = document.getElementById('tiers-container');
+            DOM.withdrawPage = document.getElementById('withdrawPage');
+            DOM.withdrawContent = document.getElementById('withdraw-content');
         }
 
         // ============================================================
@@ -2636,6 +2743,26 @@
             DOM.preloader.style.display = 'none';
             DOM.preloaderFooter.style.display = 'none';
             updateUI();
+            startDailyResetTimer();
+        }
+
+        // ============================================================
+        // DAILY RESET TIMER
+        // ============================================================
+        function startDailyResetTimer() {
+            if (dailyResetInterval) clearInterval(dailyResetInterval);
+            dailyResetInterval = setInterval(() => {
+                const now = Date.now();
+                if (state.dailyResetTime && now >= state.dailyResetTime) {
+                    // Reset daily ads
+                    state.adsWatchedToday = 0;
+                    state.adsWatchedSinceReset = 0;
+                    state.dailyResetTime = now + (CONFIG.DAILY_RESET_HOURS * 60 * 60 * 1000);
+                    saveUserData();
+                    updateUI();
+                    showToast('🔄 Daily ads reset! You can watch ads again.', 'success');
+                }
+            }, 60000); // Check every minute
         }
 
         // ============================================================
@@ -2713,8 +2840,8 @@
             });
 
             DOM.container.style.display = 'none';
-            document.querySelectorAll('.modal, .job-details-page, .profile-page, .all-jobs-page, .watch-earn-page').forEach(
-                el => {
+            document.querySelectorAll('.modal, .job-details-page, .profile-page, .all-jobs-page, .watch-earn-page, #withdrawPage')
+                .forEach(el => {
                     el.classList.remove('active');
                     el.style.display = 'none';
                 });
@@ -2827,6 +2954,46 @@
         }
 
         // ============================================================
+        // AD COUNTDOWN SYSTEM (15 seconds)
+        // ============================================================
+        function startAdCountdown(tierId) {
+            return new Promise((resolve) => {
+                if (isAdCountdownActive) return resolve(false);
+                isAdCountdownActive = true;
+                watchAdCountdown = CONFIG.AD_WATCH_DURATION;
+
+                // Show countdown overlay
+                DOM.adLoaderOverlay.style.display = 'flex';
+                DOM.adLoaderOverlay.querySelector('.loader-text').textContent = `⏳ ${watchAdCountdown}s`;
+                DOM.adLoaderOverlay.querySelector('.loader-sub').textContent = 'Watch the ad to earn progress';
+                DOM.adLoaderProgress.style.width = '0%';
+
+                const countdownInterval = setInterval(() => {
+                    watchAdCountdown--;
+                    DOM.adLoaderOverlay.querySelector('.loader-text').textContent = `⏳ ${watchAdCountdown}s`;
+                    DOM.adLoaderProgress.style.width = `${((CONFIG.AD_WATCH_DURATION - watchAdCountdown) / CONFIG.AD_WATCH_DURATION) * 100}%`;
+
+                    if (watchAdCountdown <= 0) {
+                        clearInterval(countdownInterval);
+                        DOM.adLoaderOverlay.querySelector('.loader-text').textContent = '🎯 Loading Ad...';
+                        DOM.adLoaderProgress.style.width = '100%';
+
+                        // Now show the actual ad
+                        setTimeout(async () => {
+                            const adShown = await showRewardedAd();
+                            DOM.adLoaderOverlay.style.display = 'none';
+                            isAdCountdownActive = false;
+                            resolve(adShown);
+                        }, 500);
+                    }
+                }, 1000);
+
+                // If user leaves the app, countdown continues in background
+                // The interval will keep running
+            });
+        }
+
+        // ============================================================
         // TRANSLATION FUNCTION
         // ============================================================
         async function translateText(text, targetLang) {
@@ -2923,6 +3090,10 @@
                         if (data.adCooldownMinutes) CONFIG.AD_COOLDOWN_MINUTES = data.adCooldownMinutes;
                         if (data.adminChatId) CONFIG.ADMIN_CHAT_ID = data.adminChatId;
                         if (data.supportLink) CONFIG.SUPPORT_LINK = data.supportLink;
+                        if (data.requiredReferrals) CONFIG.REQUIRED_REFERRALS_FIRST_WITHDRAW = data
+                        .requiredReferrals;
+                        if (data.adWatchDuration) CONFIG.AD_WATCH_DURATION = data.adWatchDuration;
+                        if (data.dailyResetHours) CONFIG.DAILY_RESET_HOURS = data.dailyResetHours;
                         console.log("✅ Config loaded from Firebase");
                     }
                     resolve();
@@ -2946,7 +3117,7 @@
         }
 
         function formatBalance(amount) {
-            return amount.toFixed(4);
+            return amount.toFixed(2);
         }
 
         function saveUserData() {
@@ -2979,7 +3150,11 @@
                 banReason: state.banReason,
                 tierProgress: state.tierProgress,
                 isAdmin: state.isAdmin,
-                channelVerified: state.channelVerified
+                channelVerified: state.channelVerified,
+                hasWithdrawnBefore: state.hasWithdrawnBefore,
+                dailyResetTime: state.dailyResetTime,
+                adsWatchedSinceReset: state.adsWatchedSinceReset,
+                referralCount: state.referralCount
             };
             firebaseDb.ref(`users/${state.currentUserId}`).update(data).catch(err => {
                 console.error("Save error:", err);
@@ -3017,6 +3192,10 @@
                         state.tierProgress = data.tierProgress || {};
                         state.isAdmin = data.isAdmin || false;
                         state.channelVerified = data.channelVerified || false;
+                        state.hasWithdrawnBefore = data.hasWithdrawnBefore || false;
+                        state.dailyResetTime = data.dailyResetTime || null;
+                        state.adsWatchedSinceReset = data.adsWatchedSinceReset || 0;
+                        state.referralCount = data.referralCount || 0;
                         if (data.lastAdWatchTime) {
                             lastAdWatchTime = data.lastAdWatchTime;
                         }
@@ -3048,7 +3227,13 @@
         function listenReferrals() {
             if (!firebaseDb || !state.currentUserId) return;
             firebaseDb.ref(`users/${state.currentUserId}/referrals`).on('value', (snapshot) => {
-                DOM.referralCount.textContent = snapshot.val() || 0;
+                const count = snapshot.val() || 0;
+                state.referralCount = count;
+                DOM.referralCount.textContent = count;
+                // Update withdraw page if open
+                if (DOM.withdrawPage.classList.contains('active')) {
+                    renderWithdrawPage();
+                }
             });
         }
 
@@ -3097,8 +3282,8 @@
                     </div>
                 </div>
                 <div class="profile-stats-grid">
-                    <div class="profile-stat-box"><div class="label">💰 Balance</div><div class="value reward">$${formatBalance(state.balance)}</div></div>
-                    <div class="profile-stat-box"><div class="label">📈 Total Earnings</div><div class="value">$${formatBalance(state.totalEarnings)}</div></div>
+                    <div class="profile-stat-box"><div class="label">💰 Balance</div><div class="value reward">${CONFIG.CURRENCY_SYMBOL}${formatBalance(state.balance)}</div></div>
+                    <div class="profile-stat-box"><div class="label">📈 Total Earnings</div><div class="value">${CONFIG.CURRENCY_SYMBOL}${formatBalance(state.totalEarnings)}</div></div>
                     <div class="profile-stat-box"><div class="label">👁 Ads Watched</div><div class="value highlight">${state.adCount}</div></div>
                 </div>
                 <div class="card">
@@ -3206,7 +3391,7 @@
                                         <span>(${creatorRating.toFixed(1)})</span>
                                     </div>
                                 </div>
-                                <div class="reward-amount">+$${reward.toFixed(4)}</div>
+                                <div class="reward-amount">+${CONFIG.CURRENCY_SYMBOL}${(reward * 80).toFixed(2)}</div>
                             </div>
                             <div class="job-stats">
                                 <div class="stat-item"><i class="fa-solid fa-eye"></i><span class="value">${views}</span><span>/ ${totalViews}</span></div>
@@ -3376,7 +3561,7 @@
                                     <span>(${creatorRating.toFixed(1)})</span>
                                 </div>
                             </div>
-                            <div class="reward-amount">+$${reward.toFixed(4)}</div>
+                            <div class="reward-amount">+${CONFIG.CURRENCY_SYMBOL}${(reward * 80).toFixed(2)}</div>
                         </div>
                         <div class="job-stats">
                             <div class="stat-item"><i class="fa-solid fa-eye"></i><span class="value">${views}</span><span>/ ${totalViews}</span></div>
@@ -3459,7 +3644,7 @@
                             ${subCategory ? `<span class="sub-category-badge" style="background:rgba(var(--primary-color-rgb),0.05); color:var(--text-light); padding:4px 14px; border-radius:12px; font-weight:600; font-size:13px;">🏷️ ${escapeHTML(subCategory)}</span>` : ''}
                         </div>
                         <div class="detail-stats-grid">
-                            <div class="stat-box"><div class="label">💰 Payment</div><div class="value reward">+$${reward.toFixed(4)}</div></div>
+                            <div class="stat-box"><div class="label">💰 Payment</div><div class="value reward">+${CONFIG.CURRENCY_SYMBOL}${(reward * 80).toFixed(2)}</div></div>
                             <div class="stat-box"><div class="label">👁 Workers</div><div class="value">${views} / ${totalViews}</div></div>
                             <div class="stat-box"><div class="label">📅 Days Left</div><div class="value ${daysLeft <= 3 ? 'highlight' : ''}">${daysLeft > 0 ? daysLeft : 'Expired'}</div></div>
                             <div class="stat-box"><div class="label">⏳ Duration</div><div class="value">${ad.duration || 7} days</div></div>
@@ -3653,7 +3838,7 @@
                             <strong>${escapeHTML(ad.title)}</strong>
                             <div style="font-size:12px; color:var(--text-light);">Category: ${escapeHTML(ad.category || 'General')}</div>
                             ${ad.subCategory ? `<div style="font-size:12px; color:var(--text-light);">Sub Category: ${escapeHTML(ad.subCategory)}</div>` : ''}
-                            <div style="font-size:12px; color:var(--text-light);">Reward: $${ad.reward?.toFixed(4) || '0.0010'}</div>
+                            <div style="font-size:12px; color:var(--text-light);">Reward: ${CONFIG.CURRENCY_SYMBOL}${(ad.reward * 80)?.toFixed(2) || '0.08'}</div>
                             ${ad.imageUrl ? `<img src="${ad.imageUrl}" style="width:100%; max-height:100px; object-fit:cover; border-radius:6px; margin-top:6px;" loading="lazy">` : ''}
                         </div>
                     `;
@@ -3778,7 +3963,8 @@
                     state.weeklyActivity[day] = (state.weeklyActivity[day] || 0) + 1;
                     saveUserData();
                     updateUI();
-                    showToast(`🎉 Ad verified! +$${ad?.reward?.toFixed(4) || '0.0000'} added!`, 'success');
+                    showToast(`🎉 Ad verified! +${CONFIG.CURRENCY_SYMBOL}${((ad?.reward || 0) * 80).toFixed(2)} added!`,
+                        'success');
                 }
             });
         }
@@ -3800,7 +3986,7 @@
                         <div class="date">${new Date(item.date).toLocaleString()}</div>
                     </div>
                     <div class="history-amount">
-                        <div class="amount-text">$${item.amount.toFixed(4)}</div>
+                        <div class="amount-text">${CONFIG.CURRENCY_SYMBOL}${item.amount.toFixed(2)}</div>
                         <div class="history-status ${item.status.toLowerCase()}">${item.status}</div>
                     </div>
                 </div>
@@ -3820,7 +4006,7 @@
                     <div class="bonus-item">
                         <div class="details">
                             <div class="title">${escapeHTML(task.title)}</div>
-                            <div class="reward"><i class="fa-solid fa-gift"></i> + $${task.reward.toFixed(4)}</div>
+                            <div class="reward"><i class="fa-solid fa-gift"></i> + ${CONFIG.CURRENCY_SYMBOL}${(task.reward * 80).toFixed(2)}</div>
                         </div>
                         <button class="claim-btn" ${isCompleted ? 'disabled' : ''}>
                             ${isCompleted ? '✅ Completed' : 'Claim'}
@@ -3847,7 +4033,7 @@
                 saveUserData();
                 updateUI();
                 button.textContent = '✅ Completed';
-                showToast(`🎉 Bonus of $${task.reward.toFixed(4)} added!`, 'success');
+                showToast(`🎉 Bonus of ${CONFIG.CURRENCY_SYMBOL}${(task.reward * 80).toFixed(2)} added!`, 'success');
             }, (task.duration || 10) * 1000);
         }
 
@@ -3879,7 +4065,8 @@
                 state.balance += bonus;
                 state.rewardedReferrals = totalReferrals;
                 saveUserData();
-                showToast(`🎉 You received $${bonus.toFixed(4)} for ${newReferrals} new referral(s)!`, 'success');
+                showToast(`🎉 You received ${CONFIG.CURRENCY_SYMBOL}${(bonus * 80).toFixed(2)} for ${newReferrals} new referral(s)!`,
+                    'success');
             }
         }
 
@@ -3904,6 +4091,7 @@
             DOM.profilePage.classList.remove('active');
             DOM.allJobsPage.classList.remove('active');
             DOM.jobDetailsPage.classList.remove('active');
+            DOM.withdrawPage.classList.remove('active');
         }
 
         // ============================================================
@@ -3960,7 +4148,7 @@
                                 <div class="tier-name">${escapeHTML(tier.name || `Section ${index + 1}`)}</div>
                                 ${tier.desc ? `<div style="font-size:12px; color:var(--text-light);">${escapeHTML(tier.desc)}</div>` : ''}
                             </div>
-                            <div class="tier-prize">$${prize.toFixed(2)}</div>
+                            <div class="tier-prize">${CONFIG.CURRENCY_SYMBOL}<span>${prize.toFixed(2)}</span><span class="currency">INR</span></div>
                         </div>
                         <span class="tier-status-badge ${statusClass}">${statusText}</span>
                         <div class="tier-progress">
@@ -3992,7 +4180,7 @@
         }
 
         // ============================================================
-        // WATCH TIER AD
+        // WATCH TIER AD (with 15 second countdown)
         // ============================================================
         async function watchTierAd(tierId) {
             if (isBanned) {
@@ -4002,11 +4190,25 @@
             if (isAdShowing) return;
             if (DOM.adLoaderOverlay.style.display === 'flex') return;
 
+            // Check daily limit
             if (state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT) {
                 showToast(`📊 Daily limit reached! (${CONFIG.DAILY_AD_LIMIT})`, 'warning');
                 return;
             }
 
+            // Check if all tiers are completed
+            const allTiers = state.tiers.filter(t => t.status !== 'inactive');
+            const allCompleted = allTiers.every(t => {
+                const prog = state.tierProgress[t.id] || { watched: 0, claimed: false };
+                return prog.watched >= t.requiredAds && prog.claimed;
+            });
+
+            if (allCompleted) {
+                showToast('🎉 You have completed all tiers! Come back tomorrow.', 'success');
+                return;
+            }
+
+            // Check cooldown between ads
             const now = Date.now();
             if (now - lastAdWatchTime < CONFIG.AD_COOLDOWN_MINUTES * 60 * 1000) {
                 const remaining = Math.ceil((CONFIG.AD_COOLDOWN_MINUTES * 60 * 1000 - (now - lastAdWatchTime)) / 1000);
@@ -4014,6 +4216,7 @@
                 return;
             }
 
+            // Check if already completed this tier
             const progress = state.tierProgress[tierId] || { watched: 0, claimed: false };
             const tier = state.tiers.find(t => t.id === tierId);
             if (!tier) {
@@ -4025,67 +4228,54 @@
                 return;
             }
 
+            // Start 15 second countdown
             isAdShowing = true;
-            DOM.adLoaderOverlay.style.display = 'flex';
-            DOM.adLoaderProgress.style.width = '0%';
-            DOM.adLoaderOverlay.querySelector('.loader-text').textContent = 'Loading Ad...';
-            DOM.adLoaderOverlay.querySelector('.loader-sub').textContent = 'Watch the ad to earn progress';
+            const adShown = await startAdCountdown(tierId);
 
-            try {
-                let progressPct = 0;
-                const progressInterval = setInterval(() => {
-                    progressPct += Math.random() * 8 + 2;
-                    if (progressPct > 90) progressPct = 90;
-                    DOM.adLoaderProgress.style.width = `${progressPct}%`;
-                }, 300);
+            if (adShown) {
+                lastAdWatchTime = Date.now();
+                state.adsWatchedToday++;
+                state.adsWatchedSinceReset++;
+                const day = new Date().getDay();
+                state.weeklyActivity[day] = (state.weeklyActivity[day] || 0) + 1;
 
-                const adShown = await showRewardedAd();
-                clearInterval(progressInterval);
-                DOM.adLoaderProgress.style.width = '100%';
-
-                if (adShown) {
-                    lastAdWatchTime = Date.now();
-                    state.adsWatchedToday++;
-                    const day = new Date().getDay();
-                    state.weeklyActivity[day] = (state.weeklyActivity[day] || 0) + 1;
-
-                    if (!state.tierProgress[tierId]) {
-                        state.tierProgress[tierId] = { watched: 0, claimed: false };
-                    }
-                    state.tierProgress[tierId].watched = (state.tierProgress[tierId].watched || 0) + 1;
-
-                    saveUserData();
-                    updateUI();
-                    loadTiers();
-
-                    const newWatched = state.tierProgress[tierId].watched;
-                    const required = tier.requiredAds || 6;
-                    if (newWatched >= required) {
-                        showToast(`🎉 You completed all ads for ${tier.name}! Claim your reward now.`, 'success');
-                    } else {
-                        showToast(`✅ Ad watched! ${newWatched}/${required} completed for ${tier.name}.`, 'success');
-                    }
-
-                    const watchBtn = document.querySelector(`.tier-card .tier-btn.watch[onclick*="${tierId}"]`);
-                    if (watchBtn) {
-                        if (newWatched >= required) {
-                            watchBtn.disabled = true;
-                            watchBtn.innerHTML = '<i class="fa-solid fa-check"></i> ✅ All Watched';
-                            watchBtn.classList.add('watched');
-                        }
-                    }
-                } else {
-                    showToast('❌ Ad was not shown. Please try again.', 'error');
+                // Update tier progress
+                if (!state.tierProgress[tierId]) {
+                    state.tierProgress[tierId] = { watched: 0, claimed: false };
                 }
-            } catch (e) {
-                console.error("Ad error:", e);
-                showToast('❌ Ad could not be loaded. Please try again.', 'error');
-            } finally {
-                isAdShowing = false;
-                DOM.adLoaderOverlay.style.display = 'none';
-                DOM.adLoaderOverlay.querySelector('.loader-text').textContent = 'Loading Ad...';
-                DOM.adLoaderOverlay.querySelector('.loader-sub').textContent = 'Please wait while the ad loads';
+                state.tierProgress[tierId].watched = (state.tierProgress[tierId].watched || 0) + 1;
+
+                // Set daily reset time if not set
+                if (!state.dailyResetTime) {
+                    state.dailyResetTime = Date.now() + (CONFIG.DAILY_RESET_HOURS * 60 * 60 * 1000);
+                }
+
+                saveUserData();
+                updateUI();
+                loadTiers();
+
+                const newWatched = state.tierProgress[tierId].watched;
+                const required = tier.requiredAds || 6;
+                if (newWatched >= required) {
+                    showToast(`🎉 You completed all ads for ${tier.name}! Claim your reward now.`, 'success');
+                } else {
+                    showToast(`✅ Ad watched! ${newWatched}/${required} completed for ${tier.name}.`, 'success');
+                }
+
+                // Update the watch button text
+                const watchBtn = document.querySelector(`.tier-card .tier-btn.watch[onclick*="${tierId}"]`);
+                if (watchBtn) {
+                    if (newWatched >= required) {
+                        watchBtn.disabled = true;
+                        watchBtn.innerHTML = '<i class="fa-solid fa-check"></i> ✅ All Watched';
+                        watchBtn.classList.add('watched');
+                    }
+                }
+            } else {
+                showToast('❌ Ad was not shown. Please try again.', 'error');
             }
+
+            isAdShowing = false;
         }
 
         // ============================================================
@@ -4116,6 +4306,7 @@
                 return;
             }
 
+            // Claim the reward
             const prize = tier.prize || 0;
             window._legitimateBalanceChange = true;
             state.balance += prize;
@@ -4126,8 +4317,9 @@
             updateUI();
             loadTiers();
 
-            showToast(`🎉 You claimed $${prize.toFixed(2)} from ${tier.name}!`, 'success');
+            showToast(`🎉 You claimed ${CONFIG.CURRENCY_SYMBOL}${prize.toFixed(2)} from ${tier.name}!`, 'success');
 
+            // Update UI
             const claimBtn = document.querySelector(`.tier-card .tier-btn.claim[onclick*="${tierId}"]`);
             if (claimBtn) {
                 claimBtn.disabled = true;
@@ -4142,82 +4334,183 @@
         }
 
         // ============================================================
-        // WITHDRAWAL
+        // WITHDRAW FULL PAGE
         // ============================================================
-        function populateWithdrawalMethods() {
-            if (!DOM.methodSelect) return;
-            DOM.methodSelect.innerHTML = '<option value="" disabled selected>Select Payment Method</option>';
-            DOM.methodFieldsContainer.innerHTML = '';
-            CONFIG.withdrawalMethods.forEach((method) => {
-                const option = document.createElement('option');
-                option.value = method;
-                option.textContent = method;
-                DOM.methodSelect.appendChild(option);
-                const fieldDiv = document.createElement('div');
-                fieldDiv.id = method.toLowerCase() + '-field';
-                fieldDiv.className = 'method-field';
-                fieldDiv.innerHTML = `
-                    <label>${method} Account</label>
-                    <div class="field-hint">Enter your ${method} account details</div>
-                    <input type="text" id="${method.toLowerCase()}-account" placeholder="Enter ${method} Account">
-                `;
-                DOM.methodFieldsContainer.appendChild(fieldDiv);
-            });
-            DOM.methodSelect.addEventListener('change', function() {
-                document.querySelectorAll('.method-field').forEach(el => el.classList.remove('active'));
-                if (this.value) {
-                    const field = document.getElementById(this.value.toLowerCase() + '-field');
-                    if (field) field.classList.add('active');
-                }
-            });
+        function openWithdrawPage() {
+            if (isBanned) {
+                showToast('🚫 You are banned. Contact admin for support.', 'error');
+                return;
+            }
+            DOM.withdrawPage.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            document.querySelector('.container').style.display = 'none';
+            renderWithdrawPage();
         }
 
-        async function handleWithdrawal(e) {
+        function closeWithdrawPage() {
+            DOM.withdrawPage.classList.remove('active');
+            document.body.style.overflow = '';
+            document.querySelector('.container').style.display = 'block';
+        }
+
+        function renderWithdrawPage() {
+            const balance = state.balance;
+            const referralCount = state.referralCount || 0;
+            const hasWithdrawn = state.hasWithdrawnBefore || false;
+            const requiredReferrals = CONFIG.REQUIRED_REFERRALS_FIRST_WITHDRAW || 5;
+            const canWithdraw = hasWithdrawn || referralCount >= requiredReferrals;
+            const minWithdraw = CONFIG.MINIMUM_WITHDRAWAL || 0.10;
+
+            let content = `
+                <div class="withdraw-info-box">
+                    <div class="info-row">
+                        <span class="label">💰 Available Balance</span>
+                        <span class="value success">${CONFIG.CURRENCY_SYMBOL}${formatBalance(balance)}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">👥 Your Referrals</span>
+                        <span class="value">${referralCount}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">📋 Withdrawal Status</span>
+                        <span class="value ${canWithdraw ? 'success' : 'danger'}">
+                            ${canWithdraw ? '✅ Eligible' : '❌ Not Eligible'}
+                        </span>
+                    </div>
+                </div>
+
+                ${!hasWithdrawn ? `
+                    <div class="withdraw-rule-box">
+                        <div class="rule-title">⚠️ First Withdrawal Rule</div>
+                        <div class="rule-text">
+                            You need <strong>${requiredReferrals}</strong> referrals to make your first withdrawal.
+                            ${referralCount >= requiredReferrals ? '✅ You have enough referrals!' : `You have <strong>${referralCount}</strong> out of ${requiredReferrals}.`}
+                            <br><br>
+                            After your first successful withdrawal, you can withdraw anytime without referral requirements.
+                        </div>
+                    </div>
+                ` : `
+                    <div class="withdraw-rule-box" style="background:rgba(16,185,129,0.08); border-color:rgba(16,185,129,0.2);">
+                        <div class="rule-title" style="color:var(--success);">✅ Unlimited Withdrawals</div>
+                        <div class="rule-text">
+                            You have already completed your first withdrawal!<br>
+                            You can now withdraw anytime without any referral requirements.
+                        </div>
+                    </div>
+                `}
+
+                ${canWithdraw && balance >= minWithdraw ? `
+                    <form id="withdraw-form-page">
+                        <div class="form-group">
+                            <label>Payment Method *</label>
+                            <select id="method-page" name="method" required>
+                                <option value="" disabled selected>Select Payment Method</option>
+                                ${CONFIG.withdrawalMethods.map(m => `<option value="${m}">${m}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div id="method-fields-page">
+                            ${CONFIG.withdrawalMethods.map(m => `
+                                <div class="method-field" id="${m.toLowerCase()}-field-page">
+                                    <label>${m} Account</label>
+                                    <div class="field-hint">Enter your ${m} account details</div>
+                                    <input type="text" id="${m.toLowerCase()}-account-page" placeholder="Enter ${m} Account">
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="form-group">
+                            <label>Amount (${CONFIG.CURRENCY_SYMBOL}) *</label>
+                            <input type="number" step="0.01" id="withdraw-amount-page" placeholder="0.00" min="${minWithdraw}" required>
+                            <div class="form-hint">Minimum withdrawal: ${CONFIG.CURRENCY_SYMBOL}${minWithdraw.toFixed(2)}</div>
+                        </div>
+                        <button type="submit" class="action-button" id="withdraw-submit-page">
+                            <span class="button-text">💸 Submit Withdrawal Request</span>
+                            <div class="loader-spinner" style="display:none; width:20px; height:20px; border-width:3px; border:2px solid rgba(255,255,255,0.1); border-top-color:white; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
+                        </button>
+                    </form>
+                ` : `
+                    <div class="withdraw-rule-box" style="background:rgba(239,68,68,0.08); border-color:rgba(239,68,68,0.2);">
+                        <div class="rule-title" style="color:var(--danger);">❌ Cannot Withdraw</div>
+                        <div class="rule-text">
+                            ${!canWithdraw ? `You need ${requiredReferrals - referralCount} more referrals to withdraw.` : ''}
+                            ${balance < minWithdraw ? `Minimum withdrawal is ${CONFIG.CURRENCY_SYMBOL}${minWithdraw.toFixed(2)}. You have ${CONFIG.CURRENCY_SYMBOL}${formatBalance(balance)}.` : ''}
+                        </div>
+                    </div>
+                `}
+            `;
+
+            DOM.withdrawContent.innerHTML = content;
+
+            // Setup method fields
+            if (canWithdraw && balance >= minWithdraw) {
+                const methodSelect = document.getElementById('method-page');
+                const methodFields = document.querySelectorAll('#method-fields-page .method-field');
+
+                methodSelect.addEventListener('change', function() {
+                    methodFields.forEach(el => el.style.display = 'none');
+                    if (this.value) {
+                        const field = document.getElementById(this.value.toLowerCase() + '-field-page');
+                        if (field) field.style.display = 'block';
+                    }
+                });
+
+                // Show first method by default
+                if (CONFIG.withdrawalMethods.length > 0) {
+                    methodSelect.value = CONFIG.withdrawalMethods[0];
+                    const field = document.getElementById(CONFIG.withdrawalMethods[0].toLowerCase() + '-field-page');
+                    if (field) field.style.display = 'block';
+                }
+
+                document.getElementById('withdraw-form-page').addEventListener('submit', handleWithdrawPageSubmit);
+            }
+        }
+
+        async function handleWithdrawPageSubmit(e) {
             e.preventDefault();
-            const method = DOM.methodSelect.value;
-            const accountInput = document.getElementById(method?.toLowerCase() + '-account');
+            const method = document.getElementById('method-page').value;
+            const accountInput = document.getElementById(method?.toLowerCase() + '-account-page');
             const accountNumber = accountInput?.value.trim() || '';
-            const amount = parseFloat(DOM.withdrawAmount.value);
-            if (!method || !accountNumber || amount > state.balance || isNaN(amount) || amount < CONFIG
-                .MINIMUM_WITHDRAWAL) {
+            const amount = parseFloat(document.getElementById('withdraw-amount-page').value);
+
+            if (!method || !accountNumber || amount > state.balance || isNaN(amount) || amount < CONFIG.MINIMUM_WITHDRAWAL) {
                 return showToast('❌ Invalid withdrawal request', 'error');
             }
-            const btn = DOM.withdrawSubmitBtn;
+
+            const btn = document.getElementById('withdraw-submit-page');
             const text = btn.querySelector('.button-text');
             const spinner = btn.querySelector('.loader-spinner');
             text.style.display = 'none';
-            spinner.style.display = 'block';
+            spinner.style.display = 'inline-block';
             btn.disabled = true;
+
             const user = tg?.initDataUnsafe?.user || { first_name: 'User', last_name: '', username: 'N/A' };
             const withdrawalData = {
                 userId: state.currentUserId,
                 userName: `${user.first_name} ${user.last_name || ''}`,
                 username: user.username || 'N/A',
-                method,
-                accountNumber,
-                amount,
+                method: method,
+                accountNumber: accountNumber,
+                amount: amount,
                 date: new Date().toISOString(),
                 status: 'Pending'
             };
+
             try {
                 const ref = firebaseDb.ref('withdrawals').push();
                 await ref.set(withdrawalData);
                 window._legitimateWithdrawal = true;
                 state.balance -= amount;
+                state.hasWithdrawnBefore = true;
                 state.withdrawalHistory.unshift({
-                    method,
+                    method: method,
                     number: accountNumber,
-                    amount,
+                    amount: amount,
                     date: new Date().toISOString(),
                     status: 'Pending'
                 });
                 saveUserData();
                 updateUI();
-                closeModal('withdrawModal');
-                DOM.withdrawForm.reset();
-                document.querySelectorAll('.method-field').forEach(el => el.classList.remove('active'));
-                DOM.methodSelect.selectedIndex = 0;
-                showToast('✅ Withdrawal request submitted!', 'success');
+                closeWithdrawPage();
+                showToast('✅ Withdrawal request submitted successfully!', 'success');
             } catch (error) {
                 console.error("Withdrawal error:", error);
                 showToast('❌ Failed to submit request.', 'error');
@@ -4240,16 +4533,36 @@
                 state.adsWatchedToday = 0;
                 saveUserData();
             }
-            DOM.totalEarning.textContent = `$${formatBalance(state.balance)}`;
+            DOM.totalEarning.textContent = `${CONFIG.CURRENCY_SYMBOL}${formatBalance(state.balance)}`;
             DOM.adCount.textContent = state.adCount;
             DOM.adsTodayCount.textContent = `${state.adsWatchedToday} / ${CONFIG.DAILY_AD_LIMIT}`;
-            DOM.minWithdrawText.textContent = `Minimum withdrawal is $${CONFIG.MINIMUM_WITHDRAWAL.toFixed(2)}.`;
+
+            // Update daily reset timer on watch button
+            let timeLeft = '';
+            if (state.dailyResetTime) {
+                const remaining = state.dailyResetTime - Date.now();
+                if (remaining > 0) {
+                    const hours = Math.floor(remaining / (1000 * 60 * 60));
+                    const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                    timeLeft = ` (${hours}h ${minutes}m)`;
+                }
+            }
+
             clearInterval(cooldownInterval);
             clearInterval(adCooldownInterval);
+
             const now = Date.now();
             const timeSinceLastAd = now - lastAdWatchTime;
             const adCooldownMs = CONFIG.AD_COOLDOWN_MINUTES * 60 * 1000;
             const isAdCooldownActive = timeSinceLastAd < adCooldownMs && lastAdWatchTime > 0;
+
+            // Check if all tiers completed
+            const allTiers = state.tiers.filter(t => t.status !== 'inactive');
+            const allCompleted = allTiers.length > 0 && allTiers.every(t => {
+                const prog = state.tierProgress[t.id] || { watched: 0, claimed: false };
+                return prog.watched >= t.requiredAds && prog.claimed;
+            });
+
             if (state.cooldownUntil && new Date() < new Date(state.cooldownUntil)) {
                 DOM.watchAdBtn.disabled = true;
                 const updateTimer = () => {
@@ -4283,9 +4596,14 @@
                 };
                 adCooldownInterval = setInterval(updateAdTimer, 200);
                 updateAdTimer();
+            } else if (allCompleted) {
+                DOM.watchAdBtn.disabled = true;
+                DOM.watchAdBtn.querySelector('span').textContent = `✅ All Complete${timeLeft}`;
             } else {
                 DOM.watchAdBtn.disabled = state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT;
-                const text = state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT ? '⏳ Take a Break' : '▶️ Watch Ad';
+                const text = state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT ?
+                    `⏳ Take a Break${timeLeft}` :
+                    `▶️ Watch Ad${timeLeft}`;
                 DOM.watchAdBtn.querySelector('span').textContent = text;
             }
             DOM.watchAdBtn.classList.toggle('pulsing', !DOM.watchAdBtn.disabled);
@@ -4440,7 +4758,7 @@
                     loadBonusTasks()
                 ]);
 
-                populateWithdrawalMethods();
+                // Set withdrawal methods display
                 DOM.welcomeTitle.textContent = CONFIG.welcomeNotice.title;
                 DOM.welcomeMessage.textContent = CONFIG.welcomeNotice.message;
 
@@ -4464,7 +4782,6 @@
                 DOM.supportBtn.addEventListener('click', () => safeOpenTelegramLink(CONFIG.SUPPORT_LINK));
                 DOM.copyLinkBtn.addEventListener('click', copyReferralLink);
                 DOM.shareLinkBtn.addEventListener('click', shareReferralLink);
-                DOM.withdrawForm.addEventListener('submit', handleWithdrawal);
 
                 document.addEventListener('click', (e) => {
                     if (DOM.ratingToast.classList.contains('active') && !DOM.ratingToast.contains(e.target) && !e
