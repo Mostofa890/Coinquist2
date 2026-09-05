@@ -383,6 +383,15 @@
                 transform: rotate(360deg);
             }
         }
+        @keyframes countdownPulse {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
 
         /* ===== PROFILE HEADER ===== */
         .profile-header {
@@ -756,17 +765,84 @@
             background: rgba(var(--primary-color-rgb), 0.06);
             transform: translateY(-2px);
         }
-        .action-button.success {
-            background: var(--success);
+
+        /* ===== AD COUNTDOWN OVERLAY ===== */
+        #adCountdownOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 6000;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: white;
+            text-align: center;
         }
-        .action-button.success:hover {
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        #adCountdownOverlay.active {
+            display: flex;
         }
-        .action-button.danger {
-            background: var(--danger);
+        #adCountdownOverlay .circle-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin-bottom: 30px;
         }
-        .action-button.danger:hover {
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        #adCountdownOverlay .circle-container svg {
+            transform: rotate(-90deg);
+        }
+        #adCountdownOverlay .circle-container .circle-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.1);
+            stroke-width: 6;
+        }
+        #adCountdownOverlay .circle-container .circle-progress {
+            fill: none;
+            stroke: var(--primary-color);
+            stroke-width: 6;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.3s ease;
+        }
+        #adCountdownOverlay .circle-container .circle-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 52px;
+            font-weight: 800;
+            color: white;
+        }
+        #adCountdownOverlay .circle-container .circle-label {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        #adCountdownOverlay .countdown-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        #adCountdownOverlay .countdown-sub {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        #adCountdownOverlay .countdown-warning {
+            margin-top: 16px;
+            font-size: 13px;
+            color: var(--warning);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #adCountdownOverlay .countdown-warning.show {
+            opacity: 1;
         }
 
         /* ===== FORM ===== */
@@ -916,11 +992,6 @@
         .history-status.rejected {
             color: #ef4444;
             background: rgba(239, 68, 68, 0.1);
-        }
-        .no-history {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-light);
         }
 
         /* ===== NAV BAR ===== */
@@ -1118,6 +1189,13 @@
             }
             .stat-item .value {
                 font-size: 17px;
+            }
+            #adCountdownOverlay .circle-container {
+                width: 150px;
+                height: 150px;
+            }
+            #adCountdownOverlay .circle-container .circle-text {
+                font-size: 40px;
             }
         }
         @media (min-width: 481px) {
@@ -2201,6 +2279,22 @@
         </div>
     </div>
 
+    <!-- ===== AD COUNTDOWN OVERLAY ===== -->
+    <div id="adCountdownOverlay">
+        <div class="circle-container">
+            <svg width="200" height="200" viewBox="0 0 200 200">
+                <circle class="circle-bg" cx="100" cy="100" r="90" />
+                <circle class="circle-progress" id="countdownCircle" cx="100" cy="100" r="90"
+                stroke-dasharray="565.48" stroke-dashoffset="0" />
+            </svg>
+            <div class="circle-text" id="countdownText">15</div>
+            <div class="circle-label">seconds</div>
+        </div>
+        <div class="countdown-title">⏳ Watching Ad</div>
+        <div class="countdown-sub">Please wait for the ad to complete</div>
+        <div class="countdown-warning" id="countdownWarning">⚠️ You must watch at least 10 seconds!</div>
+    </div>
+
     <!-- ===== AD LOADER ===== -->
     <div id="ad-loader-overlay">
         <div class="loader-spinner"></div>
@@ -2237,7 +2331,7 @@
         <!-- ===== BALANCE CARD ===== -->
         <div class="balance-card">
             <h3>💰 Balance</h3>
-            <div class="amount" id="total-earning">₹0.00</div>
+            <div class="amount" id="total-earning">৳0.00</div>
         </div>
 
         <!-- ===== STATS ===== -->
@@ -2262,7 +2356,7 @@
             </div>
         </div>
 
-        <!-- ===== MAIN VIEW (Publisher) ===== -->
+        <!-- ===== MAIN VIEW ===== -->
         <div id="mainView">
             <div class="card">
                 <div class="card-title">
@@ -2387,9 +2481,6 @@
         </div>
     </div>
 
-    <!-- Withdraw Modal (Old - replaced by full page) -->
-    <div id="withdrawModal" class="modal" style="display:none;"></div>
-
     <!-- Support Modal -->
     <div id="supportModal" class="modal">
         <div class="modal-content">
@@ -2484,12 +2575,13 @@
             withdrawalMethods: ['Binance', 'Bikash', 'Nogad'],
             welcomeNotice: {
                 title: "Welcome to NexEarn! 🎉",
-                message: "Please follow the rules to ensure you receive your payment.\n\n💰 Reward per Ad: ₹0.08\n💝 After watching 15 ads, there is a 30-minute break.\n✅ 100% Payment Guarantee\n💸 Withdraw via Binance UID or Email\n🔥 Minimum withdrawal is ₹8.00"
+                message: "Please follow the rules to ensure you receive your payment.\n\n💰 Reward per Ad: ৳0.08\n💝 After watching 15 ads, there is a 30-minute break.\n✅ 100% Payment Guarantee\n💸 Withdraw via Binance UID or Email\n🔥 Minimum withdrawal is ৳8.00"
             },
             REQUIRED_REFERRALS_FIRST_WITHDRAW: 5,
-            AD_WATCH_DURATION: 15, // 15 seconds per ad
+            AD_WATCH_DURATION: 15,
+            MIN_AD_WATCH_TIME: 10,
             DAILY_RESET_HOURS: 24,
-            CURRENCY_SYMBOL: '₹'
+            CURRENCY_SYMBOL: '৳'
         };
 
         // ============================================================
@@ -2521,10 +2613,9 @@
         let isBanned = false;
         let banReason = '';
         let isChannelVerified = false;
-        let adCountdownInterval = null;
         let dailyResetInterval = null;
-        let watchAdCountdown = 0;
         let isAdCountdownActive = false;
+        let adStartTime = 0;
 
         // ============================================================
         // STATE
@@ -2564,7 +2655,8 @@
             hasWithdrawnBefore: false,
             dailyResetTime: null,
             adsWatchedSinceReset: 0,
-            referralCount: 0
+            referralCount: 0,
+            allTiersCompleted: false
         };
 
         // ============================================================
@@ -2629,6 +2721,11 @@
             DOM.tiersContainer = document.getElementById('tiers-container');
             DOM.withdrawPage = document.getElementById('withdrawPage');
             DOM.withdrawContent = document.getElementById('withdraw-content');
+            // Countdown
+            DOM.adCountdownOverlay = document.getElementById('adCountdownOverlay');
+            DOM.countdownText = document.getElementById('countdownText');
+            DOM.countdownCircle = document.getElementById('countdownCircle');
+            DOM.countdownWarning = document.getElementById('countdownWarning');
         }
 
         // ============================================================
@@ -2757,12 +2854,18 @@
                     // Reset daily ads
                     state.adsWatchedToday = 0;
                     state.adsWatchedSinceReset = 0;
+                    state.allTiersCompleted = false;
                     state.dailyResetTime = now + (CONFIG.DAILY_RESET_HOURS * 60 * 60 * 1000);
+                    // Reset tier progress
+                    Object.keys(state.tierProgress).forEach(key => {
+                        state.tierProgress[key] = { watched: 0, claimed: false };
+                    });
                     saveUserData();
                     updateUI();
+                    loadTiers();
                     showToast('🔄 Daily ads reset! You can watch ads again.', 'success');
                 }
-            }, 60000); // Check every minute
+            }, 60000);
         }
 
         // ============================================================
@@ -2954,34 +3057,61 @@
         }
 
         // ============================================================
-        // AD COUNTDOWN SYSTEM (15 seconds)
+        // AD COUNTDOWN SYSTEM (15 seconds with circle animation)
         // ============================================================
         function startAdCountdown(tierId) {
             return new Promise((resolve) => {
                 if (isAdCountdownActive) return resolve(false);
                 isAdCountdownActive = true;
-                watchAdCountdown = CONFIG.AD_WATCH_DURATION;
+                adStartTime = Date.now();
+
+                let countdown = CONFIG.AD_WATCH_DURATION;
+                const circumference = 565.48; // 2 * PI * 90
 
                 // Show countdown overlay
-                DOM.adLoaderOverlay.style.display = 'flex';
-                DOM.adLoaderOverlay.querySelector('.loader-text').textContent = `⏳ ${watchAdCountdown}s`;
-                DOM.adLoaderOverlay.querySelector('.loader-sub').textContent = 'Watch the ad to earn progress';
-                DOM.adLoaderProgress.style.width = '0%';
+                DOM.adCountdownOverlay.classList.add('active');
+                DOM.countdownText.textContent = countdown;
+                DOM.countdownCircle.style.strokeDashoffset = '0';
+                DOM.countdownWarning.classList.remove('show');
 
                 const countdownInterval = setInterval(() => {
-                    watchAdCountdown--;
-                    DOM.adLoaderOverlay.querySelector('.loader-text').textContent = `⏳ ${watchAdCountdown}s`;
-                    DOM.adLoaderProgress.style.width = `${((CONFIG.AD_WATCH_DURATION - watchAdCountdown) / CONFIG.AD_WATCH_DURATION) * 100}%`;
+                    countdown--;
+                    DOM.countdownText.textContent = countdown;
 
-                    if (watchAdCountdown <= 0) {
+                    // Update circle progress
+                    const progress = (CONFIG.AD_WATCH_DURATION - countdown) / CONFIG.AD_WATCH_DURATION;
+                    const offset = circumference - (progress * circumference);
+                    DOM.countdownCircle.style.strokeDashoffset = offset;
+
+                    // Show warning when less than MIN_AD_WATCH_TIME remaining
+                    if (countdown <= CONFIG.AD_WATCH_DURATION - CONFIG.MIN_AD_WATCH_TIME) {
+                        DOM.countdownWarning.classList.add('show');
+                        DOM.countdownWarning.textContent = `⚠️ You must watch at least ${CONFIG.MIN_AD_WATCH_TIME} seconds!`;
+                    }
+
+                    if (countdown <= 0) {
                         clearInterval(countdownInterval);
-                        DOM.adLoaderOverlay.querySelector('.loader-text').textContent = '🎯 Loading Ad...';
-                        DOM.adLoaderProgress.style.width = '100%';
+                        const elapsed = (Date.now() - adStartTime) / 1000;
+
+                        // Check if user watched at least MIN_AD_WATCH_TIME seconds
+                        if (elapsed < CONFIG.MIN_AD_WATCH_TIME) {
+                            DOM.countdownWarning.textContent = `❌ You only watched ${Math.round(elapsed)}s. Minimum ${CONFIG.MIN_AD_WATCH_TIME}s required!`;
+                            DOM.countdownWarning.classList.add('show');
+                            setTimeout(() => {
+                                DOM.adCountdownOverlay.classList.remove('active');
+                                isAdCountdownActive = false;
+                                resolve(false);
+                            }, 1500);
+                            return;
+                        }
+
+                        DOM.countdownText.textContent = '🎯';
+                        DOM.countdownCircle.style.strokeDashoffset = '0';
 
                         // Now show the actual ad
                         setTimeout(async () => {
                             const adShown = await showRewardedAd();
-                            DOM.adLoaderOverlay.style.display = 'none';
+                            DOM.adCountdownOverlay.classList.remove('active');
                             isAdCountdownActive = false;
                             resolve(adShown);
                         }, 500);
@@ -2989,7 +3119,6 @@
                 }, 1000);
 
                 // If user leaves the app, countdown continues in background
-                // The interval will keep running
             });
         }
 
@@ -3094,6 +3223,7 @@
                         .requiredReferrals;
                         if (data.adWatchDuration) CONFIG.AD_WATCH_DURATION = data.adWatchDuration;
                         if (data.dailyResetHours) CONFIG.DAILY_RESET_HOURS = data.dailyResetHours;
+                        if (data.minAdWatchTime) CONFIG.MIN_AD_WATCH_TIME = data.minAdWatchTime;
                         console.log("✅ Config loaded from Firebase");
                     }
                     resolve();
@@ -3154,7 +3284,8 @@
                 hasWithdrawnBefore: state.hasWithdrawnBefore,
                 dailyResetTime: state.dailyResetTime,
                 adsWatchedSinceReset: state.adsWatchedSinceReset,
-                referralCount: state.referralCount
+                referralCount: state.referralCount,
+                allTiersCompleted: state.allTiersCompleted
             };
             firebaseDb.ref(`users/${state.currentUserId}`).update(data).catch(err => {
                 console.error("Save error:", err);
@@ -3196,6 +3327,7 @@
                         state.dailyResetTime = data.dailyResetTime || null;
                         state.adsWatchedSinceReset = data.adsWatchedSinceReset || 0;
                         state.referralCount = data.referralCount || 0;
+                        state.allTiersCompleted = data.allTiersCompleted || false;
                         if (data.lastAdWatchTime) {
                             lastAdWatchTime = data.lastAdWatchTime;
                         }
@@ -3230,7 +3362,6 @@
                 const count = snapshot.val() || 0;
                 state.referralCount = count;
                 DOM.referralCount.textContent = count;
-                // Update withdraw page if open
                 if (DOM.withdrawPage.classList.contains('active')) {
                     renderWithdrawPage();
                 }
@@ -4115,6 +4246,26 @@
             if (!DOM.tiersContainer) return;
             const activeTiers = tiers.filter(t => t.status !== 'inactive');
 
+            // Check if all tiers are completed
+            const allCompleted = activeTiers.length > 0 && activeTiers.every(t => {
+                const prog = state.tierProgress[t.id] || { watched: 0, claimed: false };
+                return prog.watched >= t.requiredAds && prog.claimed;
+            });
+
+            if (allCompleted) {
+                state.allTiersCompleted = true;
+                saveUserData();
+                DOM.tiersContainer.innerHTML = `
+                    <div class="tier-empty" style="text-align:center; padding:40px 20px; color:var(--text-light);">
+                        <i class="fa-solid fa-check-circle" style="font-size:48px; margin-bottom:12px; color:var(--success); opacity:1;"></i>
+                        <p style="font-size:18px; font-weight:700; color:var(--success);">🎉 All Tiers Completed!</p>
+                        <p style="font-size:13px; margin-top:8px;">You have completed all ad tiers. Come back tomorrow for more!</p>
+                        ${state.dailyResetTime ? `<p style="font-size:12px; margin-top:4px; color:var(--text-light);">⏳ Next reset: ${formatResetTime(state.dailyResetTime)}</p>` : ''}
+                    </div>
+                `;
+                return;
+            }
+
             if (activeTiers.length === 0) {
                 DOM.tiersContainer.innerHTML = `
                     <div class="tier-empty" style="text-align:center; padding:40px 20px; color:var(--text-light);">
@@ -4148,7 +4299,7 @@
                                 <div class="tier-name">${escapeHTML(tier.name || `Section ${index + 1}`)}</div>
                                 ${tier.desc ? `<div style="font-size:12px; color:var(--text-light);">${escapeHTML(tier.desc)}</div>` : ''}
                             </div>
-                            <div class="tier-prize">${CONFIG.CURRENCY_SYMBOL}<span>${prize.toFixed(2)}</span><span class="currency">INR</span></div>
+                            <div class="tier-prize">${CONFIG.CURRENCY_SYMBOL}<span>${prize.toFixed(2)}</span><span class="currency">BDT</span></div>
                         </div>
                         <span class="tier-status-badge ${statusClass}">${statusText}</span>
                         <div class="tier-progress">
@@ -4179,8 +4330,16 @@
             }).join('');
         }
 
+        function formatResetTime(timestamp) {
+            const diff = timestamp - Date.now();
+            if (diff <= 0) return 'Now';
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            return `${hours}h ${minutes}m`;
+        }
+
         // ============================================================
-        // WATCH TIER AD (with 15 second countdown)
+        // WATCH TIER AD (with circle countdown)
         // ============================================================
         async function watchTierAd(tierId) {
             if (isBanned) {
@@ -4189,6 +4348,7 @@
             }
             if (isAdShowing) return;
             if (DOM.adLoaderOverlay.style.display === 'flex') return;
+            if (DOM.adCountdownOverlay.classList.contains('active')) return;
 
             // Check daily limit
             if (state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT) {
@@ -4198,7 +4358,7 @@
 
             // Check if all tiers are completed
             const allTiers = state.tiers.filter(t => t.status !== 'inactive');
-            const allCompleted = allTiers.every(t => {
+            const allCompleted = allTiers.length > 0 && allTiers.every(t => {
                 const prog = state.tierProgress[t.id] || { watched: 0, claimed: false };
                 return prog.watched >= t.requiredAds && prog.claimed;
             });
@@ -4228,7 +4388,7 @@
                 return;
             }
 
-            // Start 15 second countdown
+            // Start countdown
             isAdShowing = true;
             const adShown = await startAdCountdown(tierId);
 
@@ -4250,6 +4410,11 @@
                     state.dailyResetTime = Date.now() + (CONFIG.DAILY_RESET_HOURS * 60 * 60 * 1000);
                 }
 
+                // Add reward to balance
+                const reward = CONFIG.AD_REWARD;
+                state.balance += reward;
+                state.totalEarnings += reward;
+
                 saveUserData();
                 updateUI();
                 loadTiers();
@@ -4259,7 +4424,8 @@
                 if (newWatched >= required) {
                     showToast(`🎉 You completed all ads for ${tier.name}! Claim your reward now.`, 'success');
                 } else {
-                    showToast(`✅ Ad watched! ${newWatched}/${required} completed for ${tier.name}.`, 'success');
+                    showToast(`✅ Ad watched! +${CONFIG.CURRENCY_SYMBOL}${(reward * 80).toFixed(2)} earned. ${newWatched}/${required} completed.`,
+                        'success');
                 }
 
                 // Update the watch button text
@@ -4453,7 +4619,6 @@
                     }
                 });
 
-                // Show first method by default
                 if (CONFIG.withdrawalMethods.length > 0) {
                     methodSelect.value = CONFIG.withdrawalMethods[0];
                     const field = document.getElementById(CONFIG.withdrawalMethods[0].toLowerCase() + '-field-page');
@@ -4596,7 +4761,7 @@
                 };
                 adCooldownInterval = setInterval(updateAdTimer, 200);
                 updateAdTimer();
-            } else if (allCompleted) {
+            } else if (allCompleted || state.allTiersCompleted) {
                 DOM.watchAdBtn.disabled = true;
                 DOM.watchAdBtn.querySelector('span').textContent = `✅ All Complete${timeLeft}`;
             } else {
@@ -4758,7 +4923,6 @@
                     loadBonusTasks()
                 ]);
 
-                // Set withdrawal methods display
                 DOM.welcomeTitle.textContent = CONFIG.welcomeNotice.title;
                 DOM.welcomeMessage.textContent = CONFIG.welcomeNotice.message;
 
