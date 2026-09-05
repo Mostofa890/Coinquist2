@@ -293,6 +293,8 @@
         #joinChannelModal .modal-box .verify-status {
             margin-top: 12px;
             font-size: 13px;
+            font-weight: 600;
+            min-height: 24px;
             color: var(--text-light);
         }
         #joinChannelModal .modal-box .verify-status.success {
@@ -300,6 +302,9 @@
         }
         #joinChannelModal .modal-box .verify-status.error {
             color: var(--danger);
+        }
+        #joinChannelModal .modal-box .verify-status.info {
+            color: var(--info);
         }
         #joinChannelModal.hidden {
             display: none;
@@ -2787,19 +2792,32 @@
                 showApp();
                 return;
             }
+
+            // Reset status
+            DOM.verifyStatus.textContent = '';
+            DOM.verifyStatus.className = 'verify-status';
+            DOM.verifyChannelBtn.classList.remove('active');
+
             DOM.joinChannelModal.classList.remove('hidden');
+
+            // Join Channel Button
             DOM.joinChannelBtn.onclick = function() {
                 safeOpenTelegramLink(CONFIG.CHANNEL_LINK);
+                // After user clicks join, enable verify button
                 DOM.verifyChannelBtn.classList.add('active');
                 DOM.verifyStatus.textContent = '✅ You have joined! Click "Verify" to continue.';
                 DOM.verifyStatus.className = 'verify-status success';
             };
+
+            // Verify Button
             DOM.verifyChannelBtn.onclick = function() {
+                // Check if user has actually joined
                 if (!this.classList.contains('active')) {
-                    DOM.verifyStatus.textContent = '❌ Please join the channel first!';
+                    DOM.verifyStatus.textContent = '❌ Please join the channel first! Click "Join Channel" button.';
                     DOM.verifyStatus.className = 'verify-status error';
                     return;
                 }
+
                 // Verify successful
                 state.channelVerified = true;
                 isChannelVerified = true;
@@ -2816,7 +2834,6 @@
             DOM.container.style.display = 'block';
             DOM.preloader.style.display = 'none';
             DOM.preloaderFooter.style.display = 'none';
-            // Update UI
             updateUI();
         }
 
