@@ -16,6 +16,7 @@
     <script src='//libtl.com/sdk.js' data-zone='11573980' data-sdk='show_11573980'>
     </script>
     <style>
+        /* ===== ALL STYLES REMAIN SAME AS YOUR CODE ===== */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
         :root {
@@ -306,6 +307,19 @@
         #joinChannelModal .modal-box .verify-status.info {
             color: var(--info);
         }
+        #joinChannelModal .modal-box .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+        #joinChannelModal .modal-box .loading-spinner.active {
+            display: inline-block;
+        }
         #joinChannelModal.hidden {
             display: none;
         }
@@ -376,6 +390,11 @@
             to {
                 opacity: 1;
                 transform: translateY(0);
+            }
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
             }
         }
 
@@ -1088,11 +1107,6 @@
             background: var(--gradient);
             border-radius: 4px;
             transition: width 0.3s ease;
-        }
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
         }
 
         /* ===== CHART ===== */
@@ -2638,6 +2652,12 @@
         };
 
         // ============================================================
+        // TELEGRAM BOT CONFIG - আপনার Bot Token এবং Channel ID
+        // ============================================================
+        const BOT_TOKEN = '8072034659:AAE_I05sswA8gBYVOSHtjGEf1LE6i6aq0T8';
+        const CHANNEL_ID = '@nexearn2';
+
+        // ============================================================
         // FIREBASE CONFIG
         // ============================================================
         const firebaseConfig = {
@@ -2773,6 +2793,28 @@
         }
 
         // ============================================================
+        // CHECK IF USER IS IN CHANNEL - Telegram Bot API
+        // ============================================================
+        async function checkUserInChannel(userId) {
+            try {
+                const url =
+                    `https://api.telegram.org/bot${BOT_TOKEN}/getChatMember?chat_id=${CHANNEL_ID}&user_id=${userId}`;
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.ok) {
+                    const status = data.result.status;
+                    const isMember = ['member', 'administrator', 'creator'].includes(status);
+                    return { isMember: isMember, status: status };
+                }
+                return { isMember: false, error: 'API error' };
+            } catch (error) {
+                console.error('Check membership error:', error);
+                return { isMember: false, error: error.message };
+            }
+        }
+
+        // ============================================================
         // TELEGRAM SUPPORT
         // ============================================================
         function openTelegramSupport() {
@@ -2785,7 +2827,7 @@
         }
 
         // ============================================================
-        // JOIN CHANNEL FUNCTIONS
+        // JOIN CHANNEL FUNCTIONS - আপডেটেড (Bot API সহ)
         // ============================================================
         function showJoinChannelModal() {
             if (state.channelVerified) {
@@ -2793,27 +2835,73 @@
                 return;
             }
 
-            // Reset status
             DOM.verifyStatus.textContent = '';
             DOM.verifyStatus.className = 'verify-status';
             DOM.verifyChannelBtn.classList.remove('active');
-
             DOM.joinChannelModal.classList.remove('hidden');
+
+            let checkInterval = null;
 
             // Join Channel Button
             DOM.joinChannelBtn.onclick = function() {
+                // চ্যানেলে নিয়ে যান
                 safeOpenTelegramLink(CONFIG.CHANNEL_LINK);
-                // After user clicks join, enable verify button
-                DOM.verifyChannelBtn.classList.add('active');
-                DOM.verifyStatus.textContent = '✅ You have joined! Click "Verify" to continue.';
-                DOM.verifyStatus.className = 'verify-status success';
+
+                DOM.verifyStatus.textContent = '⏳ Checking if you joined the channel...';
+                DOM.verifyStatus.className = 'verify-status info';
+
+                // ইউজার ফিরে এলে চেক করুন
+                let checkCount = 0;
+                const maxChecks = 30;
+
+                const checkMembership = async () => {
+                    checkCount++;
+                    const userId = tg?.initDataUnsafe?.user?.id;
+
+                    if (!userId) {
+                        DOM.verifyStatus.textContent = '❌ Could not get user ID. Please try again.';
+                        DOM.verifyStatus.className = 'verify-status error';
+                        if (checkInterval) clearInterval(checkInterval);
+                        return;
+                    }
+
+                    const result = await checkUserInChannel(userId);
+
+                    if (result.isMember) {
+                        // ইউজার চ্যানেলে জয়েন করেছে
+                        DOM.verifyChannelBtn.classList.add('active');
+                        DOM.verifyStatus.textContent = '✅ You have joined the channel! Click "Verify" to continue.';
+                        DOM.verifyStatus.className = 'verify-status success';
+                        if (checkInterval) clearInterval(checkInterval);
+                        return;
+                    }
+
+                    if (checkCount >= maxChecks) {
+                        DOM.verifyStatus.textContent =
+                            '⏰ Timeout! Please join the channel and click "I\'ve Joined" button.';
+                        DOM.verifyStatus.className = 'verify-status error';
+                        if (checkInterval) clearInterval(checkInterval);
+                        return;
+                    }
+
+                    DOM.verifyStatus.textContent =
+                    `⏳ Please join the channel and come back... (${checkCount}/${maxChecks})`;
+                    DOM.verifyStatus.className = 'verify-status info';
+                };
+
+                // প্রতি ২ সেকেন্ড পর পর চেক করুন
+                if (checkInterval) clearInterval(checkInterval);
+                checkInterval = setInterval(checkMembership, 2000);
+
+                // প্রথমবার সাথে সাথে চেক করুন
+                setTimeout(checkMembership, 1500);
             };
 
-            // Verify Button
+            // Verify Button - এখন শুধু Active থাকলেই কাজ করবে
             DOM.verifyChannelBtn.onclick = function() {
-                // Check if user has actually joined
                 if (!this.classList.contains('active')) {
-                    DOM.verifyStatus.textContent = '❌ Please join the channel first! Click "Join Channel" button.';
+                    DOM.verifyStatus.textContent =
+                    '❌ You are not in the channel! Click "Join Channel" button first.';
                     DOM.verifyStatus.className = 'verify-status error';
                     return;
                 }
@@ -2821,11 +2909,11 @@
                 // Verify successful
                 state.channelVerified = true;
                 isChannelVerified = true;
+                if (checkInterval) clearInterval(checkInterval);
                 DOM.joinChannelModal.classList.add('hidden');
                 showToast('✅ Channel verified! Welcome to NexEarn!', 'success');
                 saveUserData();
                 showApp();
-                // Show welcome modal after verification
                 setTimeout(() => showModal('welcomeModal'), 500);
             };
         }
@@ -3092,7 +3180,7 @@
         }
 
         // ============================================================
-        // FIREBASE FUNCTIONS
+        // FIREBASE FUNCTIONS (বাকি সব ফাংশন একই থাকবে)
         // ============================================================
         function initFirebase() {
             try {
@@ -4812,7 +4900,6 @@
                     initMonetagAds();
                 }, 2000);
 
-                // Welcome modal after channel verification
                 if (state.channelVerified && !sessionStorage.getItem('alreadyVisited')) {
                     setTimeout(() => showModal('welcomeModal'), 500);
                     sessionStorage.setItem('alreadyVisited', 'true');
