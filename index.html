@@ -15,8 +15,9 @@
     </script>
     <script src='//libtl.com/sdk.js' data-zone='11573980' data-sdk='show_11573980'>
     </script>
+    <!-- باقی স্টাইল একই থাকবে -->
     <style>
-        /* ===== ALL EXISTING STYLES REMAIN ===== */
+        /* সব স্টাইল একই রাখুন - আপনার দেওয়া কোডের স্টাইল */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
         :root {
@@ -2487,7 +2488,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- JAVASCRIPT -->
+    <!-- JAVASCRIPT (সমাধানকৃত) -->
     <!-- ============================================================ -->
     <script>
         // ============================================================
@@ -2709,24 +2710,6 @@
                 lastKnownBalance = currentBalance;
             }, 5000);
         }
-
-        const originalSaveUserData = saveUserData;
-        saveUserData = function() {
-            window._legitimateBalanceChange = true;
-            originalSaveUserData.call(this);
-        };
-
-        const originalWatchAd = watchAd;
-        watchAd = async function() {
-            window._legitimateBalanceChange = true;
-            await originalWatchAd.call(this);
-        };
-
-        const originalHandleWithdrawal = handleWithdrawal;
-        handleWithdrawal = async function(e) {
-            window._legitimateWithdrawal = true;
-            await originalHandleWithdrawal.call(this, e);
-        };
 
         // ============================================================
         // BAN SYSTEM
@@ -4528,27 +4511,38 @@
         }
 
         // ============================================================
-        // INITIALIZATION (Fixed Preloader)
+        // INITIALIZATION (সমাধানকৃত)
         // ============================================================
         async function initApp() {
-            let ready = false;
-            let loaderDone = false;
+            let isAppReady = false;
+            let isLoaderComplete = false;
+            let preloaderClosed = false;
 
-            // Force close preloader after 10 seconds (if stuck)
+            // ফোর্স ক্লোজ - ৮ সেকেন্ড পর যদি না খোলে
             const forceTimeout = setTimeout(() => {
-                if (!loaderDone) {
-                    loaderDone = true;
-                    finishLoading();
+                if (!preloaderClosed) {
+                    console.warn("⚠️ Force closing preloader due to timeout");
+                    forceClosePreloader();
                 }
-                if (!ready) {
-                    ready = true;
-                    finishLoading();
-                }
-            }, 10000);
+            }, 8000);
+
+            const forceClosePreloader = () => {
+                if (preloaderClosed) return;
+                preloaderClosed = true;
+                DOM.preloader.style.opacity = '0';
+                DOM.preloaderFooter.style.opacity = '0';
+                setTimeout(() => {
+                    DOM.preloader.style.display = 'none';
+                    DOM.preloaderFooter.style.display = 'none';
+                    DOM.container.style.display = 'block';
+                }, 400);
+                clearTimeout(forceTimeout);
+            };
 
             const finishLoading = () => {
-                if (ready && loaderDone) {
-                    clearTimeout(forceTimeout);
+                if (preloaderClosed) return;
+                if (isAppReady && isLoaderComplete) {
+                    preloaderClosed = true;
                     DOM.preloader.style.opacity = '0';
                     DOM.preloaderFooter.style.opacity = '0';
                     setTimeout(() => {
@@ -4556,36 +4550,44 @@
                         DOM.preloaderFooter.style.display = 'none';
                         DOM.container.style.display = 'block';
                     }, 400);
+                    clearTimeout(forceTimeout);
                 }
             };
 
+            // লোডার অ্যানিমেশন
             let pct = 0;
             const loaderInterval = setInterval(() => {
-                pct += Math.floor(Math.random() * 4) + 1;
+                pct += Math.floor(Math.random() * 5) + 2;
                 if (pct > 100) pct = 100;
                 DOM.preloaderPercentage.textContent = `${pct}%`;
                 DOM.loaderBar.style.width = `${pct}%`;
                 if (pct >= 100) {
                     clearInterval(loaderInterval);
-                    loaderDone = true;
+                    isLoaderComplete = true;
                     finishLoading();
                 }
             }, 80);
 
             try {
+                // DOM ইনিশিয়ালাইজ
                 initDOM();
 
+                // Firebase কানেক্ট
                 if (!initFirebase()) {
                     throw new Error("Firebase initialization failed");
                 }
 
+                // ইউজার আইডি সেট
                 const user = tg?.initDataUnsafe?.user || { first_name: 'User', id: 'testuser_' + Date.now() };
                 state.currentUserId = user.id || 'testuser';
                 state.jobCount = 0;
 
-                await loadConfigFromFirebase();
-                await loadUserData();
-                await loadBonusTasks();
+                // সব অ্যাসিঙ্ক অপারেশন সমান্তরালে
+                await Promise.all([
+                    loadConfigFromFirebase(),
+                    loadUserData(),
+                    loadBonusTasks()
+                ]);
 
                 populateWithdrawalMethods();
                 DOM.welcomeTitle.textContent = CONFIG.welcomeNotice.title;
@@ -4594,6 +4596,7 @@
                 await handleReferral();
                 await processReferralRewards();
 
+                // ইভেন্ট লিসেনার
                 listenReferrals();
                 listenAds();
                 listenUserVerifications();
@@ -4607,6 +4610,7 @@
 
                 state.currentIp = await getIpAddress();
 
+                // ইভেন্ট অ্যাটাচ
                 DOM.watchAdBtn.addEventListener('click', openWatchEarn);
                 DOM.joinChannelBtn.addEventListener('click', () => safeOpenTelegramLink(CONFIG.CHANNEL_LINK));
                 DOM.supportBtn.addEventListener('click', () => safeOpenTelegramLink(CONFIG.SUPPORT_LINK));
@@ -4627,6 +4631,7 @@
                     }
                 };
 
+                // Telegram Theme
                 if (tg) {
                     tg.ready();
                     tg.expand();
@@ -4653,27 +4658,32 @@
                 console.log("✅ NexEarn initialized successfully!");
                 console.log("👤 User ID:", state.currentUserId);
                 console.log("💰 Balance:", state.balance);
-                console.log("🔒 Security: Active");
-                console.log("📺 Watch & Earn: Loaded");
 
-                ready = true;
+                isAppReady = true;
                 finishLoading();
 
             } catch (error) {
                 console.error("Init error:", error);
                 showToast('❌ Failed to load app. Please refresh.', 'error');
-                ready = true;
+                isAppReady = true;
                 finishLoading();
             } finally {
                 clearInterval(loaderInterval);
-                if (!loaderDone) {
-                    loaderDone = true;
+                // নিশ্চিত করা যে লোডার বন্ধ হবে
+                if (!isLoaderComplete) {
+                    isLoaderComplete = true;
                     finishLoading();
                 }
-                if (!ready) {
-                    ready = true;
+                if (!isAppReady) {
+                    isAppReady = true;
                     finishLoading();
                 }
+                // ফোর্স ক্লোজ যদি ২ সেকেন্ড পরেও না খোলে
+                setTimeout(() => {
+                    if (!preloaderClosed) {
+                        forceClosePreloader();
+                    }
+                }, 2000);
                 clearTimeout(forceTimeout);
             }
         }
