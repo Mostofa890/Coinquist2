@@ -2948,7 +2948,7 @@
         function loadConfigFromFirebase() {
             return new Promise((resolve) => {
                 if (!firebaseDb) { resolve(); return; }
-                firebaseDb.ref('adminConfig').on('value', (snapshot) => {
+                firebaseDb.ref('adminConfig').once('value').then((snapshot) => {
                     const data = snapshot.val();
                     if (data) {
                         if (data.adReward) CONFIG.AD_REWARD = data.adReward;
@@ -2964,14 +2964,14 @@
                         console.log("✅ Config loaded from Firebase");
                     }
                     resolve();
-                });
+                }).catch(() => resolve());
             });
         }
 
         function loadBonusTasks() {
             return new Promise((resolve) => {
                 if (!firebaseDb) { resolve(); return; }
-                firebaseDb.ref('bonusTasks').on('value', (snapshot) => {
+                firebaseDb.ref('bonusTasks').once('value').then((snapshot) => {
                     const data = snapshot.val();
                     if (data && Array.isArray(data)) {
                         state.bonusTasks = data;
@@ -2979,7 +2979,7 @@
                         renderBonusTasks();
                     }
                     resolve();
-                });
+                }).catch(() => resolve());
             });
         }
 
@@ -4528,13 +4528,27 @@
         }
 
         // ============================================================
-        // INITIALIZATION
+        // INITIALIZATION (Fixed Preloader)
         // ============================================================
         async function initApp() {
             let ready = false;
             let loaderDone = false;
+
+            // Force close preloader after 10 seconds (if stuck)
+            const forceTimeout = setTimeout(() => {
+                if (!loaderDone) {
+                    loaderDone = true;
+                    finishLoading();
+                }
+                if (!ready) {
+                    ready = true;
+                    finishLoading();
+                }
+            }, 10000);
+
             const finishLoading = () => {
                 if (ready && loaderDone) {
+                    clearTimeout(forceTimeout);
                     DOM.preloader.style.opacity = '0';
                     DOM.preloaderFooter.style.opacity = '0';
                     setTimeout(() => {
@@ -4544,6 +4558,7 @@
                     }, 400);
                 }
             };
+
             let pct = 0;
             const loaderInterval = setInterval(() => {
                 pct += Math.floor(Math.random() * 4) + 1;
@@ -4556,51 +4571,62 @@
                     finishLoading();
                 }
             }, 80);
+
             try {
                 initDOM();
+
                 if (!initFirebase()) {
                     throw new Error("Firebase initialization failed");
                 }
+
                 const user = tg?.initDataUnsafe?.user || { first_name: 'User', id: 'testuser_' + Date.now() };
                 state.currentUserId = user.id || 'testuser';
                 state.jobCount = 0;
+
                 await loadConfigFromFirebase();
                 await loadUserData();
                 await loadBonusTasks();
+
                 populateWithdrawalMethods();
                 DOM.welcomeTitle.textContent = CONFIG.welcomeNotice.title;
                 DOM.welcomeMessage.textContent = CONFIG.welcomeNotice.message;
+
                 await handleReferral();
                 await processReferralRewards();
+
                 listenReferrals();
                 listenAds();
                 listenUserVerifications();
                 listenVerificationApprovals();
-                // Load tiers
                 loadTiers();
+
                 if (user?.first_name) {
                     DOM.greeting.textContent = `Welcome, ${escapeHTML(user.first_name)}!`;
                     DOM.profilePic.innerHTML = `<span>${escapeHTML(user.first_name.charAt(0))}</span>`;
                 }
+
                 state.currentIp = await getIpAddress();
-                // Watch button now opens Watch & Earn
+
                 DOM.watchAdBtn.addEventListener('click', openWatchEarn);
                 DOM.joinChannelBtn.addEventListener('click', () => safeOpenTelegramLink(CONFIG.CHANNEL_LINK));
                 DOM.supportBtn.addEventListener('click', () => safeOpenTelegramLink(CONFIG.SUPPORT_LINK));
                 DOM.copyLinkBtn.addEventListener('click', copyReferralLink);
                 DOM.shareLinkBtn.addEventListener('click', shareReferralLink);
                 DOM.withdrawForm.addEventListener('submit', handleWithdrawal);
+
                 document.addEventListener('click', (e) => {
                     if (DOM.ratingToast.classList.contains('active') && !DOM.ratingToast.contains(e.target) && !e
                         .target.closest('.action-btn.rate')) {
                         DOM.ratingToast.classList.remove('active');
                     }
                 });
+
                 window.onclick = (event) => {
                     if (event.target.classList.contains('modal')) {
                         closeModal(event.target.id);
                     }
                 };
+
                 if (tg) {
                     tg.ready();
                     tg.expand();
@@ -4609,34 +4635,46 @@
                         updateChart();
                     });
                 }
+
                 setTimeout(() => {
                     initMonetagAds();
                 }, 2000);
+
                 if (!sessionStorage.getItem('alreadyVisited')) {
                     setTimeout(() => showModal('welcomeModal'), 500);
                     sessionStorage.setItem('alreadyVisited', 'true');
                 }
+
                 setupBalanceProtection();
                 checkBanStatus();
                 checkMaintenanceMode();
                 updateUI();
+
                 console.log("✅ NexEarn initialized successfully!");
                 console.log("👤 User ID:", state.currentUserId);
                 console.log("💰 Balance:", state.balance);
                 console.log("🔒 Security: Active");
                 console.log("📺 Watch & Earn: Loaded");
+
+                ready = true;
+                finishLoading();
+
             } catch (error) {
                 console.error("Init error:", error);
                 showToast('❌ Failed to load app. Please refresh.', 'error');
-            } finally {
                 ready = true;
-                if (pct < 100) {
-                    clearInterval(loaderInterval);
-                    DOM.preloaderPercentage.textContent = '100%';
-                    DOM.loaderBar.style.width = '100%';
-                    loaderDone = true;
-                }
                 finishLoading();
+            } finally {
+                clearInterval(loaderInterval);
+                if (!loaderDone) {
+                    loaderDone = true;
+                    finishLoading();
+                }
+                if (!ready) {
+                    ready = true;
+                    finishLoading();
+                }
+                clearTimeout(forceTimeout);
             }
         }
 
