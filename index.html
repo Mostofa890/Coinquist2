@@ -24,9 +24,9 @@
             --primary-dark: #4A42D4;
             --secondary: #FF6B6B;
             --accent: #FFD93D;
-            --success: #10B981;
-            --warning: #F59E0B;
-            --danger: #EF4444;
+            --gradient-main: linear-gradient(135deg, #6C63FF, #4A42D4);
+            --gradient-warm: linear-gradient(135deg, #FF6B6B, #FF8E53);
+            --gradient-gold: linear-gradient(135deg, #FFD93D, #F59E0B);
             --bg: #F0F2F8;
             --card: #FFFFFF;
             --text: #1A1A2E;
@@ -37,9 +37,10 @@
             --radius: 20px;
             --radius-sm: 12px;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --gradient-main: linear-gradient(135deg, #6C63FF, #4A42D4);
-            --gradient-accent: linear-gradient(135deg, #FF6B6B, #FF8E53);
-            --gradient-gold: linear-gradient(135deg, #FFD93D, #F59E0B);
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --info: #3B82F6;
         }
 
         [data-theme="dark"] {
@@ -1008,6 +1009,116 @@
                 padding: 20px 16px 100px 16px;
             }
         }
+
+        /* Bonus item */
+        .bonus-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px;
+            background: var(--bg);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
+            gap: 12px;
+        }
+        .bonus-item .details {
+            flex: 1;
+            min-width: 0;
+        }
+        .bonus-item .title {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text);
+        }
+        .bonus-item .reward {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .bonus-item .claim-btn {
+            padding: 8px 18px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 8px;
+            background: var(--gradient-main);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            font-family: inherit;
+        }
+        .bonus-item .claim-btn:disabled {
+            background: var(--success);
+            cursor: not-allowed;
+        }
+        .bonus-item .claim-btn:hover:not(:disabled) {
+            transform: scale(1.03);
+        }
+
+        .history-item {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        .history-details {
+            flex: 1;
+            min-width: 0;
+        }
+        .history-details .method {
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .history-details .date {
+            font-size: 11px;
+            color: var(--text-light);
+        }
+        .history-amount {
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .history-amount .amount-text {
+            font-size: 16px;
+            font-weight: 800;
+        }
+        .history-status {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-top: 2px;
+        }
+        .history-status.approved {
+            color: var(--success);
+            background: rgba(16, 185, 129, 0.1);
+        }
+        .history-status.pending {
+            color: var(--warning);
+            background: rgba(245, 158, 11, 0.1);
+        }
+        .history-status.rejected {
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--text-light);
+        }
+        .empty-state i {
+            font-size: 40px;
+            margin-bottom: 12px;
+            opacity: 0.3;
+        }
     </style>
 </head>
 <body>
@@ -1611,16 +1722,29 @@
                         DOM.adLoaderFill.style.width = progress + '%';
                         if (progress >= 100) clearInterval(interval);
                     }, 300);
-                    show_11573980().then(() => {
-                        clearInterval(interval);
-                        DOM.adLoaderFill.style.width = '100%';
-                        setTimeout(() => { DOM.adLoader.classList.remove('active');
-                            resolve(true); }, 500);
-                    }).catch(() => {
-                        clearInterval(interval);
-                        DOM.adLoader.classList.remove('active');
-                        resolve(false);
-                    });
+
+                    // Monetag ad call - proper implementation
+                    const adResult = show_11573980();
+                    if (adResult && typeof adResult.then === 'function') {
+                        adResult.then(() => {
+                            clearInterval(interval);
+                            DOM.adLoaderFill.style.width = '100%';
+                            setTimeout(() => { DOM.adLoader.classList.remove('active');
+                                resolve(true); }, 500);
+                        }).catch(() => {
+                            clearInterval(interval);
+                            DOM.adLoader.classList.remove('active');
+                            resolve(false);
+                        });
+                    } else {
+                        // Fallback for non-promise SDK
+                        setTimeout(() => {
+                            clearInterval(interval);
+                            DOM.adLoader.classList.remove('active');
+                            resolve(true);
+                        }, 5000);
+                    }
+
                     setTimeout(() => {
                         clearInterval(interval);
                         DOM.adLoader.classList.remove('active');
@@ -1637,7 +1761,6 @@
                 let countdown = CONFIG.AD_DURATION;
                 let elapsed = 0;
                 let clicked = false;
-                const circumference = 100;
 
                 DOM.adOverlay.classList.add('active');
                 DOM.adTimer.textContent = countdown;
@@ -1675,7 +1798,6 @@
 
                     if (countdown <= 0) {
                         clearInterval(interval);
-                        const total = (Date.now() - adStartTime) / 1000;
                         if (!clicked) {
                             DOM.adWarning.textContent = '⏳ Click the ad now!';
                             DOM.adWarning.style.color = 'var(--warning)';
@@ -1701,7 +1823,6 @@
                         resolve(shown);
                     }
                 }, 1000);
-                let adStartTime = Date.now();
             });
         }
 
@@ -1762,7 +1883,7 @@
         function copyReferral() {
             const link = getReferralLink();
             navigator.clipboard.writeText(link).then(() => showToast('✅ Copied!', 'success')).catch(() => showToast(
-            'Could not copy.', 'error'));
+                'Could not copy.', 'error'));
         }
 
         function copyReferralFull() { copyReferral(); }
@@ -1923,15 +2044,19 @@
         function renderHistory() {
             if (!state.history.length) {
                 DOM.historyList.innerHTML =
-                    `<div style="text-align:center; padding:30px 20px; color:var(--text-light);"><i class="fa-solid fa-clock-rotate-left" style="font-size:40px; opacity:0.3; display:block; margin-bottom:12px;"></i><p>No withdrawal history</p></div>`;
+                    `<div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><p>No withdrawal history</p></div>`;
                 return;
             }
             DOM.historyList.innerHTML = state.history.map(item => `
-                <div style="padding:12px 0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
-                    <div><div style="font-weight:700; font-size:14px;">${esc(item.method)} - ${esc(item.number)}</div>
-                    <div style="font-size:11px; color:var(--text-light);">${new Date(item.date).toLocaleString()}</div></div>
-                    <div style="text-align:right;"><div style="font-weight:800;">${CONFIG.CURRENCY}${item.amount.toFixed(2)}</div>
-                    <span style="font-size:11px; font-weight:700; padding:2px 10px; border-radius:12px; background:${item.status === 'Approved' ? 'rgba(16,185,129,0.1)' : item.status === 'Rejected' ? 'rgba(239,68,68,0.1)' : 'rgba(245,158,11,0.1)'}; color:${item.status === 'Approved' ? 'var(--success)' : item.status === 'Rejected' ? 'var(--danger)' : 'var(--warning)'};">${item.status}</span></div>
+                <div class="history-item">
+                    <div class="history-details">
+                        <div class="method">${esc(item.method)} - ${esc(item.number)}</div>
+                        <div class="date">${new Date(item.date).toLocaleString()}</div>
+                    </div>
+                    <div class="history-amount">
+                        <div class="amount-text">${CONFIG.CURRENCY}${item.amount.toFixed(2)}</div>
+                        <span class="history-status ${item.status.toLowerCase()}">${item.status}</span>
+                    </div>
                 </div>
             `).join('');
         }
@@ -1939,16 +2064,18 @@
         function renderBonus() {
             if (!state.bonusTasks.length) {
                 DOM.bonusList.innerHTML =
-                    `<div style="text-align:center; padding:30px 20px; color:var(--text-light);"><i class="fa-solid fa-star" style="font-size:40px; opacity:0.3; display:block; margin-bottom:12px;"></i><p>No bonus tasks available</p></div>`;
+                    `<div class="empty-state"><i class="fa-solid fa-star"></i><p>No bonus tasks available</p></div>`;
                 return;
             }
             DOM.bonusList.innerHTML = state.bonusTasks.map(task => {
                 const done = state.bonusDone.includes(task.id);
                 return `
-                    <div style="display:flex; align-items:center; justify-content:space-between; padding:14px; background:var(--bg); border-radius:12px; margin-bottom:10px; border:1px solid var(--border);">
-                        <div><div style="font-weight:600; font-size:14px;">${esc(task.title)}</div>
-                        <div style="font-size:13px; font-weight:700; color:var(--primary);"><i class="fa-solid fa-gift"></i> + ${CONFIG.CURRENCY}${(task.reward * 80).toFixed(2)}</div></div>
-                        <button class="claim-btn" ${done ? 'disabled' : ''} data-id="${task.id}" data-reward="${task.reward}" data-link="${task.link}" data-duration="${task.duration || 10}" style="padding:8px 18px; font-size:12px; font-weight:600; border-radius:8px; background:${done ? 'var(--success)' : 'var(--gradient-main)'}; color:white; border:none; cursor:${done ? 'default' : 'pointer'}; transition:var(--transition); font-family:inherit;">${done ? '✅ Completed' : 'Claim'}</button>
+                    <div class="bonus-item">
+                        <div class="details">
+                            <div class="title">${esc(task.title)}</div>
+                            <div class="reward"><i class="fa-solid fa-gift"></i> + ${CONFIG.CURRENCY}${(task.reward * 80).toFixed(2)}</div>
+                        </div>
+                        <button class="claim-btn" ${done ? 'disabled' : ''} data-id="${task.id}" data-reward="${task.reward}" data-link="${task.link}" data-duration="${task.duration || 10}">${done ? '✅ Completed' : 'Claim'}</button>
                     </div>
                 `;
             }).join('');
@@ -2128,7 +2255,6 @@
         function showJoin() {
             DOM.joinModal.classList.add('active');
             renderChannelButtons();
-            // Auto-check channels
             setTimeout(() => {
                 const checkBtn = document.getElementById('verifyBtn');
                 if (checkBtn) checkBtn.click();
@@ -2139,7 +2265,6 @@
             DOM.container.classList.add('active');
             updateUI();
             startDailyReset();
-            // Setup theme
             if (tg?.colorScheme) {
                 document.documentElement.setAttribute('data-theme', tg.colorScheme);
                 tg.onEvent('themeChanged', () => {
