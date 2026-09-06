@@ -1,4 +1,3 @@
-html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -396,7 +395,7 @@ html
             }
         }
 
-        /* ===== PROFILE HEADER (NexEarn Support Style) ===== */
+        /* ===== PROFILE HEADER ===== */
         .profile-header {
             display: flex;
             align-items: center;
@@ -473,7 +472,7 @@ html
             font-size: 14px;
         }
 
-        /* ===== BALANCE CARD (Modern) ===== */
+        /* ===== BALANCE CARD ===== */
         .balance-card {
             background: var(--gradient);
             color: white;
@@ -1289,7 +1288,7 @@ html
     <!-- MAIN CONTAINER -->
     <!-- ============================================================ -->
     <div class="container">
-        <!-- ===== PROFILE HEADER (NexEarn Support Style) ===== -->
+        <!-- ===== PROFILE HEADER ===== -->
         <div class="profile-header">
             <div class="profile-left">
                 <div class="profile-avatar" id="profileAvatar">NS</div>
@@ -1618,6 +1617,9 @@ html
             DOM.bonusPage = document.getElementById('bonusPage');
             DOM.welcomeTitle = document.getElementById('welcome-title');
             DOM.welcomeMessage = document.getElementById('welcome-message');
+            // Ad loader
+            DOM.adLoaderOverlay = document.getElementById('ad-loader-overlay');
+            DOM.adLoaderProgress = document.getElementById('ad-loader-progress');
         }
 
         // ============================================================
@@ -1937,15 +1939,38 @@ html
                     }
                     console.log("🔄 Showing Monetag rewarded ad...");
                     
+                    // Show loader
+                    DOM.adLoaderOverlay.style.display = 'flex';
+                    DOM.adLoaderProgress.style.width = '0%';
+                    
+                    let progress = 0;
+                    const progressInterval = setInterval(() => {
+                        progress += Math.random() * 10 + 5;
+                        if (progress > 100) progress = 100;
+                        DOM.adLoaderProgress.style.width = progress + '%';
+                        if (progress >= 100) clearInterval(progressInterval);
+                    }, 300);
+                    
+                    // Call Monetag ad
                     show_11573980().then(() => {
-                        console.log("✅ Ad completed - Reward granted!");
-                        resolve(true);
+                        clearInterval(progressInterval);
+                        DOM.adLoaderProgress.style.width = '100%';
+                        setTimeout(() => {
+                            DOM.adLoaderOverlay.style.display = 'none';
+                            console.log("✅ Ad completed - Reward granted!");
+                            resolve(true);
+                        }, 500);
                     }).catch((err) => {
+                        clearInterval(progressInterval);
+                        DOM.adLoaderOverlay.style.display = 'none';
                         console.warn("Ad error:", err);
                         resolve(false);
                     });
                     
+                    // Fallback timeout
                     setTimeout(() => {
+                        clearInterval(progressInterval);
+                        DOM.adLoaderOverlay.style.display = 'none';
                         console.warn("Ad timeout - resolving false");
                         resolve(false);
                     }, 30000);
@@ -2062,7 +2087,7 @@ html
         }
 
         // ============================================================
-        // WATCH AD - Main Function
+        // WATCH AD - Main Function (Fixed)
         // ============================================================
         async function startWatchingAd() {
             if (isBanned) {
@@ -2071,7 +2096,7 @@ html
             }
             if (isWatchingAd) return;
             if (DOM.adCountdownOverlay.classList.contains('active')) return;
-            if (document.getElementById('ad-loader-overlay').style.display === 'flex') return;
+            if (DOM.adLoaderOverlay.style.display === 'flex') return;
 
             if (state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT) {
                 showToast(`📊 Daily limit reached! (${CONFIG.DAILY_AD_LIMIT})`, 'warning');
@@ -2843,6 +2868,19 @@ html
         }
 
         // ============================================================
+        // LOAD TIERS FROM FIREBASE (for any future use)
+        // ============================================================
+        function loadTiers() {
+            if (!firebaseDb) return;
+            firebaseDb.ref('adTiers').orderByChild('order').on('value', (snapshot) => {
+                const data = snapshot.val() || {};
+                const tiers = Object.entries(data).map(([id, tier]) => ({ id, ...tier }));
+                tiers.sort((a, b) => (a.order || a.createdAt || 0) - (b.order || b.createdAt || 0));
+                state.tiers = tiers;
+            });
+        }
+
+        // ============================================================
         // INITIALIZATION
         // ============================================================
         async function initApp() {
@@ -2932,6 +2970,7 @@ html
                 await processReferralRewards();
 
                 listenReferrals();
+                loadTiers();
 
                 if (user?.first_name) {
                     const initial = user.first_name.charAt(0).toUpperCase();
@@ -2940,10 +2979,6 @@ html
                 }
 
                 state.currentIp = await getIpAddress();
-
-                document.addEventListener('click', (e) => {
-                    // Close modals if clicking outside
-                });
 
                 window.onclick = (event) => {
                     if (event.target.classList.contains('modal')) {
