@@ -551,160 +551,104 @@
             gap: 8px;
         }
 
-        /* ===== JOB CARD STYLES ===== */
-        .job-card {
+        /* ===== HOME STATS (Modern Design like Image) ===== */
+        .home-stats {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
             background: var(--card-background);
             border-radius: var(--radius);
+            padding: 20px 16px;
+            margin-bottom: 16px;
             border: 1px solid var(--border-color);
-            padding: 16px;
-            margin-bottom: 14px;
-            cursor: pointer;
-            transition: var(--transition);
             box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
         }
-        .job-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-hover);
+        .home-stat-item {
+            text-align: center;
         }
-        .job-card:active {
-            transform: scale(0.98);
+        .home-stat-item .stat-icon {
+            font-size: 24px;
+            color: var(--primary-color);
+            margin-bottom: 4px;
         }
-        .job-card .job-title {
-            font-size: 17px;
-            font-weight: 700;
-            margin-bottom: 6px;
+        .home-stat-item .stat-value {
+            font-size: 18px;
+            font-weight: 800;
             color: var(--text-color);
         }
-        .job-card .job-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px 12px;
-            margin-bottom: 10px;
-            font-size: 12px;
+        .home-stat-item .stat-label {
+            font-size: 10px;
             color: var(--text-light);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        .job-card .job-meta .category-badge {
-            background: rgba(var(--primary-color-rgb), 0.1);
-            color: var(--primary-color);
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-weight: 600;
+        .home-stat-divider {
+            width: 1px;
+            height: 40px;
+            background: var(--border-color);
         }
-        .job-card .job-meta .sub-category-badge {
-            background: rgba(var(--primary-color-rgb), 0.05);
-            color: var(--text-light);
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-weight: 600;
-        }
-        .job-card .job-creator {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            padding: 8px 0;
-            border-top: 1px solid var(--border-color);
-            border-bottom: 1px solid var(--border-color);
-        }
-        .job-card .creator-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: var(--gradient);
+
+        /* ===== WATCH AD BUTTON ===== */
+        .watch-ad-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 14px;
-            flex-shrink: 0;
-        }
-        .job-card .creator-info {
-            flex: 1;
-            min-width: 0;
-        }
-        .job-card .creator-name {
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--text-color);
-        }
-        .job-card .creator-rating {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 12px;
-            color: var(--text-light);
-        }
-        .job-card .creator-rating .stars {
-            color: #f59e0b;
-        }
-        .job-card .job-stats {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 12px 16px;
-            margin-top: 8px;
-        }
-        .job-card .job-stats .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 13px;
-            color: var(--text-light);
-            background: transparent;
-            padding: 0;
-            border: none;
-            box-shadow: none;
-        }
-        .job-card .job-stats .stat-item .value {
-            font-weight: 700;
-            color: var(--text-color);
-        }
-        .job-card .job-stats .stat-item .value.highlight {
-            color: var(--primary-color);
-        }
-        .job-card .progress-container {
-            flex: 1;
-            min-width: 80px;
-        }
-        .job-card .progress-bar {
+            gap: 12px;
             width: 100%;
-            height: 4px;
-            background: var(--border-color);
-            border-radius: 4px;
+            padding: 18px;
+            border: none;
+            border-radius: var(--radius);
+            background: var(--gradient);
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+            box-shadow: 0 4px 20px rgba(var(--primary-color-rgb), 0.25);
+            margin-bottom: 16px;
+            position: relative;
             overflow: hidden;
         }
-        .job-card .progress-bar .fill {
-            height: 100%;
-            background: var(--gradient);
-            border-radius: 4px;
-            transition: width 0.5s ease;
+        .watch-ad-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            animation: shimmer 3s ease-in-out infinite;
         }
-        .job-card .progress-label {
-            font-size: 11px;
-            color: var(--text-light);
-            margin-top: 2px;
-            display: flex;
-            justify-content: space-between;
+        @keyframes shimmer {
+            0%, 100% { transform: translateX(-30%) translateY(-30%); }
+            50% { transform: translateX(30%) translateY(30%); }
         }
-        .job-card .reward-amount {
-            font-size: 16px;
-            font-weight: 800;
-            color: var(--success);
-            white-space: nowrap;
+        .watch-ad-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(var(--primary-color-rgb), 0.35);
         }
-        .job-card .days-left {
+        .watch-ad-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .watch-ad-btn .btn-icon {
+            font-size: 24px;
+            position: relative;
+            z-index: 1;
+        }
+        .watch-ad-btn .btn-text {
+            position: relative;
+            z-index: 1;
+        }
+        .watch-ad-btn .btn-sub {
             font-size: 12px;
-            color: var(--text-light);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .job-card .days-left .days {
-            font-weight: 700;
-            color: var(--text-color);
+            font-weight: 400;
+            opacity: 0.8;
+            position: relative;
+            z-index: 1;
         }
 
         /* ===== HOME COUNTDOWN (24 Hours) ===== */
@@ -1195,6 +1139,12 @@
             }
             #adCountdownOverlay .timer-text {
                 font-size: 48px;
+            }
+            .home-stat-item .stat-value {
+                font-size: 16px;
+            }
+            .home-stat-item .stat-icon {
+                font-size: 20px;
             }
         }
         @media (min-width: 481px) {
@@ -2590,44 +2540,37 @@
             <div class="amount" id="total-earning">৳0.0</div>
         </div>
 
-        <!-- ===== STATS ===== -->
-        <div class="stats-grid">
-            <div class="stat-item">
-                <i class="fa-solid fa-rectangle-ad bg-icon"></i>
-                <div class="icon"><i class="fa-solid fa-rectangle-ad"></i></div>
-                <div class="value" id="ad-count">0</div>
-                <div class="label">Ads Watched</div>
+        <!-- ===== HOME STATS (Modern Design like Image) ===== -->
+        <div class="home-stats">
+            <div class="home-stat-item">
+                <div class="stat-icon"><i class="fa-solid fa-eye"></i></div>
+                <div class="stat-value" id="ad-count">0</div>
+                <div class="stat-label">Ads Watched</div>
             </div>
-            <div class="stat-item">
-                <i class="fa-solid fa-calendar-day bg-icon"></i>
-                <div class="icon"><i class="fa-solid fa-calendar-day"></i></div>
-                <div class="value" id="ads-today-count">0 / 15</div>
-                <div class="label">Today's Ads</div>
+            <div class="home-stat-divider"></div>
+            <div class="home-stat-item">
+                <div class="stat-icon"><i class="fa-solid fa-calendar-day"></i></div>
+                <div class="stat-value" id="ads-today-count">0 / 15</div>
+                <div class="stat-label">Today's Ads</div>
             </div>
-            <div class="stat-item">
-                <i class="fa-solid fa-users bg-icon"></i>
-                <div class="icon"><i class="fa-solid fa-users"></i></div>
-                <div class="value" id="referral-count">0</div>
-                <div class="label">Referrals</div>
+            <div class="home-stat-divider"></div>
+            <div class="home-stat-item">
+                <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+                <div class="stat-value" id="referral-count">0</div>
+                <div class="stat-label">Referrals</div>
             </div>
         </div>
 
-        <!-- ===== MAIN VIEW ===== -->
-        <div id="mainView">
-            <div class="card">
-                <div class="card-title">
-                    📋 Available Jobs
-                    <span id="jobs-count-badge" style="display:inline-block; background:rgba(var(--primary-color-rgb),0.1); color:var(--primary-color); padding:2px 12px; border-radius:20px; font-size:13px; font-weight:600; margin-left:8px;">0</span>
-                    <button class="filter-btn" style="margin-left:auto; padding:4px 12px;" onclick="openAllJobs()">View All <i class="fa-solid fa-arrow-right"></i></button>
-                </div>
-                <div id="job-list-container"></div>
-            </div>
-
-            <div class="card" style="cursor:pointer;" onclick="openWatchEarn()">
-                <div class="card-title">🎯 Today's Task <span style="margin-left:auto; font-size:13px; color:var(--text-light);">⏩</span></div>
-                <div id="homeCountdown"></div>
-            </div>
-        </div>
+        <!-- ===== WATCH AD BUTTON ===== -->
+        <button class="watch-ad-btn" id="watchAdBtn" onclick="startWatchingAd()">
+            <span class="btn-icon"><i class="fa-solid fa-play-circle"></i></span>
+            <span>
+                <span class="btn-text" id="watchAdText">Watch Ad</span>
+                <br>
+                <span class="btn-sub" id="watchAdSub">Earn ৳0.08 per ad</span>
+            </span>
+        </button>
+        <div id="homeCountdown"></div>
 
         <!-- ===== CHART ===== -->
         <div class="card">
@@ -2877,6 +2820,7 @@
         let adStartTime = 0;
         let channelLinks = [];
         let homeCountdownInterval = null;
+        let isWatchingAd = false;
 
         // ============================================================
         // STATE
@@ -2935,6 +2879,9 @@
             DOM.adCount = document.getElementById('ad-count');
             DOM.adsTodayCount = document.getElementById('ads-today-count');
             DOM.referralCount = document.getElementById('referral-count');
+            DOM.watchAdBtn = document.getElementById('watchAdBtn');
+            DOM.watchAdText = document.getElementById('watchAdText');
+            DOM.watchAdSub = document.getElementById('watchAdSub');
             DOM.supportBtn = document.getElementById('admin-contact-button');
             DOM.historyList = document.getElementById('history-list');
             DOM.bonusTasksList = document.getElementById('bonus-tasks-list');
@@ -3305,53 +3252,22 @@
                         return;
                     }
                     console.log("🔄 Showing Monetag rewarded ad...");
-                    let resolved = false;
-                    const adPromise = show_11573980();
-                    if (adPromise && typeof adPromise.then === 'function') {
-                        adPromise.then(() => {
-                            if (!resolved) {
-                                resolved = true;
-                                console.log("✅ Ad completed - Reward granted!");
-                                resolve(true);
-                            }
-                        }).catch((err) => {
-                            if (!resolved) {
-                                resolved = true;
-                                console.warn("Ad error:", err);
-                                resolve(false);
-                            }
-                        });
-                    } else {
-                        const handleVisibilityChange = () => {
-                            if (!document.hidden && !resolved) {
-                                resolved = true;
-                                console.log("✅ User returned from ad - Reward granted!");
-                                document.removeEventListener('visibilitychange', handleVisibilityChange);
-                                window.removeEventListener('focus', handleFocus);
-                                resolve(true);
-                            }
-                        };
-                        const handleFocus = () => {
-                            if (!resolved) {
-                                resolved = true;
-                                console.log("✅ User returned from ad (focus) - Reward granted!");
-                                document.removeEventListener('visibilitychange', handleVisibilityChange);
-                                window.removeEventListener('focus', handleFocus);
-                                resolve(true);
-                            }
-                        };
-                        document.addEventListener('visibilitychange', handleVisibilityChange);
-                        window.addEventListener('focus', handleFocus);
-                        setTimeout(() => {
-                            if (!resolved) {
-                                resolved = true;
-                                document.removeEventListener('visibilitychange', handleVisibilityChange);
-                                window.removeEventListener('focus', handleFocus);
-                                console.warn("Ad timeout");
-                                resolve(false);
-                            }
-                        }, 15000);
-                    }
+                    
+                    // Call Monetag ad
+                    show_11573980().then(() => {
+                        console.log("✅ Ad completed - Reward granted!");
+                        resolve(true);
+                    }).catch((err) => {
+                        console.warn("Ad error:", err);
+                        resolve(false);
+                    });
+                    
+                    // Fallback timeout
+                    setTimeout(() => {
+                        console.warn("Ad timeout - resolving false");
+                        resolve(false);
+                    }, 30000);
+                    
                 } catch (e) {
                     console.error("Rewarded ad error:", e);
                     resolve(false);
@@ -3375,7 +3291,7 @@
         // ============================================================
         // AD COUNTDOWN SYSTEM (15 sec + Progress Bar)
         // ============================================================
-        function startAdCountdown(tierId) {
+        function startAdCountdown() {
             return new Promise((resolve) => {
                 if (isAdCountdownActive) return resolve(false);
                 isAdCountdownActive = true;
@@ -3383,11 +3299,30 @@
 
                 let countdown = CONFIG.AD_WATCH_DURATION;
                 let elapsed = 0;
+                let adClicked = false;
 
                 DOM.adCountdownOverlay.classList.add('active');
                 DOM.countdownText.textContent = countdown;
                 DOM.countdownProgressFill.style.width = '0%';
                 DOM.countdownWarning.classList.remove('show');
+
+                const adClickHandler = () => {
+                    if (elapsed < CONFIG.MIN_AD_WATCH_TIME) {
+                        showErrorPopup(
+                            '⚠️ Wait!',
+                            `You must watch at least ${CONFIG.MIN_AD_WATCH_TIME} seconds before clicking the ad!\n\nYou have only watched ${Math.round(elapsed)} seconds.`
+                        );
+                        return;
+                    }
+                    adClicked = true;
+                    DOM.countdownText.textContent = '🎯';
+                    DOM.countdownProgressFill.style.width = '100%';
+                    DOM.countdownWarning.textContent = '✅ Ad clicked! Processing...';
+                    DOM.countdownWarning.style.color = 'var(--success)';
+                    DOM.countdownWarning.classList.add('show');
+                };
+
+                DOM.adCountdownOverlay.onclick = adClickHandler;
 
                 const countdownInterval = setInterval(() => {
                     countdown--;
@@ -3406,15 +3341,26 @@
                         clearInterval(countdownInterval);
                         const totalElapsed = (Date.now() - adStartTime) / 1000;
 
-                        if (totalElapsed < CONFIG.MIN_AD_WATCH_TIME) {
-                            DOM.countdownWarning.textContent = `❌ You only watched ${Math.round(totalElapsed)}s. Minimum ${CONFIG.MIN_AD_WATCH_TIME}s required!`;
+                        if (!adClicked) {
+                            DOM.countdownWarning.textContent = `⏳ Click the ad now!`;
+                            DOM.countdownWarning.style.color = 'var(--warning)';
                             DOM.countdownWarning.classList.add('show');
-                            DOM.countdownWarning.style.color = 'var(--danger)';
                             setTimeout(() => {
-                                DOM.adCountdownOverlay.classList.remove('active');
-                                isAdCountdownActive = false;
-                                resolve(false);
-                            }, 1500);
+                                if (!adClicked) {
+                                    adClicked = true;
+                                    DOM.countdownText.textContent = '🎯';
+                                    DOM.countdownProgressFill.style.width = '100%';
+                                    DOM.countdownWarning.textContent = '✅ Ad clicked! Processing...';
+                                    DOM.countdownWarning.style.color = 'var(--success)';
+                                }
+                                setTimeout(async () => {
+                                    const adShown = await showRewardedAd();
+                                    DOM.adCountdownOverlay.classList.remove('active');
+                                    DOM.adCountdownOverlay.onclick = null;
+                                    isAdCountdownActive = false;
+                                    resolve(adShown);
+                                }, 500);
+                            }, 2000);
                             return;
                         }
 
@@ -3424,12 +3370,74 @@
                         setTimeout(async () => {
                             const adShown = await showRewardedAd();
                             DOM.adCountdownOverlay.classList.remove('active');
+                            DOM.adCountdownOverlay.onclick = null;
                             isAdCountdownActive = false;
                             resolve(adShown);
                         }, 500);
                     }
                 }, 1000);
             });
+        }
+
+        // ============================================================
+        // WATCH AD - Main Function (Fixed)
+        // ============================================================
+        async function startWatchingAd() {
+            if (isBanned) {
+                showToast('🚫 You are banned. Contact admin for support.', 'error');
+                return;
+            }
+            if (isWatchingAd) return;
+            if (DOM.adCountdownOverlay.classList.contains('active')) return;
+            if (DOM.adLoaderOverlay.style.display === 'flex') return;
+
+            if (state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT) {
+                showToast(`📊 Daily limit reached! (${CONFIG.DAILY_AD_LIMIT})`, 'warning');
+                return;
+            }
+
+            const now = Date.now();
+            if (now - lastAdWatchTime < CONFIG.AD_COOLDOWN_MINUTES * 60 * 1000) {
+                const remaining = Math.ceil((CONFIG.AD_COOLDOWN_MINUTES * 60 * 1000 - (now - lastAdWatchTime)) / 1000);
+                showToast(`⏳ Please wait ${remaining}s before watching another ad`, 'warning');
+                return;
+            }
+
+            isWatchingAd = true;
+            DOM.watchAdBtn.disabled = true;
+            DOM.watchAdText.textContent = 'Watching...';
+            DOM.watchAdSub.textContent = 'Please wait';
+
+            const adShown = await startAdCountdown();
+
+            if (adShown) {
+                lastAdWatchTime = Date.now();
+                state.adsWatchedToday++;
+                state.adsWatchedSinceReset++;
+                const day = new Date().getDay();
+                state.weeklyActivity[day] = (state.weeklyActivity[day] || 0) + 1;
+
+                if (!state.dailyResetTime) {
+                    state.dailyResetTime = Date.now() + (CONFIG.DAILY_RESET_HOURS * 60 * 60 * 1000);
+                }
+
+                const reward = CONFIG.AD_REWARD;
+                state.balance += reward;
+                state.totalEarnings += reward;
+                state.adCount++;
+
+                saveUserData();
+                updateUI();
+
+                showToast(`✅ Ad watched! +${CONFIG.CURRENCY_SYMBOL}${(reward * 80).toFixed(2)} earned.`, 'success');
+            } else {
+                showToast('❌ Ad was not shown properly. Please try again.', 'error');
+            }
+
+            DOM.watchAdBtn.disabled = false;
+            DOM.watchAdText.textContent = 'Watch Ad';
+            DOM.watchAdSub.textContent = `Earn ${CONFIG.CURRENCY_SYMBOL}${(CONFIG.AD_REWARD * 80).toFixed(2)} per ad`;
+            isWatchingAd = false;
         }
 
         // ============================================================
@@ -4444,7 +4452,6 @@
             if (DOM.bonusTasksList) DOM.bonusTasksList.innerHTML = html;
             if (DOM.bonusTasksListFull) DOM.bonusTasksListFull.innerHTML = html;
 
-            // Attach event listeners
             document.querySelectorAll('#bonus-tasks-list .claim-btn:not([disabled]), #bonus-tasks-list-full .claim-btn:not([disabled])')
                 .forEach(btn => {
                     btn.addEventListener('click', function() {
@@ -4615,32 +4622,9 @@
         }
 
         // ============================================================
-        // WATCH AD (Main button opens Watch & Earn page)
+        // WATCH AD (Main button opens Watch & Earn page) - Removed, now direct
         // ============================================================
-        function openWatchEarn() {
-            if (isBanned) {
-                showToast('🚫 You are banned. Contact admin for support.', 'error');
-                return;
-            }
-            DOM.watchEarnPage.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            document.querySelector('.container').style.display = 'none';
-            loadTiers();
-        }
-
-        function closeWatchEarn() {
-            DOM.watchEarnPage.classList.remove('active');
-            document.body.style.overflow = '';
-            document.querySelector('.container').style.display = 'block';
-            DOM.profilePage.classList.remove('active');
-            DOM.allJobsPage.classList.remove('active');
-            DOM.jobDetailsPage.classList.remove('active');
-            DOM.withdrawPage.classList.remove('active');
-            DOM.supportPage.classList.remove('active');
-            DOM.historyPage.classList.remove('active');
-            DOM.invitePage.classList.remove('active');
-            DOM.bonusPage.classList.remove('active');
-        }
+        // function openWatchEarn() - Removed, not needed
 
         // ============================================================
         // LOAD TIERS FROM FIREBASE
@@ -5257,7 +5241,26 @@
                 return prog.watched >= t.requiredAds && prog.claimed;
             });
 
-            // Removed the Watch Ad button, so no need to update it
+            // Update Watch Ad Button
+            if (state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT) {
+                DOM.watchAdBtn.disabled = true;
+                DOM.watchAdText.textContent = '⏳ Take a Break';
+                DOM.watchAdSub.textContent = 'Daily limit reached';
+            } else if (isAdCooldownActive) {
+                DOM.watchAdBtn.disabled = true;
+                const remaining = Math.ceil((adCooldownMs - (Date.now() - lastAdWatchTime)) / 1000);
+                DOM.watchAdText.textContent = `⏳ ${remaining}s`;
+                DOM.watchAdSub.textContent = 'Cooldown';
+            } else if (allCompleted || state.allTiersCompleted) {
+                DOM.watchAdBtn.disabled = true;
+                DOM.watchAdText.textContent = '✅ All Complete';
+                DOM.watchAdSub.textContent = 'Come back tomorrow';
+            } else {
+                DOM.watchAdBtn.disabled = false;
+                DOM.watchAdText.textContent = 'Watch Ad';
+                DOM.watchAdSub.textContent = `Earn ${CONFIG.CURRENCY_SYMBOL}${(CONFIG.AD_REWARD * 80).toFixed(2)} per ad`;
+            }
+
             updateChart();
             updateSecurityBadge();
         }
