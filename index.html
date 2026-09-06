@@ -383,15 +383,6 @@
                 transform: rotate(360deg);
             }
         }
-        @keyframes countdownPulse {
-            0%,
-            100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.05);
-            }
-        }
 
         /* ===== PROFILE HEADER ===== */
         .profile-header {
@@ -2235,6 +2226,19 @@
             color: var(--text-light);
             line-height: 1.5;
         }
+
+        /* ===== 24 HOUR COUNTDOWN ON HOME PAGE ===== */
+        #homeCountdown {
+            display: none;
+            font-size: 13px;
+            color: var(--warning);
+            font-weight: 600;
+            margin-top: 4px;
+            text-align: center;
+        }
+        #homeCountdown.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -2287,7 +2291,7 @@
                 <circle class="circle-progress" id="countdownCircle" cx="100" cy="100" r="90"
                 stroke-dasharray="565.48" stroke-dashoffset="0" />
             </svg>
-            <div class="circle-text" id="countdownText">15</div>
+            <div class="circle-text" id="countdownText">30</div>
             <div class="circle-label">seconds</div>
         </div>
         <div class="countdown-title">⏳ Watching Ad</div>
@@ -2331,7 +2335,7 @@
         <!-- ===== BALANCE CARD ===== -->
         <div class="balance-card">
             <h3>💰 Balance</h3>
-            <div class="amount" id="total-earning">৳0.00</div>
+            <div class="amount" id="total-earning">৳0.0</div>
         </div>
 
         <!-- ===== STATS ===== -->
@@ -2373,6 +2377,7 @@
                     <i class="fa-solid fa-play"></i>
                     <span>Watch Ad</span>
                 </button>
+                <div id="homeCountdown"></div>
             </div>
         </div>
 
@@ -2578,7 +2583,7 @@
                 message: "Please follow the rules to ensure you receive your payment.\n\n💰 Reward per Ad: ৳0.08\n💝 After watching 15 ads, there is a 30-minute break.\n✅ 100% Payment Guarantee\n💸 Withdraw via Binance UID or Email\n🔥 Minimum withdrawal is ৳8.00"
             },
             REQUIRED_REFERRALS_FIRST_WITHDRAW: 5,
-            AD_WATCH_DURATION: 15,
+            AD_WATCH_DURATION: 30,
             MIN_AD_WATCH_TIME: 10,
             DAILY_RESET_HOURS: 24,
             CURRENCY_SYMBOL: '৳'
@@ -2726,6 +2731,8 @@
             DOM.countdownText = document.getElementById('countdownText');
             DOM.countdownCircle = document.getElementById('countdownCircle');
             DOM.countdownWarning = document.getElementById('countdownWarning');
+            // Home countdown
+            DOM.homeCountdown = document.getElementById('homeCountdown');
         }
 
         // ============================================================
@@ -3057,7 +3064,7 @@
         }
 
         // ============================================================
-        // AD COUNTDOWN SYSTEM (15 seconds with circle animation)
+        // AD COUNTDOWN SYSTEM (30 seconds with circle animation)
         // ============================================================
         function startAdCountdown(tierId) {
             return new Promise((resolve) => {
@@ -3247,7 +3254,7 @@
         }
 
         function formatBalance(amount) {
-            return amount.toFixed(2);
+            return amount.toFixed(1);
         }
 
         function saveUserData() {
@@ -4339,7 +4346,7 @@
         }
 
         // ============================================================
-        // WATCH TIER AD (with circle countdown)
+        // WATCH TIER AD (with circle countdown - 30 seconds)
         // ============================================================
         async function watchTierAd(tierId) {
             if (isBanned) {
@@ -4388,7 +4395,7 @@
                 return;
             }
 
-            // Start countdown
+            // Start countdown - 30 seconds
             isAdShowing = true;
             const adShown = await startAdCountdown(tierId);
 
@@ -4691,6 +4698,7 @@
         // ============================================================
         let cooldownInterval;
         let adCooldownInterval;
+        let homeCountdownInterval;
 
         function updateUI() {
             if (state.cooldownUntil && new Date() >= new Date(state.cooldownUntil)) {
@@ -4702,15 +4710,30 @@
             DOM.adCount.textContent = state.adCount;
             DOM.adsTodayCount.textContent = `${state.adsWatchedToday} / ${CONFIG.DAILY_AD_LIMIT}`;
 
-            // Update daily reset timer on watch button
-            let timeLeft = '';
-            if (state.dailyResetTime) {
+            // Update home countdown (24 hours)
+            clearInterval(homeCountdownInterval);
+            if (state.dailyResetTime && state.allTiersCompleted) {
                 const remaining = state.dailyResetTime - Date.now();
                 if (remaining > 0) {
-                    const hours = Math.floor(remaining / (1000 * 60 * 60));
-                    const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-                    timeLeft = ` (${hours}h ${minutes}m)`;
+                    DOM.homeCountdown.classList.add('show');
+                    const updateHomeTimer = () => {
+                        const rem = state.dailyResetTime - Date.now();
+                        if (rem <= 0) {
+                            DOM.homeCountdown.classList.remove('show');
+                            return;
+                        }
+                        const hours = Math.floor(rem / (1000 * 60 * 60));
+                        const minutes = Math.floor((rem % (1000 * 60 * 60)) / (1000 * 60));
+                        const seconds = Math.floor((rem % (1000 * 60)) / 1000);
+                        DOM.homeCountdown.textContent = `⏳ Next ads available in: ${hours}h ${minutes}m ${seconds}s`;
+                    };
+                    updateHomeTimer();
+                    homeCountdownInterval = setInterval(updateHomeTimer, 1000);
+                } else {
+                    DOM.homeCountdown.classList.remove('show');
                 }
+            } else {
+                DOM.homeCountdown.classList.remove('show');
             }
 
             clearInterval(cooldownInterval);
@@ -4763,12 +4786,12 @@
                 updateAdTimer();
             } else if (allCompleted || state.allTiersCompleted) {
                 DOM.watchAdBtn.disabled = true;
-                DOM.watchAdBtn.querySelector('span').textContent = `✅ All Complete${timeLeft}`;
+                DOM.watchAdBtn.querySelector('span').textContent = `✅ All Complete`;
             } else {
                 DOM.watchAdBtn.disabled = state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT;
                 const text = state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT ?
-                    `⏳ Take a Break${timeLeft}` :
-                    `▶️ Watch Ad${timeLeft}`;
+                    `⏳ Take a Break` :
+                    `▶️ Watch Ad`;
                 DOM.watchAdBtn.querySelector('span').textContent = text;
             }
             DOM.watchAdBtn.classList.toggle('pulsing', !DOM.watchAdBtn.disabled);
