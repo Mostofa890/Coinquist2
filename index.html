@@ -707,50 +707,6 @@
             color: var(--text-color);
         }
 
-        /* ===== ACTION BUTTON ===== */
-        .action-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: var(--radius);
-            background: var(--gradient);
-            color: white;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-            font-family: inherit;
-            box-shadow: 0 4px 15px rgba(var(--primary-color-rgb), 0.2);
-        }
-        .action-button.pulsing {
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(var(--primary-color-rgb), 0.3);
-            }
-            70% {
-                box-shadow: 0 0 0 12px rgba(var(--primary-color-rgb), 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(var(--primary-color-rgb), 0);
-            }
-        }
-        .action-button:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(var(--primary-color-rgb), 0.3);
-        }
-        .action-button:disabled {
-            background: #8E8E93;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
         /* ===== HOME COUNTDOWN (24 Hours) ===== */
         #homeCountdown {
             display: none;
@@ -1052,7 +1008,44 @@
             transform: scale(1.1);
         }
 
-        /* ===== MODALS ===== */
+        /* ===== FULL PAGE MODALS ===== */
+        .full-page-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 2000;
+            background: var(--background-color);
+            overflow-y: auto;
+            padding: 16px 12px 100px 12px;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .full-page-modal.active {
+            display: block;
+        }
+        .full-page-modal .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 16px;
+            font-family: inherit;
+        }
+        .full-page-modal .back-btn:hover {
+            background: var(--border-color);
+        }
+
+        /* ===== MODALS (bottom sheet) ===== */
         .modal {
             display: none;
             position: fixed;
@@ -2310,6 +2303,188 @@
         #errorPopup .popup-box .popup-btn:hover {
             transform: scale(1.03);
         }
+
+        /* ===== SUPPORT PAGE ===== */
+        #supportPage {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1900;
+            background: var(--background-color);
+            overflow-y: auto;
+            padding: 16px 12px 100px 12px;
+            animation: fadeIn 0.3s ease-out;
+        }
+        #supportPage.active {
+            display: block;
+        }
+        #supportPage .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 16px;
+            font-family: inherit;
+        }
+        #supportPage .back-btn:hover {
+            background: var(--border-color);
+        }
+        .support-contact-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: var(--radius);
+            background: var(--gradient);
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(var(--primary-color-rgb), 0.2);
+            margin-top: 12px;
+        }
+        .support-contact-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(var(--primary-color-rgb), 0.3);
+        }
+
+        /* ===== HISTORY PAGE ===== */
+        #historyPage {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1900;
+            background: var(--background-color);
+            overflow-y: auto;
+            padding: 16px 12px 100px 12px;
+            animation: fadeIn 0.3s ease-out;
+        }
+        #historyPage.active {
+            display: block;
+        }
+        #historyPage .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 16px;
+            font-family: inherit;
+        }
+        #historyPage .back-btn:hover {
+            background: var(--border-color);
+        }
+
+        /* ===== INVITE PAGE ===== */
+        #invitePage {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1900;
+            background: var(--background-color);
+            overflow-y: auto;
+            padding: 16px 12px 100px 12px;
+            animation: fadeIn 0.3s ease-out;
+        }
+        #invitePage.active {
+            display: block;
+        }
+        #invitePage .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 16px;
+            font-family: inherit;
+        }
+        #invitePage .back-btn:hover {
+            background: var(--border-color);
+        }
+        .invite-link-box {
+            background: var(--background-color);
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            margin: 12px 0;
+            word-break: break-all;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        /* ===== BONUS PAGE ===== */
+        #bonusPage {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1900;
+            background: var(--background-color);
+            overflow-y: auto;
+            padding: 16px 12px 100px 12px;
+            animation: fadeIn 0.3s ease-out;
+        }
+        #bonusPage.active {
+            display: block;
+        }
+        #bonusPage .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 16px;
+            font-family: inherit;
+        }
+        #bonusPage .back-btn:hover {
+            background: var(--border-color);
+        }
     </style>
 </head>
 <body>
@@ -2448,12 +2623,8 @@
                 <div id="job-list-container"></div>
             </div>
 
-            <div class="card">
-                <div class="card-title">🎯 Today's Task</div>
-                <button class="action-button pulsing" id="watch-ad-button" onclick="openWatchEarn()">
-                    <i class="fa-solid fa-play"></i>
-                    <span>Watch Ad</span>
-                </button>
+            <div class="card" style="cursor:pointer;" onclick="openWatchEarn()">
+                <div class="card-title">🎯 Today's Task <span style="margin-left:auto; font-size:13px; color:var(--text-light);">⏩</span></div>
                 <div id="homeCountdown"></div>
             </div>
         </div>
@@ -2528,31 +2699,86 @@
         </div>
     </div>
 
+    <!-- ===== SUPPORT FULL PAGE ===== -->
+    <div id="supportPage">
+        <button class="back-btn" onclick="closeSupportPage()">
+            <i class="fa-solid fa-arrow-left"></i> Back
+        </button>
+        <div class="card">
+            <div class="card-title">🆘 Support</div>
+            <p style="line-height:1.6; margin-bottom:16px; font-size:14px; color:var(--text-light);">For any help or questions, please contact our support team. We're here to assist you!</p>
+            <button class="support-contact-btn" onclick="openTelegramSupport()">
+                <i class="fa-brands fa-telegram"></i> Contact Support
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== HISTORY FULL PAGE ===== -->
+    <div id="historyPage">
+        <button class="back-btn" onclick="closeHistoryPage()">
+            <i class="fa-solid fa-arrow-left"></i> Back
+        </button>
+        <div class="card">
+            <div class="card-title">📜 Withdrawal History</div>
+            <div id="history-list-full"></div>
+        </div>
+    </div>
+
+    <!-- ===== INVITE FULL PAGE ===== -->
+    <div id="invitePage">
+        <button class="back-btn" onclick="closeInvitePage()">
+            <i class="fa-solid fa-arrow-left"></i> Back
+        </button>
+        <div class="card">
+            <div class="card-title">👥 Invite Friends</div>
+            <p style="line-height:1.6; margin-bottom:8px; font-size:14px; color:var(--text-light);">Share your referral link with friends and earn together. You get a reward for each successful referral!</p>
+            <div class="invite-link-box" id="inviteLinkDisplay"></div>
+            <button class="action-button" id="copy-link-btn-full" onclick="copyReferralLinkFull()">
+                <i class="fa-solid fa-copy"></i> Copy Link
+            </button>
+            <button class="action-button secondary" style="margin-top:10px;" onclick="shareReferralLinkFull()">
+                <i class="fa-solid fa-share-nodes"></i> Share Link
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== BONUS FULL PAGE ===== -->
+    <div id="bonusPage">
+        <button class="back-btn" onclick="closeBonusPage()">
+            <i class="fa-solid fa-arrow-left"></i> Back
+        </button>
+        <div class="card">
+            <div class="card-title">⭐ Bonus Tasks</div>
+            <p style="text-align:center; margin-bottom:16px; font-size:14px; color:var(--text-light);">Complete these one-time tasks to earn extra rewards!</p>
+            <div id="bonus-tasks-list-full"></div>
+        </div>
+    </div>
+
     <!-- ===== NAV BAR ===== -->
     <div class="nav-bar">
         <button class="nav-button" id="withdrawNavBtn" onclick="openWithdrawPage()">
             <i class="fa-solid fa-money-bill-transfer"></i>
             <span>Withdraw</span>
         </button>
-        <button class="nav-button" onclick="showModal('historyModal', this)">
+        <button class="nav-button" onclick="openHistoryPage()">
             <i class="fa-solid fa-clock-rotate-left"></i>
             <span>History</span>
         </button>
-        <button class="nav-button" onclick="showModal('inviteModal', this)">
+        <button class="nav-button" onclick="openInvitePage()">
             <i class="fa-solid fa-user-plus"></i>
             <span>Invite</span>
         </button>
-        <button class="nav-button" onclick="showModal('supportModal', this)">
+        <button class="nav-button" onclick="openSupportPage()">
             <i class="fa-solid fa-headset"></i>
             <span>Support</span>
         </button>
-        <button class="nav-button" onclick="showModal('bonusTasksModal', this)">
+        <button class="nav-button" onclick="openBonusPage()">
             <i class="fa-solid fa-star"></i>
             <span>Bonus</span>
         </button>
     </div>
 
-    <!-- ===== MODALS ===== -->
+    <!-- ===== MODALS (Bottom Sheet) ===== -->
     <!-- Welcome Modal -->
     <div id="welcomeModal" class="modal">
         <div class="modal-content">
@@ -2560,55 +2786,6 @@
             <h3 id="welcome-title" class="card-title" style="text-align:center;"></h3>
             <p id="welcome-message" style="line-height:1.7; font-size:14px; text-align:center; white-space:pre-wrap; margin:12px 0;"></p>
             <button class="action-button" onclick="closeModal('welcomeModal')">I Understand</button>
-        </div>
-    </div>
-
-    <!-- Support Modal -->
-    <div id="supportModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('supportModal')">&times;</button>
-            <h3 class="card-title">🆘 Support</h3>
-            <p style="line-height:1.6; margin-bottom:16px;">For any help or questions, please contact our support team. We're here to assist you!</p>
-            <button class="action-button" id="admin-contact-button">
-                <i class="fa-brands fa-telegram"></i>
-                <span>Contact Support</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- History Modal -->
-    <div id="historyModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('historyModal')">&times;</button>
-            <h3 class="card-title">📜 Withdrawal History</h3>
-            <div id="history-list"></div>
-        </div>
-    </div>
-
-    <!-- Invite Modal -->
-    <div id="inviteModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('inviteModal')">&times;</button>
-            <h3 class="card-title">👥 Invite Friends</h3>
-            <p style="line-height:1.6; margin-bottom:14px;">Share your referral link with friends and earn together. You get a reward for each successful referral!</p>
-            <button class="action-button" id="copy-link-button">
-                <i class="fa-solid fa-copy"></i>
-                <span>Copy Link</span>
-            </button>
-            <button class="action-button secondary" id="share-link-button">
-                <i class="fa-solid fa-share-nodes"></i>
-                <span>Share Link</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- Bonus Tasks Modal -->
-    <div id="bonusTasksModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('bonusTasksModal')">&times;</button>
-            <h3 class="card-title">⭐ Bonus Tasks</h3>
-            <p style="text-align:center; margin-bottom:16px; font-size:14px; color:var(--text-light);">Complete these one-time tasks to earn extra rewards!</p>
-            <div id="bonus-tasks-list"></div>
         </div>
     </div>
 
@@ -2758,10 +2935,7 @@
             DOM.adCount = document.getElementById('ad-count');
             DOM.adsTodayCount = document.getElementById('ads-today-count');
             DOM.referralCount = document.getElementById('referral-count');
-            DOM.watchAdBtn = document.getElementById('watch-ad-button');
             DOM.supportBtn = document.getElementById('admin-contact-button');
-            DOM.copyLinkBtn = document.getElementById('copy-link-button');
-            DOM.shareLinkBtn = document.getElementById('share-link-button');
             DOM.historyList = document.getElementById('history-list');
             DOM.bonusTasksList = document.getElementById('bonus-tasks-list');
             DOM.welcomeTitle = document.getElementById('welcome-title');
@@ -2804,6 +2978,15 @@
             DOM.errorPopupTitle = document.getElementById('errorPopupTitle');
             DOM.errorPopupMsg = document.getElementById('errorPopupMsg');
             DOM.channelLinksContainer = document.getElementById('channelLinksContainer');
+            // Full pages
+            DOM.supportPage = document.getElementById('supportPage');
+            DOM.historyPage = document.getElementById('historyPage');
+            DOM.historyListFull = document.getElementById('history-list-full');
+            DOM.invitePage = document.getElementById('invitePage');
+            DOM.inviteLinkDisplay = document.getElementById('inviteLinkDisplay');
+            DOM.bonusPage = document.getElementById('bonusPage');
+            DOM.bonusTasksListFull = document.getElementById('bonus-tasks-list-full');
+            DOM.copyLinkBtnFull = document.getElementById('copy-link-btn-full');
         }
 
         // ============================================================
@@ -2847,7 +3030,6 @@
                         channelLinks = links;
                         renderChannelButtons();
                     } else {
-                        // Default channels if none in Firebase
                         channelLinks = [
                             { label: 'My Channel', url: 'https://t.me/nexearn2', chatId: 'nexearn2' },
                             { label: 'Adda Group', url: 'https://t.me/nexearn2_adda', chatId: 'nexearn2_adda' },
@@ -2858,7 +3040,6 @@
                     }
                 });
             } else {
-                // Default if Firebase not available
                 channelLinks = [
                     { label: 'My Channel', url: 'https://t.me/nexearn2', chatId: 'nexearn2' },
                     { label: 'Adda Group', url: 'https://t.me/nexearn2_adda', chatId: 'nexearn2_adda' },
@@ -2870,7 +3051,6 @@
 
             let checkInterval = null;
 
-            // Verify button click
             DOM.verifyChannelBtn.onclick = function() {
                 if (!this.classList.contains('active')) {
                     DOM.verifyStatus.textContent = '❌ Please join all channels first!';
@@ -2887,7 +3067,6 @@
                 setTimeout(() => showModal('welcomeModal'), 500);
             };
 
-            // Auto check all channels
             const checkAllChannels = async () => {
                 const userId = tg?.initDataUnsafe?.user?.id;
                 if (!userId) {
@@ -2918,7 +3097,6 @@
                 }
             };
 
-            // Start checking every 4 seconds
             if (channelLinks.length > 0) {
                 checkInterval = setInterval(checkAllChannels, 4000);
                 setTimeout(checkAllChannels, 1500);
@@ -2940,7 +3118,6 @@
                 };
                 container.appendChild(btn);
             });
-            // Re-add verify button
             const verifyBtn = document.createElement('button');
             verifyBtn.className = 'verify-btn';
             verifyBtn.id = 'verifyChannelBtn';
@@ -3069,7 +3246,7 @@
             });
 
             DOM.container.style.display = 'none';
-            document.querySelectorAll('.modal, .job-details-page, .profile-page, .all-jobs-page, .watch-earn-page, #withdrawPage')
+            document.querySelectorAll('.modal, .job-details-page, .profile-page, .all-jobs-page, .watch-earn-page, #withdrawPage, #supportPage, #historyPage, #invitePage, #bonusPage')
                 .forEach(el => {
                     el.classList.remove('active');
                     el.style.display = 'none';
@@ -3499,6 +3676,9 @@
                 if (DOM.withdrawPage.classList.contains('active')) {
                     renderWithdrawPage();
                 }
+                if (DOM.invitePage.classList.contains('active')) {
+                    renderInvitePage();
+                }
             });
         }
 
@@ -3536,7 +3716,6 @@
             const ratingsArray = Object.values(state.ratings).filter(r => r > 0);
             const avgRating = ratingsArray.length > 0 ? ratingsArray.reduce((a, b) => a + b, 0) / ratingsArray.length : 0;
 
-            // Calculate referral bonus earned
             const referralBonusEarned = (state.rewardedReferrals || 0) * CONFIG.REFERRAL_REWARD;
 
             let content = `
@@ -3573,15 +3752,6 @@
                             <div class="right"><span class="status ${v.status || 'pending'}">${v.status || 'Pending'}</span></div>
                         </div>
                     `).join('') : '<div class="empty-state"><i class="fa-solid fa-inbox"></i><p>No submissions yet</p></div>'}
-                </div>
-                <div class="card">
-                    <div class="profile-section-title">📋 Recent Activity</div>
-                    ${state.withdrawalHistory.slice(0, 5).map(w => `
-                        <div class="profile-list-item">
-                            <div class="left"><span class="icon"><i class="fa-solid fa-arrow-up"></i></span><div class="info"><div class="title">Withdrawal via ${escapeHTML(w.method)}</div><div class="sub">${new Date(w.date).toLocaleDateString()}</div></div></div>
-                            <div class="right"><span class="status ${w.status.toLowerCase()}">${w.status}</span></div>
-                        </div>
-                    `).join('') || '<div class="empty-state"><i class="fa-solid fa-inbox"></i><p>No recent activity</p></div>'}
                 </div>
             `;
             DOM.profileContent.innerHTML = content;
@@ -3759,8 +3929,6 @@
             }
             document.querySelectorAll('.nav-button.active').forEach(b => b.classList.remove('active'));
             if (btn) btn.classList.add('active');
-            if (modalId === 'historyModal') renderHistory();
-            if (modalId === 'bonusTasksModal') renderBonusTasks();
             const modal = document.getElementById(modalId);
             if (modal) modal.style.display = 'flex';
         }
@@ -4249,37 +4417,16 @@
         }
 
         // ============================================================
-        // RENDER FUNCTIONS
+        // RENDER FUNCTIONS (Bonus, History, Invite)
         // ============================================================
-        function renderHistory() {
-            if (!DOM.historyList) return;
-            if (!state.withdrawalHistory || state.withdrawalHistory.length === 0) {
-                DOM.historyList.innerHTML =
-                    `<div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><p>No withdrawal history</p></div>`;
-                return;
-            }
-            DOM.historyList.innerHTML = state.withdrawalHistory.map(item => `
-                <div class="history-item">
-                    <div class="history-details">
-                        <div class="method-number">${escapeHTML(item.method)} - ${escapeHTML(item.number)}</div>
-                        <div class="date">${new Date(item.date).toLocaleString()}</div>
-                    </div>
-                    <div class="history-amount">
-                        <div class="amount-text">${CONFIG.CURRENCY_SYMBOL}${item.amount.toFixed(2)}</div>
-                        <div class="history-status ${item.status.toLowerCase()}">${item.status}</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
         function renderBonusTasks() {
-            if (!DOM.bonusTasksList) return;
             if (!state.bonusTasks || state.bonusTasks.length === 0) {
-                DOM.bonusTasksList.innerHTML =
-                    `<div class="empty-state"><i class="fa-solid fa-star"></i><p>No bonus tasks available</p></div>`;
+                const msg = '<div class="empty-state"><i class="fa-solid fa-star"></i><p>No bonus tasks available</p></div>';
+                if (DOM.bonusTasksList) DOM.bonusTasksList.innerHTML = msg;
+                if (DOM.bonusTasksListFull) DOM.bonusTasksListFull.innerHTML = msg;
                 return;
             }
-            DOM.bonusTasksList.innerHTML = state.bonusTasks.map(task => {
+            const html = state.bonusTasks.map(task => {
                 const isCompleted = state.completedBonusTasks.includes(task.id);
                 return `
                     <div class="bonus-item">
@@ -4287,18 +4434,29 @@
                             <div class="title">${escapeHTML(task.title)}</div>
                             <div class="reward"><i class="fa-solid fa-gift"></i> + ${CONFIG.CURRENCY_SYMBOL}${(task.reward * 80).toFixed(2)}</div>
                         </div>
-                        <button class="claim-btn" ${isCompleted ? 'disabled' : ''}>
+                        <button class="claim-btn" ${isCompleted ? 'disabled' : ''} data-task-id="${task.id}" data-reward="${task.reward}" data-link="${task.link}" data-duration="${task.duration || 10}">
                             ${isCompleted ? '✅ Completed' : 'Claim'}
                         </button>
                     </div>
                 `;
             }).join('');
-            DOM.bonusTasksList.querySelectorAll('.claim-btn:not([disabled])').forEach((btn, index) => {
-                btn.addEventListener('click', () => {
-                    const task = state.bonusTasks[index];
-                    handleBonusTask(task, btn);
+
+            if (DOM.bonusTasksList) DOM.bonusTasksList.innerHTML = html;
+            if (DOM.bonusTasksListFull) DOM.bonusTasksListFull.innerHTML = html;
+
+            // Attach event listeners
+            document.querySelectorAll('#bonus-tasks-list .claim-btn:not([disabled]), #bonus-tasks-list-full .claim-btn:not([disabled])')
+                .forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const task = {
+                            id: this.dataset.taskId,
+                            reward: parseFloat(this.dataset.reward),
+                            link: this.dataset.link,
+                            duration: parseInt(this.dataset.duration)
+                        };
+                        handleBonusTask(task, this);
+                    });
                 });
-            });
         }
 
         function handleBonusTask(task, button) {
@@ -4313,7 +4471,114 @@
                 updateUI();
                 button.textContent = '✅ Completed';
                 showToast(`🎉 Bonus of ${CONFIG.CURRENCY_SYMBOL}${(task.reward * 80).toFixed(2)} added!`, 'success');
+                renderBonusTasks();
             }, (task.duration || 10) * 1000);
+        }
+
+        function renderHistory() {
+            if (!state.withdrawalHistory || state.withdrawalHistory.length === 0) {
+                const msg = '<div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><p>No withdrawal history</p></div>';
+                if (DOM.historyList) DOM.historyList.innerHTML = msg;
+                if (DOM.historyListFull) DOM.historyListFull.innerHTML = msg;
+                return;
+            }
+            const html = state.withdrawalHistory.map(item => `
+                <div class="history-item">
+                    <div class="history-details">
+                        <div class="method-number">${escapeHTML(item.method)} - ${escapeHTML(item.number)}</div>
+                        <div class="date">${new Date(item.date).toLocaleString()}</div>
+                    </div>
+                    <div class="history-amount">
+                        <div class="amount-text">${CONFIG.CURRENCY_SYMBOL}${item.amount.toFixed(2)}</div>
+                        <div class="history-status ${item.status.toLowerCase()}">${item.status}</div>
+                    </div>
+                </div>
+            `).join('');
+            if (DOM.historyList) DOM.historyList.innerHTML = html;
+            if (DOM.historyListFull) DOM.historyListFull.innerHTML = html;
+        }
+
+        function renderInvitePage() {
+            const link = getReferralLink();
+            if (DOM.inviteLinkDisplay) {
+                DOM.inviteLinkDisplay.textContent = link;
+            }
+        }
+
+        // ============================================================
+        // FULL PAGE NAVIGATION FUNCTIONS
+        // ============================================================
+        function openSupportPage() {
+            if (isBanned) { showToast('🚫 You are banned.', 'error'); return; }
+            DOM.supportPage.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            document.querySelector('.container').style.display = 'none';
+            document.querySelectorAll('.nav-button').forEach(b => b.classList.remove('active'));
+        }
+
+        function closeSupportPage() {
+            DOM.supportPage.classList.remove('active');
+            document.body.style.overflow = '';
+            document.querySelector('.container').style.display = 'block';
+        }
+
+        function openHistoryPage() {
+            if (isBanned) { showToast('🚫 You are banned.', 'error'); return; }
+            DOM.historyPage.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            document.querySelector('.container').style.display = 'none';
+            document.querySelectorAll('.nav-button').forEach(b => b.classList.remove('active'));
+            renderHistory();
+        }
+
+        function closeHistoryPage() {
+            DOM.historyPage.classList.remove('active');
+            document.body.style.overflow = '';
+            document.querySelector('.container').style.display = 'block';
+        }
+
+        function openInvitePage() {
+            if (isBanned) { showToast('🚫 You are banned.', 'error'); return; }
+            DOM.invitePage.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            document.querySelector('.container').style.display = 'none';
+            document.querySelectorAll('.nav-button').forEach(b => b.classList.remove('active'));
+            renderInvitePage();
+        }
+
+        function closeInvitePage() {
+            DOM.invitePage.classList.remove('active');
+            document.body.style.overflow = '';
+            document.querySelector('.container').style.display = 'block';
+        }
+
+        function openBonusPage() {
+            if (isBanned) { showToast('🚫 You are banned.', 'error'); return; }
+            DOM.bonusPage.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            document.querySelector('.container').style.display = 'none';
+            document.querySelectorAll('.nav-button').forEach(b => b.classList.remove('active'));
+            renderBonusTasks();
+        }
+
+        function closeBonusPage() {
+            DOM.bonusPage.classList.remove('active');
+            document.body.style.overflow = '';
+            document.querySelector('.container').style.display = 'block';
+        }
+
+        function copyReferralLinkFull() {
+            const link = getReferralLink();
+            navigator.clipboard.writeText(link)
+                .then(() => showToast('✅ Referral link copied!', 'success'))
+                .catch(() => showToast('Could not copy link.', 'error'));
+        }
+
+        function shareReferralLinkFull() {
+            const link = getReferralLink();
+            const text =
+                `💰 Earn money by watching ads! Join using my referral link:\n\n${link}\n\nJoin @${CONFIG.BOT_USERNAME} and start earning today! 🚀`;
+            safeOpenTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`);
         }
 
         // ============================================================
@@ -4371,6 +4636,10 @@
             DOM.allJobsPage.classList.remove('active');
             DOM.jobDetailsPage.classList.remove('active');
             DOM.withdrawPage.classList.remove('active');
+            DOM.supportPage.classList.remove('active');
+            DOM.historyPage.classList.remove('active');
+            DOM.invitePage.classList.remove('active');
+            DOM.bonusPage.classList.remove('active');
         }
 
         // ============================================================
@@ -4534,7 +4803,6 @@
                 return;
             }
 
-            // Start countdown
             isAdShowing = true;
             const watchBtn = document.querySelector(`.tier-card .tier-btn.watch[onclick*="${tierId}"]`);
             if (watchBtn) {
@@ -4542,10 +4810,7 @@
                 watchBtn.innerHTML = `<i class="fa-solid fa-hourglass-half"></i> <span class="timer-text">15s</span>`;
             }
 
-            // Reset click block
             adClickBlocked = true;
-
-            // Show countdown with progress bar
             const adShown = await startAdCountdownWithPopup(tierId);
 
             if (adShown) {
@@ -4620,10 +4885,8 @@
                 DOM.countdownProgressFill.style.width = '0%';
                 DOM.countdownWarning.classList.remove('show');
 
-                // Add click handler for the ad overlay (simulate ad click)
                 const adClickHandler = () => {
                     if (elapsed < CONFIG.MIN_AD_WATCH_TIME) {
-                        // Show error popup
                         showErrorPopup(
                             '⚠️ Wait!',
                             `You must watch at least ${CONFIG.MIN_AD_WATCH_TIME} seconds before clicking the ad!\n\nYou have only watched ${Math.round(elapsed)} seconds.`
@@ -4638,7 +4901,6 @@
                     DOM.countdownWarning.classList.add('show');
                 };
 
-                // Add click listener to the overlay
                 DOM.adCountdownOverlay.onclick = adClickHandler;
 
                 const countdownInterval = setInterval(() => {
@@ -4662,7 +4924,6 @@
                             DOM.countdownWarning.textContent = `⏳ Click the ad now!`;
                             DOM.countdownWarning.style.color = 'var(--warning)';
                             DOM.countdownWarning.classList.add('show');
-                            // Auto-click after 2 seconds if not clicked
                             setTimeout(() => {
                                 if (!adClicked) {
                                     adClicked = true;
@@ -4761,6 +5022,7 @@
             DOM.withdrawPage.classList.add('active');
             document.body.style.overflow = 'hidden';
             document.querySelector('.container').style.display = 'none';
+            document.querySelectorAll('.nav-button').forEach(b => b.classList.remove('active'));
             renderWithdrawPage();
         }
 
@@ -4995,50 +5257,7 @@
                 return prog.watched >= t.requiredAds && prog.claimed;
             });
 
-            if (state.cooldownUntil && new Date() < new Date(state.cooldownUntil)) {
-                DOM.watchAdBtn.disabled = true;
-                const updateTimer = () => {
-                    const remaining = new Date(state.cooldownUntil) - new Date();
-                    if (remaining <= 0) {
-                        clearInterval(cooldownInterval);
-                        state.cooldownUntil = null;
-                        state.adsWatchedToday = 0;
-                        saveUserData();
-                        updateUI();
-                        showToast('✅ Break is over!', 'success');
-                        return;
-                    }
-                    const minutes = Math.floor((remaining / 1000 / 60) % 60);
-                    const seconds = Math.floor((remaining / 1000) % 60);
-                    DOM.watchAdBtn.querySelector('span').textContent = `⏳ ${minutes}m ${seconds}s`;
-                };
-                cooldownInterval = setInterval(updateTimer, 1000);
-                updateTimer();
-            } else if (isAdCooldownActive) {
-                DOM.watchAdBtn.disabled = true;
-                const updateAdTimer = () => {
-                    const remaining = adCooldownMs - (Date.now() - lastAdWatchTime);
-                    if (remaining <= 0) {
-                        clearInterval(adCooldownInterval);
-                        updateUI();
-                        return;
-                    }
-                    const seconds = Math.ceil(remaining / 1000);
-                    DOM.watchAdBtn.querySelector('span').textContent = `⏳ ${seconds}s`;
-                };
-                adCooldownInterval = setInterval(updateAdTimer, 200);
-                updateAdTimer();
-            } else if (allCompleted || state.allTiersCompleted) {
-                DOM.watchAdBtn.disabled = true;
-                DOM.watchAdBtn.querySelector('span').textContent = `✅ All Complete`;
-            } else {
-                DOM.watchAdBtn.disabled = state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT;
-                const text = state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT ?
-                    `⏳ Take a Break` :
-                    `▶️ Watch Ad`;
-                DOM.watchAdBtn.querySelector('span').textContent = text;
-            }
-            DOM.watchAdBtn.classList.toggle('pulsing', !DOM.watchAdBtn.disabled);
+            // Removed the Watch Ad button, so no need to update it
             updateChart();
             updateSecurityBadge();
         }
@@ -5091,20 +5310,15 @@
         }
 
         // ============================================================
-        // COPY / SHARE
+        // TELEGRAM SUPPORT
         // ============================================================
-        function copyReferralLink() {
-            const link = getReferralLink();
-            navigator.clipboard.writeText(link)
-                .then(() => showToast('✅ Referral link copied!', 'success'))
-                .catch(() => showToast('Could not copy link.', 'error'));
-        }
-
-        function shareReferralLink() {
-            const link = getReferralLink();
-            const text =
-                `💰 Earn money by watching ads! Join using my referral link:\n\n${link}\n\nJoin @${CONFIG.BOT_USERNAME} and start earning today! 🚀`;
-            safeOpenTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`);
+        function openTelegramSupport() {
+            const supportLink = CONFIG.SUPPORT_LINK || 'https://t.me/NexEarn2Support';
+            if (tg) {
+                tg.openTelegramLink(supportLink);
+            } else {
+                window.open(supportLink, '_blank');
+            }
         }
 
         // ============================================================
@@ -5208,11 +5422,6 @@
                 }
 
                 state.currentIp = await getIpAddress();
-
-                DOM.watchAdBtn.addEventListener('click', openWatchEarn);
-                DOM.supportBtn.addEventListener('click', () => safeOpenTelegramLink(CONFIG.SUPPORT_LINK));
-                DOM.copyLinkBtn.addEventListener('click', copyReferralLink);
-                DOM.shareLinkBtn.addEventListener('click', shareReferralLink);
 
                 document.addEventListener('click', (e) => {
                     if (DOM.ratingToast.classList.contains('active') && !DOM.ratingToast.contains(e.target) && !e
