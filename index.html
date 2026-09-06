@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -37,6 +38,10 @@
             --danger: #ef4444;
             --info: #3b82f6;
             --gradient: linear-gradient(135deg, #6C63FF, #4A42D4);
+            --user-name-color: #1A1A2E;
+            --verified-color: #10b981;
+            --wallet-bg: rgba(108, 99, 255, 0.08);
+            --referral-bg: rgba(16, 185, 129, 0.08);
         }
 
         [data-theme="dark"] {
@@ -51,6 +56,9 @@
             --glass-bg: rgba(26, 26, 46, 0.8);
             --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             --shadow-hover: 0 8px 30px rgba(108, 99, 255, 0.15);
+            --user-name-color: #F0F0F5;
+            --wallet-bg: rgba(139, 131, 255, 0.12);
+            --referral-bg: rgba(16, 185, 129, 0.12);
         }
 
         * {
@@ -388,15 +396,20 @@
             }
         }
 
-        /* ===== PROFILE HEADER ===== */
+        /* ===== PROFILE HEADER (NexEarn Support Style) ===== */
         .profile-header {
             display: flex;
             align-items: center;
-            gap: 14px;
-            margin-bottom: 20px;
-            animation: fadeIn 0.4s ease-out;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding: 8px 4px;
         }
-        #profile-pic {
+        .profile-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .profile-avatar {
             width: 48px;
             height: 48px;
             border-radius: 50%;
@@ -404,54 +417,73 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
             color: white;
             flex-shrink: 0;
-            box-shadow: 0 4px 15px rgba(var(--primary-color-rgb), 0.3);
-            cursor: pointer;
-            transition: var(--transition);
         }
-        #profile-pic:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 25px rgba(var(--primary-color-rgb), 0.4);
+        .profile-name-box {
+            display: flex;
+            flex-direction: column;
         }
-        .profile-info {
-            flex: 1;
-            min-width: 0;
-        }
-        #greeting {
-            font-size: 20px;
+        .profile-name {
+            font-size: 18px;
             font-weight: 800;
+            color: var(--user-name-color);
             line-height: 1.2;
         }
-        .role-badge {
-            display: inline-block;
-            font-size: 11px;
+        .profile-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
             font-weight: 600;
-            padding: 3px 12px;
-            border-radius: 20px;
-            background: rgba(var(--primary-color-rgb), 0.12);
-            color: var(--primary-color);
-            margin-top: 2px;
+            color: var(--text-light);
         }
-        .role-badge.banned {
-            background: rgba(239, 68, 68, 0.15);
-            color: var(--danger);
+        .profile-badge .verified {
+            color: var(--verified-color);
+        }
+        .profile-badge .member {
+            color: var(--text-light);
+        }
+        .profile-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .profile-right .wallet-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border: none;
+            border-radius: 20px;
+            background: var(--wallet-bg);
+            color: var(--primary-color);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: var(--transition);
+        }
+        .profile-right .wallet-btn:hover {
+            transform: scale(1.03);
+        }
+        .profile-right .wallet-btn i {
+            font-size: 14px;
         }
 
-        /* ===== BALANCE CARD ===== */
+        /* ===== BALANCE CARD (Modern) ===== */
         .balance-card {
-            position: relative;
-            overflow: hidden;
             background: var(--gradient);
             color: white;
-            padding: 28px 20px;
+            padding: 24px 20px;
             border-radius: var(--radius);
             text-align: center;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             box-shadow: 0 8px 30px rgba(var(--primary-color-rgb), 0.25);
-            animation: fadeIn 0.6s ease-out;
+            position: relative;
+            overflow: hidden;
         }
         .balance-card::after {
             content: '\f51e';
@@ -465,15 +497,15 @@
             transform: rotate(-15deg);
             pointer-events: none;
         }
-        .balance-card h3 {
-            font-size: 14px;
+        .balance-card .balance-label {
+            font-size: 13px;
             font-weight: 500;
-            opacity: 0.9;
-            margin-bottom: 4px;
+            opacity: 0.85;
+            margin-bottom: 2px;
             position: relative;
             z-index: 1;
         }
-        .balance-card .amount {
+        .balance-card .balance-amount {
             font-size: 44px;
             font-weight: 800;
             line-height: 1.2;
@@ -481,427 +513,148 @@
             z-index: 1;
         }
 
-        /* ===== STATS GRID ===== */
-        .stats-grid {
+        /* ===== REFERRAL PROGRAM ===== */
+        .referral-section {
+            background: var(--card-background);
+            border-radius: var(--radius);
+            padding: 18px 16px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+        }
+        .referral-section .referral-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .referral-section .referral-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+        .referral-section .referral-per {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary-color);
+            background: rgba(var(--primary-color-rgb), 0.1);
+            padding: 2px 12px;
+            border-radius: 12px;
+        }
+        .referral-section .referral-stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 12px;
+        }
+        .referral-section .referral-stat {
+            text-align: center;
+        }
+        .referral-section .referral-stat .stat-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-color);
+        }
+        .referral-section .referral-stat .stat-label {
+            font-size: 11px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+        .referral-section .referral-link-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--background-color);
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+        .referral-section .referral-link-box .link-text {
+            flex: 1;
+            font-size: 12px;
+            color: var(--primary-color);
+            font-weight: 600;
+            word-break: break-all;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .referral-section .referral-link-box .copy-btn {
+            padding: 6px 16px;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary-color);
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+        .referral-section .referral-link-box .copy-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* ===== WATCH ADS & TASKS ===== */
+        .action-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: 1fr 1fr;
             gap: 12px;
             margin-bottom: 16px;
         }
-        .stat-item {
-            position: relative;
-            overflow: hidden;
+        .action-card {
             background: var(--card-background);
-            padding: 16px 12px;
             border-radius: var(--radius);
+            padding: 18px 14px;
             text-align: center;
             border: 1px solid var(--border-color);
-            animation: fadeIn 0.8s ease-out;
-            transition: var(--transition);
             box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: var(--transition);
         }
-        .stat-item:hover {
+        .action-card:hover {
             transform: translateY(-2px);
             box-shadow: var(--shadow-hover);
         }
-        .stat-item .bg-icon {
-            position: absolute;
-            right: 2px;
-            bottom: 2px;
-            font-size: 40px;
-            opacity: 0.04;
-            color: var(--text-color);
-            pointer-events: none;
-        }
-        .stat-item .icon {
-            font-size: 22px;
+        .action-card .action-icon {
+            font-size: 32px;
             color: var(--primary-color);
             margin-bottom: 6px;
         }
-        .stat-item .value {
-            font-size: 20px;
-            font-weight: 800;
-        }
-        .stat-item .label {
-            font-size: 11px;
-            color: var(--text-light);
-            margin-top: 2px;
-        }
-
-        /* ===== CARDS ===== */
-        .card {
-            background: var(--card-background);
-            padding: 18px 16px;
-            border-radius: var(--radius);
-            margin-bottom: 16px;
-            border: 1px solid var(--border-color);
-            animation: fadeIn 0.9s ease-out;
-            transition: var(--transition);
-            box-shadow: var(--shadow);
-        }
-        .card:hover {
-            box-shadow: var(--shadow-hover);
-        }
-        .card-title {
-            font-size: 17px;
+        .action-card .action-title {
+            font-size: 14px;
             font-weight: 700;
-            margin-bottom: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* ===== HOME STATS (Modern Design like Image) ===== */
-        .home-stats {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            background: var(--card-background);
-            border-radius: var(--radius);
-            padding: 20px 16px;
-            margin-bottom: 16px;
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow);
-        }
-        .home-stat-item {
-            text-align: center;
-        }
-        .home-stat-item .stat-icon {
-            font-size: 24px;
-            color: var(--primary-color);
-            margin-bottom: 4px;
-        }
-        .home-stat-item .stat-value {
-            font-size: 18px;
-            font-weight: 800;
             color: var(--text-color);
         }
-        .home-stat-item .stat-label {
+        .action-card .action-sub {
+            font-size: 11px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+        .action-card .action-badge {
+            display: inline-block;
             font-size: 10px;
-            color: var(--text-light);
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .home-stat-divider {
-            width: 1px;
-            height: 40px;
-            background: var(--border-color);
-        }
-
-        /* ===== WATCH AD BUTTON ===== */
-        .watch-ad-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            width: 100%;
-            padding: 18px;
-            border: none;
-            border-radius: var(--radius);
-            background: var(--gradient);
-            color: white;
-            font-size: 18px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-            font-family: inherit;
-            box-shadow: 0 4px 20px rgba(var(--primary-color-rgb), 0.25);
-            margin-bottom: 16px;
-            position: relative;
-            overflow: hidden;
-        }
-        .watch-ad-btn::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
-            animation: shimmer 3s ease-in-out infinite;
-        }
-        @keyframes shimmer {
-            0%, 100% { transform: translateX(-30%) translateY(-30%); }
-            50% { transform: translateX(30%) translateY(30%); }
-        }
-        .watch-ad-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 30px rgba(var(--primary-color-rgb), 0.35);
-        }
-        .watch-ad-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .watch-ad-btn .btn-icon {
-            font-size: 24px;
-            position: relative;
-            z-index: 1;
-        }
-        .watch-ad-btn .btn-text {
-            position: relative;
-            z-index: 1;
-        }
-        .watch-ad-btn .btn-sub {
-            font-size: 12px;
-            font-weight: 400;
-            opacity: 0.8;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* ===== HOME COUNTDOWN (24 Hours) ===== */
-        #homeCountdown {
-            display: none;
-            margin-top: 10px;
-            padding: 12px;
-            background: rgba(245, 158, 11, 0.12);
-            border: 1px solid rgba(245, 158, 11, 0.2);
-            border-radius: 12px;
-            text-align: center;
-            font-weight: 700;
-            font-size: 15px;
-            color: var(--warning);
-        }
-        #homeCountdown.show {
-            display: block;
-            animation: fadeIn 0.3s ease-out;
-        }
-        #homeCountdown .countdown-label {
-            font-size: 12px;
             font-weight: 600;
-            color: var(--text-light);
-            display: block;
-            margin-bottom: 2px;
-        }
-        #homeCountdown .countdown-time {
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--warning);
-        }
-
-        /* ===== AD COUNTDOWN OVERLAY (15 sec + progress bar) ===== */
-        #adCountdownOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 6000;
-            background: rgba(0, 0, 0, 0.92);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            color: white;
-            text-align: center;
-            padding: 30px;
-        }
-        #adCountdownOverlay.active {
-            display: flex;
-        }
-        #adCountdownOverlay .progress-container {
-            width: 80%;
-            max-width: 300px;
-            margin-bottom: 20px;
-        }
-        #adCountdownOverlay .progress-container .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        #adCountdownOverlay .progress-container .progress-bar .fill {
-            height: 100%;
-            background: var(--gradient);
-            border-radius: 8px;
-            transition: width 0.3s ease;
-            width: 0%;
-        }
-        #adCountdownOverlay .timer-text {
-            font-size: 64px;
-            font-weight: 800;
-            color: white;
-            margin-bottom: 4px;
-            line-height: 1.1;
-        }
-        #adCountdownOverlay .timer-label {
-            font-size: 16px;
-            color: rgba(255, 255, 255, 0.6);
-            font-weight: 500;
-        }
-        #adCountdownOverlay .countdown-title {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-        #adCountdownOverlay .countdown-sub {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-        #adCountdownOverlay .countdown-warning {
-            margin-top: 16px;
-            font-size: 14px;
-            color: var(--warning);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            font-weight: 600;
-        }
-        #adCountdownOverlay .countdown-warning.show {
-            opacity: 1;
-        }
-
-        /* ===== FORM ===== */
-        .form-group {
-            margin-bottom: 14px;
-        }
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-color);
-            margin-bottom: 4px;
-        }
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            font-family: 'Inter', sans-serif;
-            font-size: 15px;
-            background: var(--background-color);
-            color: var(--text-color);
-            transition: var(--transition);
-        }
-        .form-group textarea {
-            min-height: 70px;
-            resize: vertical;
-        }
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
-        }
-        .form-hint {
-            font-size: 11px;
-            color: var(--text-light);
-            margin-top: 4px;
-        }
-
-        /* ===== BONUS TASKS ===== */
-        .bonus-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px;
-            background: var(--background-color);
-            border-radius: 12px;
-            margin-bottom: 10px;
-            border: 1px solid var(--border-color);
-            gap: 12px;
-            transition: var(--transition);
-        }
-        .bonus-item:hover {
-            box-shadow: var(--shadow-hover);
-        }
-        .bonus-item:last-child {
-            margin-bottom: 0;
-        }
-        .bonus-item .details {
-            flex: 1;
-            min-width: 0;
-        }
-        .bonus-item .title {
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--text-color);
-        }
-        .bonus-item .reward {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--primary-color);
-        }
-        .bonus-item .claim-btn {
-            padding: 8px 18px;
-            font-size: 12px;
-            font-weight: 600;
-            border-radius: 8px;
-            background: var(--gradient);
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: var(--transition);
-            white-space: nowrap;
-            font-family: inherit;
-        }
-        .bonus-item .claim-btn:disabled {
-            background: #10b981;
-            cursor: not-allowed;
-        }
-        .bonus-item .claim-btn:hover:not(:disabled) {
-            transform: scale(1.03);
-        }
-
-        /* ===== HISTORY ===== */
-        .history-item {
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-        }
-        .history-item:last-child {
-            border-bottom: none;
-        }
-        .history-details {
-            flex: 1;
-            min-width: 0;
-        }
-        .history-details .method-number {
-            font-weight: 700;
-            font-size: 14px;
-        }
-        .history-details .date {
-            font-size: 11px;
-            color: var(--text-light);
-        }
-        .history-amount {
-            text-align: right;
-            flex-shrink: 0;
-        }
-        .history-amount .amount-text {
-            font-size: 16px;
-            font-weight: 800;
-        }
-        .history-status {
-            font-size: 11px;
-            font-weight: 700;
             padding: 2px 10px;
             border-radius: 12px;
-            display: inline-block;
-            margin-top: 2px;
+            margin-top: 4px;
         }
-        .history-status.success,
-        .history-status.approved {
-            color: #10b981;
-            background: rgba(16, 185, 129, 0.1);
+        .action-card .action-badge.earn {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--success);
         }
-        .history-status.pending {
-            color: #f59e0b;
-            background: rgba(245, 158, 11, 0.1);
+        .action-card .action-badge.complete {
+            background: rgba(59, 130, 246, 0.12);
+            color: var(--info);
         }
-        .history-status.rejected {
-            color: #ef4444;
-            background: rgba(239, 68, 68, 0.1);
+
+        /* ===== CHART ===== */
+        .chart-container {
+            position: relative;
+            height: 180px;
+            width: 100%;
         }
 
         /* ===== NAV BAR ===== */
@@ -1041,125 +794,6 @@
             color: var(--text-color);
         }
 
-        /* ===== METHOD FIELDS ===== */
-        .method-field {
-            display: none;
-            margin-top: 10px;
-        }
-        .method-field.active {
-            display: block;
-            animation: fadeIn 0.3s ease-out;
-        }
-        .method-field label {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-color);
-            display: block;
-            margin-bottom: 4px;
-        }
-        .method-field .field-hint {
-            font-size: 12px;
-            color: var(--text-light);
-            margin-bottom: 6px;
-        }
-
-        /* ===== AD LOADER ===== */
-        #ad-loader-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 5000;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 20px;
-            color: white;
-            font-size: 16px;
-            font-weight: 500;
-        }
-        #ad-loader-overlay .loader-spinner {
-            width: 56px;
-            height: 56px;
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-top-color: var(--primary-color);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        #ad-loader-overlay .loader-text {
-            font-size: 16px;
-            font-weight: 500;
-            opacity: 0.9;
-        }
-        #ad-loader-overlay .loader-sub {
-            font-size: 13px;
-            opacity: 0.6;
-            margin-top: -8px;
-        }
-        #ad-loader-overlay .loader-progress {
-            width: 200px;
-            height: 3px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        #ad-loader-overlay .loader-progress-bar {
-            height: 100%;
-            width: 0%;
-            background: var(--gradient);
-            border-radius: 4px;
-            transition: width 0.3s ease;
-        }
-
-        /* ===== CHART ===== */
-        .chart-container {
-            position: relative;
-            height: 180px;
-            width: 100%;
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 400px) {
-            body {
-                padding: 12px 8px 80px 8px;
-            }
-            .balance-card .amount {
-                font-size: 36px;
-            }
-            .stats-grid {
-                gap: 8px;
-            }
-            .stat-item {
-                padding: 12px 8px;
-            }
-            .stat-item .value {
-                font-size: 17px;
-            }
-            #adCountdownOverlay .timer-text {
-                font-size: 48px;
-            }
-            .home-stat-item .stat-value {
-                font-size: 16px;
-            }
-            .home-stat-item .stat-icon {
-                font-size: 20px;
-            }
-        }
-        @media (min-width: 481px) {
-            body {
-                padding: 20px 16px 100px 16px;
-            }
-            .modal {
-                align-items: center;
-                padding: 20px;
-            }
-            .modal-content {
-                border-radius: 20px;
-            }
-        }
-
         /* ===== TOAST ===== */
         .toast-container {
             position: fixed;
@@ -1194,841 +828,18 @@
             border-color: var(--warning);
         }
 
-        /* ===== EMPTY STATE ===== */
-        .empty-state {
-            text-align: center;
-            padding: 30px 20px;
-            color: var(--text-light);
-        }
-        .empty-state i {
-            font-size: 40px;
-            margin-bottom: 12px;
-            opacity: 0.3;
-        }
-
-        /* ===== JOB DETAILS PAGE ===== */
-        .job-details-page {
-            display: none;
+        /* ===== AD COUNTDOWN OVERLAY ===== */
+        #adCountdownOverlay {
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 2000;
-            background: var(--background-color);
-            overflow-y: auto;
-            padding: 16px 12px 100px 12px;
-            animation: fadeIn 0.3s ease-out;
-        }
-        .job-details-page.active {
-            display: block;
-        }
-        .job-details-page .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--card-background);
-            border: 1px solid var(--border-color);
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--text-color);
-            cursor: pointer;
-            transition: var(--transition);
-            margin-bottom: 16px;
-            font-family: inherit;
-        }
-        .job-details-page .back-btn:hover {
-            background: var(--border-color);
-        }
-        .job-details-page .detail-card {
-            background: var(--card-background);
-            border-radius: var(--radius);
-            border: 1px solid var(--border-color);
-            padding: 18px 16px;
-            margin-bottom: 16px;
-            box-shadow: var(--shadow);
-        }
-        .job-details-page .detail-card .detail-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            color: var(--text-color);
-        }
-
-        /* Translation Section */
-        .translation-section {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 14px;
-            flex-wrap: wrap;
-        }
-        .translation-section .translate-label {
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--text-color);
-        }
-        .translation-section select {
-            padding: 6px 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background: var(--background-color);
-            color: var(--text-color);
-            font-family: 'Inter', sans-serif;
-            font-size: 13px;
-            cursor: pointer;
-            outline: none;
-            transition: var(--transition);
-        }
-        .translation-section select:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
-        }
-
-        /* Client Info */
-        .client-info {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 12px;
-        }
-        .client-info .client-avatar {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: var(--gradient);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 22px;
-            font-weight: 700;
-            flex-shrink: 0;
-        }
-        .client-info .client-details {
-            flex: 1;
-            min-width: 0;
-        }
-        .client-info .client-name {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text-color);
-        }
-        .client-info .client-stats {
-            display: flex;
-            gap: 12px;
-            font-size: 13px;
-            color: var(--text-light);
-        }
-        .client-info .client-stats .stat {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .client-info .client-stars {
-            color: #f59e0b;
-            font-size: 14px;
-        }
-        .client-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-            flex-wrap: wrap;
-        }
-        .client-actions .action-btn {
-            padding: 6px 16px;
-            border-radius: 8px;
-            border: none;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-            transition: var(--transition);
-            font-family: inherit;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .client-actions .action-btn.follow {
-            background: var(--primary-color);
-            color: white;
-        }
-        .client-actions .action-btn.follow:hover {
-            transform: scale(1.03);
-            box-shadow: 0 4px 15px rgba(var(--primary-color-rgb), 0.3);
-        }
-        .client-actions .action-btn.follow.following {
-            background: var(--success);
-        }
-        .client-actions .action-btn.rate {
-            background: var(--card-background);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-        }
-        .client-actions .action-btn.rate:hover {
-            border-color: var(--primary-color);
-        }
-
-        /* Rating Stars */
-        .rating-stars {
-            display: inline-flex;
-            gap: 4px;
-        }
-        .rating-stars .star {
-            font-size: 20px;
-            color: var(--border-color);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        .rating-stars .star.active {
-            color: #f59e0b;
-        }
-        .rating-stars .star:hover {
-            transform: scale(1.2);
-        }
-
-        /* Job Detail Sections */
-        .job-detail-section {
-            margin-bottom: 12px;
-        }
-        .job-detail-section .section-label {
-            font-weight: 700;
-            font-size: 15px;
-            color: var(--text-color);
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .job-detail-section .section-content {
-            font-size: 14px;
-            color: var(--text-light);
-            line-height: 1.7;
-            white-space: pre-wrap;
-        }
-        .job-detail-section .section-content a {
-            color: var(--primary-color);
-            text-decoration: none;
-        }
-        .job-detail-section .section-content a:hover {
-            text-decoration: underline;
-        }
-
-        /* Detail Stats Grid */
-        .detail-stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 14px;
-        }
-        .detail-stats-grid .stat-box {
-            background: var(--background-color);
-            padding: 12px;
-            border-radius: 10px;
-            text-align: center;
-            border: 1px solid var(--border-color);
-        }
-        .detail-stats-grid .stat-box .label {
-            font-size: 11px;
-            color: var(--text-light);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .detail-stats-grid .stat-box .value {
-            font-size: 18px;
-            font-weight: 800;
-            color: var(--text-color);
-        }
-        .detail-stats-grid .stat-box .value.highlight {
-            color: var(--primary-color);
-        }
-        .detail-stats-grid .stat-box .value.reward {
-            color: var(--success);
-        }
-
-        /* Progress bar in details */
-        .detail-progress {
-            margin: 12px 0;
-        }
-        .detail-progress .progress-bar {
             width: 100%;
-            height: 6px;
-            background: var(--border-color);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .detail-progress .progress-bar .fill {
             height: 100%;
-            background: var(--gradient);
-            border-radius: 4px;
-            transition: width 0.5s ease;
-        }
-        .detail-progress .progress-label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            color: var(--text-light);
-            margin-top: 4px;
-        }
-
-        /* Verify Button */
-        .verify-job-btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: var(--radius);
-            background: var(--gradient);
-            color: white;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-            font-family: inherit;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 4px 15px rgba(var(--primary-color-rgb), 0.2);
-        }
-        .verify-job-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(var(--primary-color-rgb), 0.3);
-        }
-        .verify-job-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Verification Modal inside details */
-        .verify-job-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 3000;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            align-items: flex-end;
-            padding: 16px;
-        }
-        .verify-job-modal.active {
-            display: flex;
-        }
-        .verify-job-modal .modal-content {
-            background: var(--card-background);
-            padding: 20px;
-            border-radius: 20px 20px 0 0;
-            width: 100%;
-            max-width: 480px;
-            margin: 0 auto;
-            max-height: 85vh;
-            overflow-y: auto;
-            animation: slideUp 0.3s ease-out;
-            border: 1px solid var(--border-color);
-        }
-        .verify-job-modal .modal-content .modal-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-
-        /* Rating Toast */
-        .rating-toast {
-            position: fixed;
-            bottom: 120px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9999;
-            background: var(--card-background);
-            padding: 16px 24px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-hover);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            animation: fadeIn 0.3s ease;
-        }
-        .rating-toast.active {
-            display: flex;
-        }
-        .rating-toast .rating-stars {
-            font-size: 28px;
-        }
-        .rating-toast .rating-stars .star {
-            font-size: 28px;
-        }
-
-        /* ===== PROFILE PAGE ===== */
-        .profile-page {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 1500;
-            background: var(--background-color);
-            overflow-y: auto;
-            padding: 16px 12px 100px 12px;
-            animation: fadeIn 0.3s ease-out;
-        }
-        .profile-page.active {
-            display: block;
-        }
-        .profile-page .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--card-background);
-            border: 1px solid var(--border-color);
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--text-color);
-            cursor: pointer;
-            transition: var(--transition);
-            margin-bottom: 16px;
-            font-family: inherit;
-        }
-        .profile-page .back-btn:hover {
-            background: var(--border-color);
-        }
-        .profile-page .profile-card {
-            background: var(--card-background);
-            border-radius: var(--radius);
-            border: 1px solid var(--border-color);
-            padding: 20px 16px;
-            margin-bottom: 16px;
-            box-shadow: var(--shadow);
-            text-align: center;
-        }
-        .profile-page .profile-card .big-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: var(--gradient);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            font-weight: 700;
-            color: white;
-            margin: 0 auto 12px;
-            box-shadow: 0 4px 20px rgba(var(--primary-color-rgb), 0.3);
-        }
-        .profile-page .profile-card .profile-name {
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--text-color);
-        }
-        .profile-page .profile-card .profile-stats-row {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 8px;
-            flex-wrap: wrap;
-        }
-        .profile-page .profile-card .profile-stats-row .stat-item {
-            font-size: 13px;
-            color: var(--text-light);
-            background: transparent;
-            padding: 0;
-            border: none;
-            box-shadow: none;
-        }
-        .profile-page .profile-card .profile-stats-row .stat-item .num {
-            font-weight: 700;
-            color: var(--text-color);
-        }
-        .profile-page .profile-card .profile-stats-row .stat-item .num.following {
-            color: var(--primary-color);
-        }
-        .profile-page .profile-card .profile-stats-row .stat-item .num.followers {
-            color: var(--primary-color);
-        }
-        .profile-page .profile-card .profile-stats-row .stat-item .num.rating {
-            color: #f59e0b;
-        }
-        .profile-page .profile-stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-        .profile-page .profile-stat-box {
-            background: var(--card-background);
-            padding: 12px;
-            border-radius: 10px;
-            text-align: center;
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow);
-        }
-        .profile-page .profile-stat-box .label {
-            font-size: 10px;
-            color: var(--text-light);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .profile-page .profile-stat-box .value {
-            font-size: 18px;
-            font-weight: 800;
-            color: var(--text-color);
-        }
-        .profile-page .profile-stat-box .value.reward {
-            color: var(--success);
-        }
-        .profile-page .profile-stat-box .value.highlight {
-            color: var(--primary-color);
-        }
-        .profile-page .profile-stat-box .value.danger {
-            color: var(--danger);
-        }
-        .profile-page .profile-section-title {
-            font-size: 15px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .profile-page .profile-list-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .profile-page .profile-list-item:last-child {
-            border-bottom: none;
-        }
-        .profile-page .profile-list-item .left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .profile-page .profile-list-item .left .icon {
-            font-size: 18px;
-            color: var(--primary-color);
-        }
-        .profile-page .profile-list-item .left .info .title {
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--text-color);
-        }
-        .profile-page .profile-list-item .left .info .sub {
-            font-size: 12px;
-            color: var(--text-light);
-        }
-        .profile-page .profile-list-item .right .status {
-            font-size: 11px;
-            font-weight: 600;
-            padding: 2px 10px;
-            border-radius: 12px;
-        }
-        .profile-page .profile-list-item .right .status.pending {
-            color: var(--warning);
-            background: rgba(245, 158, 11, 0.1);
-        }
-        .profile-page .profile-list-item .right .status.approved {
-            color: var(--success);
-            background: rgba(16, 185, 129, 0.1);
-        }
-        .profile-page .profile-list-item .right .status.rejected {
-            color: var(--danger);
-            background: rgba(239, 68, 68, 0.1);
-        }
-        .profile-page .profile-list-item .right .count {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-color);
-        }
-
-        /* ===== ALL JOBS PAGE ===== */
-        .all-jobs-page {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 1600;
-            background: var(--background-color);
-            overflow-y: auto;
-            padding: 16px 12px 100px 12px;
-            animation: fadeIn 0.3s ease-out;
-        }
-        .all-jobs-page.active {
-            display: block;
-        }
-        .all-jobs-page .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--card-background);
-            border: 1px solid var(--border-color);
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--text-color);
-            cursor: pointer;
-            transition: var(--transition);
-            margin-bottom: 16px;
-            font-family: inherit;
-        }
-        .all-jobs-page .back-btn:hover {
-            background: var(--border-color);
-        }
-        .all-jobs-page .jobs-count-badge {
-            display: inline-block;
-            background: rgba(var(--primary-color-rgb), 0.1);
-            color: var(--primary-color);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            margin-left: 8px;
-        }
-
-        /* ===== VERIFY JOB BUTTON ===== */
-        .verify-job-btn.active {
-            background: var(--gradient);
-            color: white;
-        }
-        .verify-job-btn.active:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(var(--primary-color-rgb), 0.3);
-        }
-        .verify-job-btn:not(.active) {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        /* ===== WATCH & EARN PAGE ===== */
-        .watch-earn-page {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 1800;
-            background: var(--background-color);
-            overflow-y: auto;
-            padding: 16px 12px 100px 12px;
-            animation: fadeIn 0.3s ease-out;
-        }
-        .watch-earn-page.active {
-            display: block;
-        }
-
-        .watch-earn-page .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--card-background);
-            border: 1px solid var(--border-color);
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--text-color);
-            cursor: pointer;
-            transition: var(--transition);
-            margin-bottom: 16px;
-            font-family: inherit;
-        }
-        .watch-earn-page .back-btn:hover {
-            background: var(--border-color);
-        }
-
-        .watch-earn-page .page-title {
-            font-size: 24px;
-            font-weight: 800;
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .watch-earn-page .page-subtitle {
-            font-size: 14px;
-            color: var(--text-light);
-            margin-bottom: 20px;
-        }
-
-        /* Tier Card */
-        .tier-card {
-            background: var(--card-background);
-            border-radius: var(--radius);
-            border: 1px solid var(--border-color);
-            padding: 20px 16px;
-            margin-bottom: 16px;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-        .tier-card:hover {
-            box-shadow: var(--shadow-hover);
-        }
-        .tier-card .tier-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 10px;
-        }
-        .tier-card .tier-name {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-color);
-        }
-        .tier-card .tier-prize {
-            font-size: 22px;
-            font-weight: 800;
-            color: var(--success);
-            background: rgba(16, 185, 129, 0.1);
-            padding: 2px 14px;
-            border-radius: 20px;
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .tier-card .tier-prize .currency {
-            font-size: 14px;
-            font-weight: 600;
-            opacity: 0.7;
-        }
-        .tier-card .tier-progress {
-            margin: 10px 0 12px 0;
-        }
-        .tier-card .tier-progress .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: var(--border-color);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        .tier-card .tier-progress .progress-bar .fill {
-            height: 100%;
-            background: var(--gradient);
-            border-radius: 8px;
-            transition: width 0.5s ease;
-        }
-        .tier-card .tier-progress .progress-text {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            color: var(--text-light);
-            margin-top: 4px;
-        }
-        .tier-card .tier-progress .progress-text .watched {
-            font-weight: 700;
-            color: var(--text-color);
-        }
-        .tier-card .tier-progress .progress-text .remaining {
-            font-weight: 600;
-            color: var(--warning);
-        }
-        .tier-card .tier-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 12px;
-            flex-wrap: wrap;
-        }
-        .tier-card .tier-actions .tier-btn {
-            flex: 1;
-            min-width: 100px;
-            padding: 10px 16px;
-            border: none;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            transition: var(--transition);
-            font-family: inherit;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-        .tier-card .tier-actions .tier-btn.watch {
-            background: var(--gradient);
-            color: white;
-            box-shadow: 0 4px 12px rgba(var(--primary-color-rgb), 0.2);
-        }
-        .tier-card .tier-actions .tier-btn.watch:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(var(--primary-color-rgb), 0.3);
-        }
-        .tier-card .tier-actions .tier-btn.watch:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        .tier-card .tier-actions .tier-btn.watch.watched {
-            background: #10b981;
-        }
-        .tier-card .tier-actions .tier-btn.claim {
-            background: var(--warning);
-            color: white;
-        }
-        .tier-card .tier-actions .tier-btn.claim:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
-        }
-        .tier-card .tier-actions .tier-btn.claim:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .tier-card .tier-actions .tier-btn.claim.claimed {
-            background: var(--success);
-            cursor: default;
-        }
-        .tier-card .tier-status-badge {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            font-size: 11px;
-            font-weight: 600;
-            padding: 2px 12px;
-            border-radius: 12px;
-        }
-        .tier-card .tier-status-badge.active {
-            background: rgba(16, 185, 129, 0.12);
-            color: var(--success);
-        }
-        .tier-card .tier-status-badge.inactive {
-            background: rgba(239, 68, 68, 0.12);
-            color: var(--danger);
-        }
-        .tier-card .tier-status-badge.completed {
-            background: rgba(59, 130, 246, 0.12);
-            color: var(--info);
-        }
-        .tier-card .tier-status-badge.claimed {
-            background: rgba(16, 185, 129, 0.12);
-            color: var(--success);
-        }
-
-        /* ===== Banned Overlay ===== */
-        .banned-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 8000;
-            background: rgba(0, 0, 0, 0.85);
+            z-index: 6000;
+            background: rgba(0, 0, 0, 0.92);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
+            display: none;
             align-items: center;
             justify-content: center;
             flex-direction: column;
@@ -2036,159 +847,59 @@
             text-align: center;
             padding: 30px;
         }
-        .banned-overlay.active {
+        #adCountdownOverlay.active {
             display: flex;
         }
-        .banned-overlay .banned-icon {
-            font-size: 80px;
-            color: var(--danger);
+        #adCountdownOverlay .progress-container {
+            width: 80%;
+            max-width: 300px;
             margin-bottom: 20px;
         }
-        .banned-overlay .banned-title {
-            font-size: 28px;
+        #adCountdownOverlay .progress-container .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        #adCountdownOverlay .progress-container .progress-bar .fill {
+            height: 100%;
+            background: var(--gradient);
+            border-radius: 8px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        #adCountdownOverlay .timer-text {
+            font-size: 64px;
             font-weight: 800;
+            color: white;
+            margin-bottom: 4px;
+            line-height: 1.1;
+        }
+        #adCountdownOverlay .timer-label {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+        }
+        #adCountdownOverlay .countdown-title {
+            font-size: 20px;
+            font-weight: 600;
             margin-bottom: 8px;
         }
-        .banned-overlay .banned-reason {
+        #adCountdownOverlay .countdown-sub {
             font-size: 14px;
-            color: rgba(255, 255, 255, 0.7);
-            max-width: 400px;
-            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.6);
         }
-        .banned-overlay .banned-btn {
-            padding: 12px 30px;
-            border: none;
-            border-radius: 12px;
-            background: var(--primary-color);
-            color: white;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            transition: var(--transition);
-            font-family: inherit;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .banned-overlay .banned-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 20px rgba(var(--primary-color-rgb), 0.4);
-        }
-
-        .security-badge {
-            position: fixed;
-            bottom: 75px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 50;
-            font-size: 10px;
-            color: var(--text-light);
-            opacity: 0.3;
-            text-align: center;
-            pointer-events: none;
-        }
-
-        /* ===== WITHDRAW FULL PAGE ===== */
-        #withdrawPage {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 2000;
-            background: var(--background-color);
-            overflow-y: auto;
-            padding: 16px 12px 100px 12px;
-            animation: fadeIn 0.3s ease-out;
-        }
-        #withdrawPage.active {
-            display: block;
-        }
-        #withdrawPage .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--card-background);
-            border: 1px solid var(--border-color);
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--text-color);
-            cursor: pointer;
-            transition: var(--transition);
-            margin-bottom: 16px;
-            font-family: inherit;
-        }
-        #withdrawPage .back-btn:hover {
-            background: var(--border-color);
-        }
-        #withdrawPage .withdraw-card {
-            background: var(--card-background);
-            border-radius: var(--radius);
-            border: 1px solid var(--border-color);
-            padding: 20px 16px;
-            margin-bottom: 16px;
-            box-shadow: var(--shadow);
-        }
-        #withdrawPage .withdraw-card .withdraw-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-        #withdrawPage .withdraw-info-box {
-            background: var(--background-color);
-            padding: 14px;
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-            margin-bottom: 12px;
-        }
-        #withdrawPage .withdraw-info-box .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 6px 0;
-            font-size: 14px;
-        }
-        #withdrawPage .withdraw-info-box .info-row .label {
-            color: var(--text-light);
-        }
-        #withdrawPage .withdraw-info-box .info-row .value {
-            font-weight: 700;
-            color: var(--text-color);
-        }
-        #withdrawPage .withdraw-info-box .info-row .value.success {
-            color: var(--success);
-        }
-        #withdrawPage .withdraw-info-box .info-row .value.danger {
-            color: var(--danger);
-        }
-        #withdrawPage .withdraw-info-box .info-row .value.warning {
-            color: var(--warning);
-        }
-        #withdrawPage .withdraw-rule-box {
-            background: rgba(245, 158, 11, 0.08);
-            padding: 12px 14px;
-            border-radius: 10px;
-            border: 1px solid rgba(245, 158, 11, 0.2);
-            margin-bottom: 14px;
-        }
-        #withdrawPage .withdraw-rule-box .rule-title {
-            font-weight: 700;
+        #adCountdownOverlay .countdown-warning {
+            margin-top: 16px;
             font-size: 14px;
             color: var(--warning);
-            margin-bottom: 4px;
-        }
-        #withdrawPage .withdraw-rule-box .rule-text {
-            font-size: 13px;
-            color: var(--text-light);
-            line-height: 1.5;
-        }
-
-        /* ===== AD BUTTON TIMER (ใน Watch & Earn) ===== */
-        .tier-btn .timer-text {
-            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
             font-weight: 600;
+        }
+        #adCountdownOverlay .countdown-warning.show {
+            opacity: 1;
         }
 
         /* ===== ERROR POPUP ===== */
@@ -2435,6 +1146,59 @@
         #bonusPage .back-btn:hover {
             background: var(--border-color);
         }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 400px) {
+            body {
+                padding: 12px 8px 80px 8px;
+            }
+            .balance-card .balance-amount {
+                font-size: 36px;
+            }
+            .action-grid {
+                gap: 8px;
+            }
+            .action-card {
+                padding: 14px 10px;
+            }
+            .action-card .action-icon {
+                font-size: 26px;
+            }
+            .referral-section .referral-stats {
+                gap: 8px;
+            }
+            .referral-section .referral-stat .stat-value {
+                font-size: 17px;
+            }
+            #adCountdownOverlay .timer-text {
+                font-size: 48px;
+            }
+        }
+        @media (min-width: 481px) {
+            body {
+                padding: 20px 16px 100px 16px;
+            }
+            .modal {
+                align-items: center;
+                padding: 20px;
+            }
+            .modal-content {
+                border-radius: 20px;
+            }
+        }
+
+        .security-badge {
+            position: fixed;
+            bottom: 75px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 50;
+            font-size: 10px;
+            color: var(--text-light);
+            opacity: 0.3;
+            text-align: center;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -2477,7 +1241,7 @@
         </div>
     </div>
 
-    <!-- ===== AD COUNTDOWN OVERLAY (15 sec + Progress Bar) ===== -->
+    <!-- ===== AD COUNTDOWN OVERLAY ===== -->
     <div id="adCountdownOverlay">
         <div class="countdown-title">⏳ Watching Ad</div>
         <div class="timer-text" id="countdownText">15</div>
@@ -2525,130 +1289,96 @@
     <!-- MAIN CONTAINER -->
     <!-- ============================================================ -->
     <div class="container">
-        <!-- ===== PROFILE HEADER ===== -->
+        <!-- ===== PROFILE HEADER (NexEarn Support Style) ===== -->
         <div class="profile-header">
-            <div id="profile-pic" onclick="openProfilePage()"><i class="fa-solid fa-user"></i></div>
-            <div class="profile-info">
-                <div id="greeting">Welcome!</div>
-                <span id="userRoleBadge" class="role-badge">📖 Publisher</span>
+            <div class="profile-left">
+                <div class="profile-avatar" id="profileAvatar">NS</div>
+                <div class="profile-name-box">
+                    <div class="profile-name" id="greeting">User</div>
+                    <div class="profile-badge">
+                        <span class="member">Member</span>
+                        <span class="verified">• Verified</span>
+                    </div>
+                </div>
+            </div>
+            <div class="profile-right">
+                <button class="wallet-btn" onclick="openWithdrawPage()">
+                    <i class="fa-solid fa-wallet"></i> Wallet
+                </button>
             </div>
         </div>
 
         <!-- ===== BALANCE CARD ===== -->
         <div class="balance-card">
-            <h3>💰 Balance</h3>
-            <div class="amount" id="total-earning">৳0.0</div>
+            <div class="balance-label">Current Balance</div>
+            <div class="balance-amount" id="total-earning">৳0.0</div>
         </div>
 
-        <!-- ===== HOME STATS (Modern Design like Image) ===== -->
-        <div class="home-stats">
-            <div class="home-stat-item">
-                <div class="stat-icon"><i class="fa-solid fa-eye"></i></div>
-                <div class="stat-value" id="ad-count">0</div>
-                <div class="stat-label">Ads Watched</div>
+        <!-- ===== REFERRAL PROGRAM ===== -->
+        <div class="referral-section">
+            <div class="referral-header">
+                <span class="referral-title">👥 Referral Program</span>
+                <span class="referral-per">৳0.50 / Refer</span>
             </div>
-            <div class="home-stat-divider"></div>
-            <div class="home-stat-item">
-                <div class="stat-icon"><i class="fa-solid fa-calendar-day"></i></div>
-                <div class="stat-value" id="ads-today-count">0 / 15</div>
-                <div class="stat-label">Today's Ads</div>
+            <div class="referral-stats">
+                <div class="referral-stat">
+                    <div class="stat-value" id="referral-count">0</div>
+                    <div class="stat-label">Total Refer</div>
+                </div>
+                <div class="referral-stat">
+                    <div class="stat-value" id="referral-bonus">৳0.00</div>
+                    <div class="stat-label">Refer Bonus</div>
+                </div>
             </div>
-            <div class="home-stat-divider"></div>
-            <div class="home-stat-item">
-                <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
-                <div class="stat-value" id="referral-count">0</div>
-                <div class="stat-label">Referrals</div>
+            <div class="referral-link-box">
+                <span class="link-text" id="referralLinkDisplay">Loading...</span>
+                <button class="copy-btn" onclick="copyReferralLink()">Copy</button>
             </div>
         </div>
 
-        <!-- ===== WATCH AD BUTTON ===== -->
-        <button class="watch-ad-btn" id="watchAdBtn" onclick="startWatchingAd()">
-            <span class="btn-icon"><i class="fa-solid fa-play-circle"></i></span>
-            <span>
-                <span class="btn-text" id="watchAdText">Watch Ad</span>
-                <br>
-                <span class="btn-sub" id="watchAdSub">Earn ৳0.08 per ad</span>
-            </span>
-        </button>
-        <div id="homeCountdown"></div>
+        <!-- ===== WATCH ADS & TASKS ===== -->
+        <div class="action-grid">
+            <div class="action-card" onclick="startWatchingAd()">
+                <div class="action-icon"><i class="fa-solid fa-play-circle"></i></div>
+                <div class="action-title">Watch Ads</div>
+                <div class="action-sub">Watch ads & earn money</div>
+                <span class="action-badge earn" id="watchAdBadge">Earn ৳0.08</span>
+            </div>
+            <div class="action-card" onclick="openBonusPage()">
+                <div class="action-icon"><i class="fa-solid fa-list-check"></i></div>
+                <div class="action-title">Tasks</div>
+                <div class="action-sub">Complete tasks & earn</div>
+                <span class="action-badge complete" id="taskBadge">Available</span>
+            </div>
+        </div>
 
         <!-- ===== CHART ===== -->
-        <div class="card">
-            <div class="card-title">📈 Weekly Activity</div>
+        <div class="card" style="background:var(--card-background); padding:18px 16px; border-radius:var(--radius); border:1px solid var(--border-color); box-shadow:var(--shadow);">
+            <div class="card-title" style="font-size:17px; font-weight:700; margin-bottom:14px; display:flex; align-items:center; gap:8px;">📈 Weekly Activity</div>
             <div class="chart-container">
                 <canvas id="activityChart"></canvas>
             </div>
         </div>
     </div>
 
-    <!-- ===== PROFILE PAGE ===== -->
-    <div class="profile-page" id="profilePage">
-        <button class="back-btn" onclick="closeProfilePage()">
-            <i class="fa-solid fa-arrow-left"></i> Back
-        </button>
-        <div id="profile-content"></div>
-    </div>
-
-    <!-- ===== ALL JOBS PAGE ===== -->
-    <div class="all-jobs-page" id="allJobsPage">
-        <button class="back-btn" onclick="closeAllJobs()">
-            <i class="fa-solid fa-arrow-left"></i> Back
-        </button>
-        <div id="all-jobs-container"></div>
-    </div>
-
-    <!-- ===== JOB DETAILS PAGE ===== -->
-    <div class="job-details-page" id="jobDetailsPage">
-        <button class="back-btn" onclick="closeJobDetails()">
-            <i class="fa-solid fa-arrow-left"></i> Back to Jobs
-        </button>
-        <div id="job-details-content"></div>
-    </div>
-
-    <!-- ===== VERIFY JOB MODAL ===== -->
-    <div class="verify-job-modal" id="verifyJobModal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeVerifyModal()">&times;</button>
-            <div class="modal-title">📸 Submit Job Verification</div>
-            <p style="font-size:13px; color:var(--text-light); margin-bottom:12px;">Please provide details about the job you completed and upload a screenshot as proof.</p>
-            <div id="verify-job-info"></div>
-            <div class="form-group">
-                <label>Job Title *</label>
-                <input type="text" id="verify-job-title" placeholder="Enter the job title" required>
-            </div>
-            <div class="form-group">
-                <label>Job Description *</label>
-                <textarea id="verify-job-desc" placeholder="Describe the job you completed" rows="3" required></textarea>
-            </div>
-            <div class="form-group">
-                <label>Upload Screenshot *</label>
-                <input type="file" id="verify-job-screenshot" accept="image/*" required>
-                <div class="form-hint">Upload PNG, JPG or GIF (Max 5MB)</div>
-            </div>
-            <button class="action-button" onclick="submitJobVerification()">
-                <i class="fa-solid fa-upload"></i> <span>Submit for Verification</span>
-            </button>
-        </div>
-    </div>
-
     <!-- ===== WITHDRAW FULL PAGE ===== -->
-    <div id="withdrawPage">
+    <div id="withdrawPage" class="full-page-modal">
         <button class="back-btn" onclick="closeWithdrawPage()">
             <i class="fa-solid fa-arrow-left"></i> Back
         </button>
-        <div class="withdraw-card">
-            <div class="withdraw-title">💸 Withdraw Funds</div>
+        <div class="withdraw-card" style="background:var(--card-background); border-radius:var(--radius); border:1px solid var(--border-color); padding:20px 16px; box-shadow:var(--shadow);">
+            <div class="withdraw-title" style="font-size:18px; font-weight:700; margin-bottom:12px;">💸 Withdraw Funds</div>
             <div id="withdraw-content"></div>
         </div>
     </div>
 
     <!-- ===== SUPPORT FULL PAGE ===== -->
-    <div id="supportPage">
+    <div id="supportPage" class="full-page-modal">
         <button class="back-btn" onclick="closeSupportPage()">
             <i class="fa-solid fa-arrow-left"></i> Back
         </button>
-        <div class="card">
-            <div class="card-title">🆘 Support</div>
+        <div class="card" style="background:var(--card-background); padding:18px 16px; border-radius:var(--radius); border:1px solid var(--border-color); box-shadow:var(--shadow);">
+            <div class="card-title" style="font-size:17px; font-weight:700; margin-bottom:14px; display:flex; align-items:center; gap:8px;">🆘 Support</div>
             <p style="line-height:1.6; margin-bottom:16px; font-size:14px; color:var(--text-light);">For any help or questions, please contact our support team. We're here to assist you!</p>
             <button class="support-contact-btn" onclick="openTelegramSupport()">
                 <i class="fa-brands fa-telegram"></i> Contact Support
@@ -2657,41 +1387,41 @@
     </div>
 
     <!-- ===== HISTORY FULL PAGE ===== -->
-    <div id="historyPage">
+    <div id="historyPage" class="full-page-modal">
         <button class="back-btn" onclick="closeHistoryPage()">
             <i class="fa-solid fa-arrow-left"></i> Back
         </button>
-        <div class="card">
-            <div class="card-title">📜 Withdrawal History</div>
+        <div class="card" style="background:var(--card-background); padding:18px 16px; border-radius:var(--radius); border:1px solid var(--border-color); box-shadow:var(--shadow);">
+            <div class="card-title" style="font-size:17px; font-weight:700; margin-bottom:14px; display:flex; align-items:center; gap:8px;">📜 Withdrawal History</div>
             <div id="history-list-full"></div>
         </div>
     </div>
 
     <!-- ===== INVITE FULL PAGE ===== -->
-    <div id="invitePage">
+    <div id="invitePage" class="full-page-modal">
         <button class="back-btn" onclick="closeInvitePage()">
             <i class="fa-solid fa-arrow-left"></i> Back
         </button>
-        <div class="card">
-            <div class="card-title">👥 Invite Friends</div>
+        <div class="card" style="background:var(--card-background); padding:18px 16px; border-radius:var(--radius); border:1px solid var(--border-color); box-shadow:var(--shadow);">
+            <div class="card-title" style="font-size:17px; font-weight:700; margin-bottom:14px; display:flex; align-items:center; gap:8px;">👥 Invite Friends</div>
             <p style="line-height:1.6; margin-bottom:8px; font-size:14px; color:var(--text-light);">Share your referral link with friends and earn together. You get a reward for each successful referral!</p>
             <div class="invite-link-box" id="inviteLinkDisplay"></div>
-            <button class="action-button" id="copy-link-btn-full" onclick="copyReferralLinkFull()">
+            <button class="action-button" onclick="copyReferralLinkFull()" style="display:flex; align-items:center; justify-content:center; gap:10px; width:100%; padding:16px; border:none; border-radius:var(--radius); background:var(--gradient); color:white; font-size:16px; font-weight:700; cursor:pointer; font-family:inherit; box-shadow:0 4px 15px rgba(var(--primary-color-rgb),0.2); transition:var(--transition);">
                 <i class="fa-solid fa-copy"></i> Copy Link
             </button>
-            <button class="action-button secondary" style="margin-top:10px;" onclick="shareReferralLinkFull()">
+            <button class="action-button secondary" style="margin-top:10px; display:flex; align-items:center; justify-content:center; gap:10px; width:100%; padding:16px; border:2px solid var(--primary-color); border-radius:var(--radius); background:transparent; color:var(--primary-color); font-size:16px; font-weight:700; cursor:pointer; font-family:inherit; transition:var(--transition);" onclick="shareReferralLinkFull()">
                 <i class="fa-solid fa-share-nodes"></i> Share Link
             </button>
         </div>
     </div>
 
     <!-- ===== BONUS FULL PAGE ===== -->
-    <div id="bonusPage">
+    <div id="bonusPage" class="full-page-modal">
         <button class="back-btn" onclick="closeBonusPage()">
             <i class="fa-solid fa-arrow-left"></i> Back
         </button>
-        <div class="card">
-            <div class="card-title">⭐ Bonus Tasks</div>
+        <div class="card" style="background:var(--card-background); padding:18px 16px; border-radius:var(--radius); border:1px solid var(--border-color); box-shadow:var(--shadow);">
+            <div class="card-title" style="font-size:17px; font-weight:700; margin-bottom:14px; display:flex; align-items:center; gap:8px;">⭐ Bonus Tasks</div>
             <p style="text-align:center; margin-bottom:16px; font-size:14px; color:var(--text-light);">Complete these one-time tasks to earn extra rewards!</p>
             <div id="bonus-tasks-list-full"></div>
         </div>
@@ -2699,7 +1429,7 @@
 
     <!-- ===== NAV BAR ===== -->
     <div class="nav-bar">
-        <button class="nav-button" id="withdrawNavBtn" onclick="openWithdrawPage()">
+        <button class="nav-button" onclick="openWithdrawPage()">
             <i class="fa-solid fa-money-bill-transfer"></i>
             <span>Withdraw</span>
         </button>
@@ -2726,33 +1456,10 @@
     <div id="welcomeModal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal('welcomeModal')">&times;</button>
-            <h3 id="welcome-title" class="card-title" style="text-align:center;"></h3>
+            <h3 id="welcome-title" style="font-size:17px; font-weight:700; margin-bottom:14px; text-align:center;"></h3>
             <p id="welcome-message" style="line-height:1.7; font-size:14px; text-align:center; white-space:pre-wrap; margin:12px 0;"></p>
-            <button class="action-button" onclick="closeModal('welcomeModal')">I Understand</button>
+            <button class="action-button" onclick="closeModal('welcomeModal')" style="display:flex; align-items:center; justify-content:center; gap:10px; width:100%; padding:16px; border:none; border-radius:var(--radius); background:var(--gradient); color:white; font-size:16px; font-weight:700; cursor:pointer; font-family:inherit; box-shadow:0 4px 15px rgba(var(--primary-color-rgb),0.2); transition:var(--transition);">I Understand</button>
         </div>
-    </div>
-
-    <!-- ===== RATING TOAST ===== -->
-    <div class="rating-toast" id="ratingToast">
-        <div style="font-weight:600; font-size:14px;">Rate this client</div>
-        <div class="rating-stars" id="ratingStars">
-            <span class="star" data-value="1">★</span>
-            <span class="star" data-value="2">★</span>
-            <span class="star" data-value="3">★</span>
-            <span class="star" data-value="4">★</span>
-            <span class="star" data-value="5">★</span>
-        </div>
-        <button class="action-btn" style="padding:6px 20px; border:none; border-radius:8px; background:var(--primary-color); color:white; font-weight:600; cursor:pointer;" onclick="submitRating()">Submit</button>
-    </div>
-
-    <!-- ===== WATCH & EARN PAGE ===== -->
-    <div class="watch-earn-page" id="watchEarnPage">
-        <button class="back-btn" onclick="closeWatchEarn()">
-            <i class="fa-solid fa-arrow-left"></i> Back
-        </button>
-        <div class="page-title">▶️ Watch & Earn</div>
-        <div class="page-subtitle">Watch ads and claim your rewards!</div>
-        <div id="tiers-container"></div>
     </div>
 
     <!-- ============================================================ -->
@@ -2876,64 +1583,41 @@
             DOM.preloaderPercentage = document.getElementById('preloader-percentage');
             DOM.container = document.querySelector('.container');
             DOM.totalEarning = document.getElementById('total-earning');
-            DOM.adCount = document.getElementById('ad-count');
-            DOM.adsTodayCount = document.getElementById('ads-today-count');
             DOM.referralCount = document.getElementById('referral-count');
-            DOM.watchAdBtn = document.getElementById('watchAdBtn');
-            DOM.watchAdText = document.getElementById('watchAdText');
-            DOM.watchAdSub = document.getElementById('watchAdSub');
-            DOM.supportBtn = document.getElementById('admin-contact-button');
-            DOM.historyList = document.getElementById('history-list');
-            DOM.bonusTasksList = document.getElementById('bonus-tasks-list');
-            DOM.welcomeTitle = document.getElementById('welcome-title');
-            DOM.welcomeMessage = document.getElementById('welcome-message');
-            DOM.jobListContainer = document.getElementById('job-list-container');
-            DOM.profilePic = document.getElementById('profile-pic');
+            DOM.referralBonus = document.getElementById('referral-bonus');
+            DOM.referralLinkDisplay = document.getElementById('referralLinkDisplay');
+            DOM.profileAvatar = document.getElementById('profileAvatar');
             DOM.greeting = document.getElementById('greeting');
-            DOM.jobDetailsPage = document.getElementById('jobDetailsPage');
-            DOM.jobDetailsContent = document.getElementById('job-details-content');
-            DOM.verifyJobModal = document.getElementById('verifyJobModal');
-            DOM.verifyJobInfo = document.getElementById('verify-job-info');
-            DOM.verifyJobTitle = document.getElementById('verify-job-title');
-            DOM.verifyJobDesc = document.getElementById('verify-job-desc');
-            DOM.verifyJobScreenshot = document.getElementById('verify-job-screenshot');
-            DOM.ratingToast = document.getElementById('ratingToast');
-            DOM.ratingStars = document.getElementById('ratingStars');
-            DOM.profilePage = document.getElementById('profilePage');
-            DOM.profileContent = document.getElementById('profile-content');
-            DOM.allJobsPage = document.getElementById('allJobsPage');
-            DOM.allJobsContainer = document.getElementById('all-jobs-container');
-            DOM.jobsCountBadge = document.getElementById('jobs-count-badge');
+            DOM.watchAdBadge = document.getElementById('watchAdBadge');
+            DOM.taskBadge = document.getElementById('taskBadge');
+            DOM.bonusTasksListFull = document.getElementById('bonus-tasks-list-full');
+            DOM.withdrawContent = document.getElementById('withdraw-content');
+            DOM.historyListFull = document.getElementById('history-list-full');
+            DOM.inviteLinkDisplay = document.getElementById('inviteLinkDisplay');
+            DOM.adCountdownOverlay = document.getElementById('adCountdownOverlay');
+            DOM.countdownText = document.getElementById('countdownText');
+            DOM.countdownProgressFill = document.getElementById('countdownProgressFill');
+            DOM.countdownWarning = document.getElementById('countdownWarning');
+            DOM.errorPopup = document.getElementById('errorPopup');
+            DOM.errorPopupTitle = document.getElementById('errorPopupTitle');
+            DOM.errorPopupMsg = document.getElementById('errorPopupMsg');
+            DOM.joinChannelModal = document.getElementById('joinChannelModal');
+            DOM.verifyChannelBtn = document.getElementById('verifyChannelBtn');
+            DOM.verifyStatus = document.getElementById('verifyStatus');
+            DOM.channelLinksContainer = document.getElementById('channelLinksContainer');
             DOM.bannedOverlay = document.getElementById('bannedOverlay');
             DOM.banReason = document.getElementById('banReason');
             DOM.maintenanceOverlay = document.getElementById('maintenance-overlay');
             DOM.maintenanceMessage = document.getElementById('maintenanceMessage');
             DOM.maintenanceTime = document.getElementById('maintenanceTime');
-            DOM.joinChannelModal = document.getElementById('joinChannelModal');
-            DOM.verifyChannelBtn = document.getElementById('verifyChannelBtn');
-            DOM.verifyStatus = document.getElementById('verifyStatus');
-            DOM.watchEarnPage = document.getElementById('watchEarnPage');
-            DOM.tiersContainer = document.getElementById('tiers-container');
-            DOM.withdrawPage = document.getElementById('withdrawPage');
-            DOM.withdrawContent = document.getElementById('withdraw-content');
-            DOM.adCountdownOverlay = document.getElementById('adCountdownOverlay');
-            DOM.countdownText = document.getElementById('countdownText');
-            DOM.countdownProgressFill = document.getElementById('countdownProgressFill');
-            DOM.countdownWarning = document.getElementById('countdownWarning');
-            DOM.homeCountdown = document.getElementById('homeCountdown');
-            DOM.errorPopup = document.getElementById('errorPopup');
-            DOM.errorPopupTitle = document.getElementById('errorPopupTitle');
-            DOM.errorPopupMsg = document.getElementById('errorPopupMsg');
-            DOM.channelLinksContainer = document.getElementById('channelLinksContainer');
             // Full pages
+            DOM.withdrawPage = document.getElementById('withdrawPage');
             DOM.supportPage = document.getElementById('supportPage');
             DOM.historyPage = document.getElementById('historyPage');
-            DOM.historyListFull = document.getElementById('history-list-full');
             DOM.invitePage = document.getElementById('invitePage');
-            DOM.inviteLinkDisplay = document.getElementById('inviteLinkDisplay');
             DOM.bonusPage = document.getElementById('bonusPage');
-            DOM.bonusTasksListFull = document.getElementById('bonus-tasks-list-full');
-            DOM.copyLinkBtnFull = document.getElementById('copy-link-btn-full');
+            DOM.welcomeTitle = document.getElementById('welcome-title');
+            DOM.welcomeMessage = document.getElementById('welcome-message');
         }
 
         // ============================================================
@@ -3193,7 +1877,7 @@
             });
 
             DOM.container.style.display = 'none';
-            document.querySelectorAll('.modal, .job-details-page, .profile-page, .all-jobs-page, .watch-earn-page, #withdrawPage, #supportPage, #historyPage, #invitePage, #bonusPage')
+            document.querySelectorAll('.modal, .full-page-modal, #withdrawPage, #supportPage, #historyPage, #invitePage, #bonusPage')
                 .forEach(el => {
                     el.classList.remove('active');
                     el.style.display = 'none';
@@ -3253,7 +1937,6 @@
                     }
                     console.log("🔄 Showing Monetag rewarded ad...");
                     
-                    // Call Monetag ad
                     show_11573980().then(() => {
                         console.log("✅ Ad completed - Reward granted!");
                         resolve(true);
@@ -3262,7 +1945,6 @@
                         resolve(false);
                     });
                     
-                    // Fallback timeout
                     setTimeout(() => {
                         console.warn("Ad timeout - resolving false");
                         resolve(false);
@@ -3380,7 +2062,7 @@
         }
 
         // ============================================================
-        // WATCH AD - Main Function (Fixed)
+        // WATCH AD - Main Function
         // ============================================================
         async function startWatchingAd() {
             if (isBanned) {
@@ -3389,7 +2071,7 @@
             }
             if (isWatchingAd) return;
             if (DOM.adCountdownOverlay.classList.contains('active')) return;
-            if (DOM.adLoaderOverlay.style.display === 'flex') return;
+            if (document.getElementById('ad-loader-overlay').style.display === 'flex') return;
 
             if (state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT) {
                 showToast(`📊 Daily limit reached! (${CONFIG.DAILY_AD_LIMIT})`, 'warning');
@@ -3404,9 +2086,7 @@
             }
 
             isWatchingAd = true;
-            DOM.watchAdBtn.disabled = true;
-            DOM.watchAdText.textContent = 'Watching...';
-            DOM.watchAdSub.textContent = 'Please wait';
+            DOM.watchAdBadge.textContent = '⏳ Watching...';
 
             const adShown = await startAdCountdown();
 
@@ -3434,76 +2114,8 @@
                 showToast('❌ Ad was not shown properly. Please try again.', 'error');
             }
 
-            DOM.watchAdBtn.disabled = false;
-            DOM.watchAdText.textContent = 'Watch Ad';
-            DOM.watchAdSub.textContent = `Earn ${CONFIG.CURRENCY_SYMBOL}${(CONFIG.AD_REWARD * 80).toFixed(2)} per ad`;
+            DOM.watchAdBadge.textContent = `Earn ${CONFIG.CURRENCY_SYMBOL}${(CONFIG.AD_REWARD * 80).toFixed(2)}`;
             isWatchingAd = false;
-        }
-
-        // ============================================================
-        // TRANSLATION FUNCTION
-        // ============================================================
-        async function translateText(text, targetLang) {
-            if (!text || targetLang === 'original') return text;
-            try {
-                const url =
-                    `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
-                const response = await fetch(url);
-                const data = await response.json();
-                if (data && data[0]) {
-                    return data[0].map(item => item[0]).join('');
-                }
-                return text;
-            } catch (e) {
-                console.warn("Translation error:", e);
-                return text;
-            }
-        }
-
-        async function translateJobDetails() {
-            const lang = document.getElementById('translateSelect').value;
-            if (lang === 'original') {
-                const adId = currentJobId;
-                if (adId) {
-                    const snapshot = await firebaseDb.ref(`ads/${adId}`).once('value');
-                    const ad = snapshot.val();
-                    if (ad) {
-                        const descWithLinks = (ad.desc || 'No description').replace(
-                            /(https?:\/\/[^\s]+)/g,
-                            '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
-                        );
-                        document.getElementById('job-description-text').innerHTML = descWithLinks;
-                        document.getElementById('job-instructions-text').textContent = ad.instructions ||
-                            'No specific instructions provided.';
-                        document.getElementById('job-requirements-text').textContent = ad.requirements ||
-                            'No specific requirements.';
-                    }
-                }
-                return;
-            }
-            const descEl = document.getElementById('job-description-text');
-            const instructionsEl = document.getElementById('job-instructions-text');
-            const requirementsEl = document.getElementById('job-requirements-text');
-            const originalDesc = descEl.getAttribute('data-original') || descEl.textContent;
-            const originalInstructions = instructionsEl.getAttribute('data-original') || instructionsEl.textContent;
-            const originalRequirements = requirementsEl.getAttribute('data-original') || requirementsEl.textContent;
-            if (!descEl.getAttribute('data-original')) {
-                descEl.setAttribute('data-original', originalDesc);
-                instructionsEl.setAttribute('data-original', originalInstructions);
-                requirementsEl.setAttribute('data-original', originalRequirements);
-            }
-            showToast(`🌐 Translating to ${lang}...`, '');
-            const translatedDesc = await translateText(originalDesc, lang);
-            const translatedInstructions = await translateText(originalInstructions, lang);
-            const translatedRequirements = await translateText(originalRequirements, lang);
-            const descWithLinks = translatedDesc.replace(
-                /(https?:\/\/[^\s]+)/g,
-                '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
-            );
-            descEl.innerHTML = descWithLinks;
-            instructionsEl.textContent = translatedInstructions;
-            requirementsEl.textContent = translatedRequirements;
-            showToast(`✅ Translated to ${lang}`, 'success');
         }
 
         // ============================================================
@@ -3662,764 +2274,16 @@
             });
         }
 
-        function listenAds() {
-            if (!firebaseDb) return;
-            firebaseDb.ref('ads').on('value', (snapshot) => {
-                const ads = snapshot.val() || {};
-                const adList = Object.entries(ads).map(([id, data]) => ({ id, ...data }));
-                renderJobList(adList);
-                updateProfileData(adList);
-                if (DOM.allJobsPage.classList.contains('active')) {
-                    renderAllJobs(adList);
-                }
-            });
-        }
-
         function listenReferrals() {
             if (!firebaseDb || !state.currentUserId) return;
             firebaseDb.ref(`users/${state.currentUserId}/referrals`).on('value', (snapshot) => {
                 const count = snapshot.val() || 0;
                 state.referralCount = count;
+                const bonusEarned = (state.rewardedReferrals || 0) * CONFIG.REFERRAL_REWARD;
                 DOM.referralCount.textContent = count;
-                if (DOM.withdrawPage.classList.contains('active')) {
-                    renderWithdrawPage();
-                }
+                DOM.referralBonus.textContent = `${CONFIG.CURRENCY_SYMBOL}${(bonusEarned * 80).toFixed(2)}`;
                 if (DOM.invitePage.classList.contains('active')) {
                     renderInvitePage();
-                }
-            });
-        }
-
-        function listenUserVerifications() {
-            if (!firebaseDb || !state.currentUserId) return;
-            firebaseDb.ref('verifications').orderByChild('userId').equalTo(state.currentUserId).on('value', (snapshot) => {
-                const data = snapshot.val() || {};
-                state.verifications = Object.entries(data).map(([id, item]) => ({ id, ...item }));
-                listenAds();
-                updateProfileData();
-            });
-        }
-
-        // ============================================================
-        // PROFILE PAGE FUNCTIONS
-        // ============================================================
-        function openProfilePage() {
-            DOM.profilePage.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            document.querySelector('.container').style.display = 'none';
-            renderProfilePage();
-        }
-
-        function closeProfilePage() {
-            DOM.profilePage.classList.remove('active');
-            document.body.style.overflow = '';
-            document.querySelector('.container').style.display = 'block';
-        }
-
-        function renderProfilePage() {
-            const user = tg?.initDataUnsafe?.user || { first_name: 'User' };
-            const initial = user.first_name?.charAt(0) || 'U';
-            const followingCount = Object.keys(state.followers).filter(id => id !== state.currentUserId).length || 0;
-            const followersCount = Object.keys(state.followers).length || 0;
-            const ratingsArray = Object.values(state.ratings).filter(r => r > 0);
-            const avgRating = ratingsArray.length > 0 ? ratingsArray.reduce((a, b) => a + b, 0) / ratingsArray.length : 0;
-
-            const referralBonusEarned = (state.rewardedReferrals || 0) * CONFIG.REFERRAL_REWARD;
-
-            let content = `
-                <div class="profile-card">
-                    <div class="big-avatar">${initial}</div>
-                    <div class="profile-name">${escapeHTML(user.first_name || 'User')}</div>
-                    <div class="profile-stats-row">
-                        <div class="stat-item"><span class="num following">${followingCount}</span> Following</div>
-                        <div class="stat-item"><span class="num followers">${followersCount}</span> Followers</div>
-                        <div class="stat-item"><span class="num rating">${avgRating.toFixed(1)}</span> ★ Rating</div>
-                    </div>
-                </div>
-                <div class="profile-stats-grid">
-                    <div class="profile-stat-box"><div class="label">💰 Balance</div><div class="value reward">${CONFIG.CURRENCY_SYMBOL}${formatBalance(state.balance)}</div></div>
-                    <div class="profile-stat-box"><div class="label">📈 Total Earnings</div><div class="value">${CONFIG.CURRENCY_SYMBOL}${formatBalance(state.totalEarnings)}</div></div>
-                    <div class="profile-stat-box"><div class="label">👁 Ads Watched</div><div class="value highlight">${state.adCount}</div></div>
-                </div>
-                <div class="card">
-                    <div class="profile-section-title">👥 Referrals</div>
-                    <div class="profile-list-item">
-                        <div class="left"><span class="icon"><i class="fa-solid fa-user-plus"></i></span><div class="info"><div class="title">Total Referrals</div><div class="sub">People who joined using your link</div></div></div>
-                        <div class="right"><span class="count">${state.referralCount || 0}</span></div>
-                    </div>
-                    <div class="profile-list-item">
-                        <div class="left"><span class="icon"><i class="fa-solid fa-gift"></i></span><div class="info"><div class="title">Referral Bonus Earned</div><div class="sub">${CONFIG.CURRENCY_SYMBOL}${(referralBonusEarned * 80).toFixed(2)} (${state.rewardedReferrals || 0} referrals)</div></div></div>
-                        <div class="right"><span class="count">${CONFIG.CURRENCY_SYMBOL}${(referralBonusEarned * 80).toFixed(2)}</span></div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="profile-section-title">📋 My Submissions</div>
-                    ${state.verifications.length > 0 ? state.verifications.slice(0, 5).map(v => `
-                        <div class="profile-list-item">
-                            <div class="left"><span class="icon"><i class="fa-solid fa-file-alt"></i></span><div class="info"><div class="title">${escapeHTML(v.adTitle || 'Job')}</div><div class="sub">${new Date(v.createdAt).toLocaleDateString()}</div></div></div>
-                            <div class="right"><span class="status ${v.status || 'pending'}">${v.status || 'Pending'}</span></div>
-                        </div>
-                    `).join('') : '<div class="empty-state"><i class="fa-solid fa-inbox"></i><p>No submissions yet</p></div>'}
-                </div>
-            `;
-            DOM.profileContent.innerHTML = content;
-        }
-
-        function updateProfileData(ads) {
-            if (ads) {
-                state.jobCount = ads.filter(a => a.status === 'active' && a.approved && a.createdBy !== state.currentUserId)
-                    .length;
-                if (DOM.profilePage.classList.contains('active')) {
-                    renderProfilePage();
-                }
-                if (DOM.jobsCountBadge) {
-                    DOM.jobsCountBadge.textContent = state.jobCount;
-                }
-            }
-        }
-
-        // ============================================================
-        // ALL JOBS PAGE FUNCTIONS
-        // ============================================================
-        function openAllJobs() {
-            DOM.allJobsPage.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            DOM.profilePage.classList.remove('active');
-            document.querySelector('.container').style.display = 'none';
-            renderAllJobs();
-        }
-
-        function closeAllJobs() {
-            DOM.allJobsPage.classList.remove('active');
-            document.body.style.overflow = '';
-            document.querySelector('.container').style.display = 'block';
-            DOM.profilePage.classList.remove('active');
-            renderProfilePage();
-        }
-
-        function renderAllJobs(ads) {
-            if (!DOM.allJobsContainer) return;
-            firebaseDb.ref('ads').once('value').then(snapshot => {
-                const allAds = snapshot.val() || {};
-                const adList = Object.entries(allAds).map(([id, data]) => ({ id, ...data }));
-                const now = Date.now();
-                adList.forEach(ad => {
-                    if (ad.endDate && ad.endDate < now && ad.status === 'active') {
-                        firebaseDb.ref(`ads/${ad.id}/status`).set('expired');
-                    }
-                });
-                let filtered = adList.filter(ad =>
-                    (ad.status === 'active' || ad.status === 'paused') &&
-                    ad.approved === true &&
-                    ad.createdBy !== state.currentUserId
-                );
-                filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-                if (filtered.length === 0) {
-                    DOM.allJobsContainer.innerHTML =
-                        `<div class="empty-state"><i class="fa-solid fa-rectangle-ad"></i><p>No jobs available</p></div>`;
-                    return;
-                }
-                DOM.allJobsContainer.innerHTML = filtered.map(ad => {
-                    const views = ad.views || 0;
-                    const totalViews = ad.totalViews || 100;
-                    const progress = Math.min((views / totalViews) * 100, 100);
-                    const daysLeft = ad.endDate ? Math.ceil((ad.endDate - Date.now()) / (1000 * 60 * 60 * 24)) :
-                        0;
-                    const category = ad.category || 'General';
-                    const subCategory = ad.subCategory || '';
-                    const creatorName = ad.creatorName || 'Anonymous';
-                    const creatorRating = ad.creatorRating || 0;
-                    const reward = ad.reward || 0.001;
-                    const isCompleted = views >= totalViews;
-                    const creatorInitial = creatorName.charAt(0).toUpperCase();
-                    return `
-                        <div class="job-card" onclick="openJobDetailsFromAll('${ad.id}')">
-                            <div class="job-title">${escapeHTML(ad.title || 'Untitled')}</div>
-                            <div class="job-meta">
-                                <span class="category-badge">📌 ${escapeHTML(category)}</span>
-                                ${subCategory ? `<span class="sub-category-badge">🏷️ ${escapeHTML(subCategory)}</span>` : ''}
-                            </div>
-                            <div class="job-creator">
-                                <div class="creator-avatar">${creatorInitial}</div>
-                                <div class="creator-info">
-                                    <div class="creator-name">${escapeHTML(creatorName)}</div>
-                                    <div class="creator-rating">
-                                        <span class="stars">${'★'.repeat(Math.floor(creatorRating))}${creatorRating % 1 >= 0.5 ? '★' : ''}${'☆'.repeat(5 - Math.ceil(creatorRating))}</span>
-                                        <span>(${creatorRating.toFixed(1)})</span>
-                                    </div>
-                                </div>
-                                <div class="reward-amount">+${CONFIG.CURRENCY_SYMBOL}${(reward * 80).toFixed(2)}</div>
-                            </div>
-                            <div class="job-stats">
-                                <div class="stat-item"><i class="fa-solid fa-eye"></i><span class="value">${views}</span><span>/ ${totalViews}</span></div>
-                                <div class="progress-container">
-                                    <div class="progress-bar"><div class="fill" style="width:${progress}%"></div></div>
-                                    <div class="progress-label"><span>${progress.toFixed(0)}%</span><span>${isCompleted ? '✅ Completed' : 'In Progress'}</span></div>
-                                </div>
-                                <div class="days-left"><i class="fa-regular fa-clock"></i><span class="days">${daysLeft > 0 ? daysLeft : 'Expired'}</span><span>days</span></div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            }).catch(err => {
-                console.error("Error loading all jobs:", err);
-                DOM.allJobsContainer.innerHTML =
-                    `<div class="empty-state"><i class="fa-solid fa-exclamation-circle"></i><p>Failed to load jobs</p></div>`;
-            });
-        }
-
-        function openJobDetailsFromAll(adId) {
-            DOM.allJobsPage.classList.remove('active');
-            openJobDetails(adId);
-        }
-
-        // ============================================================
-        // HELPER FUNCTIONS
-        // ============================================================
-        function safeAlert(msg) {
-            if (tg) tg.showAlert(msg);
-            else alert(msg);
-        }
-
-        function safeOpenLink(url) {
-            if (tg) tg.openLink(url);
-            else window.open(url, '_blank');
-        }
-
-        function safeOpenTelegramLink(url) {
-            if (tg) tg.openTelegramLink(url);
-            else window.open(url, '_blank');
-        }
-
-        function escapeHTML(str) {
-            if (!str) return '';
-            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        }
-
-        function showToast(msg, type = '') {
-            const container = document.querySelector('.toast-container') || (() => {
-                const c = document.createElement('div');
-                c.className = 'toast-container';
-                document.body.appendChild(c);
-                return c;
-            })();
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.textContent = msg;
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transition = 'opacity 0.5s ease';
-                setTimeout(() => toast.remove(), 500);
-            }, 3000);
-        }
-
-        function getReferralLink() {
-            return `https://t.me/${CONFIG.BOT_USERNAME}?startapp=${state.currentUserId}`;
-        }
-
-        function getIpAddress() {
-            return fetch('https://api.ipify.org?format=json')
-                .then(res => res.json())
-                .then(data => data.ip)
-                .catch(() => null);
-        }
-
-        function closeModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (modal) modal.style.display = 'none';
-        }
-
-        function showModal(modalId, btn) {
-            if (isBanned) {
-                showToast('🚫 You are banned. Contact admin for support.', 'error');
-                return;
-            }
-            document.querySelectorAll('.nav-button.active').forEach(b => b.classList.remove('active'));
-            if (btn) btn.classList.add('active');
-            const modal = document.getElementById(modalId);
-            if (modal) modal.style.display = 'flex';
-        }
-
-        function uploadImage(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = function() {
-                    const base64 = reader.result.split(',')[1];
-                    const formData = new FormData();
-                    formData.append('key', 'bc5a5bca9a50833046600a2cc94de6c6');
-                    formData.append('image', base64);
-                    fetch('https://api.imgbb.com/1/upload', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) resolve(data.data.url);
-                        else reject(new Error('Upload failed'));
-                    })
-                    .catch(reject);
-                };
-                reader.onerror = reject;
-            });
-        }
-
-        // ============================================================
-        // RENDER JOB LIST (Homepage)
-        // ============================================================
-        function renderJobList(ads) {
-            if (!DOM.jobListContainer) return;
-            const now = Date.now();
-            ads.forEach(ad => {
-                if (ad.endDate && ad.endDate < now && ad.status === 'active') {
-                    firebaseDb.ref(`ads/${ad.id}/status`).set('expired');
-                }
-            });
-            let filtered = ads.filter(ad =>
-                (ad.status === 'active' || ad.status === 'paused') &&
-                ad.approved === true &&
-                ad.createdBy !== state.currentUserId
-            );
-            filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-            const topJobs = filtered.slice(0, 3);
-            if (topJobs.length === 0) {
-                DOM.jobListContainer.innerHTML =
-                    `<div class="empty-state"><i class="fa-solid fa-rectangle-ad"></i><p>No jobs available</p></div>`;
-                return;
-            }
-            DOM.jobListContainer.innerHTML = topJobs.map(ad => {
-                const views = ad.views || 0;
-                const totalViews = ad.totalViews || 100;
-                const progress = Math.min((views / totalViews) * 100, 100);
-                const daysLeft = ad.endDate ? Math.ceil((ad.endDate - Date.now()) / (1000 * 60 * 60 * 24)) : 0;
-                const category = ad.category || 'General';
-                const subCategory = ad.subCategory || '';
-                const creatorName = ad.creatorName || 'Anonymous';
-                const creatorRating = ad.creatorRating || 0;
-                const reward = ad.reward || 0.001;
-                const isCompleted = views >= totalViews;
-                const creatorInitial = creatorName.charAt(0).toUpperCase();
-                return `
-                    <div class="job-card" onclick="openJobDetails('${ad.id}')">
-                        <div class="job-title">${escapeHTML(ad.title || 'Untitled')}</div>
-                        <div class="job-meta">
-                            <span class="category-badge">📌 ${escapeHTML(category)}</span>
-                            ${subCategory ? `<span class="sub-category-badge">🏷️ ${escapeHTML(subCategory)}</span>` : ''}
-                        </div>
-                        <div class="job-creator">
-                            <div class="creator-avatar">${creatorInitial}</div>
-                            <div class="creator-info">
-                                <div class="creator-name">${escapeHTML(creatorName)}</div>
-                                <div class="creator-rating">
-                                    <span class="stars">${'★'.repeat(Math.floor(creatorRating))}${creatorRating % 1 >= 0.5 ? '★' : ''}${'☆'.repeat(5 - Math.ceil(creatorRating))}</span>
-                                    <span>(${creatorRating.toFixed(1)})</span>
-                                </div>
-                            </div>
-                            <div class="reward-amount">+${CONFIG.CURRENCY_SYMBOL}${(reward * 80).toFixed(2)}</div>
-                        </div>
-                        <div class="job-stats">
-                            <div class="stat-item"><i class="fa-solid fa-eye"></i><span class="value">${views}</span><span>/ ${totalViews}</span></div>
-                            <div class="progress-container">
-                                <div class="progress-bar"><div class="fill" style="width:${progress}%"></div></div>
-                                <div class="progress-label"><span>${progress.toFixed(0)}%</span><span>${isCompleted ? '✅ Completed' : 'In Progress'}</span></div>
-                            </div>
-                            <div class="days-left"><i class="fa-regular fa-clock"></i><span class="days">${daysLeft > 0 ? daysLeft : 'Expired'}</span><span>days</span></div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // ============================================================
-        // JOB DETAILS PAGE
-        // ============================================================
-        function openJobDetails(adId) {
-            firebaseDb.ref(`ads/${adId}`).once('value').then(snapshot => {
-                const ad = snapshot.val();
-                if (!ad) {
-                    showToast('❌ Job not found', 'error');
-                    return;
-                }
-                if (ad.createdBy === state.currentUserId) {
-                    showToast('❌ You cannot view your own ad!', 'error');
-                    return;
-                }
-                currentJobId = adId;
-                const views = ad.views || 0;
-                const totalViews = ad.totalViews || 100;
-                const progress = Math.min((views / totalViews) * 100, 100);
-                const daysLeft = ad.endDate ? Math.ceil((ad.endDate - Date.now()) / (1000 * 60 * 60 * 24)) : 0;
-                const creatorName = ad.creatorName || 'Anonymous';
-                const creatorRating = ad.creatorRating || 0;
-                const creatorFollowers = ad.creatorFollowers || 0;
-                const reward = ad.reward || 0.001;
-                const isCompleted = views >= totalViews;
-                const category = ad.category || 'General';
-                const subCategory = ad.subCategory || '';
-                const description = ad.desc || 'No description';
-                const requirements = ad.requirements || 'No specific requirements.';
-                const instructions = ad.instructions || 'No specific instructions provided.';
-                const imageUrl = ad.imageUrl || '';
-                const creatorId = ad.createdBy || 'unknown';
-                const isFollowing = state.followers && state.followers[creatorId] === true;
-                const userRating = state.userRatings && state.userRatings[creatorId] || 0;
-                const verification = state.verifications.find(v => v.adId === adId);
-                let verificationStatus = '',
-                    rejectionReason = '';
-                if (verification) {
-                    if (verification.status === 'approved') {
-                        verificationStatus = '✅ Verified';
-                    } else if (verification.status === 'rejected') {
-                        verificationStatus = '❌ Rejected';
-                        rejectionReason = verification.rejectReason || 'No reason provided';
-                    } else {
-                        verificationStatus = '⏳ Pending';
-                    }
-                }
-                const creatorInitial = creatorName.charAt(0).toUpperCase();
-                const descWithLinks = description.replace(
-                    /(https?:\/\/[^\s]+)/g,
-                    '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
-                );
-                DOM.jobDetailsContent.innerHTML = `
-                    <div class="detail-card">
-                        <div class="translation-section">
-                            <span class="translate-label">🌐 Translate this job</span>
-                            <select id="translateSelect" onchange="translateJobDetails()">
-                                <option value="original">Original</option>
-                                <option value="en">English</option>
-                                <option value="bn">বাংলা</option>
-                                <option value="hi">हिन्दी</option>
-                                <option value="ar">العربية</option>
-                            </select>
-                        </div>
-                        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
-                            <span class="category-badge" style="background:rgba(var(--primary-color-rgb),0.1); color:var(--primary-color); padding:4px 14px; border-radius:12px; font-weight:600; font-size:13px;">📌 ${escapeHTML(category)}</span>
-                            ${subCategory ? `<span class="sub-category-badge" style="background:rgba(var(--primary-color-rgb),0.05); color:var(--text-light); padding:4px 14px; border-radius:12px; font-weight:600; font-size:13px;">🏷️ ${escapeHTML(subCategory)}</span>` : ''}
-                        </div>
-                        <div class="detail-stats-grid">
-                            <div class="stat-box"><div class="label">💰 Payment</div><div class="value reward">+${CONFIG.CURRENCY_SYMBOL}${(reward * 80).toFixed(2)}</div></div>
-                            <div class="stat-box"><div class="label">👁 Workers</div><div class="value">${views} / ${totalViews}</div></div>
-                            <div class="stat-box"><div class="label">📅 Days Left</div><div class="value ${daysLeft <= 3 ? 'highlight' : ''}">${daysLeft > 0 ? daysLeft : 'Expired'}</div></div>
-                            <div class="stat-box"><div class="label">⏳ Duration</div><div class="value">${ad.duration || 7} days</div></div>
-                        </div>
-                        <div class="detail-progress">
-                            <div class="progress-bar"><div class="fill" style="width:${progress}%"></div></div>
-                            <div class="progress-label"><span>${progress.toFixed(0)}% Complete</span><span>${isCompleted ? '✅ Completed' : 'In Progress'}</span></div>
-                        </div>
-                    </div>
-                    <div class="detail-card">
-                        <div class="detail-title" style="font-size:15px;">👤 Client Information</div>
-                        <div class="client-info">
-                            <div class="client-avatar">${creatorInitial}</div>
-                            <div class="client-details">
-                                <div class="client-name">${escapeHTML(creatorName)}</div>
-                                <div class="client-stats">
-                                    <span class="stat"><span class="client-stars">${'★'.repeat(Math.floor(creatorRating))}${creatorRating % 1 >= 0.5 ? '★' : ''}</span> ${creatorRating.toFixed(1)}</span>
-                                    <span class="stat"><i class="fa-solid fa-users"></i> ${creatorFollowers} followers</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="client-actions">
-                            <button class="action-btn follow ${isFollowing ? 'following' : ''}" onclick="toggleFollow('${creatorId}', this)">
-                                <i class="fa-solid ${isFollowing ? 'fa-user-check' : 'fa-user-plus'}"></i>
-                                ${isFollowing ? 'Following' : 'Follow'}
-                            </button>
-                            <button class="action-btn rate" onclick="openRating('${creatorId}')"><i class="fa-solid fa-star"></i> Rate</button>
-                            ${userRating > 0 ? `<span style="font-size:13px; color:var(--text-light); display:flex; align-items:center; gap:4px;"><i class="fa-solid fa-star" style="color:#f59e0b;"></i> Your rating: ${userRating.toFixed(1)}</span>` : ''}
-                        </div>
-                    </div>
-                    <div class="detail-card">
-                        <div class="detail-title" style="font-size:15px;">📝 Job Description</div>
-                        <div class="job-detail-section">
-                            <div class="section-content" id="job-description-text" data-original="${escapeHTML(description)}">${descWithLinks}</div>
-                        </div>
-                    </div>
-                    <div class="detail-card">
-                        <div class="detail-title" style="font-size:15px;">📋 Instructions</div>
-                        <div class="job-detail-section">
-                            <div class="section-content" id="job-instructions-text" data-original="${escapeHTML(instructions)}">${escapeHTML(instructions)}</div>
-                        </div>
-                    </div>
-                    <div class="detail-card">
-                        <div class="detail-title" style="font-size:15px;">✅ Requirements</div>
-                        <div class="job-detail-section">
-                            <div class="section-content" id="job-requirements-text" data-original="${escapeHTML(requirements)}">${escapeHTML(requirements)}</div>
-                        </div>
-                    </div>
-                    <div class="detail-card">
-                        <div class="detail-title" style="font-size:15px;">🔍 Job Verification</div>
-                        ${verificationStatus ? `
-                            <div style="padding:10px; border-radius:8px; margin-bottom:12px; background:${verificationStatus.includes('✅') ? 'rgba(16,185,129,0.1)' : verificationStatus.includes('❌') ? 'rgba(239,68,68,0.1)' : 'rgba(245,158,11,0.1)'}; border:1px solid ${verificationStatus.includes('✅') ? 'var(--success)' : verificationStatus.includes('❌') ? 'var(--danger)' : 'var(--warning)'};">
-                                <strong>Status:</strong> ${verificationStatus}
-                                ${rejectionReason ? `<div style="margin-top:6px; font-size:13px; color:var(--text-light);"><strong>Reason:</strong> ${escapeHTML(rejectionReason)}</div>` : ''}
-                            </div>
-                        ` : ''}
-                        <button class="verify-job-btn active" onclick="openVerifyJob('${adId}')">
-                            <i class="fa-solid fa-check-circle"></i>
-                            ${verificationStatus ? 'Resubmit Verification' : 'Verify Job'}
-                        </button>
-                    </div>
-                `;
-                DOM.jobDetailsPage.classList.add('active');
-                document.body.style.overflow = 'hidden';
-                document.querySelector('.container').style.display = 'none';
-            }).catch(err => {
-                console.error("Error loading job details:", err);
-                showToast('❌ Failed to load job details', 'error');
-            });
-        }
-
-        function closeJobDetails() {
-            DOM.jobDetailsPage.classList.remove('active');
-            document.body.style.overflow = '';
-            document.querySelector('.container').style.display = 'block';
-            currentJobId = null;
-        }
-
-        // ============================================================
-        // FOLLOW / UNFOLLOW
-        // ============================================================
-        function toggleFollow(creatorId, btn) {
-            if (!state.currentUserId || creatorId === state.currentUserId) {
-                showToast('❌ You cannot follow yourself!', 'warning');
-                return;
-            }
-            const isFollowing = state.followers && state.followers[creatorId] === true;
-            if (isFollowing) {
-                delete state.followers[creatorId];
-                btn.classList.remove('following');
-                btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Follow';
-                showToast('Unfollowed', '');
-            } else {
-                state.followers[creatorId] = true;
-                btn.classList.add('following');
-                btn.innerHTML = '<i class="fa-solid fa-user-check"></i> Following';
-                showToast('✅ Following!', 'success');
-            }
-            state.followingCount = Object.keys(state.followers).filter(id => id !== state.currentUserId).length;
-            state.followersCount = Object.keys(state.followers).length;
-            state.profileFollowers = state.followersCount;
-            saveUserData();
-            firebaseDb.ref(`ads/${currentJobId}/creatorFollowers`).set(state.followersCount);
-            if (DOM.profilePage.classList.contains('active')) {
-                renderProfilePage();
-            }
-        }
-
-        // ============================================================
-        // RATING
-        // ============================================================
-        function openRating(creatorId) {
-            if (creatorId === state.currentUserId) {
-                showToast('❌ You cannot rate yourself!', 'warning');
-                return;
-            }
-            ratingTargetId = creatorId;
-            selectedRating = 0;
-            DOM.ratingStars.querySelectorAll('.star').forEach(star => {
-                star.classList.remove('active');
-            });
-            DOM.ratingToast.classList.add('active');
-            DOM.ratingStars.querySelectorAll('.star').forEach(star => {
-                star.onclick = function() {
-                    const val = parseInt(this.dataset.value);
-                    selectedRating = val;
-                    DOM.ratingStars.querySelectorAll('.star').forEach(s => {
-                        s.classList.toggle('active', parseInt(s.dataset.value) <= val);
-                    });
-                };
-            });
-        }
-
-        function submitRating() {
-            if (!ratingTargetId || selectedRating < 1) {
-                showToast('❌ Please select a rating', 'error');
-                return;
-            }
-            if (ratingTargetId === state.currentUserId) {
-                showToast('❌ You cannot rate yourself!', 'warning');
-                DOM.ratingToast.classList.remove('active');
-                return;
-            }
-            if (state.userRatings && state.userRatings[ratingTargetId]) {
-                showToast('❌ You already rated this client!', 'warning');
-                DOM.ratingToast.classList.remove('active');
-                return;
-            }
-            state.userRatings[ratingTargetId] = selectedRating;
-            const creatorRatings = state.userRatings;
-            const ratingsArray = Object.values(creatorRatings).filter(r => r > 0);
-            const avgRating = ratingsArray.length > 0 ? ratingsArray.reduce((a, b) => a + b, 0) / ratingsArray.length : 0;
-            state.ratings[ratingTargetId] = avgRating;
-            state.profileRating = avgRating;
-            saveUserData();
-            DOM.ratingToast.classList.remove('active');
-            showToast(`✅ Rated ${selectedRating}★`, 'success');
-            ratingTargetId = null;
-            firebaseDb.ref(`ads/${currentJobId}/creatorRating`).set(avgRating);
-            if (DOM.profilePage.classList.contains('active')) {
-                renderProfilePage();
-            }
-            if (currentJobId) {
-                openJobDetails(currentJobId);
-            }
-        }
-
-        // ============================================================
-        // VERIFY JOB
-        // ============================================================
-        function openVerifyJob(adId) {
-            if (!adId) {
-                showToast('❌ No job selected', 'error');
-                return;
-            }
-            const existingVerification = state.verifications.find(v => v.adId === adId);
-            if (existingVerification && existingVerification.status === 'pending') {
-                showToast('⏳ Verification already submitted and pending review', 'warning');
-                return;
-            }
-            if (existingVerification && existingVerification.status === 'approved') {
-                showToast('✅ This job is already verified!', 'success');
-                return;
-            }
-            state.currentVerifyAdId = adId;
-            firebaseDb.ref(`ads/${adId}`).once('value').then(snapshot => {
-                const ad = snapshot.val();
-                if (ad) {
-                    DOM.verifyJobInfo.innerHTML = `
-                        <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:10px; margin-bottom:12px;">
-                            <strong>${escapeHTML(ad.title)}</strong>
-                            <div style="font-size:12px; color:var(--text-light);">Category: ${escapeHTML(ad.category || 'General')}</div>
-                            ${ad.subCategory ? `<div style="font-size:12px; color:var(--text-light);">Sub Category: ${escapeHTML(ad.subCategory)}</div>` : ''}
-                            <div style="font-size:12px; color:var(--text-light);">Reward: ${CONFIG.CURRENCY_SYMBOL}${(ad.reward * 80)?.toFixed(2) || '0.08'}</div>
-                            ${ad.imageUrl ? `<img src="${ad.imageUrl}" style="width:100%; max-height:100px; object-fit:cover; border-radius:6px; margin-top:6px;" loading="lazy">` : ''}
-                        </div>
-                    `;
-                }
-            });
-            if (existingVerification && existingVerification.status === 'rejected') {
-                DOM.verifyJobTitle.value = existingVerification.adTitle || '';
-                DOM.verifyJobDesc.value = existingVerification.adDescription || '';
-            } else {
-                DOM.verifyJobTitle.value = '';
-                DOM.verifyJobDesc.value = '';
-            }
-            DOM.verifyJobScreenshot.value = '';
-            DOM.verifyJobModal.classList.add('active');
-        }
-
-        function closeVerifyModal() {
-            DOM.verifyJobModal.classList.remove('active');
-        }
-
-        async function submitJobVerification() {
-            const title = DOM.verifyJobTitle.value.trim();
-            const desc = DOM.verifyJobDesc.value.trim();
-            const file = DOM.verifyJobScreenshot.files[0];
-            if (!title || title.length < 3) {
-                showToast('❌ Please enter a valid job title (min 3 characters)', 'error');
-                return;
-            }
-            if (!desc || desc.length < 5) {
-                showToast('❌ Please enter a valid description (min 5 characters)', 'error');
-                return;
-            }
-            if (!file) {
-                showToast('❌ Please upload a screenshot!', 'error');
-                return;
-            }
-            if (file.size > 5 * 1024 * 1024) {
-                showToast('❌ Image size must be less than 5MB!', 'error');
-                return;
-            }
-            if (!state.currentVerifyAdId) {
-                showToast('❌ No job selected!', 'error');
-                return;
-            }
-            try {
-                showToast('📤 Uploading screenshot...', '');
-                const downloadUrl = await uploadImage(file);
-                const adSnapshot = await firebaseDb.ref(`ads/${state.currentVerifyAdId}`).once('value');
-                const ad = adSnapshot.val();
-                const reward = ad?.reward || 0;
-                const existingVerification = state.verifications.find(v => v.adId === state.currentVerifyAdId);
-                let verificationData = {
-                    adId: state.currentVerifyAdId,
-                    userId: state.currentUserId,
-                    userName: tg?.initDataUnsafe?.user?.first_name || 'User',
-                    adTitle: title,
-                    adDescription: desc,
-                    screenshot: downloadUrl,
-                    status: 'pending',
-                    rejectReason: '',
-                    createdAt: Date.now()
-                };
-                if (existingVerification && existingVerification.status === 'rejected') {
-                    await firebaseDb.ref(`verifications/${existingVerification.id}`).update({
-                        adTitle: title,
-                        adDescription: desc,
-                        screenshot: downloadUrl,
-                        status: 'pending',
-                        rejectReason: '',
-                        updatedAt: Date.now()
-                    });
-                } else {
-                    await firebaseDb.ref('verifications').push(verificationData);
-                }
-                saveUserData();
-                updateUI();
-                closeVerifyModal();
-                showToast('✅ Verification submitted! Waiting for admin approval.', 'success');
-                closeJobDetails();
-            } catch (e) {
-                console.error("Verification error:", e);
-                showToast('❌ Failed to submit verification: ' + e.message, 'error');
-            }
-        }
-
-        // ============================================================
-        // LISTEN FOR VERIFICATION APPROVALS
-        // ============================================================
-        function listenVerificationApprovals() {
-            if (!firebaseDb || !state.currentUserId) return;
-            firebaseDb.ref('verifications').orderByChild('userId').equalTo(state.currentUserId).on('child_changed', async (
-                snapshot) => {
-                const data = snapshot.val();
-                if (data && data.status === 'approved' && data.adId) {
-                    if (window._processedApprovals && window._processedApprovals[snapshot.key]) return;
-                    if (!window._processedApprovals) window._processedApprovals = {};
-                    window._processedApprovals[snapshot.key] = true;
-                    const adRef = firebaseDb.ref(`ads/${data.adId}`);
-                    await adRef.transaction((current) => {
-                        if (current) {
-                            current.views = (current.views || 0) + 1;
-                        }
-                        return current;
-                    });
-                    const adSnapshot = await adRef.once('value');
-                    const ad = adSnapshot.val();
-                    if (ad) {
-                        const reward = ad.reward || 0;
-                        await firebaseDb.ref(`users/${state.currentUserId}/balance`).transaction((bal) => (bal || 0) +
-                            reward);
-                        await firebaseDb.ref(`users/${state.currentUserId}/totalEarnings`).transaction((t) => (t || 0) +
-                            reward);
-                        await firebaseDb.ref(`users/${state.currentUserId}/adCount`).transaction((c) => (c || 0) + 1);
-                        const day = new Date().getDay();
-                        firebaseDb.ref(`users/${state.currentUserId}/weeklyActivity/${day}`).transaction((val) => (val ||
-                            0) + 1);
-                    }
-                    state.balance += ad?.reward || 0;
-                    state.totalEarnings += ad?.reward || 0;
-                    state.adCount += 1;
-                    const day = new Date().getDay();
-                    state.weeklyActivity[day] = (state.weeklyActivity[day] || 0) + 1;
-                    saveUserData();
-                    updateUI();
-                    showToast(`🎉 Ad verified! +${CONFIG.CURRENCY_SYMBOL}${((ad?.reward || 0) * 80).toFixed(2)} added!`,
-                        'success');
                 }
             });
         }
@@ -4429,30 +2293,28 @@
         // ============================================================
         function renderBonusTasks() {
             if (!state.bonusTasks || state.bonusTasks.length === 0) {
-                const msg = '<div class="empty-state"><i class="fa-solid fa-star"></i><p>No bonus tasks available</p></div>';
-                if (DOM.bonusTasksList) DOM.bonusTasksList.innerHTML = msg;
+                const msg = '<div class="empty-state" style="text-align:center; padding:30px 20px; color:var(--text-light);"><i class="fa-solid fa-star" style="font-size:40px; margin-bottom:12px; opacity:0.3;"></i><p>No bonus tasks available</p></div>';
                 if (DOM.bonusTasksListFull) DOM.bonusTasksListFull.innerHTML = msg;
                 return;
             }
             const html = state.bonusTasks.map(task => {
                 const isCompleted = state.completedBonusTasks.includes(task.id);
                 return `
-                    <div class="bonus-item">
-                        <div class="details">
-                            <div class="title">${escapeHTML(task.title)}</div>
-                            <div class="reward"><i class="fa-solid fa-gift"></i> + ${CONFIG.CURRENCY_SYMBOL}${(task.reward * 80).toFixed(2)}</div>
+                    <div class="bonus-item" style="display:flex; align-items:center; justify-content:space-between; padding:14px; background:var(--background-color); border-radius:12px; margin-bottom:10px; border:1px solid var(--border-color); gap:12px;">
+                        <div class="details" style="flex:1; min-width:0;">
+                            <div class="title" style="font-weight:600; font-size:14px; color:var(--text-color);">${escapeHTML(task.title)}</div>
+                            <div class="reward" style="font-size:13px; font-weight:700; color:var(--primary-color);"><i class="fa-solid fa-gift"></i> + ${CONFIG.CURRENCY_SYMBOL}${(task.reward * 80).toFixed(2)}</div>
                         </div>
-                        <button class="claim-btn" ${isCompleted ? 'disabled' : ''} data-task-id="${task.id}" data-reward="${task.reward}" data-link="${task.link}" data-duration="${task.duration || 10}">
+                        <button class="claim-btn" ${isCompleted ? 'disabled' : ''} data-task-id="${task.id}" data-reward="${task.reward}" data-link="${task.link}" data-duration="${task.duration || 10}" style="padding:8px 18px; font-size:12px; font-weight:600; border-radius:8px; background:var(--gradient); color:white; border:none; cursor:pointer; transition:var(--transition); white-space:nowrap; font-family:inherit;">
                             ${isCompleted ? '✅ Completed' : 'Claim'}
                         </button>
                     </div>
                 `;
             }).join('');
 
-            if (DOM.bonusTasksList) DOM.bonusTasksList.innerHTML = html;
             if (DOM.bonusTasksListFull) DOM.bonusTasksListFull.innerHTML = html;
 
-            document.querySelectorAll('#bonus-tasks-list .claim-btn:not([disabled]), #bonus-tasks-list-full .claim-btn:not([disabled])')
+            document.querySelectorAll('#bonus-tasks-list-full .claim-btn:not([disabled])')
                 .forEach(btn => {
                     btn.addEventListener('click', function() {
                         const task = {
@@ -4484,24 +2346,22 @@
 
         function renderHistory() {
             if (!state.withdrawalHistory || state.withdrawalHistory.length === 0) {
-                const msg = '<div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><p>No withdrawal history</p></div>';
-                if (DOM.historyList) DOM.historyList.innerHTML = msg;
+                const msg = '<div class="empty-state" style="text-align:center; padding:30px 20px; color:var(--text-light);"><i class="fa-solid fa-clock-rotate-left" style="font-size:40px; margin-bottom:12px; opacity:0.3;"></i><p>No withdrawal history</p></div>';
                 if (DOM.historyListFull) DOM.historyListFull.innerHTML = msg;
                 return;
             }
             const html = state.withdrawalHistory.map(item => `
-                <div class="history-item">
-                    <div class="history-details">
-                        <div class="method-number">${escapeHTML(item.method)} - ${escapeHTML(item.number)}</div>
-                        <div class="date">${new Date(item.date).toLocaleString()}</div>
+                <div class="history-item" style="padding:12px 0; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; gap:12px;">
+                    <div class="history-details" style="flex:1; min-width:0;">
+                        <div class="method-number" style="font-weight:700; font-size:14px;">${escapeHTML(item.method)} - ${escapeHTML(item.number)}</div>
+                        <div class="date" style="font-size:11px; color:var(--text-light);">${new Date(item.date).toLocaleString()}</div>
                     </div>
-                    <div class="history-amount">
-                        <div class="amount-text">${CONFIG.CURRENCY_SYMBOL}${item.amount.toFixed(2)}</div>
-                        <div class="history-status ${item.status.toLowerCase()}">${item.status}</div>
+                    <div class="history-amount" style="text-align:right; flex-shrink:0;">
+                        <div class="amount-text" style="font-size:16px; font-weight:800;">${CONFIG.CURRENCY_SYMBOL}${item.amount.toFixed(2)}</div>
+                        <div class="history-status ${item.status.toLowerCase()}" style="font-size:11px; font-weight:700; padding:2px 10px; border-radius:12px; display:inline-block; margin-top:2px;">${item.status}</div>
                     </div>
                 </div>
             `).join('');
-            if (DOM.historyList) DOM.historyList.innerHTML = html;
             if (DOM.historyListFull) DOM.historyListFull.innerHTML = html;
         }
 
@@ -4510,6 +2370,10 @@
             if (DOM.inviteLinkDisplay) {
                 DOM.inviteLinkDisplay.textContent = link;
             }
+        }
+
+        function getReferralLink() {
+            return `https://t.me/${CONFIG.BOT_USERNAME}?startapp=${state.currentUserId}`;
         }
 
         // ============================================================
@@ -4588,6 +2452,13 @@
             safeOpenTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`);
         }
 
+        function copyReferralLink() {
+            const link = getReferralLink();
+            navigator.clipboard.writeText(link)
+                .then(() => showToast('✅ Referral link copied!', 'success'))
+                .catch(() => showToast('Could not copy link.', 'error'));
+        }
+
         // ============================================================
         // REFERRAL SYSTEM
         // ============================================================
@@ -4622,380 +2493,6 @@
         }
 
         // ============================================================
-        // WATCH AD (Main button opens Watch & Earn page) - Removed, now direct
-        // ============================================================
-        // function openWatchEarn() - Removed, not needed
-
-        // ============================================================
-        // LOAD TIERS FROM FIREBASE
-        // ============================================================
-        function loadTiers() {
-            if (!firebaseDb) return;
-            firebaseDb.ref('adTiers').orderByChild('order').on('value', (snapshot) => {
-                const data = snapshot.val() || {};
-                const tiers = Object.entries(data).map(([id, tier]) => ({ id, ...tier }));
-                tiers.sort((a, b) => (a.order || a.createdAt || 0) - (b.order || b.createdAt || 0));
-                state.tiers = tiers;
-                renderTiers(tiers);
-            });
-        }
-
-        // ============================================================
-        // RENDER TIERS (User View)
-        // ============================================================
-        function renderTiers(tiers) {
-            if (!DOM.tiersContainer) return;
-            const activeTiers = tiers.filter(t => t.status !== 'inactive');
-
-            const allCompleted = activeTiers.length > 0 && activeTiers.every(t => {
-                const prog = state.tierProgress[t.id] || { watched: 0, claimed: false };
-                return prog.watched >= t.requiredAds && prog.claimed;
-            });
-
-            if (allCompleted) {
-                state.allTiersCompleted = true;
-                saveUserData();
-                DOM.tiersContainer.innerHTML = `
-                    <div class="tier-empty" style="text-align:center; padding:40px 20px; color:var(--text-light);">
-                        <i class="fa-solid fa-check-circle" style="font-size:48px; margin-bottom:12px; color:var(--success); opacity:1;"></i>
-                        <p style="font-size:18px; font-weight:700; color:var(--success);">🎉 All Tiers Completed!</p>
-                        <p style="font-size:13px; margin-top:8px;">You have completed all ad tiers. Come back tomorrow for more!</p>
-                        ${state.dailyResetTime ? `<p style="font-size:12px; margin-top:4px; color:var(--text-light);">⏳ Next reset: ${formatResetTime(state.dailyResetTime)}</p>` : ''}
-                    </div>
-                `;
-                return;
-            }
-
-            if (activeTiers.length === 0) {
-                DOM.tiersContainer.innerHTML = `
-                    <div class="tier-empty" style="text-align:center; padding:40px 20px; color:var(--text-light);">
-                        <i class="fa-solid fa-rectangle-ad" style="font-size:48px; margin-bottom:12px; opacity:0.3;"></i>
-                        <p>No ad tiers available right now.<br>Check back later!</p>
-                    </div>
-                `;
-                return;
-            }
-
-            DOM.tiersContainer.innerHTML = activeTiers.map((tier, index) => {
-                const progress = state.tierProgress[tier.id] || { watched: 0, claimed: false };
-                const watched = progress.watched || 0;
-                const claimed = progress.claimed || false;
-                const required = tier.requiredAds || 6;
-                const remaining = Math.max(0, required - watched);
-                const isComplete = watched >= required;
-                const pct = Math.min((watched / required) * 100, 100);
-                const prize = tier.prize || 0;
-
-                let statusClass = 'active';
-                let statusText = 'Active';
-                if (claimed) { statusClass = 'claimed';
-                    statusText = '✅ Claimed'; } else if (isComplete) { statusClass = 'completed';
-                    statusText = '🎯 Ready to Claim'; }
-
-                return `
-                    <div class="tier-card">
-                        <div class="tier-header">
-                            <div>
-                                <div class="tier-name">${escapeHTML(tier.name || `Section ${index + 1}`)}</div>
-                                ${tier.desc ? `<div style="font-size:12px; color:var(--text-light);">${escapeHTML(tier.desc)}</div>` : ''}
-                            </div>
-                            <div class="tier-prize">${CONFIG.CURRENCY_SYMBOL}<span>${prize.toFixed(2)}</span><span class="currency">BDT</span></div>
-                        </div>
-                        <span class="tier-status-badge ${statusClass}">${statusText}</span>
-                        <div class="tier-progress">
-                            <div class="progress-bar">
-                                <div class="fill" style="width:${pct}%"></div>
-                            </div>
-                            <div class="progress-text">
-                                <span class="watched">👁 ${watched} / ${required}</span>
-                                <span class="remaining">${remaining > 0 ? `${remaining} remaining` : '✅ Complete'}</span>
-                            </div>
-                        </div>
-                        <div class="tier-actions">
-                            <button class="tier-btn watch ${watched >= required ? 'watched' : ''}" 
-                                    onclick="watchTierAd('${tier.id}')"
-                                    ${watched >= required ? 'disabled' : ''}>
-                                <i class="fa-solid fa-play"></i> 
-                                ${watched >= required ? '✅ All Watched' : 'Watch Ad'}
-                            </button>
-                            <button class="tier-btn claim ${claimed ? 'claimed' : ''}" 
-                                    onclick="claimTierReward('${tier.id}')"
-                                    ${!isComplete || claimed ? 'disabled' : ''}>
-                                <i class="fa-solid fa-gift"></i> 
-                                ${claimed ? '✅ Claimed' : 'Claim Reward'}
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function formatResetTime(timestamp) {
-            const diff = timestamp - Date.now();
-            if (diff <= 0) return 'Now';
-            const hours = Math.floor(diff / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            return `${hours}h ${minutes}m`;
-        }
-
-        // ============================================================
-        // WATCH TIER AD (15 sec countdown + Progress Bar + Error Popup)
-        // ============================================================
-        let adTimerIntervals = {};
-        let adClickBlocked = false;
-
-        async function watchTierAd(tierId) {
-            if (isBanned) {
-                showToast('🚫 You are banned. Contact admin for support.', 'error');
-                return;
-            }
-            if (isAdShowing) return;
-            if (DOM.adLoaderOverlay.style.display === 'flex') return;
-            if (DOM.adCountdownOverlay.classList.contains('active')) return;
-
-            if (state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT) {
-                showToast(`📊 Daily limit reached! (${CONFIG.DAILY_AD_LIMIT})`, 'warning');
-                return;
-            }
-
-            const allTiers = state.tiers.filter(t => t.status !== 'inactive');
-            const allCompleted = allTiers.length > 0 && allTiers.every(t => {
-                const prog = state.tierProgress[t.id] || { watched: 0, claimed: false };
-                return prog.watched >= t.requiredAds && prog.claimed;
-            });
-
-            if (allCompleted) {
-                showToast('🎉 You have completed all tiers! Come back tomorrow.', 'success');
-                return;
-            }
-
-            const now = Date.now();
-            if (now - lastAdWatchTime < CONFIG.AD_COOLDOWN_MINUTES * 60 * 1000) {
-                const remaining = Math.ceil((CONFIG.AD_COOLDOWN_MINUTES * 60 * 1000 - (now - lastAdWatchTime)) / 1000);
-                showToast(`⏳ Please wait ${remaining}s before watching another ad`, 'warning');
-                return;
-            }
-
-            const progress = state.tierProgress[tierId] || { watched: 0, claimed: false };
-            const tier = state.tiers.find(t => t.id === tierId);
-            if (!tier) {
-                showToast('❌ Tier not found', 'error');
-                return;
-            }
-            if (progress.watched >= tier.requiredAds) {
-                showToast('✅ You already watched all ads for this tier!', 'success');
-                return;
-            }
-
-            isAdShowing = true;
-            const watchBtn = document.querySelector(`.tier-card .tier-btn.watch[onclick*="${tierId}"]`);
-            if (watchBtn) {
-                watchBtn.disabled = true;
-                watchBtn.innerHTML = `<i class="fa-solid fa-hourglass-half"></i> <span class="timer-text">15s</span>`;
-            }
-
-            adClickBlocked = true;
-            const adShown = await startAdCountdownWithPopup(tierId);
-
-            if (adShown) {
-                lastAdWatchTime = Date.now();
-                state.adsWatchedToday++;
-                state.adsWatchedSinceReset++;
-                const day = new Date().getDay();
-                state.weeklyActivity[day] = (state.weeklyActivity[day] || 0) + 1;
-
-                if (!state.tierProgress[tierId]) {
-                    state.tierProgress[tierId] = { watched: 0, claimed: false };
-                }
-                state.tierProgress[tierId].watched = (state.tierProgress[tierId].watched || 0) + 1;
-
-                if (!state.dailyResetTime) {
-                    state.dailyResetTime = Date.now() + (CONFIG.DAILY_RESET_HOURS * 60 * 60 * 1000);
-                }
-
-                const reward = CONFIG.AD_REWARD;
-                state.balance += reward;
-                state.totalEarnings += reward;
-
-                saveUserData();
-                updateUI();
-                loadTiers();
-
-                const newWatched = state.tierProgress[tierId].watched;
-                const required = tier.requiredAds || 6;
-                if (newWatched >= required) {
-                    showToast(`🎉 You completed all ads for ${tier.name}! Claim your reward now.`, 'success');
-                } else {
-                    showToast(`✅ Ad watched! +${CONFIG.CURRENCY_SYMBOL}${(reward * 80).toFixed(2)} earned. ${newWatched}/${required} completed.`,
-                        'success');
-                }
-
-                if (watchBtn) {
-                    if (newWatched >= required) {
-                        watchBtn.disabled = true;
-                        watchBtn.innerHTML = '<i class="fa-solid fa-check"></i> ✅ All Watched';
-                        watchBtn.classList.add('watched');
-                    } else {
-                        watchBtn.disabled = false;
-                        watchBtn.innerHTML = '<i class="fa-solid fa-play"></i> Watch Ad';
-                    }
-                }
-            } else {
-                if (watchBtn) {
-                    watchBtn.disabled = false;
-                    watchBtn.innerHTML = '<i class="fa-solid fa-play"></i> Watch Ad';
-                }
-            }
-
-            isAdShowing = false;
-            adClickBlocked = false;
-        }
-
-        // ============================================================
-        // START AD COUNTDOWN WITH POPUP CHECK
-        // ============================================================
-        function startAdCountdownWithPopup(tierId) {
-            return new Promise((resolve) => {
-                if (isAdCountdownActive) return resolve(false);
-                isAdCountdownActive = true;
-                adStartTime = Date.now();
-
-                let countdown = CONFIG.AD_WATCH_DURATION;
-                let elapsed = 0;
-                let adClicked = false;
-
-                DOM.adCountdownOverlay.classList.add('active');
-                DOM.countdownText.textContent = countdown;
-                DOM.countdownProgressFill.style.width = '0%';
-                DOM.countdownWarning.classList.remove('show');
-
-                const adClickHandler = () => {
-                    if (elapsed < CONFIG.MIN_AD_WATCH_TIME) {
-                        showErrorPopup(
-                            '⚠️ Wait!',
-                            `You must watch at least ${CONFIG.MIN_AD_WATCH_TIME} seconds before clicking the ad!\n\nYou have only watched ${Math.round(elapsed)} seconds.`
-                        );
-                        return;
-                    }
-                    adClicked = true;
-                    DOM.countdownText.textContent = '🎯';
-                    DOM.countdownProgressFill.style.width = '100%';
-                    DOM.countdownWarning.textContent = '✅ Ad clicked! Processing...';
-                    DOM.countdownWarning.style.color = 'var(--success)';
-                    DOM.countdownWarning.classList.add('show');
-                };
-
-                DOM.adCountdownOverlay.onclick = adClickHandler;
-
-                const countdownInterval = setInterval(() => {
-                    countdown--;
-                    elapsed = CONFIG.AD_WATCH_DURATION - countdown;
-                    DOM.countdownText.textContent = countdown;
-                    const progress = (elapsed / CONFIG.AD_WATCH_DURATION) * 100;
-                    DOM.countdownProgressFill.style.width = Math.min(progress, 100) + '%';
-
-                    if (elapsed >= CONFIG.MIN_AD_WATCH_TIME) {
-                        DOM.countdownWarning.classList.add('show');
-                        DOM.countdownWarning.textContent = `✅ You can click the ad now! (${elapsed}s elapsed)`;
-                        DOM.countdownWarning.style.color = 'var(--success)';
-                    }
-
-                    if (countdown <= 0) {
-                        clearInterval(countdownInterval);
-                        const totalElapsed = (Date.now() - adStartTime) / 1000;
-
-                        if (!adClicked) {
-                            DOM.countdownWarning.textContent = `⏳ Click the ad now!`;
-                            DOM.countdownWarning.style.color = 'var(--warning)';
-                            DOM.countdownWarning.classList.add('show');
-                            setTimeout(() => {
-                                if (!adClicked) {
-                                    adClicked = true;
-                                    DOM.countdownText.textContent = '🎯';
-                                    DOM.countdownProgressFill.style.width = '100%';
-                                    DOM.countdownWarning.textContent = '✅ Ad clicked! Processing...';
-                                    DOM.countdownWarning.style.color = 'var(--success)';
-                                }
-                                setTimeout(async () => {
-                                    const adShown = await showRewardedAd();
-                                    DOM.adCountdownOverlay.classList.remove('active');
-                                    DOM.adCountdownOverlay.onclick = null;
-                                    isAdCountdownActive = false;
-                                    resolve(adShown);
-                                }, 500);
-                            }, 2000);
-                            return;
-                        }
-
-                        DOM.countdownText.textContent = '🎯';
-                        DOM.countdownProgressFill.style.width = '100%';
-
-                        setTimeout(async () => {
-                            const adShown = await showRewardedAd();
-                            DOM.adCountdownOverlay.classList.remove('active');
-                            DOM.adCountdownOverlay.onclick = null;
-                            isAdCountdownActive = false;
-                            resolve(adShown);
-                        }, 500);
-                    }
-                }, 1000);
-            });
-        }
-
-        // ============================================================
-        // CLAIM TIER REWARD
-        // ============================================================
-        async function claimTierReward(tierId) {
-            if (isBanned) {
-                showToast('🚫 You are banned. Contact admin for support.', 'error');
-                return;
-            }
-
-            const tier = state.tiers.find(t => t.id === tierId);
-            if (!tier) {
-                showToast('❌ Tier not found', 'error');
-                return;
-            }
-
-            const progress = state.tierProgress[tierId] || { watched: 0, claimed: false };
-            const required = tier.requiredAds || 6;
-
-            if (progress.watched < required) {
-                showToast(`❌ You need to watch all ${required} ads first!`, 'warning');
-                return;
-            }
-
-            if (progress.claimed) {
-                showToast('✅ You already claimed this reward!', 'success');
-                return;
-            }
-
-            const prize = tier.prize || 0;
-            window._legitimateBalanceChange = true;
-            state.balance += prize;
-            state.totalEarnings += prize;
-            state.tierProgress[tierId].claimed = true;
-
-            saveUserData();
-            updateUI();
-            loadTiers();
-
-            showToast(`🎉 You claimed ${CONFIG.CURRENCY_SYMBOL}${prize.toFixed(2)} from ${tier.name}!`, 'success');
-
-            const claimBtn = document.querySelector(`.tier-card .tier-btn.claim[onclick*="${tierId}"]`);
-            if (claimBtn) {
-                claimBtn.disabled = true;
-                claimBtn.innerHTML = '<i class="fa-solid fa-check"></i> ✅ Claimed';
-                claimBtn.classList.add('claimed');
-            }
-            const statusBadge = document.querySelector(`.tier-card .tier-status-badge`);
-            if (statusBadge) {
-                statusBadge.textContent = '✅ Claimed';
-                statusBadge.className = 'tier-status-badge claimed';
-            }
-        }
-
-        // ============================================================
         // WITHDRAW FULL PAGE
         // ============================================================
         function openWithdrawPage() {
@@ -5025,27 +2522,25 @@
             const minWithdraw = CONFIG.MINIMUM_WITHDRAWAL || 0.10;
 
             let content = `
-                <div class="withdraw-info-box">
-                    <div class="info-row">
-                        <span class="label">💰 Available Balance</span>
-                        <span class="value success">${CONFIG.CURRENCY_SYMBOL}${formatBalance(balance)}</span>
+                <div class="withdraw-info-box" style="background:var(--background-color); padding:14px; border-radius:10px; border:1px solid var(--border-color); margin-bottom:12px;">
+                    <div class="info-row" style="display:flex; justify-content:space-between; padding:6px 0; font-size:14px;">
+                        <span class="label" style="color:var(--text-light);">💰 Available Balance</span>
+                        <span class="value success" style="font-weight:700; color:var(--success);">${CONFIG.CURRENCY_SYMBOL}${formatBalance(balance)}</span>
                     </div>
-                    <div class="info-row">
-                        <span class="label">👥 Your Referrals</span>
-                        <span class="value">${referralCount}</span>
+                    <div class="info-row" style="display:flex; justify-content:space-between; padding:6px 0; font-size:14px;">
+                        <span class="label" style="color:var(--text-light);">👥 Your Referrals</span>
+                        <span class="value" style="font-weight:700; color:var(--text-color);">${referralCount}</span>
                     </div>
-                    <div class="info-row">
-                        <span class="label">📋 Withdrawal Status</span>
-                        <span class="value ${canWithdraw ? 'success' : 'danger'}">
-                            ${canWithdraw ? '✅ Eligible' : '❌ Not Eligible'}
-                        </span>
+                    <div class="info-row" style="display:flex; justify-content:space-between; padding:6px 0; font-size:14px;">
+                        <span class="label" style="color:var(--text-light);">📋 Withdrawal Status</span>
+                        <span class="value ${canWithdraw ? 'success' : 'danger'}" style="font-weight:700;">${canWithdraw ? '✅ Eligible' : '❌ Not Eligible'}</span>
                     </div>
                 </div>
 
                 ${!hasWithdrawn ? `
-                    <div class="withdraw-rule-box">
-                        <div class="rule-title">⚠️ First Withdrawal Rule</div>
-                        <div class="rule-text">
+                    <div class="withdraw-rule-box" style="background:rgba(245,158,11,0.08); padding:12px 14px; border-radius:10px; border:1px solid rgba(245,158,11,0.2); margin-bottom:14px;">
+                        <div class="rule-title" style="font-weight:700; font-size:14px; color:var(--warning); margin-bottom:4px;">⚠️ First Withdrawal Rule</div>
+                        <div class="rule-text" style="font-size:13px; color:var(--text-light); line-height:1.5;">
                             You need <strong>${requiredReferrals}</strong> referrals to make your first withdrawal.
                             ${referralCount >= requiredReferrals ? '✅ You have enough referrals!' : `You have <strong>${referralCount}</strong> out of ${requiredReferrals}.`}
                             <br><br>
@@ -5053,9 +2548,9 @@
                         </div>
                     </div>
                 ` : `
-                    <div class="withdraw-rule-box" style="background:rgba(16,185,129,0.08); border-color:rgba(16,185,129,0.2);">
-                        <div class="rule-title" style="color:var(--success);">✅ Unlimited Withdrawals</div>
-                        <div class="rule-text">
+                    <div class="withdraw-rule-box" style="background:rgba(16,185,129,0.08); border-color:rgba(16,185,129,0.2); padding:12px 14px; border-radius:10px; border:1px solid rgba(16,185,129,0.2); margin-bottom:14px;">
+                        <div class="rule-title" style="font-weight:700; font-size:14px; color:var(--success); margin-bottom:4px;">✅ Unlimited Withdrawals</div>
+                        <div class="rule-text" style="font-size:13px; color:var(--text-light); line-height:1.5;">
                             You have already completed your first withdrawal!<br>
                             You can now withdraw anytime without any referral requirements.
                         </div>
@@ -5064,36 +2559,36 @@
 
                 ${canWithdraw && balance >= minWithdraw ? `
                     <form id="withdraw-form-page">
-                        <div class="form-group">
-                            <label>Payment Method *</label>
-                            <select id="method-page" name="method" required>
+                        <div class="form-group" style="margin-bottom:14px;">
+                            <label style="display:block; font-size:13px; font-weight:600; color:var(--text-color); margin-bottom:4px;">Payment Method *</label>
+                            <select id="method-page" name="method" required style="width:100%; padding:12px 14px; border:1px solid var(--border-color); border-radius:10px; font-family:'Inter',sans-serif; font-size:15px; background:var(--background-color); color:var(--text-color); transition:var(--transition);">
                                 <option value="" disabled selected>Select Payment Method</option>
                                 ${CONFIG.withdrawalMethods.map(m => `<option value="${m}">${m}</option>`).join('')}
                             </select>
                         </div>
                         <div id="method-fields-page">
                             ${CONFIG.withdrawalMethods.map(m => `
-                                <div class="method-field" id="${m.toLowerCase()}-field-page">
-                                    <label>${m} Account</label>
-                                    <div class="field-hint">Enter your ${m} account details</div>
-                                    <input type="text" id="${m.toLowerCase()}-account-page" placeholder="Enter ${m} Account">
+                                <div class="method-field" id="${m.toLowerCase()}-field-page" style="display:none; margin-top:10px;">
+                                    <label style="font-size:13px; font-weight:600; color:var(--text-color); display:block; margin-bottom:4px;">${m} Account</label>
+                                    <div class="field-hint" style="font-size:12px; color:var(--text-light); margin-bottom:6px;">Enter your ${m} account details</div>
+                                    <input type="text" id="${m.toLowerCase()}-account-page" placeholder="Enter ${m} Account" style="width:100%; padding:12px 14px; border:1px solid var(--border-color); border-radius:10px; font-family:'Inter',sans-serif; font-size:15px; background:var(--background-color); color:var(--text-color); transition:var(--transition);">
                                 </div>
                             `).join('')}
                         </div>
-                        <div class="form-group">
-                            <label>Amount (${CONFIG.CURRENCY_SYMBOL}) *</label>
-                            <input type="number" step="0.01" id="withdraw-amount-page" placeholder="0.00" min="${minWithdraw}" required>
-                            <div class="form-hint">Minimum withdrawal: ${CONFIG.CURRENCY_SYMBOL}${minWithdraw.toFixed(2)}</div>
+                        <div class="form-group" style="margin-bottom:14px;">
+                            <label style="display:block; font-size:13px; font-weight:600; color:var(--text-color); margin-bottom:4px;">Amount (${CONFIG.CURRENCY_SYMBOL}) *</label>
+                            <input type="number" step="0.01" id="withdraw-amount-page" placeholder="0.00" min="${minWithdraw}" required style="width:100%; padding:12px 14px; border:1px solid var(--border-color); border-radius:10px; font-family:'Inter',sans-serif; font-size:15px; background:var(--background-color); color:var(--text-color); transition:var(--transition);">
+                            <div class="form-hint" style="font-size:11px; color:var(--text-light); margin-top:4px;">Minimum withdrawal: ${CONFIG.CURRENCY_SYMBOL}${minWithdraw.toFixed(2)}</div>
                         </div>
-                        <button type="submit" class="action-button" id="withdraw-submit-page">
+                        <button type="submit" class="action-button" id="withdraw-submit-page" style="display:flex; align-items:center; justify-content:center; gap:10px; width:100%; padding:16px; border:none; border-radius:var(--radius); background:var(--gradient); color:white; font-size:16px; font-weight:700; cursor:pointer; font-family:inherit; box-shadow:0 4px 15px rgba(var(--primary-color-rgb),0.2); transition:var(--transition);">
                             <span class="button-text">💸 Submit Withdrawal Request</span>
                             <div class="loader-spinner" style="display:none; width:20px; height:20px; border-width:3px; border:2px solid rgba(255,255,255,0.1); border-top-color:white; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
                         </button>
                     </form>
                 ` : `
-                    <div class="withdraw-rule-box" style="background:rgba(239,68,68,0.08); border-color:rgba(239,68,68,0.2);">
-                        <div class="rule-title" style="color:var(--danger);">❌ Cannot Withdraw</div>
-                        <div class="rule-text">
+                    <div class="withdraw-rule-box" style="background:rgba(239,68,68,0.08); border-color:rgba(239,68,68,0.2); padding:12px 14px; border-radius:10px; border:1px solid rgba(239,68,68,0.2); margin-bottom:14px;">
+                        <div class="rule-title" style="font-weight:700; font-size:14px; color:var(--danger); margin-bottom:4px;">❌ Cannot Withdraw</div>
+                        <div class="rule-text" style="font-size:13px; color:var(--text-light); line-height:1.5;">
                             ${!canWithdraw ? `You need ${requiredReferrals - referralCount} more referrals to withdraw.` : ''}
                             ${balance < minWithdraw ? `Minimum withdrawal is ${CONFIG.CURRENCY_SYMBOL}${minWithdraw.toFixed(2)}. You have ${CONFIG.CURRENCY_SYMBOL}${formatBalance(balance)}.` : ''}
                         </div>
@@ -5183,11 +2678,70 @@
         }
 
         // ============================================================
-        // UI UPDATE (with 24 Hour Countdown on Home)
+        // HELPER FUNCTIONS
         // ============================================================
-        let cooldownInterval;
-        let adCooldownInterval;
+        function safeAlert(msg) {
+            if (tg) tg.showAlert(msg);
+            else alert(msg);
+        }
 
+        function safeOpenLink(url) {
+            if (tg) tg.openLink(url);
+            else window.open(url, '_blank');
+        }
+
+        function safeOpenTelegramLink(url) {
+            if (tg) tg.openTelegramLink(url);
+            else window.open(url, '_blank');
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function showToast(msg, type = '') {
+            const container = document.querySelector('.toast-container') || (() => {
+                const c = document.createElement('div');
+                c.className = 'toast-container';
+                document.body.appendChild(c);
+                return c;
+            })();
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) modal.style.display = 'none';
+        }
+
+        function showModal(modalId, btn) {
+            if (isBanned) {
+                showToast('🚫 You are banned. Contact admin for support.', 'error');
+                return;
+            }
+            const modal = document.getElementById(modalId);
+            if (modal) modal.style.display = 'flex';
+        }
+
+        function getIpAddress() {
+            return fetch('https://api.ipify.org?format=json')
+                .then(res => res.json())
+                .then(data => data.ip)
+                .catch(() => null);
+        }
+
+        // ============================================================
+        // UI UPDATE
+        // ============================================================
         function updateUI() {
             if (state.cooldownUntil && new Date() >= new Date(state.cooldownUntil)) {
                 state.cooldownUntil = null;
@@ -5195,71 +2749,35 @@
                 saveUserData();
             }
             DOM.totalEarning.textContent = `${CONFIG.CURRENCY_SYMBOL}${formatBalance(state.balance)}`;
-            DOM.adCount.textContent = state.adCount;
-            DOM.adsTodayCount.textContent = `${state.adsWatchedToday} / ${CONFIG.DAILY_AD_LIMIT}`;
 
-            // ==== 24 Hour Countdown on Home ====
-            clearInterval(homeCountdownInterval);
-            if (state.dailyResetTime) {
-                const remaining = state.dailyResetTime - Date.now();
-                if (remaining > 0) {
-                    DOM.homeCountdown.classList.add('show');
-                    const updateHomeTimer = () => {
-                        const rem = state.dailyResetTime - Date.now();
-                        if (rem <= 0) {
-                            DOM.homeCountdown.classList.remove('show');
-                            return;
-                        }
-                        const hours = Math.floor(rem / (1000 * 60 * 60));
-                        const minutes = Math.floor((rem % (1000 * 60 * 60)) / (1000 * 60));
-                        const seconds = Math.floor((rem % (1000 * 60)) / 1000);
-                        DOM.homeCountdown.innerHTML = `
-                            <span class="countdown-label">⏳ Next ads available in:</span>
-                            <span class="countdown-time">${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}</span>
-                        `;
-                    };
-                    updateHomeTimer();
-                    homeCountdownInterval = setInterval(updateHomeTimer, 1000);
-                } else {
-                    DOM.homeCountdown.classList.remove('show');
-                }
-            } else {
-                DOM.homeCountdown.classList.remove('show');
+            // Update referral bonus
+            const bonusEarned = (state.rewardedReferrals || 0) * CONFIG.REFERRAL_REWARD;
+            DOM.referralCount.textContent = state.referralCount || 0;
+            DOM.referralBonus.textContent = `${CONFIG.CURRENCY_SYMBOL}${(bonusEarned * 80).toFixed(2)}`;
+
+            // Update referral link
+            const link = getReferralLink();
+            if (DOM.referralLinkDisplay) {
+                DOM.referralLinkDisplay.textContent = link;
+            }
+            if (DOM.inviteLinkDisplay) {
+                DOM.inviteLinkDisplay.textContent = link;
             }
 
-            clearInterval(cooldownInterval);
-            clearInterval(adCooldownInterval);
-
-            const now = Date.now();
-            const timeSinceLastAd = now - lastAdWatchTime;
-            const adCooldownMs = CONFIG.AD_COOLDOWN_MINUTES * 60 * 1000;
-            const isAdCooldownActive = timeSinceLastAd < adCooldownMs && lastAdWatchTime > 0;
-
-            const allTiers = state.tiers.filter(t => t.status !== 'inactive');
-            const allCompleted = allTiers.length > 0 && allTiers.every(t => {
-                const prog = state.tierProgress[t.id] || { watched: 0, claimed: false };
-                return prog.watched >= t.requiredAds && prog.claimed;
-            });
-
-            // Update Watch Ad Button
+            // Update watch ad badge
             if (state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT) {
-                DOM.watchAdBtn.disabled = true;
-                DOM.watchAdText.textContent = '⏳ Take a Break';
-                DOM.watchAdSub.textContent = 'Daily limit reached';
-            } else if (isAdCooldownActive) {
-                DOM.watchAdBtn.disabled = true;
-                const remaining = Math.ceil((adCooldownMs - (Date.now() - lastAdWatchTime)) / 1000);
-                DOM.watchAdText.textContent = `⏳ ${remaining}s`;
-                DOM.watchAdSub.textContent = 'Cooldown';
-            } else if (allCompleted || state.allTiersCompleted) {
-                DOM.watchAdBtn.disabled = true;
-                DOM.watchAdText.textContent = '✅ All Complete';
-                DOM.watchAdSub.textContent = 'Come back tomorrow';
+                DOM.watchAdBadge.textContent = '⏳ Limit Reached';
+                DOM.watchAdBadge.style.background = 'rgba(239,68,68,0.12)';
+                DOM.watchAdBadge.style.color = 'var(--danger)';
             } else {
-                DOM.watchAdBtn.disabled = false;
-                DOM.watchAdText.textContent = 'Watch Ad';
-                DOM.watchAdSub.textContent = `Earn ${CONFIG.CURRENCY_SYMBOL}${(CONFIG.AD_REWARD * 80).toFixed(2)} per ad`;
+                DOM.watchAdBadge.textContent = `Earn ${CONFIG.CURRENCY_SYMBOL}${(CONFIG.AD_REWARD * 80).toFixed(2)}`;
+                DOM.watchAdBadge.style.background = 'rgba(16,185,129,0.12)';
+                DOM.watchAdBadge.style.color = 'var(--success)';
             }
+
+            // Update task badge
+            const availableTasks = state.bonusTasks.filter(t => !state.completedBonusTasks.includes(t.id)).length;
+            DOM.taskBadge.textContent = availableTasks > 0 ? `${availableTasks} Available` : '✅ Completed';
 
             updateChart();
             updateSecurityBadge();
@@ -5414,23 +2932,17 @@
                 await processReferralRewards();
 
                 listenReferrals();
-                listenAds();
-                listenUserVerifications();
-                listenVerificationApprovals();
-                loadTiers();
 
                 if (user?.first_name) {
-                    DOM.greeting.textContent = `Welcome, ${escapeHTML(user.first_name)}!`;
-                    DOM.profilePic.innerHTML = `<span>${escapeHTML(user.first_name.charAt(0))}</span>`;
+                    const initial = user.first_name.charAt(0).toUpperCase();
+                    DOM.greeting.textContent = user.first_name;
+                    DOM.profileAvatar.textContent = initial;
                 }
 
                 state.currentIp = await getIpAddress();
 
                 document.addEventListener('click', (e) => {
-                    if (DOM.ratingToast.classList.contains('active') && !DOM.ratingToast.contains(e.target) && !e
-                        .target.closest('.action-btn.rate')) {
-                        DOM.ratingToast.classList.remove('active');
-                    }
+                    // Close modals if clicking outside
                 });
 
                 window.onclick = (event) => {
@@ -5498,3 +3010,4 @@
     </script>
 </body>
 </html>
+```
