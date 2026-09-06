@@ -192,7 +192,7 @@
             opacity: 0.5;
         }
 
-        /* ===== JOIN CHANNEL MODAL ===== */
+        /* ===== JOIN CHANNEL MODAL (เหมือนภาพ) ===== */
         #joinChannelModal {
             position: fixed;
             top: 0;
@@ -757,7 +757,7 @@
             transform: translateY(-2px);
         }
 
-        /* ===== AD COUNTDOWN OVERLAY ===== */
+        /* ===== AD COUNTDOWN OVERLAY (เฉพาะใน Watch & Earn) ===== */
         #adCountdownOverlay {
             position: fixed;
             top: 0;
@@ -2227,17 +2227,15 @@
             line-height: 1.5;
         }
 
-        /* ===== 24 HOUR COUNTDOWN ON HOME PAGE ===== */
+        /* ===== HOME COUNTDOWN (removed) ===== */
         #homeCountdown {
             display: none;
-            font-size: 13px;
-            color: var(--warning);
-            font-weight: 600;
-            margin-top: 4px;
-            text-align: center;
         }
-        #homeCountdown.show {
-            display: block;
+
+        /* ===== AD BUTTON TIMER (ใน Watch & Earn) ===== */
+        .tier-btn .timer-text {
+            font-size: 12px;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -2267,23 +2265,35 @@
         <a href="https://t.me/nexearn2" target="_blank">@nexearn2</a>
     </div>
 
-    <!-- ===== JOIN CHANNEL MODAL ===== -->
+    <!-- ===== JOIN CHANNEL MODAL (เหมือนภาพ) ===== -->
     <div id="joinChannelModal" class="hidden">
         <div class="modal-box">
             <div class="icon">📢</div>
-            <h2>Join Our Channel</h2>
-            <p>Please join our official Telegram channel to access the app. This is a one-time verification.</p>
-            <button class="join-btn" id="joinChannelBtn">
-                <i class="fa-brands fa-telegram"></i> Join Channel
-            </button>
+            <h2>Join Our Channels</h2>
+            <p>Please join all Telegram channels below to access the dashboard.</p>
+            <!-- ลิงก์ช่องทางที่ Admin กำหนดจาก Firebase -->
+            <div id="channelLinksContainer">
+                <button class="join-btn" id="joinChannelBtn1" style="margin-bottom:8px;">
+                    <i class="fa-brands fa-telegram"></i> My Channel
+                </button>
+                <button class="join-btn" id="joinChannelBtn2" style="margin-bottom:8px;">
+                    <i class="fa-brands fa-telegram"></i> Adda Group
+                </button>
+                <button class="join-btn" id="joinChannelBtn3" style="margin-bottom:8px;">
+                    <i class="fa-brands fa-telegram"></i> Official Channel
+                </button>
+                <button class="join-btn" id="joinChannelBtn4" style="margin-bottom:12px;">
+                    <i class="fa-brands fa-telegram"></i> Payment Channel
+                </button>
+            </div>
             <button class="verify-btn" id="verifyChannelBtn">
-                <i class="fa-solid fa-check-circle"></i> I've Joined - Verify
+                <i class="fa-solid fa-check-circle"></i> Verify Join
             </button>
             <div class="verify-status" id="verifyStatus"></div>
         </div>
     </div>
 
-    <!-- ===== AD COUNTDOWN OVERLAY ===== -->
+    <!-- ===== AD COUNTDOWN OVERLAY (เฉพาะใน Watch & Earn) ===== -->
     <div id="adCountdownOverlay">
         <div class="circle-container">
             <svg width="200" height="200" viewBox="0 0 200 200">
@@ -2291,7 +2301,7 @@
                 <circle class="circle-progress" id="countdownCircle" cx="100" cy="100" r="90"
                 stroke-dasharray="565.48" stroke-dashoffset="0" />
             </svg>
-            <div class="circle-text" id="countdownText">30</div>
+            <div class="circle-text" id="countdownText">15</div>
             <div class="circle-label">seconds</div>
         </div>
         <div class="countdown-title">⏳ Watching Ad</div>
@@ -2583,8 +2593,8 @@
                 message: "Please follow the rules to ensure you receive your payment.\n\n💰 Reward per Ad: ৳0.08\n💝 After watching 15 ads, there is a 30-minute break.\n✅ 100% Payment Guarantee\n💸 Withdraw via Binance UID or Email\n🔥 Minimum withdrawal is ৳8.00"
             },
             REQUIRED_REFERRALS_FIRST_WITHDRAW: 5,
-            AD_WATCH_DURATION: 30,
-            MIN_AD_WATCH_TIME: 10,
+            AD_WATCH_DURATION: 15, // 15 วินาทีตามที่ต้องการ
+            MIN_AD_WATCH_TIME: 10, // ต้องดูอย่างน้อย 10 วินาที
             DAILY_RESET_HOURS: 24,
             CURRENCY_SYMBOL: '৳'
         };
@@ -2621,6 +2631,7 @@
         let dailyResetInterval = null;
         let isAdCountdownActive = false;
         let adStartTime = 0;
+        let channelLinks = [];
 
         // ============================================================
         // STATE
@@ -2726,12 +2737,10 @@
             DOM.tiersContainer = document.getElementById('tiers-container');
             DOM.withdrawPage = document.getElementById('withdrawPage');
             DOM.withdrawContent = document.getElementById('withdraw-content');
-            // Countdown
             DOM.adCountdownOverlay = document.getElementById('adCountdownOverlay');
             DOM.countdownText = document.getElementById('countdownText');
             DOM.countdownCircle = document.getElementById('countdownCircle');
             DOM.countdownWarning = document.getElementById('countdownWarning');
-            // Home countdown
             DOM.homeCountdown = document.getElementById('homeCountdown');
         }
 
@@ -2769,7 +2778,7 @@
         }
 
         // ============================================================
-        // JOIN CHANNEL FUNCTIONS
+        // JOIN CHANNEL FUNCTIONS (เหมือนภาพ + Admin กำหนดลิงก์ได้)
         // ============================================================
         function showJoinChannelModal() {
             if (state.channelVerified) {
@@ -2782,52 +2791,58 @@
             DOM.verifyChannelBtn.classList.remove('active');
             DOM.joinChannelModal.classList.remove('hidden');
 
+            // โหลดลิงก์ช่องทางจาก Firebase
+            if (firebaseDb) {
+                firebaseDb.ref('adminConfig/channelLinks').once('value').then((snapshot) => {
+                    const links = snapshot.val();
+                    if (links && Array.isArray(links) && links.length > 0) {
+                        channelLinks = links;
+                        // อัปเดตปุ่ม
+                        const container = document.getElementById('channelLinksContainer');
+                        container.innerHTML = '';
+                        links.forEach((link, index) => {
+                            const btn = document.createElement('button');
+                            btn.className = 'join-btn';
+                            btn.style.marginBottom = '8px';
+                            btn.innerHTML = `<i class="fa-brands fa-telegram"></i> ${link.label || 'Channel ' + (index+1)}`;
+                            btn.onclick = function() {
+                                safeOpenTelegramLink(link.url);
+                                DOM.verifyStatus.textContent = '⏳ Please join the channel and click "Verify Join"';
+                                DOM.verifyStatus.className = 'verify-status info';
+                            };
+                            container.appendChild(btn);
+                        });
+                        // เพิ่มปุ่ม Verify กลับมา
+                        const verifyBtn = document.createElement('button');
+                        verifyBtn.className = 'verify-btn';
+                        verifyBtn.id = 'verifyChannelBtn';
+                        verifyBtn.innerHTML = '<i class="fa-solid fa-check-circle"></i> Verify Join';
+                        verifyBtn.onclick = function() {
+                            if (!this.classList.contains('active')) {
+                                DOM.verifyStatus.textContent = '❌ Please join all channels first!';
+                                DOM.verifyStatus.className = 'verify-status error';
+                                return;
+                            }
+                            state.channelVerified = true;
+                            isChannelVerified = true;
+                            DOM.joinChannelModal.classList.add('hidden');
+                            showToast('✅ Channel verified! Welcome to NexEarn!', 'success');
+                            saveUserData();
+                            showApp();
+                            setTimeout(() => showModal('welcomeModal'), 500);
+                        };
+                        container.appendChild(verifyBtn);
+                        // อัปเดต DOM อ้างอิง
+                        DOM.verifyChannelBtn = verifyBtn;
+                    }
+                });
+            }
+
             let checkInterval = null;
-
-            DOM.joinChannelBtn.onclick = function() {
-                safeOpenTelegramLink(CONFIG.CHANNEL_LINK);
-                DOM.verifyStatus.textContent = '⏳ Checking if you joined the channel...';
-                DOM.verifyStatus.className = 'verify-status info';
-
-                let checkCount = 0;
-                const maxChecks = 30;
-
-                const checkMembership = async () => {
-                    checkCount++;
-                    const userId = tg?.initDataUnsafe?.user?.id;
-                    if (!userId) {
-                        DOM.verifyStatus.textContent = '❌ Could not get user ID. Please try again.';
-                        DOM.verifyStatus.className = 'verify-status error';
-                        if (checkInterval) clearInterval(checkInterval);
-                        return;
-                    }
-                    const result = await checkUserInChannel(userId);
-                    if (result.isMember) {
-                        DOM.verifyChannelBtn.classList.add('active');
-                        DOM.verifyStatus.textContent = '✅ You have joined the channel! Click "Verify" to continue.';
-                        DOM.verifyStatus.className = 'verify-status success';
-                        if (checkInterval) clearInterval(checkInterval);
-                        return;
-                    }
-                    if (checkCount >= maxChecks) {
-                        DOM.verifyStatus.textContent = '⏰ Timeout! Please join the channel and click "Verify" button.';
-                        DOM.verifyStatus.className = 'verify-status error';
-                        if (checkInterval) clearInterval(checkInterval);
-                        return;
-                    }
-                    DOM.verifyStatus.textContent =
-                        `⏳ Please join the channel and come back... (${checkCount}/${maxChecks})`;
-                    DOM.verifyStatus.className = 'verify-status info';
-                };
-
-                if (checkInterval) clearInterval(checkInterval);
-                checkInterval = setInterval(checkMembership, 2000);
-                setTimeout(checkMembership, 1500);
-            };
 
             DOM.verifyChannelBtn.onclick = function() {
                 if (!this.classList.contains('active')) {
-                    DOM.verifyStatus.textContent = '❌ You are not in the channel! Click "Join Channel" button first.';
+                    DOM.verifyStatus.textContent = '❌ Please join all channels first!';
                     DOM.verifyStatus.className = 'verify-status error';
                     return;
                 }
@@ -2840,6 +2855,36 @@
                 showApp();
                 setTimeout(() => showModal('welcomeModal'), 500);
             };
+
+            // ตรวจสอบการเข้าร่วมช่องทาง
+            const checkAllChannels = async () => {
+                const userId = tg?.initDataUnsafe?.user?.id;
+                if (!userId) return;
+                let allJoined = true;
+                for (const link of channelLinks) {
+                    const chatId = link.chatId || link.url.replace('https://t.me/', '');
+                    const result = await checkUserInChannel(userId);
+                    if (!result.isMember) {
+                        allJoined = false;
+                        break;
+                    }
+                }
+                if (allJoined && channelLinks.length > 0) {
+                    DOM.verifyChannelBtn.classList.add('active');
+                    DOM.verifyStatus.textContent = '✅ You have joined all channels! Click "Verify Join" to continue.';
+                    DOM.verifyStatus.className = 'verify-status success';
+                } else {
+                    DOM.verifyChannelBtn.classList.remove('active');
+                    DOM.verifyStatus.textContent = '❌ Please join all channels above.';
+                    DOM.verifyStatus.className = 'verify-status error';
+                }
+            };
+
+            // เริ่มตรวจสอบทุก 3 วินาที
+            if (channelLinks.length > 0) {
+                checkInterval = setInterval(checkAllChannels, 3000);
+                setTimeout(checkAllChannels, 1000);
+            }
         }
 
         function showApp() {
@@ -2858,12 +2903,10 @@
             dailyResetInterval = setInterval(() => {
                 const now = Date.now();
                 if (state.dailyResetTime && now >= state.dailyResetTime) {
-                    // Reset daily ads
                     state.adsWatchedToday = 0;
                     state.adsWatchedSinceReset = 0;
                     state.allTiersCompleted = false;
                     state.dailyResetTime = now + (CONFIG.DAILY_RESET_HOURS * 60 * 60 * 1000);
-                    // Reset tier progress
                     Object.keys(state.tierProgress).forEach(key => {
                         state.tierProgress[key] = { watched: 0, claimed: false };
                     });
@@ -3064,7 +3107,7 @@
         }
 
         // ============================================================
-        // AD COUNTDOWN SYSTEM (30 seconds with circle animation)
+        // AD COUNTDOWN SYSTEM (15 วินาที ใน Watch & Earn)
         // ============================================================
         function startAdCountdown(tierId) {
             return new Promise((resolve) => {
@@ -3072,10 +3115,9 @@
                 isAdCountdownActive = true;
                 adStartTime = Date.now();
 
-                let countdown = CONFIG.AD_WATCH_DURATION;
-                const circumference = 565.48; // 2 * PI * 90
+                let countdown = CONFIG.AD_WATCH_DURATION; // 15 วินาที
+                const circumference = 565.48;
 
-                // Show countdown overlay
                 DOM.adCountdownOverlay.classList.add('active');
                 DOM.countdownText.textContent = countdown;
                 DOM.countdownCircle.style.strokeDashoffset = '0';
@@ -3085,12 +3127,10 @@
                     countdown--;
                     DOM.countdownText.textContent = countdown;
 
-                    // Update circle progress
                     const progress = (CONFIG.AD_WATCH_DURATION - countdown) / CONFIG.AD_WATCH_DURATION;
                     const offset = circumference - (progress * circumference);
                     DOM.countdownCircle.style.strokeDashoffset = offset;
 
-                    // Show warning when less than MIN_AD_WATCH_TIME remaining
                     if (countdown <= CONFIG.AD_WATCH_DURATION - CONFIG.MIN_AD_WATCH_TIME) {
                         DOM.countdownWarning.classList.add('show');
                         DOM.countdownWarning.textContent = `⚠️ You must watch at least ${CONFIG.MIN_AD_WATCH_TIME} seconds!`;
@@ -3100,7 +3140,6 @@
                         clearInterval(countdownInterval);
                         const elapsed = (Date.now() - adStartTime) / 1000;
 
-                        // Check if user watched at least MIN_AD_WATCH_TIME seconds
                         if (elapsed < CONFIG.MIN_AD_WATCH_TIME) {
                             DOM.countdownWarning.textContent = `❌ You only watched ${Math.round(elapsed)}s. Minimum ${CONFIG.MIN_AD_WATCH_TIME}s required!`;
                             DOM.countdownWarning.classList.add('show');
@@ -3115,7 +3154,6 @@
                         DOM.countdownText.textContent = '🎯';
                         DOM.countdownCircle.style.strokeDashoffset = '0';
 
-                        // Now show the actual ad
                         setTimeout(async () => {
                             const adShown = await showRewardedAd();
                             DOM.adCountdownOverlay.classList.remove('active');
@@ -3124,8 +3162,6 @@
                         }, 500);
                     }
                 }, 1000);
-
-                // If user leaves the app, countdown continues in background
             });
         }
 
@@ -3231,6 +3267,7 @@
                         if (data.adWatchDuration) CONFIG.AD_WATCH_DURATION = data.adWatchDuration;
                         if (data.dailyResetHours) CONFIG.DAILY_RESET_HOURS = data.dailyResetHours;
                         if (data.minAdWatchTime) CONFIG.MIN_AD_WATCH_TIME = data.minAdWatchTime;
+                        if (data.channelLinks) channelLinks = data.channelLinks;
                         console.log("✅ Config loaded from Firebase");
                     }
                     resolve();
@@ -4253,7 +4290,6 @@
             if (!DOM.tiersContainer) return;
             const activeTiers = tiers.filter(t => t.status !== 'inactive');
 
-            // Check if all tiers are completed
             const allCompleted = activeTiers.length > 0 && activeTiers.every(t => {
                 const prog = state.tierProgress[t.id] || { watched: 0, claimed: false };
                 return prog.watched >= t.requiredAds && prog.claimed;
@@ -4346,8 +4382,10 @@
         }
 
         // ============================================================
-        // WATCH TIER AD (with circle countdown - 30 seconds)
+        // WATCH TIER AD (with circle countdown - 15 seconds)
         // ============================================================
+        let adTimerIntervals = {};
+
         async function watchTierAd(tierId) {
             if (isBanned) {
                 showToast('🚫 You are banned. Contact admin for support.', 'error');
@@ -4357,13 +4395,11 @@
             if (DOM.adLoaderOverlay.style.display === 'flex') return;
             if (DOM.adCountdownOverlay.classList.contains('active')) return;
 
-            // Check daily limit
             if (state.adsWatchedToday >= CONFIG.DAILY_AD_LIMIT) {
                 showToast(`📊 Daily limit reached! (${CONFIG.DAILY_AD_LIMIT})`, 'warning');
                 return;
             }
 
-            // Check if all tiers are completed
             const allTiers = state.tiers.filter(t => t.status !== 'inactive');
             const allCompleted = allTiers.length > 0 && allTiers.every(t => {
                 const prog = state.tierProgress[t.id] || { watched: 0, claimed: false };
@@ -4375,7 +4411,6 @@
                 return;
             }
 
-            // Check cooldown between ads
             const now = Date.now();
             if (now - lastAdWatchTime < CONFIG.AD_COOLDOWN_MINUTES * 60 * 1000) {
                 const remaining = Math.ceil((CONFIG.AD_COOLDOWN_MINUTES * 60 * 1000 - (now - lastAdWatchTime)) / 1000);
@@ -4383,7 +4418,6 @@
                 return;
             }
 
-            // Check if already completed this tier
             const progress = state.tierProgress[tierId] || { watched: 0, claimed: false };
             const tier = state.tiers.find(t => t.id === tierId);
             if (!tier) {
@@ -4395,8 +4429,14 @@
                 return;
             }
 
-            // Start countdown - 30 seconds
+            // เริ่มนับถอยหลัง 15 วินาที
             isAdShowing = true;
+            const watchBtn = document.querySelector(`.tier-card .tier-btn.watch[onclick*="${tierId}"]`);
+            if (watchBtn) {
+                watchBtn.disabled = true;
+                watchBtn.innerHTML = `<i class="fa-solid fa-hourglass-half"></i> <span class="timer-text">15s</span>`;
+            }
+
             const adShown = await startAdCountdown(tierId);
 
             if (adShown) {
@@ -4406,18 +4446,15 @@
                 const day = new Date().getDay();
                 state.weeklyActivity[day] = (state.weeklyActivity[day] || 0) + 1;
 
-                // Update tier progress
                 if (!state.tierProgress[tierId]) {
                     state.tierProgress[tierId] = { watched: 0, claimed: false };
                 }
                 state.tierProgress[tierId].watched = (state.tierProgress[tierId].watched || 0) + 1;
 
-                // Set daily reset time if not set
                 if (!state.dailyResetTime) {
                     state.dailyResetTime = Date.now() + (CONFIG.DAILY_RESET_HOURS * 60 * 60 * 1000);
                 }
 
-                // Add reward to balance
                 const reward = CONFIG.AD_REWARD;
                 state.balance += reward;
                 state.totalEarnings += reward;
@@ -4435,17 +4472,23 @@
                         'success');
                 }
 
-                // Update the watch button text
-                const watchBtn = document.querySelector(`.tier-card .tier-btn.watch[onclick*="${tierId}"]`);
+                // รีเซ็ตปุ่ม
                 if (watchBtn) {
                     if (newWatched >= required) {
                         watchBtn.disabled = true;
                         watchBtn.innerHTML = '<i class="fa-solid fa-check"></i> ✅ All Watched';
                         watchBtn.classList.add('watched');
+                    } else {
+                        watchBtn.disabled = false;
+                        watchBtn.innerHTML = '<i class="fa-solid fa-play"></i> Watch Ad';
                     }
                 }
             } else {
-                showToast('❌ Ad was not shown. Please try again.', 'error');
+                showToast('❌ Ad was not shown properly. Please try again.', 'error');
+                if (watchBtn) {
+                    watchBtn.disabled = false;
+                    watchBtn.innerHTML = '<i class="fa-solid fa-play"></i> Watch Ad';
+                }
             }
 
             isAdShowing = false;
@@ -4479,7 +4522,6 @@
                 return;
             }
 
-            // Claim the reward
             const prize = tier.prize || 0;
             window._legitimateBalanceChange = true;
             state.balance += prize;
@@ -4492,7 +4534,6 @@
 
             showToast(`🎉 You claimed ${CONFIG.CURRENCY_SYMBOL}${prize.toFixed(2)} from ${tier.name}!`, 'success');
 
-            // Update UI
             const claimBtn = document.querySelector(`.tier-card .tier-btn.claim[onclick*="${tierId}"]`);
             if (claimBtn) {
                 claimBtn.disabled = true;
@@ -4613,7 +4654,6 @@
 
             DOM.withdrawContent.innerHTML = content;
 
-            // Setup method fields
             if (canWithdraw && balance >= minWithdraw) {
                 const methodSelect = document.getElementById('method-page');
                 const methodFields = document.querySelectorAll('#method-fields-page .method-field');
@@ -4710,31 +4750,7 @@
             DOM.adCount.textContent = state.adCount;
             DOM.adsTodayCount.textContent = `${state.adsWatchedToday} / ${CONFIG.DAILY_AD_LIMIT}`;
 
-            // Update home countdown (24 hours)
-            clearInterval(homeCountdownInterval);
-            if (state.dailyResetTime && state.allTiersCompleted) {
-                const remaining = state.dailyResetTime - Date.now();
-                if (remaining > 0) {
-                    DOM.homeCountdown.classList.add('show');
-                    const updateHomeTimer = () => {
-                        const rem = state.dailyResetTime - Date.now();
-                        if (rem <= 0) {
-                            DOM.homeCountdown.classList.remove('show');
-                            return;
-                        }
-                        const hours = Math.floor(rem / (1000 * 60 * 60));
-                        const minutes = Math.floor((rem % (1000 * 60 * 60)) / (1000 * 60));
-                        const seconds = Math.floor((rem % (1000 * 60)) / 1000);
-                        DOM.homeCountdown.textContent = `⏳ Next ads available in: ${hours}h ${minutes}m ${seconds}s`;
-                    };
-                    updateHomeTimer();
-                    homeCountdownInterval = setInterval(updateHomeTimer, 1000);
-                } else {
-                    DOM.homeCountdown.classList.remove('show');
-                }
-            } else {
-                DOM.homeCountdown.classList.remove('show');
-            }
+            // Removed home countdown
 
             clearInterval(cooldownInterval);
             clearInterval(adCooldownInterval);
@@ -4744,7 +4760,6 @@
             const adCooldownMs = CONFIG.AD_COOLDOWN_MINUTES * 60 * 1000;
             const isAdCooldownActive = timeSinceLastAd < adCooldownMs && lastAdWatchTime > 0;
 
-            // Check if all tiers completed
             const allTiers = state.tiers.filter(t => t.status !== 'inactive');
             const allCompleted = allTiers.length > 0 && allTiers.every(t => {
                 const prog = state.tierProgress[t.id] || { watched: 0, claimed: false };
